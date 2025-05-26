@@ -1,4 +1,4 @@
-# Intro2SE-23CLC06-Group07
+# Intro2SE-23CLC06-Group6
 
 ## Course Information
 
@@ -8,8 +8,8 @@
 
 ## Group Information
 
-- Class ID: **22CLC06**
-- Group ID: **7**
+- Class ID: **23CLC06**
+- Group ID: **6**
 - Group members:
 
 | Student ID | Full name             | Email                       |
