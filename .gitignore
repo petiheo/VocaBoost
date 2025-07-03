@@ -1,20 +1,20 @@
 # Dependencies
 /node_modules
-/client/node_modules
-/server/node_modules
+/frontend/node_modules
+/backend/node_modules
 /.pnp
 .pnp.js
 
 # Testing
 /coverage
-/client/coverage
-/server/coverage
+/frontend/coverage
+/backend/coverage
 
 # Production
 /build
-/client/build
+/frontend/build
 /dist
-/client/dist
+/frontend/dist
 
 # Environment variables
 .env
@@ -22,7 +22,7 @@
 .env.development.local
 .env.test.local
 .env.production.local
-/server/.env
+/backend/.env
 
 # Logs
 logs
