@@ -1,0 +1,36 @@
+@use '../Fonts' as *;
+
+.footer {
+    background-color: #241F1F;
+    margin-top: 10rem;
+    
+    grid-template-columns: repeat(2, 50%);
+
+    &-left {
+        grid-column: 1 / 2;
+        .logo {
+            margin: 2em 4em;
+            width: 100px;
+        }
+
+        .support-button-list {
+            margin-left: 4em;
+
+            display: flex;
+            gap: 20px ;
+
+            font-family: $font-jost;
+            font-size: 16px;
+
+            .about,
+            .carees,
+            .pres,
+            .custom-care,
+            .service {
+                color: white;
+                text-decoration: none;
+            }
+
+        }
+    }
+}

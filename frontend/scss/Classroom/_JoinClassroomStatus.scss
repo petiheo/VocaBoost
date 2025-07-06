@@ -1,0 +1,68 @@
+@use '../Fonts' as *;
+
+.join-classroom {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+//   &.confetti {
+//     background-image: url("/assets/confetti-bg.svg");
+//     background-size: cover;
+//   }
+
+//   &.error-bg {
+//     background-color: #ffeaea;
+//     background-image: url("/assets/error-icons.svg");
+//     background-repeat: repeat;
+//   }
+
+  &__card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    text-align: center;
+    max-width: 400px;
+    border: 1px solid #ddd;
+  }
+
+  &__header {
+    font-family: $font-lalezar;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  &__message {
+    font-family: $font-inriasans;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  &__code {
+    font-family: $font-inriasans;
+    font-weight: 600;
+    font-size: 1.2rem;
+    background: #eee;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+  }
+
+  &__button {
+    font-family: $font-inriasans;
+    background-color: #2b2112;
+    color: #fff;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #1e1811;
+    }
+  }
+}

@@ -1,0 +1,19 @@
+@use 'Fonts' as *;
+@use './Admin';
+@use './Auth';
+@use './Classroom';
+@use './Components';
+@use './Review';
+@use './Statistic';
+@use './User';
+@use './Vocabulary';
+
+
+* {
+  padding: 0 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0 0;
+}
