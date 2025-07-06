@@ -17,6 +17,13 @@ class AuthService {
     const expiredAt = new Date(Date.now() + ms(expiresIn));
     return await tokenModel.create(token, userId, tokenType, expiredAt);
   }
+
+  async validatePassword(password, hashedPassword) {
+    await bcrypt(password, hashedPassword, (error, res) => {
+      if (error) throw error;
+      return res;
+    });
+  }
 }
 
 module.exports = new AuthService();

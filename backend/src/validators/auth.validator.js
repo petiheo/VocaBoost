@@ -20,6 +20,16 @@ const authValidator = {
       .isIn(['learner', 'teacher'])
       .withMessage('Role must be learner or teacher'),
   ],
+
+  login: [
+    body('email')
+      .trim()
+      .notEmpty()
+      .isEmail()
+      .normalizeEmail()
+      .withMessage('Invalid email format'),
+    body('password').notEmpty().withMessage('Password must not be empty'),
+  ],
 };
 
 module.exports = authValidator;

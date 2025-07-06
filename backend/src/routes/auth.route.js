@@ -12,4 +12,11 @@ authRouter.post(
   authController.register
 );
 
+authRouter.post(
+  '/login',
+  rateLimiter,
+  authValidator.login,
+  authController.login
+);
+
 module.exports = authRouter;

@@ -56,6 +56,43 @@ class AuthController {
       });
     }
   }
+
+  async login(req, res) {
+    const { email, password } = req.body;
+
+    const userData = await authService.findUserByEmail(email);
+    if (!userData) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid email or password',
+      });
+    }
+
+    const isValidPassword = await authService.validatePassword(
+      password,
+      userData.password_hash
+    );
+    if (!isValidPassword) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid email or password',
+      });
+    }
+
+    if (user.status === 'inactive') {
+      return res.status(403).json({
+        success: false,
+        error: 'Account has been deactivated',
+      });
+    }
+
+    if (user.status === 'suspended') {
+      return res.status(403).json({
+        success: false,
+        error: 'Account has been suspended',
+      });
+    }
+  }
 }
 
 module.exports = new AuthController();
