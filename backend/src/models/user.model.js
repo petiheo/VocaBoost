@@ -4,12 +4,25 @@ class UserModel {
   async findByEmail(email) {
     const { data, error } = await supabase
       .from('users')
-      .select('*')
+      .select()
       .eq('email', email)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') throw error;
-    console.log('UserModel sài OK!');
+    if (error) throw error;
+    return data;
+  }
+
+  async create(email, hashedPassword, role) {
+    const { data, error } = await supabase
+      .from('users')
+      .insert({
+        email: email,
+        password_hash: hashedPassword,
+        role: role,
+      })
+      .select();
+
+    if (error) throw error;
     return data;
   }
 }

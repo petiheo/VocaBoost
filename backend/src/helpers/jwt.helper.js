@@ -1,34 +1,23 @@
 const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_EXPIRE = process.env.JWT_EXPIRE;
 
-function generateToken(payload) {
-  return jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE,
-  });
-}
+const generateToken = (payload) => {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRE });
+};
 
-function generateEmailVerificationToken(userId) {
+const generateEmailVerifyToken = (userId) => {
   return jwt.sign(
     {
       userId,
       type: 'email_verification',
     },
-    process.env.JWT_SECRET || 'vocaboost-secret-key',
-    {
-      expiresIn: '7d',
-    }
+    JWT_SECRET,
+    { expiresIn: '24h' }
   );
-}
-
-function verifyToken(token) {
-  try {
-    return jwt.verify(token, process.env.JWT_SECRET || 'vocaboost-secret-key');
-  } catch (error) {
-    throw new Error('Invalid token');
-  }
-}
+};
 
 module.exports = {
   generateToken,
-  generateEmailVerificationToken,
-  verifyToken,
+  generateEmailVerifyToken,
 };
