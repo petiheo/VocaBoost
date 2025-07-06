@@ -20,7 +20,8 @@ class UserModel {
         password_hash: hashedPassword,
         role: role,
       })
-      .select();
+      .select()
+      .single();
 
     if (error) throw error;
     return data;

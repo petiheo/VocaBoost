@@ -1,6 +1,9 @@
 const { auth } = require('../config/database');
 const authService = require('../services/auth.service');
-const { generateEmailVerifyToken } = require('../helpers/jwt.helper');
+const {
+  generateEmailVerificationToken,
+  generateToken,
+} = require('../helpers/jwt.helper');
 const emailService = require('../services/email.service');
 
 class AuthController {
@@ -17,20 +20,34 @@ class AuthController {
       }
 
       const userData = await authService.insertIntoUsers(email, password, role);
-      const verifyToken = generateEmailVerifyToken(userData.id);
+      const verificationToken = generateEmailVerificationToken(userData.id);
       await authService.insertIntoAuthTokens(
-        verifyToken,
+        verificationToken,
         userData.id,
         `email_verification`,
         '24h'
       );
+      await emailService.sendEmailVerification(email, verificationToken);
 
-      // Gui email xac thuc
+      const accessToken = generateToken({
+        userId: userData.id,
+        email,
+        role,
+      });
 
       return res.status(201).json({
         success: true,
         message:
           'Registration successful. Please check your email for verification.',
+        data: {
+          user: {
+            id: userData.id,
+            email,
+            role,
+            status: userData.account_status,
+          },
+          token: accessToken,
+        },
       });
     } catch (error) {
       return res.status(400).json({

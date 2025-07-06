@@ -6,7 +6,7 @@ const generateToken = (payload) => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRE });
 };
 
-const generateEmailVerifyToken = (userId) => {
+const generateEmailVerificationToken = (userId) => {
   return jwt.sign(
     {
       userId,
@@ -19,5 +19,5 @@ const generateEmailVerifyToken = (userId) => {
 
 module.exports = {
   generateToken,
-  generateEmailVerifyToken,
+  generateEmailVerificationToken,
 };
