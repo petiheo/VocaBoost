@@ -18,10 +18,10 @@
 
 # Environment variables
 .env
+.env.keys
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
+/frontend/.env
 /backend/.env
 
 # Logs
@@ -89,3 +89,6 @@ public/
 # Misc
 .DS_Store
 *.pem
+
+# Supabase
+.branches
