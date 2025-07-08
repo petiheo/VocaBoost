@@ -1,4 +1,3 @@
-const { auth } = require('../config/database');
 const authService = require('../services/auth.service');
 const {
   generateEmailVerificationToken,
@@ -7,6 +6,7 @@ const {
 const emailService = require('../services/email.service');
 
 class AuthController {
+  // TODO: Render HTML bằng Pug, chuyển logic chính sang service
   async register(req, res) {
     try {
       const { email, password, role = 'learner' } = req.body;
@@ -57,6 +57,7 @@ class AuthController {
     }
   }
 
+  // TODO: Chuyển logic chính sang service, thêm attemp tracker (optional)
   async login(req, res) {
     const { email, password } = req.body;
 
@@ -79,19 +80,39 @@ class AuthController {
       });
     }
 
-    if (user.status === 'inactive') {
+    if (userData.account_status === 'inactive') {
       return res.status(403).json({
         success: false,
         error: 'Account has been deactivated',
       });
     }
 
-    if (user.status === 'suspended') {
+    if (userData.account_status === 'suspended') {
       return res.status(403).json({
         success: false,
         error: 'Account has been suspended',
       });
     }
+
+    const accessToken = generateToken({
+      userID: userData.id,
+      email,
+      role: userData.role,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        user: {
+          id: userData.id,
+          email,
+          role: userData.role,
+          avataUrl: userData.avatar_url,
+        },
+        token: accessToken,
+      },
+    });
   }
 }
 
