@@ -16,8 +16,6 @@ CREATE TABLE IF NOT EXISTS public.users (
     account_status public.user_status NOT NULL DEFAULT 'active',
     email_verified BOOLEAN DEFAULT FALSE,
     password_changed_at TIMESTAMPTZ,
-    deactivated_at TIMESTAMPTZ,
-    deactivation_reason TEXT,
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );

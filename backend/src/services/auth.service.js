@@ -19,10 +19,7 @@ class AuthService {
   }
 
   async validatePassword(password, hashedPassword) {
-    await bcrypt(password, hashedPassword, (error, res) => {
-      if (error) throw error;
-      return res;
-    });
+    return await bcrypt.compare(password, hashedPassword);
   }
 }
 
