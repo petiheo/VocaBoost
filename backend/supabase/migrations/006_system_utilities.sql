@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id UUID,
     action TEXT NOT NULL,
-    target_type TEXT,
+    target_type TEXT, -- crud, Actions
     target_id TEXT,
     details JSONB,
     ip_address INET,

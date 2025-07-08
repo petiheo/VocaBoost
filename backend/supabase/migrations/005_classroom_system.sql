@@ -39,11 +39,9 @@ CREATE TABLE IF NOT EXISTS public.assignments (
     vocab_list_id UUID NOT NULL,
     teacher_id UUID NOT NULL,
     title TEXT NOT NULL,
-    instructions TEXT,
     exercise_method TEXT NOT NULL, -- 'flashcard', 'fill_blank', 'word_association'
-    words_per_review INT DEFAULT 10,
-    sublist_count INT DEFAULT 1,
-    estimated_duration INTEGER, -- In minutes
+    words_per_review INT,
+    sublist_count INT,
     start_date TIMESTAMPTZ DEFAULT now() NOT NULL,
     due_date TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
@@ -54,7 +52,7 @@ CREATE TABLE IF NOT EXISTS public.assignments (
 CREATE TABLE IF NOT EXISTS public.assignment_sublists (
     assignment_id UUID NOT NULL,
     sublist_index INT NOT NULL,
-    vocab_list_id UUID NOT NULL,
+    vocab_list_id UUID NOT NULL, -- (cloned vocab list)
     PRIMARY KEY (assignment_id, sublist_index)
 );
 
