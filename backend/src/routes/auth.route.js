@@ -19,4 +19,13 @@ authRouter.post(
   authController.login
 );
 
+authRouter.post('/logout', rateLimiter, authController.logout);
+
+authRouter.post(
+  '/forgot-password',
+  rateLimiter,
+  authValidator.email,
+  authController.forgotPassword
+);
+
 module.exports = authRouter;

@@ -1,6 +1,6 @@
 const userModel = require('../models/user.model');
 const bcrypt = require('bcryptjs');
-const tokenModel = require('../models/authToken.model');
+const AuthToken = require('../models/authToken.model');
 const ms = require('ms');
 
 class AuthService {
@@ -15,7 +15,7 @@ class AuthService {
 
   async insertIntoAuthTokens(token, userId, tokenType, expiresIn) {
     const expiredAt = new Date(Date.now() + ms(expiresIn));
-    return await tokenModel.create(token, userId, tokenType, expiredAt);
+    return await AuthToken.create(token, userId, tokenType, expiredAt);
   }
 
   async validatePassword(password, hashedPassword) {

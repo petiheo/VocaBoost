@@ -1,9 +1,9 @@
 const supabase = require('../config/database');
 
 class AuthToken {
-  async create(token, userId, tokenType, expiresAt) {
-    const { data, error } = supabase
-      .from('tokens')
+  static async create(token, userId, tokenType, expiresAt) {
+    const { data, error } = await supabase
+      .from('auth_tokens')
       .insert({
         token: token,
         user_id: userId,
@@ -17,4 +17,4 @@ class AuthToken {
   }
 }
 
-module.exports = new AuthToken();
+module.exports = AuthToken;

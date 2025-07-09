@@ -1,7 +1,8 @@
 const authService = require('../services/auth.service');
 const {
-  generateEmailVerificationToken,
   generateToken,
+  generateEmailVerificationToken,
+  generateResetToken,
 } = require('../helpers/jwt.helper');
 const emailService = require('../services/email.service');
 
@@ -13,7 +14,7 @@ class AuthController {
 
       const isExistEmail = await authService.findUserByEmail(email);
       if (isExistEmail) {
-        return res.status(400).json({
+        return res.status(409).json({
           success: false,
           message: 'Email already registered',
         });
@@ -50,69 +51,129 @@ class AuthController {
         },
       });
     } catch (error) {
+      console.error('Register error: ', error);
       return res.status(400).json({
         success: false,
-        message: error,
+        message: 'Registration failed',
       });
     }
   }
 
-  // TODO: Chuyển logic chính sang service, thêm attemp tracker (optional)
+  // TODO: Chuyển logic chính sang service, thêm login attemp (optional), update last login
   async login(req, res) {
-    const { email, password } = req.body;
+    try {
+      const { email, password } = req.body;
 
-    const userData = await authService.findUserByEmail(email);
-    if (!userData) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid email or password',
+      const userData = await authService.findUserByEmail(email);
+      if (!userData) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid email or password',
+        });
+      }
+
+      const isValidPassword = await authService.validatePassword(
+        password,
+        userData.password_hash
+      );
+      if (!isValidPassword) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid email or password',
+        });
+      }
+
+      if (userData.account_status === 'inactive') {
+        return res.status(403).json({
+          success: false,
+          error: 'Account has been deactivated',
+        });
+      }
+
+      if (userData.account_status === 'suspended') {
+        return res.status(403).json({
+          success: false,
+          error: 'Account has been suspended',
+        });
+      }
+
+      const accessToken = generateToken({
+        userID: userData.id,
+        email,
+        role: userData.role,
       });
-    }
 
-    const isValidPassword = await authService.validatePassword(
-      password,
-      userData.password_hash
-    );
-    if (!isValidPassword) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid email or password',
-      });
-    }
-
-    if (userData.account_status === 'inactive') {
-      return res.status(403).json({
-        success: false,
-        error: 'Account has been deactivated',
-      });
-    }
-
-    if (userData.account_status === 'suspended') {
-      return res.status(403).json({
-        success: false,
-        error: 'Account has been suspended',
-      });
-    }
-
-    const accessToken = generateToken({
-      userID: userData.id,
-      email,
-      role: userData.role,
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: 'Login successful',
-      data: {
-        user: {
-          id: userData.id,
-          email,
-          role: userData.role,
-          avataUrl: userData.avatar_url,
+      return res.status(200).json({
+        success: true,
+        message: 'Login successful',
+        data: {
+          user: {
+            id: userData.id,
+            email,
+            role: userData.role,
+            avataUrl: userData.avatar_url,
+          },
+          token: accessToken,
         },
-        token: accessToken,
-      },
-    });
+      });
+    } catch (error) {
+      console.error('Login error: ', error);
+      return res.status(400).json({
+        success: false,
+        message: 'Login failed',
+      });
+    }
+  }
+
+  // TODO: frontend sẽ xử lý xóa JWT, sau này có thể triển khai thêm blacklist token
+  async logout(req, res) {
+    try {
+      return res.status(200).json({
+        success: true,
+        message: 'Logout successful',
+      });
+    } catch (error) {
+      console.error('Logout error: ', error);
+      return res.status(400).json({
+        success: false,
+        message: 'Logout failed',
+      });
+    }
+  }
+
+  // TODO: chú ý trường hợp xử lý tài khoản Google sau này
+  async forgotPassword(req, res) {
+    try {
+      const { email } = req.body;
+
+      const userData = await authService.findUserByEmail(email);
+      if (!userData) {
+        return res.status(404).json({
+          success: false,
+          message: 'Email not found',
+        });
+      }
+
+      const resetToken = generateResetToken(userData.id);
+      await authService.insertIntoAuthTokens(
+        resetToken,
+        userData.id,
+        'password_reset',
+        '15m'
+      );
+      await emailService.sendPasswordReset(email, resetToken);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Password reset instructions sent to your email',
+      });
+    } catch (error) {
+      console.error('Forgot password error: ', error);
+      return res.status(400).json({
+        success: false,
+        message: 'Forgot password failed',
+      });
+    }
   }
 }
 
