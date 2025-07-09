@@ -34,6 +34,20 @@ class EmailService {
       throw error;
     }
   }
+
+  async sendPasswordReset(to, resetToken) {
+    try {
+      await this.transporter.sendMail({
+        from: `"VocaBoost" <${process.env.FROM_EMAIL}>`,
+        to,
+        subject: 'VocaBoost - Reset Password',
+        html: `<a href="${process.env.FRONTEND_URL}/reset-password?token=${resetToken}"> Reset Password </a>`,
+        text: `Reset password at: ${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new EmailService();

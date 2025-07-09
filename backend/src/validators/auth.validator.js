@@ -1,5 +1,4 @@
 const { body, validationResult } = require('express-validator');
-const { register } = require('../controllers/auth.controller');
 
 const authValidator = {
   register: [
@@ -29,6 +28,15 @@ const authValidator = {
       .normalizeEmail()
       .withMessage('Invalid email format'),
     body('password').notEmpty().withMessage('Password must not be empty'),
+  ],
+
+  email: [
+    body('email')
+      .trim()
+      .notEmpty()
+      .isEmail()
+      .normalizeEmail()
+      .withMessage('Invalid email format'),
   ],
 };
 

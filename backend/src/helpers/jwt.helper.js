@@ -17,7 +17,19 @@ const generateEmailVerificationToken = (userId) => {
   );
 };
 
+const generateResetToken = (userId) => {
+  return jwt.sign(
+    {
+      userId,
+      type: 'password_reset',
+    },
+    JWT_SECRET,
+    { expiresIn: '15m' }
+  );
+};
+
 module.exports = {
   generateToken,
   generateEmailVerificationToken,
+  generateResetToken,
 };
