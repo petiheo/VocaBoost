@@ -1,0 +1,332 @@
+const vocabularyService = require('../services/vocabulary.service'); 
+
+class VocabularyController {
+    // Vocab List
+    async createList(req, res) {
+        try {
+        const { title, description, privacy_setting, tags } = req.body;
+        const creatorId = req.user.userId; // Assuming authMiddleware provides this
+
+        const newList = await vocabularyService.createList(
+            { title, description, privacy_setting, tags },
+            creatorId
+        );
+
+        return res.status(201).json({
+            success: true,
+            message: 'Vocabulary list created successfully.',
+            data: {
+            list: newList,
+            },
+        });
+        } catch (error) {
+        if (error.isValidationError) {
+            return res.status(400).json({ success: false, errors: error.errors });
+        }
+        return res
+            .status(500)
+            .json({ success: false, error: 'Internal server error' });
+        }
+    }
+
+    async getUserLists(req, res) {
+        try {
+        const userId = req.user.userId;
+        const { q, privacy, sortBy, page, limit } = req.query;
+
+        const result = await vocabularyService.findUserLists(userId, {
+            q,
+            privacy,
+            sortBy,
+            page,
+            limit,
+        });
+
+        return res.status(200).json({
+            success: true,
+            data: {
+            lists: result.lists,
+            },
+            pagination: result.pagination,
+        });
+        } catch (error) {
+        return res
+            .status(500)
+            .json({ success: false, error: 'Internal server error' });
+        }
+    }
+
+    async searchPublicLists(req, res) {
+        try {
+        const { q, tags, sortBy, page, limit } = req.query;
+        const result = await vocabularyService.searchPublicLists({
+            q,
+            tags,
+            sortBy,
+            page,
+            limit,
+        });
+
+        return res.status(200).json({
+            success: true,
+            data: {
+            lists: result.lists,
+            },
+            pagination: result.pagination,
+        });
+        } catch (error) {
+        return res
+            .status(500)
+            .json({ success: false, error: 'Internal server error' });
+        }
+    }
+
+    async getListById(req, res) {
+        try {
+        const { listId } = req.params;
+        const userId = req.user.userId; // For permission checks in the service
+        const list = await vocabularyService.findListById(listId, userId);
+
+        if (!list) {
+            return res
+            .status(404)
+            .json({ success: false, error: 'Resource not found.' });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: { list },
+        });
+        } catch (error) {
+        if (error.isForbidden) {
+            return res.status(403).json({
+            success: false,
+            error: 'Forbidden: You do not have permission to perform this action.',
+            });
+        }
+        return res
+            .status(500)
+            .json({ success: false, error: 'Internal server error' });
+        }
+    }
+
+    async updateList(req, res) {
+        try {
+        const { listId } = req.params;
+        const userId = req.user.userId;
+        const updateData = req.body;
+
+        const updatedList = await vocabularyService.updateList(
+            listId,
+            userId,
+            updateData
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: 'Vocabulary list updated successfully.',
+            data: { list: updatedList },
+        });
+        } catch (error) {
+        if (error.isForbidden) {
+            return res.status(403).json({
+            success: false,
+            error: 'Forbidden: You do not have permission to perform this action.',
+            });
+        }
+        if (error.isValidationError) {
+            return res.status(400).json({ success: false, errors: error.errors });
+        }
+        return res
+            .status(500)
+            .json({ success: false, error: 'Internal server error' });
+        }
+    }
+
+    async deleteList(req, res) {
+        try {
+        const { listId } = req.params;
+        const userId = req.user.userId;
+
+        await vocabularyService.deleteList(listId, userId);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Vocabulary list deleted successfully.',
+        });
+        } catch (error) {
+        if (error.isForbidden) {
+            return res.status(403).json({
+            success: false,
+            error: 'Forbidden: You do not have permission to perform this action.',
+            });
+        }
+        return res
+            .status(500)
+            .json({ success: false, error: 'Internal server error' });
+        }
+    }
+
+    // Vocabulary
+    async createWord(req, res) {
+        try {
+        const { listId, term, definition, phonetics } = req.body;
+        const userId = req.user.userId;
+
+        const newWord = await vocabularyService.createWord(
+            listId,
+            { term, definition, phonetics },
+            userId
+        );
+
+        return res.status(201).json({
+            success: true,
+            message: 'Word added successfully.',
+            data: { word: newWord },
+        });
+        } catch (error) {
+        if (error.isForbidden) {
+            return res.status(403).json({
+            success: false,
+            error: 'Forbidden: You do not have permission to perform this action.',
+            });
+        }
+        return res
+            .status(500)
+            .json({ success: false, error: 'Internal server error' });
+        }
+    }
+
+    async createWordsBulk(req, res) {
+        try {
+        const { listId, words } = req.body;
+        const userId = req.user.userId;
+
+        const result = await vocabularyService.createWordsBulk(
+            listId,
+            words,
+            userId
+        );
+
+        return res.status(201).json({
+            success: true,
+            message: 'Bulk operation completed.',
+            data: result,
+        });
+        } catch (error) {
+        if (error.isForbidden) {
+            return res.status(403).json({
+            success: false,
+            error: 'Forbidden: You do not have permission to perform this action.',
+            });
+        }
+        return res
+            .status(500)
+            .json({ success: false, error: 'Internal server error' });
+        }
+    }
+
+    async updateWord(req, res) {
+        try {
+        const { wordId } = req.params;
+        const userId = req.user.userId;
+        const updateData = req.body;
+
+        const updatedWord = await vocabularyService.updateWord(
+            wordId,
+            userId,
+            updateData
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: 'Word updated successfully.',
+            data: { word: updatedWord },
+        });
+        } catch (error) {
+        if (error.isForbidden) {
+            return res.status(403).json({
+            success: false,
+            error: 'Forbidden: You do not have permission to perform this action.',
+            });
+        }
+        return res
+            .status(500)
+            .json({ success: false, error: 'Internal server error' });
+        }
+    }
+
+    async deleteWord(req, res) {
+        try {
+        const { wordId } = req.params;
+        const userId = req.user.userId;
+
+        await vocabularyService.deleteWord(wordId, userId);
+
+        return res
+            .status(200)
+            .json({ success: true, message: 'Word deleted successfully.' });
+        } catch (error) {
+        if (error.isForbidden) {
+            return res.status(403).json({
+            success: false,
+            error: 'Forbidden: You do not have permission to perform this action.',
+            });
+        }
+        return res
+            .status(500)
+            .json({ success: false, error: 'Internal server error' });
+        }
+    }
+
+    async getWordsByListId(req, res) {
+        try {
+        const { listId } = req.params;
+        const { page, limit } = req.query;
+        const userId = req.user.userId;
+
+        const result = await vocabularyService.findWordsByListId(listId, userId, {
+            page,
+            limit,
+        });
+
+        if (!result) {
+            return res
+            .status(404)
+            .json({ success: false, error: 'Resource not found.' });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: { words: result.words },
+            pagination: result.pagination,
+        });
+        } catch (error) {
+        if (error.isForbidden) {
+            return res.status(403).json({
+            success: false,
+            error: 'Forbidden: You do not have permission to perform this action.',
+            });
+        }
+        return res
+            .status(500)
+            .json({ success: false, error: 'Internal server error' });
+        }
+    }
+
+    async getAllTags(req, res) {
+        try {
+        const tags = await vocabularyService.findAllTags();
+        return res.status(200).json({
+            success: true,
+            data: { tags },
+        });
+        } catch (error) {
+        return res
+            .status(500)
+            .json({ success: false, error: 'Internal server error' });
+        }
+    }
+}
+
+module.exports = new VocabularyController();
