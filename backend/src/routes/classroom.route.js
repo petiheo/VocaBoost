@@ -53,6 +53,12 @@ classroomRouter.get('/:classroomId/learners',
   classroomController.getJoinedLearners
 );
 
+classroomRouter.post('/:classroomId/remove-learner',
+  hasClassroomAccess,
+  requireClassRole('teacher'),
+  classroomController.removeLearner
+);
+
 
 
 module.exports = classroomRouter;

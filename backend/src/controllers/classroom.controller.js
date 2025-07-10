@@ -145,11 +145,11 @@ class ClassroomController {
     try {
       const classroomId = req.classroom.id;
 
-      await classroomService.approveAllJoinRequests(classroomId);
+      const result = await classroomService.approveAllJoinRequests(classroomId);
 
       return res.status(200).json({
         success: true,
-        message: 'All pending join requests have been approved.',
+        message: `Approved ${result} learners.`,
       });
     } catch (err) {
       return res.status(500).json({
@@ -173,6 +173,32 @@ class ClassroomController {
       return res.status(500).json({
         success: false,
         message: 'Failed to fetch learner list.',
+      });
+    }
+  }
+
+  async removeLearner(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const { learnerId } = req.body;
+
+      if (!learnerId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing learnerId in request body.',
+        });
+      }
+
+      await classroomService.removeLearner(classroomId, learnerId);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Learner has been removed from the classroom.',
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to remove learner.',
       });
     }
   }

@@ -28,7 +28,7 @@ class ClassroomModel {
 
         if (error) throw error;
         return !!data;
-    };
+    }
 
     async findByTeacherId(teacherId) {
         const { data, error } = await supabase

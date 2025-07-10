@@ -46,6 +46,10 @@ class ClassroomService {
       }
     }
 
+    if (classroom.learner_count >= classroom.capacity_limit) {
+        throw new Error('This classroom has reached its capacity limit.');
+    }
+
     await classroomModel.createJoinRequest(classroom.id, user.userId, user.email);
 
     const isAuto = classroom.is_auto_approval_enabled;
@@ -54,6 +58,7 @@ class ClassroomService {
         join_status: 'joined',
         joined_at: new Date().toISOString(),
         });
+
         return { autoApproved: true };
     }
 
@@ -66,6 +71,7 @@ class ClassroomService {
 
   async approveJoinRequest(classroomId, learnerId) {
     const learner = await classroomModel.findMemberStatus(classroomId, learnerId);
+    const classroom = await classroomModel.getClassroomById(classroomId);
 
     if (!learner) {
       throw new Error('Learner is not part of this classroom.');
@@ -75,7 +81,11 @@ class ClassroomService {
       throw new Error('Learner is not in pending request state.');
     }
 
-    await classroomModel.updateLearnerStatus(classroomId, learnerId, {
+    if (classroom.learner_count >= classroom.capacity_limit) {
+      throw new Error('Classroom is full. Cannot approve more learners.');
+    }
+
+    await classroomModel.updateLearnerStatus(classroom.id, learnerId, {
       join_status: 'joined',
       joined_at: new Date().toISOString(),
     });
@@ -96,13 +106,45 @@ class ClassroomService {
         join_status: 'rejected',
     });
   }
-  
+
   async approveAllJoinRequests(classroomId) {
-    await classroomModel.approveAllPendingRequests(classroomId);
+    const classroom = await classroomModel.getClassroomById(classroomId);
+    const currentCount = classroom.learner_count;
+    const availableSlots = classroom.capacity_limit - currentCount;
+    let approvedCount = 0;
+
+    const pendingList = await classroomModel.getPendingJoinRequests(classroomId);
+
+    for (const learner of pendingList.slice(0, availableSlots)) {
+      await classroomModel.updateLearnerStatus(classroomId, learner.learner_id, {
+        join_status: 'joined',
+        joined_at: new Date().toISOString()
+      });
+
+      approvedCount++;
+    }
+    return approvedCount;
   }
 
   async getJoinedLearners(classroomId) {
     return await classroomModel.getJoinedLearners(classroomId);
+  }
+
+  async removeLearner(classroomId, learnerId) {
+    const learner = await classroomModel.findMemberStatus(classroomId, learnerId);
+
+    if (!learner) {
+      throw new Error('Learner is not found in this classroom.');
+    }
+
+    if (learner.join_status !== 'joined') {
+      throw new Error('Cannot remove learner who is not currently in the class.');
+    }
+
+    await classroomModel.updateLearnerStatus(classroomId, learnerId, {
+      join_status: 'rejected',
+      left_at: new Date().toISOString()
+    });
   }
 }
 
