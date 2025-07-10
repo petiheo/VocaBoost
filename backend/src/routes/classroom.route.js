@@ -42,4 +42,17 @@ classroomRouter.post('/:classroomId/reject-request',
   classroomController.rejectJoinRequest
 );
 
+classroomRouter.post('/:classroomId/approve-all',
+  hasClassroomAccess,
+  requireClassRole('teacher'),
+  classroomController.approveAllJoinRequests
+);
+
+classroomRouter.get('/:classroomId/learners',
+  hasClassroomAccess,
+  classroomController.getJoinedLearners
+);
+
+
+
 module.exports = classroomRouter;

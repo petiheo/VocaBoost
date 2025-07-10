@@ -54,10 +54,13 @@ class ClassroomController {
         return res.status(400).json({ success: false, message: 'Join code is required.' });
       }
 
-      await classroomService.handleJoinRequestByCode(joinCode, user);
-      return res.status(200).json({ 
-        success: true, 
-        message: 'Join request submitted.' 
+      const result = await classroomService.handleJoinRequestByCode(joinCode, user);
+
+      return res.status(200).json({
+        success: true,
+        message: result.autoApproved
+          ? 'You have joined the classroom.'
+          : 'Join request submitted. Please wait for approval.',
       });
     } catch (error) {
       return res.status(400).json({ 
@@ -134,6 +137,42 @@ class ClassroomController {
       return res.status(400).json({
         success: false,
         message: err.message || 'Failed to reject join request.',
+      });
+    }
+  }
+
+  async approveAllJoinRequests(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+
+      await classroomService.approveAllJoinRequests(classroomId);
+
+      return res.status(200).json({
+        success: true,
+        message: 'All pending join requests have been approved.',
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to approve join requests.',
+      });
+    }
+  }
+
+  async getJoinedLearners(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+
+      const learners = await classroomService.getJoinedLearners(classroomId);
+
+      return res.status(200).json({
+        success: true,
+        data: learners,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch learner list.',
       });
     }
   }

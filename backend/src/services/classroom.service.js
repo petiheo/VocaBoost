@@ -28,6 +28,10 @@ class ClassroomService {
       throw new Error('Classroom not found or has been deleted.');
     }
 
+    if (classroom.classroom_status === 'private') {
+      throw new Error('This classroom is private. You must be invited by the teacher.');
+    }
+
     if (classroom.teacher_id === user.userId) {
       throw new Error('You are the owner of this classroom.');
     }
@@ -43,6 +47,17 @@ class ClassroomService {
     }
 
     await classroomModel.createJoinRequest(classroom.id, user.userId, user.email);
+
+    const isAuto = classroom.is_auto_approval_enabled;
+    if (isAuto) {
+        await classroomModel.updateLearnerStatus(classroom.id, user.userId, {
+        join_status: 'joined',
+        joined_at: new Date().toISOString(),
+        });
+        return { autoApproved: true };
+    }
+
+    return { autoApproved: false };
   }
 
   async getPendingJoinRequests(classroomId) {
@@ -80,6 +95,14 @@ class ClassroomService {
     await classroomModel.updateLearnerStatus(classroomId, learnerId, {
         join_status: 'rejected',
     });
+  }
+  
+  async approveAllJoinRequests(classroomId) {
+    await classroomModel.approveAllPendingRequests(classroomId);
+  }
+
+  async getJoinedLearners(classroomId) {
+    return await classroomModel.getJoinedLearners(classroomId);
   }
 }
 

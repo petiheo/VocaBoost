@@ -129,6 +129,40 @@ class ClassroomModel {
 
         if (error) throw error;
     }
+
+    async approveAllPendingRequests(classroomId) {
+        const now = new Date().toISOString();
+
+        const { error } = await supabase
+            .from('classroom_members')
+            .update({
+            join_status: 'joined',
+            joined_at: now,
+            })
+            .eq('classroom_id', classroomId)
+            .eq('join_status', 'pending_request');
+
+        if (error) throw error;
+    }
+
+    async getJoinedLearners(classroomId) {
+        const { data, error } = await supabase
+            .from('classroom_members')
+            .select(`
+            learner_id,
+            email,
+            joined_at,
+            users (
+                display_name,
+                avatar_url
+            )
+            `)
+            .eq('classroom_id', classroomId)
+            .eq('join_status', 'joined');
+
+        if (error) throw error;
+        return data;
+    }
 }
 
 module.exports = new ClassroomModel();
