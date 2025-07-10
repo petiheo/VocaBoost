@@ -32,7 +32,7 @@ class ClassroomController {
       const { userId } = req.user;
 
       const classrooms = await classroomService.getClassroomsByTeacherId(userId);
-      
+
       return res.status(200).json({ 
         success: true, 
         data: classrooms 
@@ -63,6 +63,25 @@ class ClassroomController {
       return res.status(400).json({ 
         success: false, 
         message: error.message 
+      });
+    }
+  }
+
+  async getPendingJoinRequests(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+
+      const pendingRequests = await classroomService.getPendingJoinRequests(classroomId);
+
+      return res.status(200).json({
+        success: true,
+        data: pendingRequests,
+      });
+    } catch (err) {
+      console.error('Error getting join requests:', err);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch join requests.',
       });
     }
   }

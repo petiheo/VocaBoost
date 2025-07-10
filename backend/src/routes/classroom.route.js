@@ -3,7 +3,7 @@ classroomRouter = express.Router();
 
 const classroomValidator = require('../validators/classroom.validator');
 const classroomController = require('../controllers/classroom.controller');
-const { requireRole } = require('../middlewares/authorize.middleware');
+const { requireRole, hasClassroomAccess } = require('../middlewares/authorize.middleware');
 const authenticate = require('../middlewares/auth.middleware');
 
 classroomRouter.use(authenticate);
@@ -22,6 +22,12 @@ classroomRouter.get('/my-classrooms',
 
 classroomRouter.post('/join-request',
   classroomController.requestJoinByCode
+);
+
+classroomRouter.get('/:classroomId/join-requests',
+  requireRole('teacher'),
+  hasClassroomAccess,
+  classroomController.getPendingJoinRequests
 );
 
 module.exports = classroomRouter;

@@ -44,6 +44,10 @@ class ClassroomService {
 
     await classroomModel.createJoinRequest(classroom.id, user.userId, user.email);
   }
+
+  async getPendingJoinRequests(classroomId) {
+    return await classroomModel.getPendingJoinRequests(classroomId);
+  }
 }
 
 module.exports = new ClassroomService();
