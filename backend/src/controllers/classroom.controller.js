@@ -85,6 +85,58 @@ class ClassroomController {
       });
     }
   }
+
+  async approveJoinRequest(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const { learnerId } = req.body;
+
+      if (!learnerId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing learnerId in request body.',
+        });
+      }
+
+      await classroomService.approveJoinRequest(classroomId, learnerId);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Join request approved.',
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to approve join request.',
+      });
+    }
+  }
+
+  async rejectJoinRequest(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const { learnerId } = req.body;
+
+      if (!learnerId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing learnerId in request body.',
+        });
+      }
+
+      await classroomService.rejectJoinRequest(classroomId, learnerId);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Join request rejected.',
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to reject join request.',
+      });
+    }
+  }
 }
 
 module.exports = new ClassroomController();

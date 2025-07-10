@@ -24,7 +24,7 @@ const requireRole = (...roles) => {
 const hasClassroomAccess = async (req, res, next) => {
   try {
     const classroomId = req.params.classroomId;
-    const { userId, role } = req.user;
+    const { userId, role: globalRole } = req.user;
 
     const classroom = await classroomModel.getClassroomById(classroomId);
     if (!classroom || classroom.classroom_status === 'deleted') {
@@ -34,22 +34,25 @@ const hasClassroomAccess = async (req, res, next) => {
       });
     }
 
-    // Admin has access by default (optional)
-    if (role === 'admin') {
+    // Admin has full access
+    if (globalRole === 'admin') {
       req.classroom = classroom;
+      req.classRole = 'admin';
       return next();
     }
 
-    // Teacher who owns the class
+    // Check if user is the teacher of the class
     if (classroom.teacher_id === userId) {
       req.classroom = classroom;
+      req.classRole = 'teacher';
       return next();
     }
 
-    // Learner who has joined
+    // Check if user is a joined learner of the class
     const isJoined = await classroomModel.isJoinedLearner(classroomId, userId);
     if (isJoined) {
       req.classroom = classroom;
+      req.classRole = 'learner';
       return next();
     }
 
@@ -66,7 +69,23 @@ const hasClassroomAccess = async (req, res, next) => {
   }
 };
 
+const requireClassRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    const classRole = req.classRole; // set by hasClassroomAccess
+
+    if (!classRole || !allowedRoles.includes(classRole)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Insufficient classroom permissions.',
+      });
+    }
+
+    next();
+  };
+};
+
 module.exports = {
   requireRole,
-  hasClassroomAccess
+  hasClassroomAccess,
+  requireClassRole
 };

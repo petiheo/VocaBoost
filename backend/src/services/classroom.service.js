@@ -48,6 +48,39 @@ class ClassroomService {
   async getPendingJoinRequests(classroomId) {
     return await classroomModel.getPendingJoinRequests(classroomId);
   }
+
+  async approveJoinRequest(classroomId, learnerId) {
+    const learner = await classroomModel.findMemberStatus(classroomId, learnerId);
+
+    if (!learner) {
+      throw new Error('Learner is not part of this classroom.');
+    }
+
+    if (learner.join_status !== 'pending_request') {
+      throw new Error('Learner is not in pending request state.');
+    }
+
+    await classroomModel.updateLearnerStatus(classroomId, learnerId, {
+      join_status: 'joined',
+      joined_at: new Date().toISOString(),
+    });
+  }
+
+  async rejectJoinRequest(classroomId, learnerId) {
+    const learner = await classroomModel.findMemberStatus(classroomId, learnerId);
+
+    if (!learner) {
+      throw new Error('Learner is not part of this classroom.');
+    }
+
+    if (learner.join_status !== 'pending_request') {
+      throw new Error('Learner is not in pending request state.');
+    }
+
+    await classroomModel.updateLearnerStatus(classroomId, learnerId, {
+        join_status: 'rejected',
+    });
+  }
 }
 
 module.exports = new ClassroomService();

@@ -119,6 +119,16 @@ class ClassroomModel {
         if (error) throw error;
         return data;
     }
+
+    async updateLearnerStatus(classroomId, learnerId, fields) {
+        const { error } = await supabase
+            .from('classroom_members')
+            .update(fields)
+            .eq('classroom_id', classroomId)
+            .eq('learner_id', learnerId);
+
+        if (error) throw error;
+    }
 }
 
 module.exports = new ClassroomModel();

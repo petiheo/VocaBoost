@@ -1,9 +1,3 @@
-// {
-//   userId: '4d876ced-9e9a-4fa1-8b6d-4269291350a6'
-//   email: 'hoan@gmail.com',
-//   role: 'learner'
-// }
-
 
 const authenticate = (req, res, next) => {
   // Tạm gán mock user để test
