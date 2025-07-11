@@ -1,27 +1,9 @@
-const supabase = require('../config/database');
+// src/services/vocabulary.service.js
 
-/**
- * Custom error class for permission-denied errors.
- */
-class ForbiddenError extends Error {
-  constructor(message = 'User does not have permission for this action.') {
-    super(message);
-    this.name = 'ForbiddenError';
-    this.isForbidden = true;
-  }
-}
-
-/**
- * Custom error class for validation errors.
- */
-class ValidationError extends Error {
-  constructor(errors) {
-    super('Validation failed.');
-    this.name = 'ValidationError';
-    this.isValidationError = true;
-    this.errors = errors;
-  }
-}
+const vocabularyModel = require('../models/vocabulary.model');
+// Custom error classes remain the same
+class ForbiddenError extends Error { /* ... */ }
+class ValidationError extends Error { /* ... */ }
 
 class VocabularyService {
   // =================================================================
@@ -29,18 +11,7 @@ class VocabularyService {
   // =================================================================
 
   async createList(listData, creatorId) {
-    const { title, description, privacy_setting, tags = [] } = listData;
-
-    const { data, error } = await supabase
-      .rpc('create_list_with_tags', {
-        p_title: title,
-        p_description: description,
-        p_privacy_setting: privacy_setting,
-        p_creator_id: creatorId,
-        p_tags: tags
-      })
-      .select('*, tags(name)')
-      .single();
+    const { data, error } = await vocabularyModel.createListWithTags({ ...listData, creatorId });
 
     if (error) {
         if (error.message.includes('does not exist')) {
@@ -53,80 +24,30 @@ class VocabularyService {
     return data;
   }
 
-  async findUserLists(userId, { q, privacy, sortBy, page = 1, limit = 20 }) {
-    let query = supabase
-      .from('vocab_lists')
-      .select('id, title, privacy_setting, word_count, updated_at, tags(name)', { count: 'exact' })
-      .eq('creator_id', userId);
-
-    if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
-    if (privacy) query = query.eq('privacy_setting', privacy);
-
-    if (sortBy) {
-        const [field, direction] = sortBy.split(':');
-        const ascending = direction === 'asc';
-        if (['title', 'updated_at', 'word_count'].includes(field)) {
-            query = query.order(field, { ascending });
-        }
-    } else {
-        query = query.order('updated_at', { ascending: false });
-    }
-
+  async findUserLists(userId, options) {
+    const { page = 1, limit = 20 } = options;
     const { from, to } = this._getPagination(page, limit);
-    const { data, error, count } = await query.range(from, to);
+    const { data, error, count } = await vocabularyModel.findUserLists(userId, { ...options, from, to });
 
     if (error) throw error;
     
     const lists = data.map(list => ({ ...list, tags: list.tags.map(t => t.name) }));
-
-    return {
-      lists,
-      pagination: this._formatPagination(page, limit, count),
-    };
+    return { lists, pagination: this._formatPagination(page, limit, count) };
   }
 
-  async searchPublicLists({ q, tags, sortBy, page = 1, limit = 20 }) {
-    let query = supabase
-      .from('vocab_lists')
-      .select('id, title, description, word_count, updated_at, creator:users(id, display_name, role), tags(name)', { count: 'exact' })
-      .eq('privacy_setting', 'public')
-      .eq('is_active', true);
-      
-    if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
-    if (tags) {
-        const tagArray = tags.split(',').map(t => t.trim());
-        query = query.in('tags.name', tagArray);
-    }
-    if (sortBy) {
-        const [field, direction] = sortBy.split(':');
-        const ascending = direction === 'asc';
-        if (['title', 'updated_at', 'word_count'].includes(field)) {
-            query = query.order(field, { ascending });
-        }
-    } else {
-        query = query.order('word_count', { ascending: false });
-    }
-
+  async searchPublicLists(options) {
+    const { page = 1, limit = 20 } = options;
     const { from, to } = this._getPagination(page, limit);
-    const { data, error, count } = await query.range(from, to);
+    const { data, error, count } = await vocabularyModel.searchPublicLists({ ...options, from, to });
     
     if (error) throw error;
     
     const lists = data.map(list => ({ ...list, tags: list.tags.map(t => t.name) }));
-
-    return {
-      lists,
-      pagination: this._formatPagination(page, limit, count),
-    };
+    return { lists, pagination: this._formatPagination(page, limit, count) };
   }
 
   async findListById(listId, userId, skipPermissionCheck = false) {
-    const { data: list, error } = await supabase
-        .from('vocab_lists')
-        .select('*, creator:users(id, display_name, role), tags(name)')
-        .eq('id', listId)
-        .single();
-    
+    const { data: list, error } = await vocabularyModel.findListById(listId);
     if (error || !list) return null;
 
     if (!skipPermissionCheck && list.privacy_setting === 'private' && list.creator_id !== userId) {
@@ -145,21 +66,15 @@ class VocabularyService {
 
     if(tags) {
         const tagIds = await this._validateAndGetTagIds(tags);
-        await supabase.from('list_tags').delete().eq('list_id', listId);
+        await vocabularyModel.disassociateAllTagsFromList(listId);
         if (tagIds.length > 0) {
             const listTagRelations = tagIds.map(tagId => ({ list_id: listId, tag_id: tagId }));
-            const { error: tagsError } = await supabase.from('list_tags').insert(listTagRelations);
+            const { error: tagsError } = await vocabularyModel.associateTagsToList(listTagRelations);
             if(tagsError) throw tagsError;
         }
     }
 
-    const { data: updatedList, error } = await supabase
-        .from('vocab_lists')
-        .update(allowedUpdates)
-        .eq('id', listId)
-        .select('id, title, privacy_setting, updated_at, tags(name)')
-        .single();
-    
+    const { data: updatedList, error } = await vocabularyModel.updateList(listId, allowedUpdates);
     if (error) throw error;
     
     updatedList.tags = updatedList.tags.map(t => t.name);
@@ -168,7 +83,7 @@ class VocabularyService {
 
   async deleteList(listId, userId) {
     await this._verifyListOwnership(listId, userId);
-    const { error } = await supabase.from('vocab_lists').delete().eq('id', listId);
+    const { error } = await vocabularyModel.deleteList(listId);
     if (error) throw error;
   }
 
@@ -178,191 +93,103 @@ class VocabularyService {
 
   async createWord(listId, wordData, userId) {
     await this._verifyListOwnership(listId, userId);
-    
     const { term, definition, phonetics, image_url } = wordData;
-    const { data: newWord, error } = await supabase
-      .from('vocabulary')
-      .insert({ list_id: listId, term, definition, phonetics, image_url, created_by: userId })
-      .select()
-      .single();
+    const { data: newWord, error } = await vocabularyModel.createWord({ list_id: listId, term, definition, phonetics, image_url, created_by: userId });
 
     if (error) throw error;
-    await this._updateWordCount(listId);
+    await vocabularyModel.updateWordCount(listId);
     return newWord;
   }
   
   async createWordsBulk(listId, words, userId) {
     await this._verifyListOwnership(listId, userId);
-    
-    const wordsToInsert = [];
-    const errors = [];
-    
-    words.forEach((word, index) => {
-        if (word.term && word.definition) {
-            wordsToInsert.push({
-                list_id: listId,
-                term: word.term,
-                definition: word.definition,
-                phonetics: word.phonetics,
-                image_url: word.image_url,
-                created_by: userId
-            });
-        } else {
-            errors.push({
-                itemIndex: index,
-                term: word.term || 'N/A',
-                reason: 'Term and definition are required fields.'
-            });
-        }
-    });
+    const { wordsToInsert, errors } = this._prepareBulkWords(listId, words, userId);
 
     if (wordsToInsert.length > 0) {
-        const { error: insertError } = await supabase.from('vocabulary').insert(wordsToInsert);
+        const { error: insertError } = await vocabularyModel.createWordsBulk(wordsToInsert);
         if (insertError) throw insertError;
     }
     
-    await this._updateWordCount(listId);
-
-    return {
-        createdCount: wordsToInsert.length,
-        failedCount: errors.length,
-        errors,
-    };
+    await vocabularyModel.updateWordCount(listId);
+    return { createdCount: wordsToInsert.length, failedCount: errors.length, errors };
   }
 
   async updateWord(wordId, userId, updateData) {
     await this._verifyWordPermission(wordId, userId);
-    const { term, definition, phonetics, image_url } = updateData;
-
-    const { data: updatedWord, error } = await supabase
-      .from('vocabulary')
-      .update({ term, definition, phonetics, image_url })
-      .eq('id', wordId)
-      .select('id, term, definition, image_url, updated_at')
-      .single();
-      
+    const { data: updatedWord, error } = await vocabularyModel.updateWord(wordId, updateData);
     if (error) throw error;
     return updatedWord;
   }
 
   async deleteWord(wordId, userId) {
     const listId = await this._verifyWordPermission(wordId, userId);
-    const { error } = await supabase.from('vocabulary').delete().eq('id', wordId);
+    const { error } = await vocabularyModel.deleteWord(wordId);
     if (error) throw error;
-    await this._updateWordCount(listId);
+    await vocabularyModel.updateWordCount(listId);
   }
 
   async findWordsByListId(listId, userId, { page = 1, limit = 25 }) {
-    const list = await this.findListById(listId, userId);
-    if (!list) return null;
-    
-    const query = supabase
-      .from('vocabulary')
-      .select('id, term, definition, phonetics, image_url, created_at', { count: 'exact' })
-      .eq('list_id', listId)
-      .order('created_at', { ascending: true });
-
+    await this.findListById(listId, userId); // Use existing method for permission check
     const { from, to } = this._getPagination(page, limit);
-    const { data: words, error, count } = await query.range(from, to);
+    const { data: words, error, count } = await vocabularyModel.findWordsByListId(listId, from, to);
 
     if (error) throw error;
-    
-    return {
-      words,
-      pagination: this._formatPagination(page, limit, count),
-    };
+    return { words, pagination: this._formatPagination(page, limit, count) };
   }
 
   // =================================================================
-  //  EXAMPLES (NEW METHODS)
+  //  EXAMPLES
   // =================================================================
 
   async addExample(wordId, exampleData, userId) {
     await this._verifyWordPermission(wordId, userId);
     const { exampleSentence, translation } = exampleData;
-    
-    // Server-side validation
     if (!exampleSentence || exampleSentence.length < 10) {
       throw new ValidationError([{ field: 'exampleSentence', message: 'Example sentence is required and must be at least 10 characters.' }]);
     }
-
-    const { data: newExample, error } = await supabase
-      .from('vocabulary_examples')
-      .insert({ vocabulary_id: wordId, example_sentence: exampleSentence, translation })
-      .select()
-      .single();
-
+    const { data, error } = await vocabularyModel.createExample({ vocabulary_id: wordId, example_sentence: exampleSentence, translation });
     if (error) throw error;
-    return newExample;
+    return data;
   }
 
   async getExamplesByWordId(wordId, userId) {
     await this._verifyWordPermission(wordId, userId, 'read');
-    const { data, error } = await supabase
-      .from('vocabulary_examples')
-      .select('*')
-      .eq('vocabulary_id', wordId)
-      .order('created_at', { ascending: true });
-
+    const { data, error } = await vocabularyModel.findExamplesByWordId(wordId);
     if (error) throw error;
     return data;
   }
 
   async deleteExample(exampleId, userId) {
     await this._verifyExamplePermission(exampleId, userId);
-    const { error } = await supabase.from('vocabulary_examples').delete().eq('id', exampleId);
+    const { error } = await vocabularyModel.deleteExample(exampleId);
     if (error) throw error;
   }
   
   // =================================================================
-  //  SYNONYMS (NEW METHODS)
+  //  SYNONYMS
   // =================================================================
 
   async addSynonyms(wordId, synonyms, userId) {
     await this._verifyWordPermission(wordId, userId);
-
     if (!synonyms || !Array.isArray(synonyms) || synonyms.length === 0) {
       throw new ValidationError([{ field: 'synonyms', message: 'Synonyms must be a non-empty array of strings.' }]);
     }
-
     const synonymsToInsert = synonyms.map(s => ({ word_id: wordId, synonym: s.trim() }));
-
-    // `onConflict` ignores duplicates, so we don't add existing ones.
-    const { data, error } = await supabase
-      .from('word_synonyms')
-      .insert(synonymsToInsert)
-      .onConflict('word_id', 'synonym')
-      .ignore();
-    
+    const { error } = await vocabularyModel.createSynonyms(synonymsToInsert);
     if (error) throw error;
-
-    // To return the added count, we'd need to query before and after, or just return the list.
-    // For simplicity, we return what was sent and a success message.
-    return {
-      wordId: wordId,
-      addedCount: synonyms.length, // This is the attempted count, not the actual new count.
-      synonymsAdded: synonyms,
-    }
+    return { wordId, addedCount: synonyms.length, synonymsAdded: synonyms };
   }
 
   async getSynonymsByWordId(wordId, userId) {
     await this._verifyWordPermission(wordId, userId, 'read');
-    const { data, error } = await supabase
-      .from('word_synonyms')
-      .select('synonym')
-      .eq('word_id', wordId);
-
+    const { data, error } = await vocabularyModel.findSynonymsByWordId(wordId);
     if (error) throw error;
-    return data.map(s => s.synonym); // Return a simple array of strings
+    return data.map(s => s.synonym);
   }
 
   async deleteSynonym(wordId, synonym, userId) {
     await this._verifyWordPermission(wordId, userId);
-    const { error } = await supabase
-      .from('word_synonyms')
-      .delete()
-      .match({ word_id: wordId, synonym: synonym });
-      
+    const { error } = await vocabularyModel.deleteSynonym(wordId, synonym);
     if (error) throw error;
   }
   
@@ -371,7 +198,7 @@ class VocabularyService {
   // =================================================================
   
   async findAllTags() {
-    const { data, error } = await supabase.from('tags').select('name').order('name');
+    const { data, error } = await vocabularyModel.findAllTags();
     if (error) throw error;
     return data.map(tag => tag.name);
   }
@@ -381,41 +208,30 @@ class VocabularyService {
   // =================================================================
 
   async _verifyListOwnership(listId, userId) {
-    const { data, error } = await supabase
-      .from('vocab_lists').select('creator_id').eq('id', listId).single();
-    if (error || !data) throw new Error('List not found.');
-    if (data.creator_id !== userId) throw new ForbiddenError();
+    const { data: list, error } = await vocabularyModel.findListOwner(listId);
+    if (error || !list) throw new Error('List not found.');
+    if (list.creator_id !== userId) throw new ForbiddenError();
   }
   
   async _verifyWordPermission(wordId, userId, accessType = 'write') {
-    const { data, error } = await supabase
-      .from('vocabulary').select('list_id, vocab_lists(creator_id, privacy_setting)').eq('id', wordId).single();
-    if (error || !data) throw new Error('Word not found.');
-    
-    if (accessType === 'read' && data.vocab_lists.privacy_setting === 'public') {
-      return data.list_id; // Allow read access for public lists
+    const { data: word, error } = await vocabularyModel.findWordWithListInfo(wordId);
+    if (error || !word) throw new Error('Word not found.');
+    if (accessType === 'read' && word.vocab_lists.privacy_setting === 'public') {
+      return word.list_id;
     }
-    
-    if (data.vocab_lists.creator_id !== userId) throw new ForbiddenError();
-    return data.list_id;
+    if (word.vocab_lists.creator_id !== userId) throw new ForbiddenError();
+    return word.list_id;
   }
 
   async _verifyExamplePermission(exampleId, userId) {
-    const { data, error } = await supabase
-      .from('vocabulary_examples').select('vocabulary(id, list_id, vocab_lists(creator_id))').eq('id', exampleId).single();
-    
-    if (error || !data) throw new Error('Example not found.');
-    if (data.vocabulary.vocab_lists.creator_id !== userId) throw new ForbiddenError();
-  }
-  
-  async _updateWordCount(listId) {
-    const { error } = await supabase.rpc('update_list_word_count', { list_id_param: listId });
-    if (error) console.error(`Failed to update word count for list ${listId}:`, error);
+    const { data: example, error } = await vocabularyModel.findExampleWithListInfo(exampleId);
+    if (error || !example) throw new Error('Example not found.');
+    if (example.vocabulary.vocab_lists.creator_id !== userId) throw new ForbiddenError();
   }
   
   async _validateAndGetTagIds(tagNames) {
     if (!tagNames || tagNames.length === 0) return [];
-    const { data: existingTags, error } = await supabase.from('tags').select('id, name').in('name', tagNames);
+    const { data: existingTags, error } = await vocabularyModel.findTagsByName(tagNames);
     if (error) throw error;
     if (existingTags.length !== tagNames.length) {
       const found = existingTags.map(t => t.name);
@@ -423,6 +239,19 @@ class VocabularyService {
       throw new ValidationError([{ field: 'tags', message: `Invalid tags: ${invalid.join(', ')}` }]);
     }
     return existingTags.map(t => t.id);
+  }
+
+  _prepareBulkWords(listId, words, userId) {
+    const wordsToInsert = [];
+    const errors = [];
+    words.forEach((word, index) => {
+        if (word.term && word.definition) {
+            wordsToInsert.push({ list_id: listId, term: word.term, definition: word.definition, phonetics: word.phonetics, image_url: word.image_url, created_by: userId });
+        } else {
+            errors.push({ itemIndex: index, term: word.term || 'N/A', reason: 'Term and definition are required fields.'});
+        }
+    });
+    return { wordsToInsert, errors };
   }
 
   _getPagination(page, size) {

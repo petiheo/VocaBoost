@@ -79,6 +79,7 @@ vocabularyRouter.delete(
 vocabularyRouter.post(
   '/words/:wordId/examples',
   authMiddleware.verifyToken,
+  ...vocabularyValidator.addExample,
   vocabularyController.addExample
 );
 
@@ -97,6 +98,7 @@ vocabularyRouter.delete(
 vocabularyRouter.post(
   '/words/:wordId/synonyms',
   authMiddleware.verifyToken,
+  ...vocabularyValidator.addSynonyms,
   vocabularyController.addSynonyms
 );
 
