@@ -3,18 +3,16 @@ const vocabularyRouter = express.Router();
 
 const authMiddleware = require('../middlewares/auth.middleware');
 const uploadMiddleware = require('../middlewares/upload.middleware');
+const rateLimiter = require('../middlewares/rateLimiter.middleware');
 
 const vocabularyValidator = require('../validators/vocabulary.validator');
 const vocabularyController = require('../controllers/vocabulary.controller');
 
-const rateLimiter = require('../middlewares/rateLimiter.middleware');
-
-// Vocal List
 vocabularyRouter.post(
-  '/create-list',
+  '/lists',
   authMiddleware.verifyToken,
   rateLimiter,
-  vocabularyValidator.createList, // Placeholder for validation rules
+  ...vocabularyValidator.createList,
   vocabularyController.createList
 );
 
@@ -24,72 +22,106 @@ vocabularyRouter.get(
   vocabularyController.getUserLists
 );
 
-vocabularyRouter.get(
-  '/search', // authMiddleware.verifyToken is optional here if you want unauthenticated users to search
-  vocabularyController.searchPublicLists
-);
+vocabularyRouter.get('/search', vocabularyController.searchPublicLists);
 
 vocabularyRouter.get(
-  '/get-list/:listId',
-  authMiddleware.verifyToken, // Required to check permissions on private lists
+  '/lists/:listId',
+  authMiddleware.verifyToken,
   vocabularyController.getListById
 );
 
 vocabularyRouter.put(
-  '/update-list/:listId',
+  '/lists/:listId',
   authMiddleware.verifyToken,
-  vocabularyValidator.updateList, // Placeholder for validation rules
+  ...vocabularyValidator.updateList,
   vocabularyController.updateList
 );
 
 vocabularyRouter.delete(
-  '/delete-list/:listId',
+  '/lists/:listId',
   authMiddleware.verifyToken,
   vocabularyController.deleteList
 );
 
-// Vocabulary
 vocabularyRouter.post(
-  '/create-word',
+  '/lists/:listId/words',
   authMiddleware.verifyToken,
-  vocabularyValidator.createWord, // Placeholder for validation rules
+  ...vocabularyValidator.createWord,
   vocabularyController.createWord
 );
 
 vocabularyRouter.post(
-  '/create-words-bulk',
+  '/lists/:listId/words-bulk',
   authMiddleware.verifyToken,
-  vocabularyValidator.createWordsBulk, // Placeholder for validation rules
+  ...vocabularyValidator.createWordsBulk,
   vocabularyController.createWordsBulk
 );
 
-vocabularyRouter.put(
-  '/update-word/:wordId',
+vocabularyRouter.get(
+  '/lists/:listId/words',
   authMiddleware.verifyToken,
-  vocabularyValidator.updateWord, // Placeholder for validation rules
+  vocabularyController.getWordsByListId
+);
+
+vocabularyRouter.put(
+  '/words/:wordId',
+  authMiddleware.verifyToken,
+  ...vocabularyValidator.updateWord,
   vocabularyController.updateWord
 );
 
 vocabularyRouter.delete(
-  '/delete-word/:wordId',
+  '/words/:wordId',
   authMiddleware.verifyToken,
   vocabularyController.deleteWord
 );
 
-vocabularyRouter.get(
-  '/get-list/:listId/words',
+vocabularyRouter.post(
+  '/words/:wordId/examples',
   authMiddleware.verifyToken,
-  vocabularyController.getWordsByListId
+  vocabularyController.addExample
+);
+
+vocabularyRouter.get(
+  '/words/:wordId/examples',
+  authMiddleware.verifyToken,
+  vocabularyController.getExamplesByWordId
+);
+
+vocabularyRouter.delete(
+  '/examples/:exampleId',
+  authMiddleware.verifyToken,
+  vocabularyController.deleteExample
+);
+
+vocabularyRouter.post(
+  '/words/:wordId/synonyms',
+  authMiddleware.verifyToken,
+  vocabularyController.addSynonyms
+);
+
+vocabularyRouter.get(
+  '/words/:wordId/synonyms',
+  authMiddleware.verifyToken,
+  vocabularyController.getSynonymsByWordId
+);
+
+vocabularyRouter.delete(
+  '/words/:wordId/synonyms/:synonym',
+  authMiddleware.verifyToken,
+  vocabularyController.deleteSynonym
+);
+
+vocabularyRouter.get(
+  '/tags', 
+  vocabularyController.getAllTags
 );
 
 vocabularyRouter.post(
   '/upload-image',
   authMiddleware.verifyToken,
-  uploadMiddleware.single('image'), // 'image' is the field name in the form-data
+  uploadMiddleware.single('image'),
   vocabularyController.uploadImageForWord
 );
-
-// Tags
-vocabularyRouter.get('/tags', vocabularyController.getAllTags);
 
 module.exports = vocabularyRouter;
