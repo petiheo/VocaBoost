@@ -1,0 +1,49 @@
+@use '../Fonts' as *;
+
+$text-color: #352D24;
+
+.input {
+
+    color: $text-color;
+    font-family: $font-lalezar;
+    font-size: 17px;
+
+    &__container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .input-error {
+        text-align: left;
+        color: red;
+        font-size: 0.9rem;
+        margin-top: 4px;
+    }
+    
+    &__submit {
+        background-color: #3492EA;
+        border: none;
+        border-radius: calc((13 / 1440) * 100vw);
+
+        width: 50%;
+        padding: calc((15 / 1440) * 100vh);
+
+
+        font-family: $font-lalezar;
+        font-size: calc((20 / 1440) * 100vw);
+        color: white;
+    }
+
+    &__text,
+    &__password {
+        align-items: flex-start;
+
+        background-color: #D6D6D6;
+        border: none;
+        border-radius: calc((7 / 1440) * 100vw);
+        width: 100%;
+        padding: calc((23 / 1440) * 100vh);
+    }
+}
