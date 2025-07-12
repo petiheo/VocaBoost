@@ -202,6 +202,44 @@ class ClassroomController {
       });
     }
   }
+
+  async deleteClassroom(req, res) {
+    try {
+      const classroom = req.classroom;
+
+      await classroomService.deleteClassroom(classroom);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Classroom has been deleted.',
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to delete classroom.',
+      });
+    }
+  }
+
+  async searchLearnersByDisplayName(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const { status, q } = req.query;
+
+      const results = await classroomService.searchLearnersByDisplayName(classroomId, status, q);
+
+      return res.status(200).json({
+        success: true,
+        data: results,
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to search learners.',
+      });
+    }
+  }
+
 }
 
 module.exports = new ClassroomController();

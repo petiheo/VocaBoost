@@ -146,6 +146,24 @@ class ClassroomService {
       left_at: new Date().toISOString()
     });
   }
+
+  async deleteClassroom(classroom) {
+    if (classroom.classroom_status === 'deleted') {
+      throw new Error('This classroom has already been deleted.');
+    }
+
+    await classroomModel.softDeleteClassroom(classroom.id);
+  }
+
+  async searchLearnersByDisplayName(classroomId, status, keyword) {
+    if (!status) {
+      throw new Error('Missing required parameter: status');
+    }
+
+    return await classroomModel.searchLearnersByDisplayName(classroomId, status, keyword);
+  }
+
+
 }
 
 module.exports = new ClassroomService();

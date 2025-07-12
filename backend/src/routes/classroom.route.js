@@ -59,6 +59,17 @@ classroomRouter.post('/:classroomId/remove-learner',
   classroomController.removeLearner
 );
 
+classroomRouter.delete('/:classroomId',
+  hasClassroomAccess,
+  requireClassRole('teacher', 'admin'),
+  classroomController.deleteClassroom
+);
+
+classroomRouter.get('/:classroomId/search-learners',
+  hasClassroomAccess,
+  classroomController.searchLearnersByDisplayName
+);
+
 
 
 module.exports = classroomRouter;

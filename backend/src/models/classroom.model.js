@@ -163,6 +163,41 @@ class ClassroomModel {
         if (error) throw error;
         return data;
     }
+
+    async softDeleteClassroom(classroomId) {
+        const { error } = await supabase
+            .from('classrooms')
+            .update({ classroom_status: 'deleted' })
+            .eq('id', classroomId);
+
+        if (error) throw error;
+    }
+
+    async searchLearnersByDisplayName(classroomId, status, keyword) {
+        const { data, error } = await supabase
+            .from('classroom_members')
+            .select(`
+            learner_id,
+            email,
+            join_status,
+            users (
+                display_name,
+                avatar_url
+            )
+            `)
+            .eq('classroom_id', classroomId)
+            .eq('join_status', status);
+
+        if (error) throw error;
+
+        if (!keyword) return data;
+
+        const lower = keyword.toLowerCase();
+        return data.filter(item =>
+            item.users?.display_name?.toLowerCase().includes(lower)
+        );
+    }
+
 }
 
 module.exports = new ClassroomModel();
