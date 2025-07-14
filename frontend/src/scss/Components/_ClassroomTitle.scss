@@ -1,0 +1,23 @@
+.class-header{
+        padding: 20px;
+        border-radius: 20px;
+        background-color: #FCF9F1;
+      }
+      .class-header h2 {
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0;
+      }
+  
+      .class-tags {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+  
+        .tag {
+          background: #F8EED3;
+          padding: 4px 12px;
+          border-radius: 8px;
+          font-size: 13px;
+        }
+      }
