@@ -70,6 +70,25 @@ classroomRouter.get('/:classroomId/search-learners',
   classroomController.searchLearnersByDisplayName
 );
 
+classroomRouter.post('/:classroomId/invitation',
+  hasClassroomAccess,
+  requireClassRole('teacher'),
+  classroomController.inviteLearner
+);
+
+classroomRouter.post('/accept-invitation',
+  classroomController.acceptInvitation
+);
+
+classroomRouter.delete('/:classroomId/invitation',
+  hasClassroomAccess,
+  requireClassRole('teacher'),
+  classroomController.cancelInvitation
+);
+
+
+
+
 
 
 module.exports = classroomRouter;

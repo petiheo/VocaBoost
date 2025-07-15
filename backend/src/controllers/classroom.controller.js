@@ -240,6 +240,84 @@ class ClassroomController {
     }
   }
 
+  async inviteLearner(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing email of learner.',
+        });
+      }
+
+      const result = await classroomService.inviteLearner(classroomId, email);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Invitation has been sent.',
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to sent invitation.',
+      });
+    }
+  }
+
+  async acceptInvitation(req, res) {
+    try {
+      const { token } = req.body;
+      const user = req.user;
+
+      if (!token) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing invitation token.',
+        });
+      }
+
+      const result = await classroomService.acceptInvitation(token, user);
+
+      return res.status(200).json({
+        success: true,
+        message: 'You have successfully joined the classroom.',
+        data: result,
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to accept invitation.',
+      });
+    }
+  }
+
+  async cancelInvitation(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing email in request body.',
+        });
+      }
+
+      await classroomService.cancelInvitation(classroomId, email);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Invitation has been cancelled.',
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to cancel invitation.',
+      });
+    }
+  }
 }
 
 module.exports = new ClassroomController();

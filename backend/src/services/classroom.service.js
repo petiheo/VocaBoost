@@ -1,5 +1,8 @@
 const classroomModel = require('../models/classroom.model');
 const { generateUniqueJoinCode } = require('../helpers/joinCode.helper');
+// const { v4: uuidv4 } = require('uuid');
+const ms = require('ms');
+const emailService = require('../services/email.service');
 
 class ClassroomService {
   async createClassroom({ name, description, teacher_id, classroom_status, capacity_limit }) {
@@ -163,6 +166,88 @@ class ClassroomService {
     return await classroomModel.searchLearnersByDisplayName(classroomId, status, keyword);
   }
 
+  async inviteLearner(classroomId, email) {
+    const classroom = await classroomModel.getClassroomById(classroomId);
+
+    // // Load thông tin giáo viên
+    // const teacher = await userModel.findById(classroom.teacher_id);
+    // if (!teacher) {
+    //   throw new Error('Teacher not found.');
+    // }
+
+    // // Không cho mời chính mình
+    // if (teacher.email.toLowerCase() === email.toLowerCase()) {
+    //   throw new Error("You cannot invite yourself to your own classroom.");
+    // }
+
+    // Kiểm tra học sinh đã là thành viên chưa
+    // const user = await userModel.findByEmail(email);
+    // if (user) {
+    //   const member = await classroomModel.findMemberStatus(classroomId, user.id);
+    //   if (member?.join_status === 'joined') {
+    //     throw new Error('This learner is already a member of the classroom.');
+    //   }
+    // }
+
+    // Tạo token mới
+    const token = await generateUniqueJoinCode(); // uuidv4();
+    const expiresAt = new Date(Date.now() + ms('7d')).toISOString();
+    
+    // Upsert lời mời
+    await classroomModel.upsertInvitation({
+      classroom_id: classroomId,
+      email,
+      token,
+      expires_at: expiresAt,
+    });
+
+    // Gửi email
+    await emailService.sendClassInvitation(email, token, classroom);
+  }
+
+  async acceptInvitation(token, user) {
+    const invitation = await classroomModel.getInvitationByToken(token);
+
+    if (!invitation) {
+      throw new Error('Invalid or expired invitation link.');
+    }
+
+    if (invitation.status === 'rejected') { // cancelled
+      throw new Error('This invitation has been cancelled.');
+    }
+
+    if (invitation.used_at) {
+      throw new Error('This invitation has already been used.');
+    }
+
+    if (new Date(invitation.expires_at) < new Date()) {
+      throw new Error('This invitation has expired.');
+    }
+
+    const classroom = await classroomModel.getClassroomById(invitation.classroom_id);
+
+    const member = await classroomModel.findMemberStatus(classroom.id, user.userId);
+    if (member?.join_status === 'joined') {
+      throw new Error('You are already a member of this classroom.');
+    }
+
+    await classroomModel.addLearnerToClass(classroom.id, user.userId, user.email);
+    await classroomModel.updateInvitationStatus(invitation.id, 'joined');
+
+    return { classroomId: classroom.id };
+  }
+
+  async cancelInvitation(classroomId, email) {
+    const invitation = await classroomModel.findInvitation(classroomId, email);
+    if (!invitation) {
+      throw new Error('Invitation not found.');
+    }
+
+    if (invitation.status !== 'pending_invite' || invitation.used_at) {
+      throw new Error('This invitation has already been accepted and cannot be cancelled.');
+    }
+    await classroomModel.cancelInvitation(classroomId, email);
+  }
 
 }
 

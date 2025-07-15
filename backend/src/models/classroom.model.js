@@ -198,6 +198,81 @@ class ClassroomModel {
         );
     }
 
+    async upsertInvitation({ classroom_id, email, token, expires_at }) {
+        const { data, error } = await supabase
+            .from('classroom_invitations')
+            .upsert({
+            classroom_id,
+            email,
+            token,
+            expires_at,
+            status: 'pending_invite',
+            used_at: null,
+            }, { onConflict: 'classroom_id,email' })
+            .select()
+            .single();
+        if (error) throw error;
+        return data;
+    }
+
+    async getInvitationByToken(token) {
+        const { data, error } = await supabase
+            .from('classroom_invitations')
+            .select('*')
+            .eq('token', token)
+            .maybeSingle();
+        if (error) throw error;
+        return data;
+    }
+
+    async updateInvitationStatus(invitationId, status) {
+        const { error } = await supabase
+            .from('classroom_invitations')
+            .update({
+            used_at: new Date().toISOString(),
+            status,
+            })
+            .eq('id', invitationId);
+        if (error) throw error;
+    }
+
+    async addLearnerToClass(classroomId, learnerId, email) {
+        const { error } = await supabase
+            .from('classroom_members')
+            .upsert({
+            classroom_id: classroomId,
+            learner_id: learnerId,
+            email,
+            join_status: 'joined',
+            joined_at: new Date().toISOString(),
+            }, { onConflict: 'classroom_id,learner_id' });
+        if (error) throw error;
+    }
+
+    async findInvitation(classroomId, email) {
+        const { data, error } = await supabase
+            .from('classroom_invitations')
+            .select('*')
+            .eq('classroom_id', classroomId)
+            .eq('email', email)
+            .maybeSingle();
+        if (error) throw error;
+        return data;
+    }
+
+
+    async cancelInvitation(classroomId, email) {
+        const { error } = await supabase
+            .from('classroom_invitations')
+            .update({ status: 'rejected' }) // cancelled 
+            .eq('classroom_id', classroomId)
+            .eq('email', email);
+        if (error) throw error;
+    }
+
+
+
+
 }
 
 module.exports = new ClassroomModel();
