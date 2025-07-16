@@ -1,22 +1,66 @@
-import { Children } from "react";
-import{
+import {
+    AssignExercise,
+    AssignmentPage,
     CreateClassroom,
-    JoinClassroomStatus,
     JoinClassroomPage,
+    JoinClassroomStatus,
+    MyClassroom,
+    ViewClassroom,
+    // Manage classroom
+    AddLearners, ApproveJoinClassroomRequest, ManageClassroomLayout, LearnersList, PendingRequest,
 } from "../pages/Classroom"
 
 const classroomRoutes = [
     {
         path: "/create-classroom",
-        element: <CreateClassroom/>
+        element: <CreateClassroom />
     },
     {
         path: "/join-classroom-status",
-        element: <JoinClassroomStatus/>
+        element: <JoinClassroomStatus />
     },
     {
         path: "/join-classroom-page",
-        element: <JoinClassroomPage/>,
+        element: <JoinClassroomPage />,
+    },
+    {
+        path: "/my-classroom",
+        element: <MyClassroom />
+    },
+    {
+        path: "/view-classroom",
+        element: <ViewClassroom />
+    },
+    {
+        path: "/assignment-page",
+        element: <AssignmentPage />
+    },
+    {
+        path: "assign-exercise",
+        element: <AssignExercise />
+    },
+    {
+        path: "/learners",
+        element: <ManageClassroomLayout />,
+        children: [
+            {
+                path: "approve-join-classroom-request",
+                element: <ApproveJoinClassroomRequest />
+            },
+            {
+                path: "add-students",
+                element: <AddLearners />
+            },
+            {
+                path: "learners-list",
+                element: <LearnersList />
+            },
+            {
+                path: "pending-request",
+                element: <PendingRequest />
+            },
+
+        ]
     },
 ];
 export default classroomRoutes;

@@ -1,0 +1,11 @@
+.learners-layout{
+    &__body{
+        margin: 2em 0;
+        display: flex;
+        gap: 2em;
+    }
+    &__content{
+        width: 70%;
+        margin: auto;
+    }
+}

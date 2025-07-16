@@ -1,0 +1,75 @@
+.vocab-card {
+  background-color: #F9F3E4;
+  padding: 1.2rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 220px;
+  max-width: 300px;
+
+  .vocab-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2b2b2b;
+    margin-bottom: 0.5rem;
+  }
+
+  .vocab-desc {
+    font-size: 0.9rem;
+    color: #444;
+    margin-bottom: auto;
+  }
+
+  .vocab-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+
+    .user-block {
+      display: flex;
+      align-items: center;
+
+      .avatar {
+        width: 28px;
+        height: 28px;
+        background-color: #d8cfc3;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+      }
+
+      .user-info {
+        display: flex;
+        flex-direction: column;
+
+        .username {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: #222;
+        }
+
+        .role-tag {
+          font-size: 0.7rem;
+          background-color: #d6e5ff;
+          color: #1b4da3;
+          padding: 2px 6px;
+          border-radius: 5px;
+          margin-top: 2px;
+          width: fit-content;
+        }
+      }
+    }
+
+    .review-btn {
+      background-color: #2e2a25;
+      color: #fff;
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+  }
+}
