@@ -2,17 +2,25 @@
 const authenticate = (req, res, next) => {
   // Tạm gán mock user để test
   req.user = {
-    userId: '5d989deb-f811-479e-beb3-75e8d43db64c', 
-    email: 'bin01677952356@gmail.com',
+    userId: '16ba97c6-15f3-4515-88af-fd74285d47ae',
+    email: 'teacher@vocaboost.com',
     role: 'teacher'
 
-    // userId: '8c74a0ad-0e75-4f4a-a507-00146ce31299',
-    // email: 'bin@gmail.com',
-    // role: 'teacher'
-    
-    // userId: '4d876ced-9e9a-4fa1-8b6d-4269291350a6',
-    // email: 'hoan@gmail.com',
-    // role: 'learner'
+  // // Mock học viên 1 
+  //   userId: '9e4da817-8fb9-422c-9cfe-122752a3ff5d',
+  //   email: 'learner1@vb.com',
+  //   role: 'learner'
+
+  // // Mock học viên 2 
+  //   userId: 'e4a1362e-eeac-43bc-87ff-f4121ed11dab',
+  //   email: 'learner2@vb.com',
+  //   role: 'learner'
+
+  // // Mock học viên 3
+  //   userId: '653d9fb9-54db-415a-91e2-f3aa549f1eba',
+  //   email: 'learner3@vb.com',
+  //   role: 'learner'
+
   };
   next();
 };
