@@ -318,6 +318,44 @@ class ClassroomController {
       });
     }
   }
+
+  async createAssignment(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const teacherId = req.user.userId;
+      const {
+        vocabListId,
+        title,
+        exerciseMethod,
+        wordsPerReview,
+        startDate,
+        dueDate
+      } = req.body;
+
+      const assignment = await classroomService.createAssignment({
+        classroomId,
+        teacherId,
+        vocabListId,
+        title,
+        exerciseMethod,
+        wordsPerReview,
+        startDate,
+        dueDate
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: 'Assignment created successfully.',
+        data: assignment
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to create assignment.'
+      });
+    }
+  }
+
 }
 
 module.exports = new ClassroomController();

@@ -1,8 +1,10 @@
 const classroomModel = require('../models/classroom.model');
 const { generateUniqueJoinCode } = require('../helpers/joinCode.helper');
-// const { v4: uuidv4 } = require('uuid');
 const ms = require('ms');
 const emailService = require('../services/email.service');
+const { generateInvitationToken } = require('../helpers/jwt.helper');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET;
 
 class ClassroomService {
   async createClassroom({ name, description, teacher_id, classroom_status, capacity_limit }) {
@@ -189,11 +191,9 @@ class ClassroomService {
     //   }
     // }
 
-    // Tạo token mới
-    const token = await generateUniqueJoinCode(); // uuidv4();
+    const token = generateInvitationToken({ classroomId, email });
     const expiresAt = new Date(Date.now() + ms('7d')).toISOString();
     
-    // Upsert lời mời
     await classroomModel.upsertInvitation({
       classroom_id: classroomId,
       email,
@@ -201,12 +201,30 @@ class ClassroomService {
       expires_at: expiresAt,
     });
 
-    // Gửi email
     await emailService.sendClassInvitation(email, token, classroom);
   }
 
   async acceptInvitation(token, user) {
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+      throw new Error('Invalid or expired invitation token.');
+    }
+
+    if (decoded.type !== 'classroom_invitation') {
+      throw new Error('Invalid invitation token type.');
+    }
+
+    const classroomId = decoded.classroomId;
+    const invitedEmail = decoded.email;
+
     const invitation = await classroomModel.getInvitationByToken(token);
+    const classroom = await classroomModel.getClassroomById(invitation.classroom_id);
+
+    if (invitedEmail !== user.email || classroomId !== classroom.id) {
+      throw new Error('This invitation was not sent to your account.');
+    }
 
     if (!invitation) {
       throw new Error('Invalid or expired invitation link.');
@@ -223,8 +241,6 @@ class ClassroomService {
     if (new Date(invitation.expires_at) < new Date()) {
       throw new Error('This invitation has expired.');
     }
-
-    const classroom = await classroomModel.getClassroomById(invitation.classroom_id);
 
     const member = await classroomModel.findMemberStatus(classroom.id, user.userId);
     if (member?.join_status === 'joined') {
@@ -247,6 +263,63 @@ class ClassroomService {
       throw new Error('This invitation has already been accepted and cannot be cancelled.');
     }
     await classroomModel.cancelInvitation(classroomId, email);
+  }
+
+  async createAssignment({
+    classroomId,
+    teacherId,
+    vocabListId,
+    title,
+    exerciseMethod,
+    wordsPerReview,
+    startDate,
+    dueDate
+  }) {
+    if (wordsPerReview < 5 || wordsPerReview > 30) {
+      throw new Error('wordsPerReview must be between 5 and 30.');
+    }
+
+    const allWords = await classroomModel.getWordsByListId(vocabListId); // vocabModel  
+    if (!allWords || allWords.length === 0) {
+      throw new Error('Vocabulary list is empty.');
+    }
+
+    const sublistCount = Math.ceil(allWords.length / wordsPerReview);
+
+    const assignment = await classroomModel.createAssignment({
+      classroom_id: classroomId,
+      vocab_list_id: vocabListId,
+      teacher_id: teacherId,
+      title,
+      exercise_method: exerciseMethod,
+      words_per_review: wordsPerReview,
+      sublist_count: sublistCount,
+      start_date: startDate,
+      due_date: dueDate
+    });
+
+    const assignmentId = assignment.id;
+
+    for (let i = 0; i < sublistCount; i++) {
+      const start = i * wordsPerReview;
+      const end = (i + 1) * wordsPerReview;
+      const subWords = allWords.slice(start, end);
+
+      const clonedListId = await classroomModel.cloneListWithWords({ // vocabModel
+        originalListId: vocabListId,
+        creatorId: teacherId,
+        title: `${title} - Sublist ${i + 1}`,
+        words: subWords
+      });
+
+      await classroomModel.createAssignmentSublist({
+        assignment_id: assignmentId,
+        sublist_index: i + 1,
+        vocab_list_id: clonedListId
+      });
+    }
+
+    return assignment;
   }
 
 }

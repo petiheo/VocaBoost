@@ -86,6 +86,13 @@ classroomRouter.delete('/:classroomId/invitation',
   classroomController.cancelInvitation
 );
 
+classroomRouter.post('/:classroomId/assignment',
+  hasClassroomAccess,
+  requireClassRole('teacher'),
+  classroomValidator.createAssignment,
+  classroomController.createAssignment
+);
+
 
 
 

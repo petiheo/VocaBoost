@@ -1,4 +1,5 @@
 const supabase = require('../config/database');
+const { v4: uuidv4 } = require('uuid');
 
 class ClassroomModel {
     async createClassroom({ name, description, teacher_id, join_code, classroom_status, capacity_limit }) {
@@ -260,7 +261,6 @@ class ClassroomModel {
         return data;
     }
 
-
     async cancelInvitation(classroomId, email) {
         const { error } = await supabase
             .from('classroom_invitations')
@@ -270,8 +270,62 @@ class ClassroomModel {
         if (error) throw error;
     }
 
+    async createAssignment(data) {
+        const { data: result, error } = await supabase
+            .from('assignments')
+            .insert(data)
+            .select()
+            .single();
+        if (error) throw error;
+        return result;
+    }
 
+    async createAssignmentSublist(data) {
+        const { error } = await supabase.from('assignment_sublists').insert(data);
+        if (error) throw error;
+    }
 
+// =================    
+//    vocab model
+// =================
+    async getWordsByListId(listId) {
+        const { data, error } = await supabase
+            .from('vocabulary')
+            .select('*')
+            .eq('list_id', listId);
+        if (error) throw error;
+        return data;
+    }
+
+    async cloneListWithWords({ originalListId, creatorId, title, words }) {
+        const newListId = uuidv4();
+
+        await supabase.from('vocab_lists').insert({
+            id: newListId,
+            creator_id: creatorId,
+            title,
+            description: `Cloned from list ${originalListId}`,
+            word_count: words.length,
+            privacy_setting: 'private',
+            is_active: true
+        });
+
+        // Clone từng từ
+        const clonedWords = words.map(w => ({
+            id: uuidv4(),
+            list_id: newListId,
+            created_by: creatorId,
+            term: w.term,
+            definition: w.definition,
+            phonetics: w.phonetics || null,
+            image_url: w.image_url || null
+        }));
+
+        const { error } = await supabase.from('vocabulary').insert(clonedWords);
+        if (error) throw error;
+
+        return newListId;
+    }
 
 }
 
