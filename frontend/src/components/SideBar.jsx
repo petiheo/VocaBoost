@@ -1,11 +1,10 @@
-// Nghị 
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/Logo.svg";
 import {Home, Learning, History, Analysis, Setting, LogOut, ArrowRight, ArrowLeft} from "../assets/icons/index";
 
 export default function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
@@ -39,7 +38,7 @@ export default function Sidebar() {
           </Link>
         </div>
 
-        <div className="sidebar__section">
+        <div className="sidebar__section2">
           <h2 className="sidebar__title">Tools</h2>
           <hr className="sidebar__divider" />
           <Link to="/homepage" className="sidebar__link">
