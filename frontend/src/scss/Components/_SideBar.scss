@@ -1,11 +1,7 @@
 .sidebar {
-<<<<<<< HEAD
   position: fixed;
   z-index: 1000;
   top: 10%;
-=======
-  position: relative;
->>>>>>> 1e28c37925e5af59d60b07d2859bf23070d6b62e
   width: 250px;
   background: #241F1F;
   color: white;
@@ -17,16 +13,9 @@
   border-radius: 0 2rem 2rem 0;
   font-family: 'Inria Sans', sans-serif;
 
-<<<<<<< HEAD
   &.collapsed {
     width: 10px;
     padding: 4px;
-=======
-  max-height: 100vh;
-  
-  &.collapsed {
-    width: 50px;
->>>>>>> 1e28c37925e5af59d60b07d2859bf23070d6b62e
 
     .sidebar__logo,
     .sidebar__nav,
@@ -34,11 +23,7 @@
     .sidebar__title,
     .sidebar__divider,
     .sidebar__link {
-<<<<<<< HEAD
       visibility: hidden;
-=======
-      display: none !important;
->>>>>>> 1e28c37925e5af59d60b07d2859bf23070d6b62e
     }
   }
 
@@ -50,14 +35,11 @@
     }
   }
 
-<<<<<<< HEAD
   .sidebar__section2
   {
     margin-top: 8rem;
   }
 
-=======
->>>>>>> 1e28c37925e5af59d60b07d2859bf23070d6b62e
   .sidebar__toggle {
     position: absolute;
     top: 10%;
@@ -89,10 +71,7 @@
     color: white;
     border-radius: 0.5rem;
     transition: background 0.2s ease;
-<<<<<<< HEAD
     margin-top: 2rem;
-=======
->>>>>>> 1e28c37925e5af59d60b07d2859bf23070d6b62e
 
     &:hover {
       background: #686262;

@@ -80,7 +80,7 @@ export default function MyClassroomPage() {
                 style={{ cursor: "pointer" }}
               >
                 <div className="info">
-                  <span>{c.lists} lists | {c.members} members</span>
+                  <span>{c.assignment_count} lists | {c.learner_count} members</span>
                   <h3>{c.name}</h3>
                 </div>
               </div>

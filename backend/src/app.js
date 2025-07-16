@@ -1,8 +1,14 @@
 const express = require('express');
 const app = express();
 const router = require('./routes/index.route');
+const cors = require('cors');
 
 app.use(express.json());
+
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+}))
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
