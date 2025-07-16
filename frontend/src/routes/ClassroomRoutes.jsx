@@ -40,7 +40,7 @@ const classroomRoutes = [
         element: <AssignExercise />
     },
     {
-        path: "/learners",
+        path: "/classroom",
         element: <ManageClassroomLayout />,
         children: [
             {

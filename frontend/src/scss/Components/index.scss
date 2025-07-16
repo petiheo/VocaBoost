@@ -3,5 +3,8 @@
 @use 'Header';
 @use 'Navbar';
 @use 'SearchBar';
-// @use 'Sidebar';
+@use 'Sidebar';
 @forward 'Dropdown' as dropdown-*;
+@forward 'ClassroomTitle';
+@forward 'TeacherClassroomMenuTab';
+@forward 'VocabularyListCard'
