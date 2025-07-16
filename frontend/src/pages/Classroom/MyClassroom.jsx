@@ -1,22 +1,38 @@
-import { useState } from "react";
-import { Header, Footer, SideBar } from "../../components/index"
-import { Link } from "react-router-dom";
-
-const classrooms = Array(5).fill({
-  name: "Family and Friend Class",
-  lists: 3,
-  members: 5,
-});
-
+import { useState, useEffect } from "react";
+import { Header, Footer, SideBar } from "../../components/index";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import classroomService from "../../services/Classroom/classroomService";
+import { useAuth } from "../../services/Auth/authContext";
 
 const tabs = [
-  { name: "My classroom", active: false },
-  { name: "My vocabulary list", active: false },
-  { name: "Statistic", active: true },
+  { name: "My classroom", route: "/my-classroom" },
+  { name: "My vocabulary list", route: "/my-vocabulary-list" },
+  { name: "Statistic", route: "/statistic" },
 ];
 
 export default function MyClassroomPage() {
-  const [userRole, setUserRole] = useState("teacher"); // 'teacher' | 'learner'
+  // const [userRole, setUserRole] = useState("teacher"); // 'teacher' | 'learner'
+  const [classrooms, setClassrooms] = useState([]);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+
+  // Lấy pathname hiện tại, ví dụ: "/my-classroom"
+  const currentPath = location.pathname;
+
+  useEffect(() => {
+    const fetchClassroom = async () => {
+      try {
+        const res = await classroomService.myClassroom();
+        if (res.success && Array.isArray(res.data)) {
+          setClassrooms(res.data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách lớp học:", error);
+      };
+    }
+    fetchClassroom();
+  }, [])
 
   return (
     <div className="my-classroom">
@@ -26,31 +42,14 @@ export default function MyClassroomPage() {
           <SideBar />
         </div>
         <div className="my-classroom-page">
-          {/* Header + Role Switch (for demo purpose) */}
-          {/* <div className="my-classroom-header">
-            <h2>My Classrooms - {userRole === "teacher" ? "Teacher" : "Learner"}</h2>
-            <div className="role-switch">
-              <button
-                className={userRole === "teacher" ? "active" : ""}
-                onClick={() => setUserRole("teacher")}
-              >
-                Teacher View
-              </button>
-              <button
-                className={userRole === "learner" ? "active" : ""}
-                onClick={() => setUserRole("learner")}
-              >
-                Learner View
-              </button>
-            </div>
-          </div> */}
 
           <div className="sub-menu-tabs">
             <div className="tab-list">
               {tabs.map((tab, idx) => (
                 <div
                   key={idx}
-                  className={`tab ${tab.active ? "active" : ""}`}
+                  className={`tab ${currentPath === tab.route ? "active" : ""}`}
+                  onClick={() => navigate(tab.route)}
                 >
                   {tab.name}
                 </div>
@@ -60,23 +59,32 @@ export default function MyClassroomPage() {
 
           {/* Actions */}
           <div className="actions">
-            <button className="btn light">Join Classroom</button>
-            {userRole === "teacher" && (
-              <button className="btn dark">+ Create New Classroom</button>
+            <Link to="/join-classroom-page" className="btn light">Join Classroom</Link>
+            {user?.role === "teacher" && (
+              <Link to="/create-classroom" className="btn dark">+ Create New Classroom</Link>
             )}
-            <span className="total">All classrooms: 32</span>
+            <span className="total">All classrooms: {classrooms.length} </span>
           </div>
 
           {/* Classroom List */}
           <div className="classroom-list">
-            {classrooms.map((c, index) => (
-              <div className="classroom-card" key={index}>
+            {classrooms.length === 0 ? (
+              <p className="no-classroom-message">No classroom available.</p>
+            ) : (classrooms.map((c, index) => (
+              <div className="classroom-card"
+                key={c.id}
+                onClick={() => {
+                  localStorage.setItem("selectedClassroom", JSON.stringify(c)) // luu thông tin của classroom được chọn
+                  navigate(`/learners/approve-join-classroom-request`); // Điều hướng
+                }}
+                style={{ cursor: "pointer" }}
+              >
                 <div className="info">
                   <span>{c.lists} lists | {c.members} members</span>
                   <h3>{c.name}</h3>
                 </div>
               </div>
-            ))}
+            )))}
           </div>
 
           {/* See more */}
@@ -90,3 +98,4 @@ export default function MyClassroomPage() {
 
   );
 }
+

@@ -1,30 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
     ClassroomTitle,
     TeacherClassroomMenuTab,
     SearchBar, ClassroomDropdownMenu
 } from "../../../components/index";
+import classroomService from "../../../services/Classroom/classroomService";
 
-const initialStudents = Array(7).fill("Jane Smith");
+// const initialStudents = Array(7).fill("Jane Smith");
 
 export default function PendingRequestPage() {
-    const [students, setStudents] = useState(initialStudents);
+    const [request, setRequest] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const handleCancel = (index) => {
-        setStudents(students.filter((_, i) => i !== index));
+    // Fetch data về trang 
+    useEffect(() => {
+        const fetchPendingRequest = async () => {
+            try {
+                const res = await classroomService.getPendingJoinRequets();
+                if (res.success && Array.isArray(res.data)) {
+                    setRequest(res.data);
+                }
+            } catch (error) {
+                console.error("Lỗi khi lấy danh sách lớp học:", error);
+            }
+        }
+        fetchPendingRequest();
+    }, [])
+    // Xử lý nút Cancel (chưa hoàn thiện)
+    const handleCancel = (learner_id) => {
+        setRequest(request.filter((_, i) => i !== learner_id));
     };
 
-    const filteredStudents = students.filter((name) =>
-        name.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredRequest = request.filter((r) =>
+        r.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
         <div className="pending-request__page">
             <ClassroomTitle />
-            <TeacherClassroomMenuTab />
 
+            <TeacherClassroomMenuTab />
             <div className="pending-request__container">
                 {/* Actions */}
                 <div className="pending-request__student-action">
@@ -33,19 +49,19 @@ export default function PendingRequestPage() {
                     <div className="pending-request__search-block">
                         <SearchBar />
                         <div className="search-block--dropdown-menu">
-                            <ClassroomDropdownMenu students={students} />
+                            <ClassroomDropdownMenu students={request.length} />
                         </div>
                     </div>
                 </div>
 
                 {/* Student list */}
                 <div className="pending-request__student-list">
-                    {filteredStudents.map((name, index) => (
-                        <div className="pending-request__student-row" key={index}>
-                            <span>{name}</span>
+                    {filteredRequest.map((r) => (
+                        <div className="pending-request__student-row" key={r.learner_id}>
+                            <span>{r.email}</span>
                             <button
                                 className="btn btn--light"
-                                onClick={() => handleCancel(index)}
+                                onClick={() => handleCancel(learner_id)}
                             >
                                 Cancel
                             </button>

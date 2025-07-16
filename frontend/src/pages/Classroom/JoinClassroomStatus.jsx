@@ -1,16 +1,15 @@
 import { useState, useEffect } from "react";
 
-export default function JoinClassroomStatus({ status, code }) {
+export default function JoinClassroomStatus({ status, code, errorMsg }) {
     const [animation, setAnimation] = useState("");
 
     const safeStatus = status ?? "default";
-    const safeCode = code ?? "Nguyen Hoang Phi Hung";
+    const safeCode = code ?? "No code provided";
 
     useEffect(() => {
-        // Gán class animation theo trạng thái
         if (status === "success") setAnimation("confetti");
-        else if (status === "pending") setAnimation("cofetti");
-        else if (status === "full") setAnimation("error-bg");
+        else if (status === "pending") setAnimation("confetti");
+        else if (status === "full" || status === "error") setAnimation("error-bg");
         else setAnimation("default");
     }, [status]);
 
@@ -19,24 +18,28 @@ export default function JoinClassroomStatus({ status, code }) {
             case "success":
                 return "Join classroom successfully!";
             case "pending":
-                return "Your request sent successfully!";
+                return "Join request sent!";
             case "full":
-                return "Error - The classroom is full";
-            case "default":
+                return "Classroom is full";
+            case "error":
+                return "Join failed";
+            default:
                 return "Join classroom";
         }
-    }
+    };
 
     const getMessage = (status) => {
         switch (status) {
             case "success":
-                return "Continue with the classroom:";
+                return "You've joined the classroom:";
             case "pending":
-                return "Wait for the approval to join the classroom:";
+                return "Waiting for teacher approval to join:";
             case "full":
-                return "Can't join the classroom:";
+                return "Cannot join, class has reached capacity:";
+            case "error":
+                return errorMsg || "Could not join classroom.";
             default:
-                return "Enter classroom invitation code:";
+                return "Enter classroom invitation code below:";
         }
     };
 

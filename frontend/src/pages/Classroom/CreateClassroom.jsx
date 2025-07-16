@@ -1,8 +1,10 @@
-import { useState } from "react"
-import { Header, SideBar } from "../../components/index.jsx"
+import { useState } from "react";
+import { Header, SideBar, Footer } from "../../components/index.jsx";
+import classroomService from "../../services/Classroom/classroomService.js";
 
 export default function CreateClassroom() {
-    const [privacy, setPrivacy] = useState("invite-only");
+    const [privacy, setPrivacy] = useState("private");
+    const [errors, setErrors] = useState({});
 
     const handleCreateClassroom = async (e) => {
         e.preventDefault();
@@ -14,10 +16,16 @@ export default function CreateClassroom() {
             name: classroomName,
             description,
             privacy,
-            limit,
+            limit
         };
 
         // Handle API submission or further logic here...
+        try {
+            const res = await classroomService.createClassroom(data);
+        } catch (error) {
+            setErrors({ server: error.response?.data?.error || "Classroom error." });
+            console.error(errors);
+        }
     };
 
     return (
@@ -42,7 +50,7 @@ export default function CreateClassroom() {
                         name="description"
                         type="text"
                         placeholder="Description:..."
-                        required
+                        max={1000}
                     />
 
                     {/* privacy button  */}
@@ -53,13 +61,13 @@ export default function CreateClassroom() {
                                 type="button"
                                 onClick={() =>
                                     setPrivacy((prev) =>
-                                        prev === "invite-only" ? "public" : "invite-only"
+                                        prev === "private" ? "public" : "private"
                                     )
                                 }
-                                className={privacy === "invite-only" ? "active" : ""}
+                                className={privacy === "private" ? "active" : ""}
                             >
 
-                                {privacy === "invite-only" ? "Invite-only" : "Public"}
+                                {privacy === "private" ? "Private" : "Public"}
                             </button>
                         </div>
                     </div>
@@ -75,6 +83,15 @@ export default function CreateClassroom() {
                             min={1}
                             step={1}
                             max={100}
+                            defaultValue={50}
+                            onChange={(e) => {
+                                if (parseInt(e.target.value) > 100) {
+                                    e.target.value = 100;
+                                }
+                                else if (parseInt(e.target.value) <= 0) {
+                                    e.target.value = 1;
+                                }
+                            }}
                             required
                         />
                         <span>students</span>
@@ -87,6 +104,8 @@ export default function CreateClassroom() {
                     />
                 </form>
             </div>
+            {/* Footer */}
+            <Footer />
         </div>
     )
 }

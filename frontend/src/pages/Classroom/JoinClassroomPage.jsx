@@ -1,30 +1,48 @@
 import { useState } from "react";
 import JoinClassroomStatus from "./JoinClassroomStatus";
-import axios from "axios";
-import { data } from "react-router-dom";
+import classroomService from "../../services/Classroom/classroomService"
 
 export default function JoinClassroomPage() {
     const [inputCode, setInputCode] = useState("");
     const [status, setStatus] = useState("default");
     const [submittedCode, setSubmittedCode] = useState("");
+    const [errors, setErrors] = useState({});
 
     const handleJoin = async (e) => {
         if (!inputCode) return;
 
         try {
-            const response = await axios.post("api/classroom/join", { code: inputCode });
-
-            const { status } = response(data);
+            const res = await classroomService.joinRequest(inputCode);
             setSubmittedCode(inputCode);
-            setStatus(status);
+            if (res.success) {
+                if (res.message.includes("joined")) {
+                    setStatus("success");
+                } else if (res.message.includes("submitted")) {
+                    setStatus("pending");
+                } else {
+                    setStatus("success");
+                }
+            } else {
+                if (res.message.includes("capacity")) {
+                    setStatus("full");
+                } else {
+                    setStatus("error");
+                    setErrors({ server: res.message });
+                }
+            }
         }
-        catch (err) {
+        catch (error) {
             setStatus("error");
+            setErrors({
+                server:
+                    error.response?.data?.message ||
+                    "Unexpected error occurred. Please try again.",
+            });
         }
     };
 
     if (status != "default") {
-        return <JoinClassroomStatus status={status} code={submittedCode} />
+        return <JoinClassroomStatus status={status} code={submittedCode} errorMsg={errors.server} />
     }
 
     return (
