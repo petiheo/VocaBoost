@@ -4,3 +4,5 @@
 @use 'Navbar';
 @use 'SearchBar';
 @forward 'Dropdown' as dropdown-*;
+@use 'Report';
+@use 'ReportTrigger';
