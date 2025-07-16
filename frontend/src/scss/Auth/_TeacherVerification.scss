@@ -1,0 +1,119 @@
+@use '../Fonts' as *;
+
+$text-color: #352D24;
+
+.teacher-verification {
+  background-color: #F8F8F8;
+  height: 100vh;
+
+
+  &__header {
+    margin: 0 0 40px 0;
+    background-color: $text-color;
+  }
+
+  &__form-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px 40px;
+    background-color: white;
+  }
+
+  &__title {
+    font-family: $font-lalezar;
+    font-size: 28px;
+    margin: 0 0 24px 0;
+
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  &__form-left,
+  &__form-right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    font-family: $font-inriasans;
+  }
+
+  &__upload-label {
+    font-weight: 600;
+    font-size: 25px;
+  }
+
+  &__upload-description {
+    font-size: 15px;
+    color: #666;
+  }
+
+
+
+  &__upload-box {
+    position: relative;
+    border: 2px dashed #aaa;
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+
+  &__upload-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  &__preview {
+    margin-top: 16px;
+
+    img {
+      max-width: 50px;
+      max-height: 200px;
+      border-radius: 6px;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+      object-fit: contain;
+    }
+  }
+
+  &__upload-icon {
+    font-size: 32px;
+  }
+
+  &__upload-title {
+    font-weight: bold;
+    margin-top: 8px;
+  }
+
+  &__upload-subtext {
+    font-size: 13px;
+    color: #999;
+  }
+
+  &__upload-notes {
+    font-size: 11px;
+
+    ul {
+      padding-left: 16px;
+
+      li {
+        margin-bottom: 4px;
+      }
+    }
+  }
+
+  &__submit {
+    margin-top: 32px;
+  }
+}

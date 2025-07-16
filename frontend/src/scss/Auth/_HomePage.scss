@@ -1,0 +1,24 @@
+.homepage__wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.homepage__body {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  width: 240px;
+  background-color: #f8f9fa;
+}
+
+.homepage__main {
+  flex: 1;
+  padding: 24px;
+  background-color: #fdfdfd;
+  display: flex;
+  flex-direction: column;
+}
+
