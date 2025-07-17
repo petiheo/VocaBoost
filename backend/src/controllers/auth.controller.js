@@ -130,9 +130,7 @@ class AuthController {
   async googleCallback(req, res, next) {
     passport.authenticate(
       'google',
-      {
-        session: false,
-      },
+      { session: false },
       async (err, user, info) => {
         const frontendUrl = process.env.FRONTEND_URL;
         try {

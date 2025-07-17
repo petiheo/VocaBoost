@@ -1,6 +1,7 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const userModel = require('../models/user.model');
+const validator = require('validator');
 
 passport.serializeUser((user, done) => {
   done(null, user);
@@ -19,12 +20,15 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const email = profile.emails[0].value;
+        const email = validator.normalizeEmail(profile.emails[0].value);
         const googleId = profile.id;
         const displayName = profile.displayName;
         const avatarUrl = profile.photos[0]?.value;
 
-        let user = await userModel.findByGoogleId(profile.id);
+        let user = await userModel.findByEmail(email);
+        console.log('Email:::', email);
+        console.log(user);
+
         if (user) {
           if (!user.google_id)
             user = await userModel.updateGoogleId(user.id, googleId);
