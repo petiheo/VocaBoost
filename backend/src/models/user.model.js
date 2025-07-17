@@ -26,6 +26,87 @@ class UserModel {
     if (error) throw error;
     return data;
   }
+
+  async findByGoogleId(id) {
+    const { data, error } = await supabase
+      .from('users')
+      .select()
+      .eq('google_id', id)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async updateGoogleId(userId, googleId) {
+    const { data, error } = await supabase
+      .from('users')
+      .update({
+        google_id: googleId,
+        email_verified: true,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async updateDisplayName(id, displayName) {
+    const { data, error } = await supabase
+      .from('users')
+      .update({
+        display_name: displayName,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async updateAvartar(id, avatar) {
+    const { data, error } = await supabase
+      .from('users')
+      .update({
+        avatar_url: avatar,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async createGoogleUser({
+    email,
+    googleId,
+    displayName,
+    avatarUrl,
+    role = 'learner',
+  }) {
+    const { data, error } = await supabase
+      .from('users')
+      .insert({
+        email,
+        google_id: googleId,
+        display_name: displayName,
+        avatar_url: avatarUrl,
+        role,
+        email_verified: true,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
 }
 
 module.exports = new UserModel();

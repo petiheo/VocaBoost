@@ -3,8 +3,10 @@ const {
   generateToken,
   generateEmailVerificationToken,
   generateResetToken,
+  verifyToken,
 } = require('../helpers/jwt.helper');
 const emailService = require('../services/email.service');
+const passport = require('passport');
 
 class AuthController {
   // TODO: Render HTML bằng Pug, chuyển logic chính sang service
@@ -98,7 +100,7 @@ class AuthController {
       }
 
       const accessToken = generateToken({
-        userID: userData.id,
+        userId: userData.id,
         email,
         role: userData.role,
       });
@@ -123,6 +125,38 @@ class AuthController {
         message: 'Login failed',
       });
     }
+  }
+
+  async googleCallback(req, res, next) {
+    passport.authenticate(
+      'google',
+      {
+        session: false,
+      },
+      async (err, user, info) => {
+        const frontendUrl = process.env.FRONTEND_URL;
+        try {
+          if (err) {
+            console.error('Google OAuth Error:', err);
+            return res.redirect(`${frontendUrl}/login?error=oauth_failed`);
+          }
+
+          if (!user) {
+            return res.redirect(`${frontendUrl}/login?error=access_denied`);
+          }
+
+          const accessToken = generateToken({
+            userId: user.id,
+            email: user.email,
+            role: user.role,
+          });
+          res.redirect(`${frontendUrl}/auth/success?token=${accessToken}`);
+        } catch (error) {
+          console.error('Google callback processing error:', error);
+          res.redirect(`${frontendUrl}/login?error=processing_failed`);
+        }
+      }
+    )(req, res, next);
   }
 
   // TODO: frontend sẽ xử lý xóa JWT, sau này có thể triển khai thêm blacklist token
@@ -174,6 +208,21 @@ class AuthController {
         message: 'Forgot password failed',
       });
     }
+  }
+
+  async resetPassword(req, res) {
+    try {
+      const { token, newPassword } = req.body;
+
+      // let decoded;
+      // try {
+      //   decoded = verifyToken(token);
+      //   if (decoded.type !== 'password_reset')
+      //     throw new Error
+      // } catch (error) {
+
+      // }
+    } catch (error) {}
   }
 }
 

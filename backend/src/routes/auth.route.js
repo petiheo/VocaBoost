@@ -4,6 +4,7 @@ const authRouter = express.Router();
 const rateLimiter = require('../middlewares/rateLimiter.middleware');
 const authValidator = require('../validators/auth.validator');
 const authController = require('../controllers/auth.controller');
+const passport = require('passport');
 
 authRouter.post(
   '/register',
@@ -19,6 +20,16 @@ authRouter.post(
   authController.login
 );
 
+authRouter.get(
+  '/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    session: false,
+  })
+);
+
+authRouter.get('/google/callback', authController.googleCallback);
+
 authRouter.post('/logout', rateLimiter, authController.logout);
 
 authRouter.post(
@@ -26,6 +37,13 @@ authRouter.post(
   rateLimiter,
   authValidator.email,
   authController.forgotPassword
+);
+
+authRouter.post(
+  '/reset-password',
+  rateLimiter,
+  authValidator.resetPassword,
+  authController.resetPassword
 );
 
 module.exports = authRouter;

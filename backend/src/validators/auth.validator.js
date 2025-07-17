@@ -27,7 +27,7 @@ const authValidator = {
       .isEmail()
       .normalizeEmail()
       .withMessage('Invalid email format'),
-    body('password').notEmpty().withMessage('Password must not be empty'),
+    body('password').notEmpty().withMessage('Password is required'),
   ],
 
   email: [
@@ -37,6 +37,15 @@ const authValidator = {
       .isEmail()
       .normalizeEmail()
       .withMessage('Invalid email format'),
+  ],
+
+  resetPassword: [
+    body('token').trim().notEmpty().withMessage('Reset token is required'),
+    body('newPassword')
+      .isLength({ min: 8, max: 128 })
+      .withMessage('Password must be 8-128 characters')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+      .withMessage('Password must contain uppercase, lowercase and number'),
   ],
 };
 
