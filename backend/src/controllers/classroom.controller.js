@@ -1,4 +1,5 @@
 const classroomService = require('../services/classroom.service');
+const { validationResult } = require('express-validator');
 
 class ClassroomController {
   async createClassroom(req, res) {
@@ -320,6 +321,18 @@ class ClassroomController {
   }
 
   async createAssignment(req, res) {
+    // Bắt lỗi từ validator
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array().map(err => ({
+          field: err.path,
+          message: err.msg
+        }))
+      });
+    }
+    
     try {
       const classroomId = req.classroom.id;
       const teacherId = req.user.userId;
@@ -352,6 +365,59 @@ class ClassroomController {
       return res.status(400).json({
         success: false,
         message: err.message || 'Failed to create assignment.'
+      });
+    }
+  }
+
+  async getMyJoinedClassrooms(req, res) {
+    try {
+      const learnerId = req.user.userId;
+      const result = await classroomService.getJoinedClassroomsByLearner(learnerId);
+
+      return res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to get joined classrooms.',
+      });
+    }
+  }
+
+  async getClassroomInvitations(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+
+      const invitations = await classroomService.getClassroomInvitations(classroomId);
+
+      return res.status(200).json({
+        success: true,
+        data: invitations,
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to get invitations.',
+      });
+    }
+  }
+
+  async getClassroomAssignments(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+
+      const assignments = await classroomService.getClassroomAssignments(classroomId);
+
+      return res.status(200).json({
+        success: true,
+        data: assignments
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to retrieve assignments'
       });
     }
   }

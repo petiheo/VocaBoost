@@ -24,6 +24,7 @@ const classroomValidator = {
       .isInt({ min: 1, max: 100 })
       .withMessage('capacity_limit must be an integer between 1 and 100'),
   ],
+
   createAssignment: [
     body('vocabListId')
       .notEmpty()
@@ -68,16 +69,21 @@ const classroomValidator = {
       .isISO8601()
       .withMessage('dueDate must be a valid ISO 8601 datetime')
       .bail()
-      .custom((value) => {
+      .custom((value, { req }) => {
         const due = new Date(value);
-        const now = new Date();
-        if (due < now) {
+        const start = new Date(req.body.startDate);
+
+        if (due < new Date()) {
           throw new Error('dueDate cannot be in the past');
         }
+
+        if (req.body.startDate && (due < start)) {
+          throw new Error('dueDate must be equal to or after startDate');
+        }
+
         return true;
       }),
   ]
-
 };
 
 module.exports = classroomValidator;

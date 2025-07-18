@@ -93,9 +93,20 @@ classroomRouter.post('/:classroomId/assignment',
   classroomController.createAssignment
 );
 
+classroomRouter.get('/my-joined',
+  classroomController.getMyJoinedClassrooms
+);
 
+classroomRouter.get('/:classroomId/invitations',
+  hasClassroomAccess,
+  requireClassRole('teacher'),
+  classroomController.getClassroomInvitations
+);
 
-
-
+classroomRouter.get('/:classroomId/assignments',
+  hasClassroomAccess,
+  requireClassRole('teacher'),
+  classroomController.getClassroomAssignments
+);
 
 module.exports = classroomRouter;

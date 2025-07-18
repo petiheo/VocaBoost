@@ -22,6 +22,17 @@ const generateUniqueJoinCode = async () => {
     return code;
 }
 
+function computeAssignmentStatus(startDate, dueDate) {
+    const now = new Date();
+    const start = new Date(startDate);
+    const due = dueDate ? new Date(dueDate) : null;
+
+    if (now < start) return 'pending';
+    if (due && now > due) return 'overdue';
+    return 'assigned';
+}
+
 module.exports = {
-    generateUniqueJoinCode
+    generateUniqueJoinCode,
+    computeAssignmentStatus,
 };

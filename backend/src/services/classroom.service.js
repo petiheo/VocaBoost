@@ -1,5 +1,5 @@
 const classroomModel = require('../models/classroom.model');
-const { generateUniqueJoinCode } = require('../helpers/joinCode.helper');
+const { generateUniqueJoinCode, computeAssignmentStatus } = require('../helpers/classroom.helper');
 const ms = require('ms');
 const emailService = require('../services/email.service');
 const { generateInvitationToken } = require('../helpers/jwt.helper');
@@ -52,7 +52,7 @@ class ClassroomService {
     }
 
     if (classroom.learner_count >= classroom.capacity_limit) {
-        throw new Error('This classroom has reached its capacity limit.');
+        throw new Error('This classroom is full.');
     }
 
     await classroomModel.createJoinRequest(classroom.id, user.userId, user.email);
@@ -242,6 +242,10 @@ class ClassroomService {
       throw new Error('This invitation has expired.');
     }
 
+    if (classroom.learner_count >= classroom.capacity_limit) {
+        throw new Error('This classroom is full.');
+    }
+
     const member = await classroomModel.findMemberStatus(classroom.id, user.userId);
     if (member?.join_status === 'joined') {
       throw new Error('You are already a member of this classroom.');
@@ -281,7 +285,7 @@ class ClassroomService {
 
     const allWords = await classroomModel.getWordsByListId(vocabListId); // vocabModel  
     if (!allWords || allWords.length === 0) {
-      throw new Error('Vocabulary list is empty.');
+      throw new Error('Vocabulary list not found or empty.');
     }
 
     const sublistCount = Math.ceil(allWords.length / wordsPerReview);
@@ -320,6 +324,24 @@ class ClassroomService {
     }
 
     return assignment;
+  }
+
+  async getJoinedClassroomsByLearner(learnerId) {
+    // nhớ gắn assignmentassignment_count
+    return await classroomModel.getJoinedClassroomsByLearner(learnerId);
+  }
+
+  async getClassroomInvitations(classroomId) {
+    return await classroomModel.getInvitationsByClassroomId(classroomId);
+  }
+
+  async getClassroomAssignments(classroomId) {
+    const raw = await classroomModel.getAssignmentsByClassroom(classroomId);
+
+    return raw.map(a => ({
+      ...a,
+      status: computeAssignmentStatus(a.start_date, a.due_date)
+    }));
   }
 
 }

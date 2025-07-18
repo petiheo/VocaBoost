@@ -285,6 +285,69 @@ class ClassroomModel {
         if (error) throw error;
     }
 
+    async getJoinedClassroomsByLearner(learnerId) {
+        const { data, error } = await supabase
+            .from('classroom_members')
+            .select(`
+            classroom_id,
+            classrooms (
+                id,
+                teacher_id,
+                name,
+                description,
+                join_code,
+                learner_count,
+                classroom_status
+            )
+            `)
+            .eq('learner_id', learnerId)
+            .eq('join_status', 'joined');
+
+        if (error) throw error;
+
+        return data.map(entry => ({
+            id: entry.classrooms.id,
+            teacher_id: entry.classrooms.teacher_id,
+            name: entry.classrooms.name,
+            description: entry.classrooms.description,
+            join_code: entry.classrooms.join_code,
+            learner_count: entry.classrooms.learner_count,
+            status: entry.classrooms.classroom_status,
+        }));
+    }
+
+    async getInvitationsByClassroomId(classroomId) {
+        const { data, error } = await supabase
+            .from('classroom_invitations')
+            .select('email')
+            .eq('classroom_id', classroomId)
+            .eq('status', 'pending_invite');
+        if (error) throw error;
+        return data;
+    }
+
+    async getAssignmentsByClassroom(classroomId) {
+        const { data, error } = await supabase
+            .from('assignments')
+            .select(`
+            id,
+            title,
+            exercise_method,
+            start_date,
+            due_date,
+            words_per_review,
+            sublist_count,
+            created_at,
+            updated_at
+            `)
+            .eq('classroom_id', classroomId)
+            .order('start_date', { ascending: false });
+
+        if (error) throw error;
+        return data;
+    }
+
+
 // =================    
 //    vocab model
 // =================
