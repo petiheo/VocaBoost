@@ -28,38 +28,50 @@ const classroomService = {
     },
 
     //4. Get Pending Join Requests
-    getPendingJoinRequets: async () => {
-        // Truy xuất dữ liệu lớp học được lưu khi users chọn classroom ở trang MyClassroom. 
-        const selectedClassroom = JSON.parse(localStorage.getItem("selectedClassroom"));// lấy thông tin từ local
-        if (!selectedClassroom || !selectedClassroom.id) {
-            throw new Error("Missing classroom");
-        }
-        const classroomId = selectedClassroom.id;
+    getPendingJoinRequets: async (classroomId) => {
         const res = await api.get(`/classroom/${classroomId}/join-requests`);
         return res.data;
     },
 
     //5. Approve Join Request
-    apporveJoinRequest: async (data) => { // chua cap nhat data ben ApproveClassroomRequest
-        const selectedClassroom = JSON.parse(localStorage.getItem("selectedClassroom")); // can chuyen qua file ApproveClassroomRequest
-        if (!selectedClassroom || !selectedClassroom.id) {
-            throw new Error("Missing classroom");
-        }
-        const classroomId = selectedClassroom.id; 
-        const res = await api.post(`/classroom/${classroomId}/approve-request`, {data});
+    approveJoinRequest: async ({ classroomId, learnerId }) => { // chua cap nhat data ben ApproveClassroomRequest
+        const res = await api.post(`/classroom/${classroomId}/approve-request`, { learnerId });
         return res.data
     },
 
     //6. Reject join request 
-    rejectJoinRequest: async (data) => {
-        const selectedClassroom = JSON.parse(localStorage.getItem("selectedClassroom")); // can chuyen qua file ApproveClassroomRequest
-        if (!selectedClassroom || !selectedClassroom.id) {
-            throw new Error("Missing classroom");
-        }
-        const classroomId = selectedClassroom.id; 
-        const res = await api.post(`/classroom/${classroomId}/reject-request`, {data});
-        return res.data; 
+    rejectJoinRequest: async ({ classroomId, learnerId }) => {
+        const res = await api.post(`/classroom/${classroomId}/reject-request`, { learnerId });
+        return res.data;
+    },
+
+    //7. approve all join request 
+    approveAllJoinRequest: async ({ classroomId }) => {
+        const res = await api.post(`/classroom/${classroomId}/approve-all`);
+        return res.data;
+    },
+
+    //8. get learner in classroom 
+    getLearnerInClassroom: async ({ classroomId }) => {
+        const res = await api.post(`/classroom/${classroomId}/learner`)
+        return res.data;
+    },
+
+    //9. remove a learner
+    removeALearner: async ({ classroomId, learnerId }) => {
+        const res = await api.post(`/classroom/${classroomId}/remove-learner`, { learnerId })
+        return res.data;
+    },
+
+    //10. delete a classroom 
+    deleteAClassroom: async ({classroomId}) => {
+        const res = await api.delete(`/classroom/${classroomId}`);
+        return res.data;
     }
+
+    //11. Search Learners by Display Name
+
+
 };
 
 export default classroomService;

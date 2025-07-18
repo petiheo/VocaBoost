@@ -2153,6 +2153,7 @@ h2 {
 
 .sidebar {
   position: relative;
+  z-index: 1000;
   width: 250px;
   background: #241F1F;
   color: white;
@@ -2163,10 +2164,10 @@ h2 {
   flex-direction: column;
   border-radius: 0 2rem 2rem 0;
   font-family: "Inria Sans", sans-serif;
-  max-height: 100vh;
 }
 .sidebar.collapsed {
-  width: 50px;
+  width: 10px;
+  padding: 4px;
 }
 .sidebar.collapsed .sidebar__logo,
 .sidebar.collapsed .sidebar__nav,
@@ -2174,13 +2175,16 @@ h2 {
 .sidebar.collapsed .sidebar__title,
 .sidebar.collapsed .sidebar__divider,
 .sidebar.collapsed .sidebar__link {
-  display: none !important;
+  visibility: hidden;
 }
 .sidebar .sidebar__logo {
   margin-bottom: 2rem;
 }
 .sidebar .sidebar__logo img {
   width: 100px;
+}
+.sidebar .sidebar__section2 {
+  margin-top: 8rem;
 }
 .sidebar .sidebar__toggle {
   position: absolute;
@@ -2211,6 +2215,7 @@ h2 {
   color: white;
   border-radius: 0.5rem;
   transition: background 0.2s ease;
+  margin-top: 2rem;
 }
 .sidebar .sidebar__link:hover {
   background: #686262;

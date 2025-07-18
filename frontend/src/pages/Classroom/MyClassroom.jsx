@@ -75,7 +75,7 @@ export default function MyClassroomPage() {
                 key={c.id}
                 onClick={() => {
                   localStorage.setItem("selectedClassroom", JSON.stringify(c)) // luu thông tin của classroom được chọn
-                  navigate(`/learners/approve-join-classroom-request`); // Điều hướng
+                  navigate(`/classroom/approve-join-classroom-request`); // Điều hướng
                 }}
                 style={{ cursor: "pointer" }}
               >

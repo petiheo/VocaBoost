@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { Header, SideBar, Footer, ClassroomTitle, TeacherClassroomMenuTab } from "../../../components";
+import { Link } from "react-router-dom";
 const mockAssignments = Array(8).fill({
     title: "Unit 1 Vocabulary",
     words: 20,
@@ -25,7 +25,7 @@ export default function AssignmentPage() {
 
                     {/* Controls */}
                     <div className="controls">
-                        <button className="btn dark">+ Assign Exercise</button>
+                        <Link to = "/assign-exercise" className="btn dark">+ Assign Exercise</Link>
                         <div className="sort">Sort by ▼</div>
                     </div>
 
