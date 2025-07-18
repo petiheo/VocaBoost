@@ -107,6 +107,13 @@ class UserModel {
     if (error) throw error;
     return data;
   }
+
+  async updatePassword(id, hashedPassword) {
+    return await supabase
+      .from('users')
+      .update({ password_hash: hashedPassword })
+      .eq('id', id);
+  }
 }
 
 module.exports = new UserModel();

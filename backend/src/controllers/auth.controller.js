@@ -7,6 +7,7 @@ const {
 } = require('../helpers/jwt.helper');
 const emailService = require('../services/email.service');
 const passport = require('passport');
+const { verify } = require('jsonwebtoken');
 
 class AuthController {
   // TODO: Render HTML bằng Pug, chuyển logic chính sang service
@@ -211,16 +212,32 @@ class AuthController {
   async resetPassword(req, res) {
     try {
       const { token, newPassword } = req.body;
+      const decoded = verifyToken(token);
 
-      // let decoded;
-      // try {
-      //   decoded = verifyToken(token);
-      //   if (decoded.type !== 'password_reset')
-      //     throw new Error
-      // } catch (error) {
+      if (
+        decoded.type !== 'password_reset' ||
+        (await authService.isUsedToken(token))
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid or expired token',
+        });
+      }
 
-      // }
-    } catch (error) {}
+      await authService.updateUsedAt(decoded.userId, token);
+      await authService.updatePassword(decoded.userId, newPassword);
+      return res.status(200).json({
+        success: true,
+        message:
+          'Password has been reset successfully. Please login with your new password.',
+      });
+    } catch (error) {
+      console.error('Reset password error: ', error);
+      return res.status(400).json({
+        success: false,
+        message: 'Reset password failed',
+      });
+    }
   }
 }
 
