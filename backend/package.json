@@ -7,11 +7,6 @@
     "dev": "nodemon server.js",
     "format": "prettier --write .",
     "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:integration": "jest --testPathPattern=integration",
-    "test:unit": "jest --testPathPattern=test --testPathIgnorePatterns=integration",
-    "test:email": "node tests/scripts/test-emails.js",
     "test:preview": "node tests/scripts/preview-templates.js"
   },
   "author": "",
