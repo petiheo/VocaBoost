@@ -422,6 +422,63 @@ class ClassroomController {
     }
   }
 
+  async getLearnerToReviewAssignments(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const learnerId = req.user.userId;
+
+      const result = await classroomService.getLearnerToReviewAssignments(classroomId, learnerId);
+
+      return res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to load assignments.'
+      });
+    }
+  }
+
+  async getLearnerReviewedAssignments(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const learnerId = req.user.userId;
+
+      const result = await classroomService.getLearnerReviewedAssignments(classroomId, learnerId);
+
+      return res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to load reviewed assignments.'
+      });
+    }
+  }
+
+  async getAssignmentDetails(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const assignmentId = req.params.assignmentId;
+
+      const result = await classroomService.getAssignmentDetails(classroomId, assignmentId);
+
+      return res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (err) {
+      return res.status(404).json({
+        success: false,
+        message: err.message || 'Assignment not found.'
+      });
+    }
+  }
+
 }
 
 module.exports = new ClassroomController();

@@ -347,7 +347,99 @@ class ClassroomModel {
         return data;
     }
 
+    async getLearnerAssignmentsByStatus(classroomId, learnerId, statusList) {
+        const { data, error } = await supabase
+            .from('learner_assignments')
+            .select(`
+            assignment_id,
+            completed_sublist_index,
+            status,
+            assignments (
+                title,
+                exercise_method,
+                sublist_count,
+                due_date,
+                start_date,
+                classroom_id
+            )
+            `)
+            .eq('learner_id', learnerId)
+            .in('status', statusList);
 
+        if (error) throw error;
+
+        return data.filter(item => item.assignments?.classroom_id === classroomId);
+    }
+
+    async hasLearnerAssignment(assignmentId, learnerId) {
+        const { data, error } = await supabase
+            .from('learner_assignments')
+            .select('assignment_id')
+            .eq('assignment_id', assignmentId)
+            .eq('learner_id', learnerId)
+            .maybeSingle();
+
+        if (error) throw error;
+        return !!data;
+    }
+
+    async createLearnerAssignment({ assignment_id, learner_id }) {
+        const { error } = await supabase
+            .from('learner_assignments')
+            .insert({
+            assignment_id,
+            learner_id,
+            status: 'not_started',
+            completed_sublist_index: 0
+            });
+
+        if (error) throw error;
+    }
+
+    async getAssignmentById(classroomId, assignmentId) {
+        const { data, error } = await supabase
+            .from('assignments')
+            .select('*')
+            .eq('id', assignmentId)
+            .eq('classroom_id', classroomId)
+            .single();
+
+        if (error) throw error;
+        return data;
+    }
+
+    async getAssignmentById(classroomId, assignmentId) {
+        const { data, error } = await supabase
+            .from('assignments')
+            .select('*')
+            .eq('id', assignmentId)
+            .eq('classroom_id', classroomId)
+            .single();
+
+        if (error) throw error;
+        return data;
+    }
+
+    async getAssignmentVocabulary(vocabListId) {
+        const { data, error } = await supabase
+            .from('vocabulary')
+            .select('term, definition')
+            .eq('list_id', vocabListId);
+
+        if (error) throw error;
+        return data;
+    }
+
+    async countLearnersCompleted(assignmentId) {
+        const { count, error } = await supabase
+            .from('learner_assignments')
+            .select('*', { count: 'exact', head: true })
+            .eq('assignment_id', assignmentId)
+            .eq('status', 'completed');
+
+        if (error) throw error;
+        return count;
+    }
 // =================    
 //    vocab model
 // =================

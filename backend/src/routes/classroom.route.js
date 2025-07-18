@@ -109,4 +109,23 @@ classroomRouter.get('/:classroomId/assignments',
   classroomController.getClassroomAssignments
 );
 
+classroomRouter.get('/:classroomId/assignments/to-review',
+  hasClassroomAccess,
+  requireClassRole('learner'),
+  classroomController.getLearnerToReviewAssignments
+);
+
+classroomRouter.get('/:classroomId/assignments/reviewed',
+  hasClassroomAccess,
+  requireClassRole('learner'),
+  classroomController.getLearnerReviewedAssignments
+);
+
+classroomRouter.get('/:classroomId/:assignmentId',
+  hasClassroomAccess,
+  requireClassRole('teacher'),
+  classroomController.getAssignmentDetails
+);
+
+
 module.exports = classroomRouter;

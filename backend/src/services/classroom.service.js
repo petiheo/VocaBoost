@@ -23,7 +23,21 @@ class ClassroomService {
   }
 
   async getClassroomsByTeacherId(teacherId) {
-    return await classroomModel.findByTeacherId(teacherId);
+    const classrooms = await classroomModel.findByTeacherId(teacherId);
+
+    const updated = await Promise.all(
+      classrooms.map(async (classroom) => {
+        const assignments = await classroomModel.getAssignmentsByClassroom(classroom.id);
+        const count = assignments.length;
+
+        return {
+          ...classroom,
+          assignment_count: count
+        };
+      })
+    );
+
+    return updated;
   }
 
   async handleJoinRequestByCode(joinCode, user) {
@@ -327,8 +341,24 @@ class ClassroomService {
   }
 
   async getJoinedClassroomsByLearner(learnerId) {
-    // nhớ gắn assignmentassignment_count
-    return await classroomModel.getJoinedClassroomsByLearner(learnerId);
+    const classrooms = await classroomModel.getJoinedClassroomsByLearner(learnerId);
+
+    const result = [];
+
+    for (const classroom of classrooms) {
+      const assignments = await classroomModel.getAssignmentsByClassroom(classroom.id);
+
+      const assignedCount = assignments.filter(a =>
+        computeAssignmentStatus(a.start_date, a.due_date) === 'assigned'
+      ).length;
+
+      result.push({
+        ...classroom,
+        assignment_count: assignedCount
+      });
+    }
+
+    return result;
   }
 
   async getClassroomInvitations(classroomId) {
@@ -342,6 +372,81 @@ class ClassroomService {
       ...a,
       status: computeAssignmentStatus(a.start_date, a.due_date)
     }));
+  }
+
+  async getLearnerToReviewAssignments(classroomId, learnerId) {
+    const allAssignments = await classroomModel.getAssignmentsByClassroom(classroomId);
+    const assignedAssignments = allAssignments.filter(a => 
+      computeAssignmentStatus(a.start_date, a.due_date) === 'assigned'
+    );
+    
+    for (const assignment of assignedAssignments) {
+      const hasRecord = await classroomModel.hasLearnerAssignment(assignment.id, learnerId);
+      if (!hasRecord) {
+        await classroomModel.createLearnerAssignment({
+          assignment_id: assignment.id,
+          learner_id: learnerId
+        });
+      }
+    }
+   
+    const raw = await classroomModel.getLearnerAssignmentsByStatus(
+      classroomId,
+      learnerId,
+      ['not_started', 'in_progress']
+    );
+
+    const result = raw.filter(item => 
+      computeAssignmentStatus(item.assignments.start_date, item.assignments.due_date) === 'assigned'
+    );
+
+    return result.map(item => ({
+      assignment_id: item.assignment_id,
+      title: item.assignments.title,
+      exercise_method: item.assignments.exercise_method,
+      completed_sublist_index: item.completed_sublist_index,
+      sublist_count: item.assignments.sublist_count,
+      due_date: item.assignments.due_date,
+      status: 'assigned',
+      learner_status: item.status
+    }));
+  }
+
+  async getLearnerReviewedAssignments(classroomId, learnerId) {
+    const raw = await classroomModel.getLearnerAssignmentsByStatus(
+      classroomId,
+      learnerId,
+      ['completed']
+    );
+
+    return raw.map(item => ({
+      assignment_id: item.assignment_id,
+      title: item.assignments.title,
+      exercise_method: item.assignments.exercise_method,
+      completed_sublist_index: item.completed_sublist_index,
+      sublist_count: item.assignments.sublist_count,
+      due_date: item.assignments.due_date,
+      learner_status: item.status
+    }));
+  }
+
+  async getAssignmentDetails(classroomId, assignmentId) {
+    const assignment = await classroomModel.getAssignmentById(classroomId, assignmentId);
+    if (!assignment) {
+      throw new Error('Assignment not found.');
+    }
+
+    const allWords = await classroomModel.getAssignmentVocabulary(assignment.vocab_list_id);
+    const reviewedCount = await classroomModel.countLearnersCompleted(assignmentId);
+
+    return {
+      title: assignment.title,
+      start_date: assignment.start_date,
+      due_date: assignment.due_date,
+      total_words: allWords.length,
+      reviewed_learner_count: reviewedCount,
+      vocabulary: allWords
+    };
   }
 
 }
