@@ -111,7 +111,21 @@ class UserModel {
   async updatePassword(id, hashedPassword) {
     return await supabase
       .from('users')
-      .update({ password_hash: hashedPassword })
+      .update({
+        password_hash: hashedPassword,
+        password_changed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id);
+  }
+
+  async verifyEmail(id) {
+    return await supabase
+      .from('users')
+      .update({
+        email_verified: true,
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', id);
   }
 }

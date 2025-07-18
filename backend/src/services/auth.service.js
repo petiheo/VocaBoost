@@ -35,6 +35,10 @@ class AuthService {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     return await userModel.updatePassword(userId, hashedPassword);
   }
+
+  async verifyEmail(id) {
+    return await userModel.verifyEmail(id);
+  }
 }
 
 module.exports = new AuthService();

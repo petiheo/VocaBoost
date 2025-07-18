@@ -224,7 +224,7 @@ class AuthController {
         });
       }
 
-      await authService.updateUsedAt(decoded.userId, token);
+      await authService.updateUsedAt(token);
       await authService.updatePassword(decoded.userId, newPassword);
       return res.status(200).json({
         success: true,
@@ -236,6 +236,64 @@ class AuthController {
       return res.status(400).json({
         success: false,
         message: 'Reset password failed',
+      });
+    }
+  }
+
+  async verifyEmail(req, res) {
+    try {
+      const token = req.params.token;
+      const decoded = verifyToken(token);
+
+      if (
+        decoded.type !== 'email_verification' ||
+        (await authService.isUsedToken(token))
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid or expired token',
+        });
+      }
+
+      await authService.updateUsedAt(token);
+      await authService.verifyEmail(decoded.userId);
+      return res.status(200).json({
+        success: true,
+        message: 'Email verified successfully.',
+      });
+    } catch (error) {
+      console.error('Verify email error: ', error);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired verification token',
+      });
+    }
+  }
+
+  async resendVerification(req, res) {
+    try {
+      const { email } = req.body;
+      const userData = await authService.findUserByEmail(email);
+
+      if (!userData || userData.email_verified) {
+        return res.status(404).json({
+          success: false,
+          message: 'Email not found or already verified',
+        });
+      }
+
+      const token = generateEmailVerificationToken(userData.id);
+      await emailService.sendEmailVerification(email, token);
+      return res.status(200).json({
+        success: true,
+        message:
+          'Verification email resent successfully. Please check your inbox',
+      });
+    } catch (error) {
+      console.error('Resend verification error: ', error);
+      return res.status(404).json({
+        success: false,
+        message: 'Email not found or already verified',
       });
     }
   }

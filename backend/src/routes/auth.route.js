@@ -46,4 +46,12 @@ authRouter.post(
   authController.resetPassword
 );
 
+authRouter.post('/verify-email/:token', authController.verifyEmail);
+
+authRouter.post(
+  '/resend-verification',
+  authValidator.email,
+  authController.resendVerification
+);
+
 module.exports = authRouter;
