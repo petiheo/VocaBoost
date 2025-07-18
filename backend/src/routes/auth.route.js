@@ -1,48 +1,52 @@
 const express = require('express');
 const authRouter = express.Router();
-
-const rateLimiter = require('../middlewares/rateLimiter.middleware');
-const authValidator = require('../validators/auth.validator');
-const authController = require('../controllers/auth.controller');
 const passport = require('passport');
 
+const rateLimiter = require('../middlewares/rateLimiter.middleware');
+const { authValidators } = require('../validators/auth.validator');
+const authController = require('../controllers/auth.controller');
+
+// Registration & Login & Logout
 authRouter.post(
   '/register',
   rateLimiter,
-  authValidator.register,
+  authValidators.register,
   authController.register
 );
 
 authRouter.post(
   '/login',
   rateLimiter,
-  authValidator.login,
+  authValidators.login,
   authController.login
 );
 
+authRouter.post('/logout', rateLimiter, authController.logout);
+
+// OAuth Routes
 authRouter.get(
   '/google',
   passport.authenticate('google', {
     scope: ['profile', 'email'],
     session: false,
+    prompt: 'select_account', // Force account selection
   })
 );
 
 authRouter.get('/google/callback', authController.googleCallback);
 
-authRouter.post('/logout', rateLimiter, authController.logout);
-
+// Password Reset Flow
 authRouter.post(
   '/forgot-password',
   rateLimiter,
-  authValidator.email,
+  authValidators.email,
   authController.forgotPassword
 );
 
 authRouter.post(
   '/reset-password',
   rateLimiter,
-  authValidator.resetPassword,
+  authValidators.resetPassword,
   authController.resetPassword
 );
 
@@ -50,7 +54,7 @@ authRouter.post('/verify-email/:token', authController.verifyEmail);
 
 authRouter.post(
   '/resend-verification',
-  authValidator.email,
+  authValidators.email,
   authController.resendVerification
 );
 
