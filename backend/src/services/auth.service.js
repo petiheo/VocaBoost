@@ -24,7 +24,11 @@ class AuthService {
 
   async isUsedToken(token) {
     const tokenInDb = await AuthToken.get(token);
-    return tokenInDb.used_at !== null;
+    return (
+      !tokenInDb ||
+      tokenInDb.used_at !== null ||
+      new Date(tokenInDb.expires_at) < new Date()
+    );
   }
 
   async updateUsedAt(token) {
