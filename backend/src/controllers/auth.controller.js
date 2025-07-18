@@ -7,7 +7,6 @@ const {
 } = require('../helpers/jwt.helper');
 const emailService = require('../services/email.service');
 const passport = require('passport');
-const { verify } = require('jsonwebtoken');
 
 class AuthController {
   // TODO: Render HTML bằng Pug, chuyển logic chính sang service
@@ -181,9 +180,10 @@ class AuthController {
 
       const userData = await authService.findUserByEmail(email);
       if (!userData) {
-        return res.status(404).json({
-          success: false,
-          message: 'Email not found',
+        return res.status(200).json({
+          success: true,
+          message:
+            'If the email exists, password reset instructions have been sent',
         });
       }
 
@@ -198,7 +198,8 @@ class AuthController {
 
       return res.status(200).json({
         success: true,
-        message: 'Password reset instructions sent to your email',
+        message:
+          'If the email exists, password reset instructions have been sent',
       });
     } catch (error) {
       console.error('Forgot password error: ', error);
