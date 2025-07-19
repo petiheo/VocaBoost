@@ -109,7 +109,9 @@ classroomRouter.post(
   classroomController.createAssignment
 );
 
-classroomRouter.get('/my-joined', classroomController.getMyJoinedClassrooms);
+classroomRouter.get('/my-joined', 
+  classroomController.getMyJoinedClassrooms
+);
 
 classroomRouter.get(
   '/:classroomId/invitations',
@@ -152,5 +154,19 @@ classroomRouter.patch(
   requireClassRole('teacher'),
   classroomController.changeAutoApproveSetting
 );
+
+classroomRouter.delete(
+  '/:classroomId/:assignmentId',
+  hasClassroomAccess,
+  requireClassRole('teacher'),
+  classroomController.deleteAssignment
+);
+
+classroomRouter.post('/:classroomId/leave',
+  hasClassroomAccess,
+  requireClassRole('learner'),
+  classroomController.leaveClassroom
+);
+
 
 module.exports = classroomRouter;

@@ -522,6 +522,37 @@ class ClassroomService {
   async changeAutoApproveSetting(classroomId, enabled) {
     return await classroomModel.updateAutoApproval(classroomId, enabled);
   }
+
+  async deleteAssignment(classroomId, assignmentId) {
+    const assignment = await classroomModel.getAssignmentById(
+      classroomId,
+      assignmentId
+    );
+    
+    if (!assignment) {
+      throw new Error('Assignment not found.');
+    }
+
+    const subLists = await classroomModel.getAssignmentSublists(assignmentId);
+    const vocabListIds = subLists.map((sub) => sub.vocab_list_id);
+
+    if (vocabListIds.length > 0) {
+      await classroomModel.deleteVocabLists(vocabListIds);
+    }
+
+    await classroomModel.deleteAssignmentSublists(assignmentId);
+    await classroomModel.deleteLearnerAssignmentsByAssignmentId(assignmentId);
+    await classroomModel.deleteAssignmentRecord(assignmentId);
+  }
+
+  async leaveClassroom(classroomId, learnerId){
+    await classroomModel.updateLearnerStatus(classroomId, learnerId, {
+      join_status: 'rejected',
+      left_at: new Date().toISOString(),
+    });
+    
+    await classroomModel.deleteLearnerAssignmentsByLearnerId(learnerId);
+  }
 }
 
 module.exports = new ClassroomService();

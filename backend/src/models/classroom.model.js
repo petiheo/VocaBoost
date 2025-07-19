@@ -423,19 +423,7 @@ class ClassroomModel {
       .select('*')
       .eq('id', assignmentId)
       .eq('classroom_id', classroomId)
-      .single();
-
-    if (error) throw error;
-    return data;
-  }
-
-  async getAssignmentById(classroomId, assignmentId) {
-    const { data, error } = await supabase
-      .from('assignments')
-      .select('*')
-      .eq('id', assignmentId)
-      .eq('classroom_id', classroomId)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -472,6 +460,52 @@ class ClassroomModel {
 
     if (error) throw error;
     return data;
+  }
+
+  async getAssignmentSublists(assignmentId) {
+    const { data, error } = await supabase
+      .from('assignment_sublists')
+      .select('*')
+      .eq('assignment_id', assignmentId)
+
+    if (error) throw error;
+    return data;
+  }
+
+  async deleteAssignmentSublists(assignmentId) {
+    const { error } = await supabase
+      .from('assignment_sublists')
+      .delete()
+      .eq('assignment_id', assignmentId);
+
+    if (error) throw error;
+  }
+
+  async deleteLearnerAssignmentsByAssignmentId(assignmentId) {
+    const { error } = await supabase
+      .from('learner_assignments')
+      .delete()
+      .eq('assignment_id', assignmentId);
+
+    if (error) throw error;
+  }
+
+  async deleteLearnerAssignmentsByLearnerId(learnerId) {
+    const { error } = await supabase
+      .from('learner_assignments')
+      .delete()
+      .eq('learner_id', learnerId);
+
+    if (error) throw error;
+  }
+
+  async deleteAssignmentRecord(assignmentId) {
+    const { error } = await supabase
+      .from('assignments')
+      .delete()
+      .eq('id', assignmentId);
+
+    if (error) throw error;
   }
 
   // =================
@@ -514,6 +548,15 @@ class ClassroomModel {
     if (error) throw error;
 
     return newListId;
+  }
+
+  async deleteVocabLists(listIds) {
+    const { error } = await supabase
+      .from('vocab_lists')
+      .delete()
+      .in('id', listIds);
+
+    if (error) throw error;
   }
 }
 

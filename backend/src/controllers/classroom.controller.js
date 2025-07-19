@@ -534,6 +534,50 @@ class ClassroomController {
       });
     }
   }
+
+  async deleteAssignment(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const assignmentId = req.params.assignmentId;
+      const userId = req.user.userId;
+
+      await classroomService.deleteAssignment(
+        classroomId,
+        assignmentId,
+        userId
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: 'Assignment deleted successfully.',
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to delete assignment.',
+      });
+    }
+  }
+
+  async leaveClassroom(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const learnerId = req.user.userId;
+
+      await classroomService.leaveClassroom(classroomId, learnerId);
+
+      return res.status(200).json({
+        success: true,
+        message: 'You have left the classroom.',
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to leave the classroom.',
+      });
+    }
+  }
+
 }
 
 module.exports = new ClassroomController();
