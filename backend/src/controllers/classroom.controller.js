@@ -32,16 +32,17 @@ class ClassroomController {
     try {
       const { userId } = req.user;
 
-      const classrooms = await classroomService.getClassroomsByTeacherId(userId);
+      const classrooms =
+        await classroomService.getClassroomsByTeacherId(userId);
 
-      return res.status(200).json({ 
-        success: true, 
-        data: classrooms 
+      return res.status(200).json({
+        success: true,
+        data: classrooms,
       });
     } catch (error) {
-      return res.status(500).json({ 
-        success: false, 
-        message: error.message 
+      return res.status(500).json({
+        success: false,
+        message: error.message,
       });
     }
   }
@@ -52,10 +53,15 @@ class ClassroomController {
       const user = req.user;
 
       if (!joinCode) {
-        return res.status(400).json({ success: false, message: 'Join code is required.' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'Join code is required.' });
       }
 
-      const result = await classroomService.handleJoinRequestByCode(joinCode, user);
+      const result = await classroomService.handleJoinRequestByCode(
+        joinCode,
+        user
+      );
 
       return res.status(200).json({
         success: true,
@@ -64,9 +70,9 @@ class ClassroomController {
           : 'Join request submitted. Please wait for approval.',
       });
     } catch (error) {
-      return res.status(400).json({ 
-        success: false, 
-        message: error.message 
+      return res.status(400).json({
+        success: false,
+        message: error.message,
       });
     }
   }
@@ -75,7 +81,8 @@ class ClassroomController {
     try {
       const classroomId = req.classroom.id;
 
-      const pendingRequests = await classroomService.getPendingJoinRequests(classroomId);
+      const pendingRequests =
+        await classroomService.getPendingJoinRequests(classroomId);
 
       return res.status(200).json({
         success: true,
@@ -227,7 +234,11 @@ class ClassroomController {
       const classroomId = req.classroom.id;
       const { status, q } = req.query;
 
-      const results = await classroomService.searchLearnersByDisplayName(classroomId, status, q);
+      const results = await classroomService.searchLearnersByDisplayName(
+        classroomId,
+        status,
+        q
+      );
 
       return res.status(200).json({
         success: true,
@@ -326,13 +337,13 @@ class ClassroomController {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        errors: errors.array().map(err => ({
+        errors: errors.array().map((err) => ({
           field: err.path,
-          message: err.msg
-        }))
+          message: err.msg,
+        })),
       });
     }
-    
+
     try {
       const classroomId = req.classroom.id;
       const teacherId = req.user.userId;
@@ -342,7 +353,7 @@ class ClassroomController {
         exerciseMethod,
         wordsPerReview,
         startDate,
-        dueDate
+        dueDate,
       } = req.body;
 
       const assignment = await classroomService.createAssignment({
@@ -353,18 +364,18 @@ class ClassroomController {
         exerciseMethod,
         wordsPerReview,
         startDate,
-        dueDate
+        dueDate,
       });
 
       return res.status(201).json({
         success: true,
         message: 'Assignment created successfully.',
-        data: assignment
+        data: assignment,
       });
     } catch (err) {
       return res.status(400).json({
         success: false,
-        message: err.message || 'Failed to create assignment.'
+        message: err.message || 'Failed to create assignment.',
       });
     }
   }
@@ -372,7 +383,8 @@ class ClassroomController {
   async getMyJoinedClassrooms(req, res) {
     try {
       const learnerId = req.user.userId;
-      const result = await classroomService.getJoinedClassroomsByLearner(learnerId);
+      const result =
+        await classroomService.getJoinedClassroomsByLearner(learnerId);
 
       return res.status(200).json({
         success: true,
@@ -390,7 +402,8 @@ class ClassroomController {
     try {
       const classroomId = req.classroom.id;
 
-      const invitations = await classroomService.getClassroomInvitations(classroomId);
+      const invitations =
+        await classroomService.getClassroomInvitations(classroomId);
 
       return res.status(200).json({
         success: true,
@@ -408,16 +421,17 @@ class ClassroomController {
     try {
       const classroomId = req.classroom.id;
 
-      const assignments = await classroomService.getClassroomAssignments(classroomId);
+      const assignments =
+        await classroomService.getClassroomAssignments(classroomId);
 
       return res.status(200).json({
         success: true,
-        data: assignments
+        data: assignments,
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: 'Failed to retrieve assignments'
+        message: 'Failed to retrieve assignments',
       });
     }
   }
@@ -427,16 +441,19 @@ class ClassroomController {
       const classroomId = req.classroom.id;
       const learnerId = req.user.userId;
 
-      const result = await classroomService.getLearnerToReviewAssignments(classroomId, learnerId);
+      const result = await classroomService.getLearnerToReviewAssignments(
+        classroomId,
+        learnerId
+      );
 
       return res.status(200).json({
         success: true,
-        data: result
+        data: result,
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: 'Failed to load assignments.'
+        message: 'Failed to load assignments.',
       });
     }
   }
@@ -446,16 +463,19 @@ class ClassroomController {
       const classroomId = req.classroom.id;
       const learnerId = req.user.userId;
 
-      const result = await classroomService.getLearnerReviewedAssignments(classroomId, learnerId);
+      const result = await classroomService.getLearnerReviewedAssignments(
+        classroomId,
+        learnerId
+      );
 
       return res.status(200).json({
         success: true,
-        data: result
+        data: result,
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: 'Failed to load reviewed assignments.'
+        message: 'Failed to load reviewed assignments.',
       });
     }
   }
@@ -465,20 +485,55 @@ class ClassroomController {
       const classroomId = req.classroom.id;
       const assignmentId = req.params.assignmentId;
 
-      const result = await classroomService.getAssignmentDetails(classroomId, assignmentId);
+      const result = await classroomService.getAssignmentDetails(
+        classroomId,
+        assignmentId
+      );
 
       return res.status(200).json({
         success: true,
-        data: result
+        data: result,
       });
     } catch (err) {
       return res.status(404).json({
         success: false,
-        message: err.message || 'Assignment not found.'
+        message: err.message || 'Assignment not found.',
       });
     }
   }
 
+  async changeAutoApproveSetting(req, res) {
+    try {
+      const classroomId = req.classroom.id;
+      const { isAutoApprovalEnabled } = req.body;
+
+      if (typeof isAutoApprovalEnabled !== 'boolean') {
+        return res.status(400).json({
+          success: false,
+          message: 'isAutoApprovalEnabled must be a boolean.',
+        });
+      }
+
+      const updatedClassroom = await classroomService.changeAutoApproveSetting(
+        classroomId,
+        isAutoApprovalEnabled
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: `Auto-approve setting has been ${isAutoApprovalEnabled ? 'enabled' : 'disabled'}.`,
+        data: {
+          classroomId: updatedClassroom.id,
+          isAutoApprovalEnabled: updatedClassroom.is_auto_approval_enabled,
+        },
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message || 'Failed to update auto-approve setting.',
+      });
+    }
+  }
 }
 
 module.exports = new ClassroomController();

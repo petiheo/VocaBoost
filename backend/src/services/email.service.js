@@ -52,7 +52,6 @@ class EmailService {
         html,
         text: `Join class here: ${inviteUrl}`,
       });
-
     } catch (error) {
       console.error(`Failed to send invitation to ${to}:`, error);
       throw error;

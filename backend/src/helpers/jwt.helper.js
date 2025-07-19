@@ -18,7 +18,9 @@ const generateEmailVerificationToken = (userId) => {
 };
 
 const generateInvitationToken = (payload) => {
-  return jwt.sign({ ...payload, type: 'classroom_invitation' }, JWT_SECRET, { expiresIn: JWT_EXPIRE });
+  return jwt.sign({ ...payload, type: 'classroom_invitation' }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRE,
+  });
 };
 
 module.exports = {
