@@ -2,10 +2,7 @@ const { body } = require('express-validator');
 
 const classroomValidator = {
   create: [
-    body('name')
-      .trim()
-      .notEmpty()
-      .withMessage('Classroom name is required'),
+    body('name').trim().notEmpty().withMessage('Classroom name is required'),
 
     body('description')
       .optional()
@@ -46,7 +43,9 @@ const classroomValidator = {
       .withMessage('exerciseMethod is required')
       .bail()
       .isIn(['flashcard', 'fill_blank', 'word_association'])
-      .withMessage('exerciseMethod must be one of: flashcard, fill_blank, word_association'),
+      .withMessage(
+        'exerciseMethod must be one of: flashcard, fill_blank, word_association'
+      ),
 
     body('wordsPerReview')
       .notEmpty()
@@ -77,13 +76,13 @@ const classroomValidator = {
           throw new Error('dueDate cannot be in the past');
         }
 
-        if (req.body.startDate && (due < start)) {
+        if (req.body.startDate && due < start) {
           throw new Error('dueDate must be equal to or after startDate');
         }
 
         return true;
       }),
-  ]
+  ],
 };
 
 module.exports = classroomValidator;

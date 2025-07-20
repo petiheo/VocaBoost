@@ -3,20 +3,20 @@ const classroomModel = require('../models/classroom.model');
 const requireRole = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        error: 'Authentication required' 
+        error: 'Authentication required',
       });
     }
-    
+
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         success: false,
-        error: 'Forbidden', 
-        message: 'Insufficient permissions' 
+        error: 'Forbidden',
+        message: 'Insufficient permissions',
       });
     }
-    
+
     next();
   };
 };
@@ -86,5 +86,5 @@ const requireClassRole = (...allowedRoles) => {
 module.exports = {
   requireRole,
   hasClassroomAccess,
-  requireClassRole
+  requireClassRole,
 };
