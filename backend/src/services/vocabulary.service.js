@@ -1,7 +1,5 @@
-// src/services/vocabulary.service.js
-
 const vocabularyModel = require('../models/vocabulary.model');
-// Custom error classes remain the same
+
 class ForbiddenError extends Error { /* ... */ }
 class ValidationError extends Error { /* ... */ }
 
