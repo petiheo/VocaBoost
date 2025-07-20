@@ -40,7 +40,7 @@ export default function ApproveJoinClassroomRequest() {
             const res = await classroomService.approveJoinRequest({ classroomId, learnerId: id });
             if (res.success){
                 console.log("Approve thanh cong");
-                setLearners(learners.filter((l) => l.learner_id !== id));
+                setLearners(requests.filter((r) => r.learner_id !== id));
             }
         } catch (error) {
             console.error(error.message);
@@ -53,7 +53,7 @@ export default function ApproveJoinClassroomRequest() {
             const res = await classroomService.rejectJoinRequest({ classroomId, learnerId: id });
             if (res.success){
                 console.log("Reject thanh cong");
-                setRequests(requests.filter((_, i) => i !== id));
+                setRequests(requests.filter((r) => r.learner_id !== id));
             }
         } catch (error) {
             console.error(error.message);

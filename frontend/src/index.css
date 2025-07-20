@@ -1597,6 +1597,9 @@ h2 {
   font-size: 0.85rem;
 }
 
+.learners-layout {
+  grid-template-rows: 10% 80% 10%;
+}
 .learners-layout__body {
   margin: 2em 0;
   display: flex;
@@ -1604,11 +1607,11 @@ h2 {
 }
 .learners-layout__content {
   width: 70%;
-  margin: auto;
+  margin: 0 auto;
+  gap: 2em;
 }
 
 .student-list-page {
-  min-height: 100vh;
   font-family: "Inria Sans", sans-serif;
 }
 
@@ -1656,7 +1659,6 @@ h2 {
 }
 
 .pending-request__page {
-  min-height: 100vh;
   font-family: "Inria Sans", sans-serif;
 }
 .pending-request__student-action {
@@ -2154,7 +2156,6 @@ h2 {
 .sidebar {
   position: relative;
   z-index: 1000;
-  width: 250px;
   background: #241F1F;
   color: white;
   height: 100%;
@@ -2333,6 +2334,42 @@ h2 {
   padding: 20px;
   border-radius: 20px;
   background-color: #FCF9F1;
+  font-family: "Inter", sans-serif;
+}
+
+.dropdown-container {
+  position: relative;
+  display: flex;
+  justify-self: end;
+}
+
+.dropdown-toggle {
+  border: none;
+  background: none;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #F5F5F5;
+  min-width: 120px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  border-radius: 4px;
+  padding: 8px 0;
+}
+
+.dropdown-item {
+  padding: 8px 16px;
+  text-align: left;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.dropdown-item:hover {
+  background-color: #f2f2f2;
 }
 
 .class-header h2 {
@@ -2345,8 +2382,12 @@ h2 {
   display: flex;
   gap: 10px;
   margin-top: 10px;
+  font-family: "Inria Sans", sans-serif;
 }
 .class-tags .tag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   background: #F8EED3;
   padding: 4px 12px;
   border-radius: 8px;

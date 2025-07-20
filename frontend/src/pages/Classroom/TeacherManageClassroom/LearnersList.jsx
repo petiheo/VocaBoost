@@ -36,10 +36,10 @@ export default function StudentListPage() {
 
     const handleRemove = async(id) => {
         try {
-            const res = await classroomService.removeALearner({ classroomId, learner_id: id });
+            const res = await classroomService.removeALearner({ classroomId, learnerId: id });
             if (res.success){
                 console.log("Remove thanh cong");
-                setLearners(learners.filter((_, i) => i !== id));
+                setLearners(learners.filter((l) => l.learner_id !== id));
             }
         } catch (error) {
             console.error(error.message);
