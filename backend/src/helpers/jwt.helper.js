@@ -28,8 +28,13 @@ const generateResetToken = (userId) => {
   );
 };
 
+const verifyToken = (token) => {
+  return jwt.verify(token, JWT_SECRET);
+};
+
 module.exports = {
   generateToken,
   generateEmailVerificationToken,
   generateResetToken,
+  verifyToken,
 };
