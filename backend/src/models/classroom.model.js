@@ -42,7 +42,8 @@ class ClassroomModel {
     const { data, error } = await supabase
       .from('classrooms')
       .select('*')
-      .eq('teacher_id', teacherId);
+      .eq('teacher_id', teacherId)
+      .neq('classroom_status', 'deleted');
 
     if (error) throw error;
     return data;
