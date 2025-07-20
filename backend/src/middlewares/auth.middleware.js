@@ -23,7 +23,6 @@ const authMiddleware = {
     }
 
     try {
-      // Verify the token using the secret key
       const decoded = jwt.verify(token, JWT_SECRET);
 
       // Attach the decoded user payload to the request object
@@ -45,9 +44,6 @@ const authMiddleware = {
     // If token is valid, proceed to the next middleware/controller
     return next();
   },
-
-  // You can add other middleware here later, e.g., for checking admin role
-  // isAdmin: (req, res, next) => { ... }
 };
 
 module.exports = authMiddleware;

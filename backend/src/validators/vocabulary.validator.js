@@ -54,13 +54,11 @@ const vocabularyValidator = {
       .trim()
       .isLength({ min: 3, max: 100 })
       .withMessage('Title must be between 3 and 100 characters.'),
-    // ... (other list update rules are the same)
     handleValidationErrors,
   ],
 
   // --- WORD VALIDATORS ---
   createWord: [
-    // Corrected: Validate listId from URL params, not body
     param('listId').isUUID().withMessage('URL parameter listId must be a valid UUID.'),
     body('term').trim().notEmpty().withMessage('Term is required.'),
     body('definition').trim().notEmpty().withMessage('Definition is required.'),
@@ -69,10 +67,8 @@ const vocabularyValidator = {
   ],
 
   createWordsBulk: [
-    // Corrected: Validate listId from URL params, not body
     param('listId').isUUID().withMessage('URL parameter listId must be a valid UUID.'),
     body('words').isArray({ min: 1 }).withMessage('Words must be a non-empty array.'),
-    // Optional: Add a custom validator to check the structure of objects inside the 'words' array
     body('words.*.term').notEmpty().withMessage('Each word must have a term.'),
     body('words.*.definition').notEmpty().withMessage('Each word must have a definition.'),
     handleValidationErrors,

@@ -44,7 +44,7 @@ class VocabularyController {
 
       return res.status(200).json({
         success: true,
-        data: result.lists, // Changed to directly return the lists array
+        data: result.lists, 
         pagination: result.pagination,
       });
     } catch (error) {
