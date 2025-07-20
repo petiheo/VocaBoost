@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Header, SideBar, Footer } from "../../components/index.jsx";
 import classroomService from "../../services/Classroom/classroomService.js";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateClassroom() {
     const [privacy, setPrivacy] = useState("private");
     const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
 
     const handleCreateClassroom = async (e) => {
         e.preventDefault();
@@ -22,6 +24,8 @@ export default function CreateClassroom() {
         // Handle API submission or further logic here...
         try {
             const res = await classroomService.createClassroom(data);
+            navigate("my-classroom");
+
         } catch (error) {
             setErrors({ server: error.response?.data?.error || "Classroom error." });
             console.error(errors);

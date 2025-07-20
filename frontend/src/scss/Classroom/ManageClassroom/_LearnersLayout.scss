@@ -1,11 +1,15 @@
 .learners-layout{
+    grid-template-rows: 10% 80% 10%;
     &__body{
         margin: 2em 0;
         display: flex;
         gap: 2em;
+        
     }
     &__content{
         width: 70%;
-        margin: auto;
+        margin: 0 auto;
+        gap: 2em;
+
     }
 }

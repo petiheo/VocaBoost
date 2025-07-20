@@ -25,7 +25,6 @@ const hasClassroomAccess = async (req, res, next) => {
   try {
     const classroomId = req.params.classroomId;
     const { userId, role: globalRole } = req.user;
-
     const classroom = await classroomModel.getClassroomById(classroomId);
     if (!classroom || classroom.classroom_status === 'deleted') {
       return res.status(404).json({

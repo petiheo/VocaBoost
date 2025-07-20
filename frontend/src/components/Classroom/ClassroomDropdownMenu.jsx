@@ -11,9 +11,9 @@ const ClassroomDropdownMenu = ({ students }) => {
         value={location.pathname}
         onChange={(e) => navigate(e.target.value)}
       >
-        <option value="/learners/pending-request">Pending Request</option>
-        <option value="/learners/learners-list">Learner list</option>
-        <option value="/learners/approve-join-classroom-request">Learner’s Request</option>
+        <option value="/classroom/pending-request">Pending Request</option>
+        <option value="/classroom/learners-list">Learner list</option>
+        <option value="/classroom/approve-join-classroom-request">Learner’s Request</option>
       </select>
     </div>
   );

@@ -36,7 +36,7 @@ const classroomService = {
     //5. Approve Join Request
     approveJoinRequest: async ({ classroomId, learnerId }) => { // chua cap nhat data ben ApproveClassroomRequest
         const res = await api.post(`/classroom/${classroomId}/approve-request`, { learnerId });
-        return res.data
+        return res.data;
     },
 
     //6. Reject join request 
@@ -52,8 +52,8 @@ const classroomService = {
     },
 
     //8. get learner in classroom 
-    getLearnerInClassroom: async ({ classroomId }) => {
-        const res = await api.post(`/classroom/${classroomId}/learner`)
+    getLearnerInClassroom: async (classroomId) => {
+        const res = await api.get(`/classroom/${classroomId}/learners`)
         return res.data;
     },
 
@@ -64,14 +64,40 @@ const classroomService = {
     },
 
     //10. delete a classroom 
-    deleteAClassroom: async ({classroomId}) => {
+    deleteAClassroom: async (classroomId) => {
         const res = await api.delete(`/classroom/${classroomId}`);
         return res.data;
-    }
+    },
 
     //11. Search Learners by Display Name
 
+    //12. Invite Learner (Teacher)
+    inviteLearner: async ({ classroomId, email }) => {
+        const res = await api.post(`/classroom/${classroomId}/invitation`, { email });
+        return res.data;
+    },
 
+    //13. Accept invitation (Learner)
+
+    //14. Cancel Invitation (Teacher)
+    cancelInvitation: async (classroomId, { email }) => {
+        const res = await api.delete(`/classroom/${classroomId}/`, { email });
+        return res.data;
+    },
+
+    //15. 
+    //16.
+    //17. Get Invitations (Teacher)
+    getInvitations: async (classroomId) => {
+        const res = await api.get(`/classroom/${classroomId}/invitations`);
+        return res.data;
+    }
+    //18. 
+    //19. 
+    //20.
+    //21.
+    //22.
+    //23.
 };
 
 export default classroomService;

@@ -1,64 +1,64 @@
 @use '../../Fonts' as *;
 
-.approve-join-classroom-request{
+.approve-join-classroom-request {
 
-    &__page {
-      font-family: $font-inriasans;
-    }
+  &__page {
+    font-family: $font-inriasans;
+  }
 
-    &__class-card {
-      border-radius: 15px;
-  
-      .tabs {
-        display: flex;
-        gap: 30px;
-        margin-top: 20px;
-        font-weight: 500;
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 10px;
-  
-        div {
-          cursor: pointer;
-          padding-bottom: 4px;
-  
-          &.active {
-            border-bottom: 3px solid #fbeecf;
-          }
+  &__class-card {
+    border-radius: 15px;
+
+    .tabs {
+      display: flex;
+      gap: 30px;
+      margin-top: 20px;
+      font-weight: 500;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+
+      div {
+        cursor: pointer;
+        padding-bottom: 4px;
+
+        &.active {
+          border-bottom: 3px solid #fbeecf;
         }
       }
-  
-      .actions {
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .student-list {
+      margin-top: 20px;
+      border-top: 1px solid #ddd;
+
+      .student-row {
         display: flex;
-        gap: 10px;
-        margin-top: 20px;
-      }
-  
-      .student-list {
-        margin-top: 20px;
-        border-top: 1px solid #ddd;
-  
-        .student-row {
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 0;
+        border-bottom: 1px solid #eee;
+
+        .buttons {
           display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 14px 0;
-          border-bottom: 1px solid #eee;
-  
-          .buttons {
-            display: flex;
-            gap: 8px;
-          }
+          gap: 8px;
         }
       }
-  
-      .see-more {
-        text-align: center;
-        margin-top: 20px;
-      }
     }
+
+    .see-more {
+      text-align: center;
+      margin-top: 20px;
+    }
+  }
 }
 
-.search-block--btn{
+.search-block--btn {
   display: flex;
   gap: 2em;
 }
