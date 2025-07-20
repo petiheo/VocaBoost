@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS public.classroom_members (
 );
 
 -- Assignments
-CREATE TABLE IF NOT EXISTS public.assignments (
+CREATE TABLE IF NOT EXISTS public.assignments ( -- bổ sung thêm status: pending/ assigned/ overdue
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     classroom_id UUID NOT NULL,
     vocab_list_id UUID NOT NULL,
