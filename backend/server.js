@@ -1,7 +1,8 @@
 require('dotenv').config();
-const PORT = process.env.PORT;
+const logger = require('./src/utils/logger');
+const PORT = process.env.PORT || 3000;
 
 app = require('./src/app');
 app.listen(PORT, () => {
-  console.log(`URL of app: http://127.0.0.1:${PORT}/`);
+  logger.info(`URL of app: http://127.0.0.1:${PORT}/`);
 });

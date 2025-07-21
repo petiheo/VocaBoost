@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
 const fs = require('fs').promises;
 const path = require('path');
+const logger = require('../utils/logger');
 
 class EmailService {
   constructor() {
@@ -37,9 +38,9 @@ class EmailService {
       });
 
       await this.transporter.verify();
-      console.log('✅ SMTP configuration verified successfully');
+      logger.info('SMTP configuration verified successfully');
     } catch (error) {
-      console.error('❌ SMTP configuration failed:', error.message);
+      logger.error('SMTP configuration failed:', error.message);
       this.transporter = null;
     }
   }
@@ -83,9 +84,9 @@ class EmailService {
         }
       }
 
-      console.log(`✅ Compiled ${this.templates.size} email templates`);
+      logger.info(`Compiled ${this.templates.size} email templates`);
     } catch (error) {
-      console.error('❌ Failed to compile templates:', error);
+      logger.error('Failed to compile templates:', error);
       // Fallback to inline templates if file loading fails
       this.setupFallbackTemplates();
     }
@@ -157,7 +158,7 @@ class EmailService {
 
   async sendEmail(options) {
     if (!this.transporter) {
-      console.error('Email service is not available');
+      logger.error('Email service is not available');
       return;
     }
 
@@ -167,14 +168,14 @@ class EmailService {
         ...options,
       });
 
-      console.log(`✅ Email sent: ${info.messageId}`);
+      logger.info(`✅ Email sent: ${info.messageId}`);
 
       // Log to audit trail
       await this.logEmailSent(options.to, options.subject);
 
       return info;
     } catch (error) {
-      console.error('❌ Failed to send email:', error.message);
+      logger.error('❌ Failed to send email:', error.message);
       throw error;
     }
   }
@@ -255,14 +256,14 @@ class EmailService {
     const successful = results.filter((r) => r.status === 'fulfilled').length;
     const failed = results.filter((r) => r.status === 'rejected').length;
 
-    console.log(`Batch email results: ${successful} sent, ${failed} failed`);
+    logger.info(`Batch email results: ${successful} sent, ${failed} failed`);
     return { successful, failed, results };
   }
 
   // Audit logging
   async logEmailSent(to, subject) {
     // In production, this would write to database
-    console.log(
+    logger.info(
       `📧 Email sent to: ${to}, Subject: ${subject}, Time: ${new Date().toISOString()}`
     );
   }
@@ -280,7 +281,7 @@ class EmailService {
     );
     await fs.writeFile(previewPath, html);
 
-    console.log(`📧 Email preview saved to: ${previewPath}`);
+    logger.info(`📧 Email preview saved to: ${previewPath}`);
     return previewPath;
   }
 }
