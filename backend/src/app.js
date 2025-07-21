@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const app = express();
 const router = require('./routes/index.route');
+const logger = require('./utils/logger');
 
 require('./config/passport');
 
@@ -24,7 +25,7 @@ app.use((req, res, next) => {
 app.use(passport.initialize());
 
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  logger.error(err.stack);
   return res.status(500).json({
     status: 'failed',
     message: 'Đã xảy ra lỗi!',
