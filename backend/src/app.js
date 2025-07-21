@@ -32,6 +32,26 @@ app.get('/', (req, res) => {
 
 app.use('/api', router);
 
+app.use('/health', async (req, res) => {
+  try {
+    const db = require('./config/database');
+    await db.from('users').select('count').limit(1);
+
+    return res.status(200).json({
+      success: true,
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+    });
+  } catch (error) {
+    res.status(503).json({
+      success: false,
+      status: 'unhealthy',
+      error: error.message,
+    });
+  }
+});
+
 // =====ERROR HANDLING=====
 // Ignore favicon request to avoid 404 logs
 app.get('/favicon.ico', (req, res) => res.status(204).end());
