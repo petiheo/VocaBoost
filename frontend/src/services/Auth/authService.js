@@ -6,7 +6,7 @@ const authService = {
     return res.data;
   },
 
-  // Đăng nhập
+  //1.  Đăng nhập
   login: async (email, password) => {
     const res = await api.post("/auth/login", { email, password }); //  FIX
     localStorage.setItem("token", res.data.token);
@@ -15,7 +15,7 @@ const authService = {
   },
 
 
-  // Đăng xuất
+  // 4. Đăng xuất
   logout: async () => {
     const token = localStorage.getItem("token");
     await api.post("/auth/logout", {}, {
@@ -27,12 +27,12 @@ const authService = {
     localStorage.removeItem("user");
   },
 
-  // Quên mật khẩu 
+  // 5. Quên mật khẩu 
   forgotPassword: async (email) => {
     return await api.post("/auth/forgot-password", { email }); //  FIX
   },
 
-  // Đặt lại mật khẩu
+  // 7. Đặt lại mật khẩu
   resetPassword: async (newPassword) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -45,13 +45,21 @@ const authService = {
     return res.data;
   },
 
+  // 9. Get account status
+  getAccountStatus: async (email) => {
+    const res = await api.post("/auth/get-account-status", {
+      data: {email: email}
+    })
+    return res.data; 
+  },
+
   getToken: () => localStorage.getItem("token"),
   getCurrentUser: () => {
-    try{
-    const userStr = localStorage.getItem("user");
-    return userStr ? JSON.parse(userStr) : null;
+    try {
+      const userStr = localStorage.getItem("user");
+      return userStr ? JSON.parse(userStr) : null;
     }
-    catch (e){
+    catch (e) {
       console.error("Lỗi khi parse user:", e);
       return null;
     }

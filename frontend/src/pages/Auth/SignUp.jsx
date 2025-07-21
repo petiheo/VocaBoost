@@ -4,7 +4,8 @@ import AccountPageInput from "../../components/AccountPageInput"
 import MainPageLogo from "../../assets/Logo.svg";
 import { GoogleLogo } from "../../assets/icons/index";
 import authService from "../../services/Auth/authService";
-
+import { SignInSignUpBG } from "../../assets/Auth";
+import LoadingCursor from "../../components/cursor/LoadingCursor";
 
 const handleGoogleSignUp = () => {
     window.location.href = "http://localhost:3000/api/auth/google";
@@ -13,7 +14,11 @@ const handleGoogleSignUp = () => {
 export default function SignUp() {
 
     const [errors, setErrors] = useState({});
+
     const navigate = useNavigate();
+
+    // Xử lý cursor xoay khi bấm nút đăng nhập 
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSignUp = async (e) => {
         e.preventDefault();
@@ -35,19 +40,22 @@ export default function SignUp() {
             setErrors(newErrors);
             return;
         }
-
+        setIsLoading(true);
         try {
             const res = await authService.register({ email, password });
             navigate("/checkYourMail");
         } catch (error) {
             setErrors({ server: error.response?.data?.error || "Registration error." });
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
 
     return (
         <div className="grid-container">
+            <LoadingCursor loading={isLoading} />
             <div className="left-grid">
                 <Link to="/" className="signup-logo">
                     <img src={MainPageLogo} alt="logo-page" />
@@ -56,7 +64,7 @@ export default function SignUp() {
                 <div className="signup-container">
 
                     <div className="signup-signup-container">
-                        <Link to="/signin" className="signup-signup-button">Sign in</Link>
+                        <Link to="/signin" className="signup-signin-button">Sign in</Link>
                         <Link to="" className="signup-signup-button">Sign up</Link>
                     </div>
 
@@ -101,7 +109,7 @@ export default function SignUp() {
             </div>
 
             <div className="right-grid">
-
+                <img src={SignInSignUpBG} alt="sign-in-sign-up-background" />
             </div>
         </div>
     );

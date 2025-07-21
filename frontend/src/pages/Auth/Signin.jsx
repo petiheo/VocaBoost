@@ -5,33 +5,49 @@ import MainPageLogo from "../../assets/Logo.svg";
 import { GoogleLogo } from "../../assets/icons/index";
 import { useNavigate } from 'react-router-dom' // Import useNavigate for navigation
 import authService from "../../services/Auth/authService";
+import { SignInSignUpBG } from "../../assets/Auth";
+import { useState } from "react";
+import LoadingCursor from "../../components/cursor/LoadingCursor";
 
 
 
 export default function Login() {
+    // Xử lý việc navigate trang
+    const navigate = useNavigate();
 
-    const navigate = useNavigate()
+    // Xử lý cursor xoay khi bấm nút đăng nhập 
+    const [isLoading, setIsLoading] = useState(false);
 
+    // Xử lý việc đăng nhập 
     const handleLogin = async (e) => {
         e.preventDefault();
         const email = e.target.email.value;
         const password = e.target.password.value;
 
-
+        setIsLoading(true);
         try {
             const res = await authService.login(email, password);
-            alert(res.message || "Sign in successfully");
-            navigate("/homepage");
+            const check = await authService.getAccountStatus(email);
+            if (check?.emailVerified)
+                navigate("/homepage");
+            else
+                navigate("/checkYourMail")
         } catch (error) {
             alert(error.response?.data?.error || "Incorrect email or password!");
+        } finally {
+            setIsLoading(false);
         }
     };
 
+    // Đăng nhập bằng google
     const handleGoogleLogin = () => {
         window.location.href = "http://localhost:3000/api/auth/google";
     };
+
     return (
         <div className="grid-container">
+            {/* Xử lý cursor */}
+            <LoadingCursor loading={isLoading} />
             <div className="left-grid">
                 <Link to="/" className="login-logo">
                     <img src={MainPageLogo} alt="logo-page" />
@@ -53,17 +69,17 @@ export default function Login() {
                     <form className="login-form" onSubmit={handleLogin}>
                         <AccountPageInput
                             label="Email:"
-                            name="email" 
-                            type="text" 
-                            placeholder="Enter your email" 
+                            name="email"
+                            type="text"
+                            placeholder="Enter your email"
                             required
                         />
 
                         <AccountPageInput
-                            label="Password:" 
-                            name="password" 
-                            type="password" 
-                            placeholder="Enter password" 
+                            label="Password:"
+                            name="password"
+                            type="password"
+                            placeholder="Enter password"
                             required
                         />
 
@@ -84,7 +100,7 @@ export default function Login() {
             </div>
 
             <div className="right-grid">
-
+                <img src={SignInSignUpBG} alt="sign-in-sign-up-background" />
             </div>
         </div>
     );
