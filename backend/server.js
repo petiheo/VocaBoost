@@ -1,6 +1,6 @@
 require('dotenv').config();
-const PORT = process.env.PORT;
 const logger = require('./src/utils/logger');
+const PORT = process.env.PORT || 3000;
 
 app = require('./src/app');
 app.listen(PORT, () => {
