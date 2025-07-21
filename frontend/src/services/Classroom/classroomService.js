@@ -82,17 +82,24 @@ const classroomService = {
         const res = await api.post(`/classroom/accept-invitation`, token);
     },
 
-    //14. Cancel Invitation (Teacher) (chua hd)
+    //14. Cancel Invitation (Teacher)
     cancelInvitation: async (classroomId, canceled_email) => {
         const res = await api.delete(`/classroom/${classroomId}/invitation`, {
-        data: { email: canceled_email }
-    });
+            data: { email: canceled_email }
+        });
         return res.data;
     },
 
     //15. Create a assignment (chua link)
-    createAssignment: async (classroomId, { data }) => {
-        const res = await api.post(`/classroom/${classroomId}/assignment`, data);
+    createAssignment: async (classroomId, data) => {
+        const res = await api.post(`/classroom/${classroomId}/assignment`, {
+            vocabListId: data.vocabListId,
+            title: data.title,
+            exerciseMethod: data.exerciseMethod,
+            wordsPerReview: data.wordsPerReview,
+            startDate: data.startDate,
+            dueDate: data.dueDate
+        });
         return res.data;
     },
 

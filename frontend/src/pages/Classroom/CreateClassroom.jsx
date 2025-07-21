@@ -85,8 +85,8 @@ export default function CreateClassroom() {
                             name="limit"
                             type="number"
                             min={1}
-                            step={1}
                             max={100}
+                            step={1}
                             defaultValue={50}
                             onChange={(e) => {
                                 if (parseInt(e.target.value) > 100) {

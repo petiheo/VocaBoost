@@ -1,6 +1,7 @@
 @use '../../Fonts' as *;
 
 .assign-exercise {
+    background: #FFFCF7;
     &__container {
         display: flex;
         font-family: $font-inter;
@@ -35,6 +36,7 @@ h2 {
     }
 
     input[type='date'] {
+        background-color: #F8F3E8;
         padding: 8px 12px;
         border-radius: 6px;
         border: 1px solid #dcdcdc;
@@ -47,6 +49,10 @@ h2 {
         max-width: 80px;
         padding: 6px 10px;
         font-size: 14px;
+    }
+
+    input{
+        background-color: #F8F3E8;
     }
 
     &__word {
@@ -124,6 +130,7 @@ h2 {
 
 .method-select .methods {
     display: flex;
+    
 
     button {
         flex: 1;
@@ -156,3 +163,5 @@ h2 {
         background: #333;
     }
 }
+
+

@@ -17,6 +17,7 @@ const patterns = {
     7: Pattern7,
     8: Pattern8,
 };
+
 const patternsCard = {
     1: PatternCard1,
     2: PatternCard2,
