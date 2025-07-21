@@ -16,24 +16,23 @@ export default function AddStudentPage() {
 
 
   // Fetch data về trang
-  useEffect(() => {
+  const fetchDataInvitations = async () => {
     if (!classroomId) {
       console.error("Missing classroom ID");
       return;
     }
-
-    const fetchDataInvitations = async () => {
-      try {
-        const res = await classroomService.getInvitations(classroomId);
-        if (res.success && Array.isArray(res.data)) {
-          setInvitations(res.data);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách lời mời:", error.message);
-        navigate("/fail");
+    try {
+      const res = await classroomService.getInvitations(classroomId);
+      if (res.success && Array.isArray(res.data)) {
+        setInvitations(res.data);
       }
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách lời mời:", error.message);
+      navigate("/fail");
     }
+  }
 
+  useEffect(() => {
     fetchDataInvitations();
   }, [classroomId])
 
@@ -43,6 +42,8 @@ export default function AddStudentPage() {
       const res = await classroomService.inviteLearner({ classroomId, email: invited_email })
       if (res.success) {
         console.log("Gửi lời mời thành công");
+        setEmail("");
+        fetchDataInvitations();
       }
     } catch (error) {
       console.log("Lỗi trong việc gửi lời mời learner", error.message);
@@ -52,14 +53,15 @@ export default function AddStudentPage() {
 
   // Xử lý việc cancel lời mời gửi đến learner
   const handleCancel = async (canceled_email) => {
+    console.log(canceled_email);
     try {
-      const res = await classroomService.cancelInvitation(classroomId, { email: canceled_email })
+      const res = await classroomService.cancelInvitation(classroomId, canceled_email)
       if (res.success) {
         console.log(res.message);
         setInvitations(invitations.filter((i) => i.email !== canceled_email));
       }
     } catch (error) {
-      console.log("Lỗi cancel lời mời", error);
+      console.log("Lỗi cancel lời mời:", error.message);
       navigate("/fail");
     }
   }
@@ -70,7 +72,7 @@ export default function AddStudentPage() {
         <ClassroomTitle />
         <TeacherClassroomMenuTab />
 
-        <h2 className="page-title">Add student</h2>
+        <h2 className="page-title">Add learner</h2>
 
         {/* Add student form */}
         <div className="form-section">

@@ -17,8 +17,8 @@ const authenticate = (req, res, next) => {
 
     // // Mock học viên 3
     //   userId: '653d9fb9-54db-415a-91e2-f3aa549f1eba',
-    //   email: 'learner3@vb.com',
-    //   role: 'learner'
+    //   email: '',
+    //   role: 'learner'learner3@vb.com
 
     // // Mock học viên 4 (Quang Nghi)
     //   userId: 'e3d2f7a8-4c92-4e3e-87f4-bd3a7cd62db9',

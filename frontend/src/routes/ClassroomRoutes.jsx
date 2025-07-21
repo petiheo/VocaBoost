@@ -8,6 +8,7 @@ import {
     ViewClassroom,
     // Manage classroom
     AddLearners, ApproveJoinClassroomRequest, ManageClassroomLayout, LearnersList, PendingRequest,
+    AssignmentDetail,
 } from "../pages/Classroom"
 
 const classroomRoutes = [
@@ -31,14 +32,13 @@ const classroomRoutes = [
         path: "/view-classroom",
         element: <ViewClassroom />
     },
+
     {
-        path: "/assignment-page",
-        element: <AssignmentPage />
-    },
-    {
-        path: "assign-exercise",
+        path: "/assign-exercise",
         element: <AssignExercise />
     },
+
+
     {
         path: "/classroom",
         element: <ManageClassroomLayout />,
@@ -59,7 +59,14 @@ const classroomRoutes = [
                 path: "pending-request",
                 element: <PendingRequest />
             },
-
+            {
+                path: "assignment-page",
+                element: <AssignmentPage />
+            },
+            {
+                path: "assignment-detail",
+                element: <AssignmentDetail />
+            },
         ]
     },
 ];

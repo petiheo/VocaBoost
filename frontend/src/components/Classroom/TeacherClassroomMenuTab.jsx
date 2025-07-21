@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 
 const tabs = [
-  { name: "Assignments", route: "/assignment-page" },
+  { name: "Assignments", route: "/classroom/assignment-page" },
   { name: "Statistics", route: "/classroom/statistics" },
   {
     name: "Learners",

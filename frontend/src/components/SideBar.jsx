@@ -28,7 +28,7 @@ export default function Sidebar() {
             <img src={Learning} alt="my vocab icon" />
             <span className="sidebar__label">My Vocabulary Lists</span>
           </Link>
-          <Link to="/homepage" className="sidebar__link">
+          <Link to="/my-classroom" className="sidebar__link">
             <img src={History} alt="my classroom icon" />
             <span className="sidebar__label">My Classrooms</span>
           </Link>

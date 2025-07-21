@@ -24,7 +24,7 @@ export default function CreateClassroom() {
         // Handle API submission or further logic here...
         try {
             const res = await classroomService.createClassroom(data);
-            navigate("my-classroom");
+            navigate("/my-classroom");
 
         } catch (error) {
             setErrors({ server: error.response?.data?.error || "Classroom error." });
