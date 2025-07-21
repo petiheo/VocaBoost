@@ -3,4 +3,6 @@
 @use 'Header';
 @use 'Navbar';
 @use 'SearchBar';
+@use 'SideBar';
+@use 'LearnerSubMenu';
 @forward 'Dropdown' as dropdown-*;

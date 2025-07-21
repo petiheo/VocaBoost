@@ -18,6 +18,18 @@ const vocabularyRoutes = [
     path: "/vocabulary",
     element: <Dashboard />
   },
+  {
+    path: "/vocabulary/edit/:listId",
+    element: <EditList />
+  },
+  {
+    path: "/vocabulary/view/:listId",
+    element: <ViewList />
+  },
+  {
+    path: "/vocabulary/overview/:listId",
+    element: <OverviewList />
+  }
 ];
 
 export default vocabularyRoutes;
