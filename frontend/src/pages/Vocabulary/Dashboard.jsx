@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Footer, Header, SideBar, LearnerSubMenu } from "../../components/index.jsx";
-import { DropdownIcon, EditIcon, PlusIcon } from "../../assets/Vocabulary/index.jsx";
+import { DropdownIcon, MoreIcon, PlusIcon } from "../../assets/Vocabulary/index.jsx";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 
 export default function Dashboard() {
     const [lists, setLists] = useState([]);
     const [visibleRows, setVisibleRows] = useState(2);
     const [columns, setColumns] = useState(3);
+    const [activeListId, setActiveListId] = useState(null);
+
 
     const navigate = useNavigate();
 
@@ -15,23 +17,12 @@ export default function Dashboard() {
     navigate("/vocabulary/create"); 
     };
 
-    // Dummy data
-    // useEffect(() => {
-    //     const dummyData = Array.from({ length: 20 }).map((_, i) => ({
-    //         title: "IELTS Academic Vocabulary",
-    //         description:
-    //             "A helpful list of commonly used English words to boost your reading and speaking skills",
-    //         owner: "Mia Nguyen Le",
-    //         role: "Teacher",
-    //     }));
-    //     setLists(dummyData);
-    // }, []);
-
     useEffect(() => {
         async function fetchLists() {
             try {
                 const res = await vocabularyService.getMyLists();
                 setLists(res.map(list => ({
+                    id: list.id,
                     title: list.title,
                     description: list.description,
                     owner: list.creator?.display_name || "Unknown",
@@ -68,6 +59,21 @@ export default function Dashboard() {
         setVisibleRows((prev) => prev + 2);
     };
 
+    const handleDeleteList = async (listId) => {
+        const confirm = window.confirm("Are you sure you want to delete this list?");
+        if (!confirm) return;
+
+        try {
+            await vocabularyService.deleteList(listId);
+            // Cập nhật lại danh sách sau khi xóa
+            setLists(prev => prev.filter(list => list.id !== listId));
+            setActiveListId(null);
+        } catch (err) {
+            console.error("Failed to delete list:", err);
+            alert("Failed to delete list.");
+        }
+    };
+
     return (
         <div className="dashboard">
             <Header />
@@ -95,14 +101,44 @@ export default function Dashboard() {
                         {lists.slice(0, visibleCount).map((list, idx) => (
                             <div className="dashboard__list-card" key={idx}>
                                 <div className="dashboard__list-header">
-                                    <h3 className="dashboard__list-title">
+                                    <button className="dashboard__list-title" onClick={() => navigate(`/vocabulary/overview/${list.id}`)}>
                                         {list.title.length > 20
                                             ? list.title.slice(0, 20) + "..."
                                             : list.title}
-                                    </h3>
-                                    <button className="dashboard__edit-button" onClick={() => navigate(`/vocabulary/edit/${list.id}`)}>
-                                        <img src={EditIcon} alt="edit" className="edit-icon" />
                                     </button>
+                                    <div className="dashboard__more-button-wrapper">
+                                        <button
+                                            className="dashboard__more-button"
+                                            onClick={() => setActiveListId((prevId) => (prevId === list.id ? null : list.id))}
+                                        >
+                                            <img src={MoreIcon} alt="more" className="more-icon" />
+                                        </button>
+
+                                        {activeListId === list.id && (
+                                            <div className="dashboard__more-popup">
+                                            <div
+                                                className="more-option delete"
+                                                onClick={async () => {
+                                                const confirmed = window.confirm("Are you sure you want to delete this list?");
+                                                if (!confirmed) return;
+
+                                                try {
+                                                    await vocabularyService.deleteList(list.id);
+                                                    // Cập nhật lại list trong Dashboard
+                                                    setLists(prev => prev.filter(item => item.id !== list.id));
+                                                    setActiveListId(null);
+                                                } catch (err) {
+                                                    console.error("Delete failed:", err);
+                                                    alert("Failed to delete list.");
+                                                }
+                                                }}
+                                            >
+                                                Delete List
+                                            </div>
+                                            </div>
+                                        )}
+                                    </div>
+
                                 </div>
                                 <p className="dashboard__list-description">
                                     {list.description }

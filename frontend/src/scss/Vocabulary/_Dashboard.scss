@@ -103,7 +103,7 @@
       margin: 0; // tránh bị browser mặc định đẩy xuống
     }
 
-    .edit-icon {
+    .more-icon {
       width: 0.8rem;
       height: 0.8rem;
       cursor: pointer;
@@ -111,10 +111,44 @@
   }
 
   &__list-title {
+    background-color: transparent;
+    border: none;
     font-size: 1.2rem;
     font-weight: bold;
     color: #2a1e17;
   }
+
+  &__more-button-wrapper {
+        position: relative; // đánh dấu định vị để popup hiện đúng vị trí
+        z-index: 10; // đảm bảo popup hiện trên các phần tử khác
+  }   
+
+  &__more-popup {
+      position: absolute;
+      top: 120%;
+      right: 0;
+      background: #fff4f4;
+      border-radius: 12px;
+      padding: 0.5rem 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      min-width: 150px;
+
+      .more-option {
+          padding: 0.75rem 1rem;
+          font-size: 1rem;
+          cursor: pointer;
+          color: #2a1e17;
+
+          &.delete {
+          color: #a30000;
+          &:hover {
+              background: #ffe5e5;
+          }
+          }
+      }
+  }
+
 
   &__list-description {
     display: -webkit-box;
@@ -213,7 +247,7 @@
     }
   }
 
-    &__edit-button {
+    &__more-button {
         background-color: transparent;
         border: none;
         cursor: pointer;
