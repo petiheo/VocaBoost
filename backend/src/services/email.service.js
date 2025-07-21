@@ -38,9 +38,9 @@ class EmailService {
       });
 
       await this.transporter.verify();
-      logger.info('✅ SMTP configuration verified successfully');
+      logger.info('SMTP configuration verified successfully');
     } catch (error) {
-      logger.error('❌ SMTP configuration failed:', error.message);
+      logger.error('SMTP configuration failed:', error.message);
       this.transporter = null;
     }
   }
@@ -84,9 +84,9 @@ class EmailService {
         }
       }
 
-      logger.info(`✅ Compiled ${this.templates.size} email templates`);
+      logger.info(`Compiled ${this.templates.size} email templates`);
     } catch (error) {
-      logger.error('❌ Failed to compile templates:', error);
+      logger.error('Failed to compile templates:', error);
       // Fallback to inline templates if file loading fails
       this.setupFallbackTemplates();
     }
