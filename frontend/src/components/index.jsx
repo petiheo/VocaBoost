@@ -5,3 +5,5 @@ export { default as Header } from "./Header.jsx";
 export { default as Logo } from "./Logo.jsx";
 export { default as NavBar } from "./NavBar.jsx";
 export { default as SearchBar } from "./SearchBar.jsx";
+export { default as SideBar } from "./SideBar.jsx";
+export { default as LearnerSubMenu } from "./LearnerSubMenu.jsx";
