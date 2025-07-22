@@ -2,6 +2,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const userModel = require('../models/user.model');
 const validator = require('validator');
+const logger = require('../utils/logger');
 
 passport.serializeUser((user, done) => {
   done(null, user);
@@ -26,9 +27,6 @@ passport.use(
         const avatarUrl = profile.photos[0]?.value;
 
         let user = await userModel.findByEmail(email);
-        console.log('Email:::', email);
-        console.log(user);
-
         if (user) {
           if (!user.google_id)
             user = await userModel.updateGoogleId(user.id, googleId);
@@ -54,7 +52,7 @@ passport.use(
           avatarUrl: user.avatar_url,
         });
       } catch (error) {
-        console.error('Google OAuth Error:', error);
+        logger.error('Google OAuth Error:', error);
         return done(error, null);
       }
     }

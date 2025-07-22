@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const logger = require('../utils/logger');
 
 class EmailService {
   constructor() {
@@ -13,9 +14,9 @@ class EmailService {
     (async () => {
       try {
         await this.transporter.verify();
-        console.log('Configure SMTP successfully');
+        logger.info('Configure SMTP successfully');
       } catch (err) {
-        console.error('Configure SMTP failed: ', err);
+        logger.error('Configure SMTP failed: ', err);
       }
     })();
   }
@@ -29,7 +30,7 @@ class EmailService {
         html: `<a href="${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}"> Verify Email </a>`,
         text: `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`,
       });
-      console.log('Send verification email successfully!');
+      logger.info('Send verification email successfully!');
     } catch (error) {
       throw error;
     }
