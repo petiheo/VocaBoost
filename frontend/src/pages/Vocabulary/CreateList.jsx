@@ -14,6 +14,7 @@ export default function CreateList() {
         { term: "", definition: "", example: "", image: null, tag: "" },
         { term: "", definition: "", example: "", image: null, tag: "" },
     ]);
+
     const { listId } = useParams();
 
 
@@ -29,17 +30,11 @@ export default function CreateList() {
     }, []);
 
     
-    const handleDeleteWord = async (wordId) => {
+    const handleDeleteWord = async (index) => {
         const confirmed = window.confirm("Are you sure you want to delete this word?");
         if (!confirmed) return;
 
-        try {
-            await vocabularyService.deleteWord(wordId); //  gọi backend
-            setWords(prev => prev.filter(w => w.id !== wordId)); //  cập nhật UI
-        } catch (err) {
-            console.error("Failed to delete word:", err);
-            alert("Failed to delete word.");
-        }
+        setWords(prev => prev.filter((_, i) => i !== index));
     };  
 
 
@@ -207,8 +202,9 @@ export default function CreateList() {
                                     <div className="create-list__word-box--header">
                                         <div className="create-list__word-box--index">{index + 1}</div>
                                         <button
+                                        type="button"
                                         className="create-list__word-box--remove"
-                                        onClick={() => handleDeleteWord(word.id)}
+                                        onClick={() => handleDeleteWord(index)}
                                         >
                                         ×
                                         </button>
