@@ -3,6 +3,7 @@
 
 import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import authService from "../../services/Auth/authService";
 
 export default function AuthVerify() {
   const [searchParams] = useSearchParams();
@@ -11,28 +12,42 @@ export default function AuthVerify() {
   useEffect(() => {
     const token = searchParams.get("token");
 
-    if (token) {
-      // Lưu token
-      localStorage.setItem("token", token);
+    const handleVerification = async () => {
+      if (token) {
+        // Lưu token
+        localStorage.setItem("token", token);
 
-      // (Tùy chọn) Giải mã token để lấy thông tin user
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        localStorage.setItem("user", JSON.stringify({
-          id: payload.userId,
-          email: payload.email,
-          role: payload.role
-        }));
-      } catch {
-        // Nếu token không decode được thì bỏ qua
-        return; 
+        // (Tùy chọn) Giải mã token để lấy thông tin user
+        try {
+          // Gọi API verify từ authService
+          const result = await authService.verifyEmail(token);
+
+          if (!result.success) {
+            throw new Error(result.error || "Email verification failed");
+          }
+
+          // Decode để lấy thông tin user
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            localStorage.setItem("user", JSON.stringify({
+              id: payload.userId,
+              email: payload.email,
+              role: payload.role
+            }));
+            console.log(payload.id, payload.email, payload.role);
+          } catch {
+            console.log("Không decode được token");
+          }
+
+          // Chuyển sang homepage/dashboard
+          navigate("/select-user-type");
+        } catch(error) {
+          console.log(error.message);
+          navigate("/signin");
+        }
       }
-
-      // Chuyển sang homepage/dashboard
-      navigate("/select-user-type");
-    } else {
-      navigate("/login");
     }
+    handleVerification();
   }, [searchParams, navigate]);
 
   return <div>Authenticating..</div>;

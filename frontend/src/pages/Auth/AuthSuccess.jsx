@@ -23,8 +23,10 @@ export default function AuthSuccess() {
           email: payload.email,
           role: payload.role
         }));
+        console.log(payload.id, payload.email, payload.role);
       } catch {
         // Nếu token không decode được thì bỏ qua
+        console.log("Không decode được token");
         return; 
       }
 

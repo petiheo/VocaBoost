@@ -9,8 +9,10 @@ const HomePage = () => {
       <Header />
 
       <div className="homepage__body">
-        <Sidebar />
-        
+        <div className="homepage_sidebar">
+          <Sidebar />
+        </div>
+
         <main className="homepage__main">
           <section className="homepage__content">
             <h1>Welcome to VocaBoost</h1>

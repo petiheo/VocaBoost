@@ -18,9 +18,13 @@ export default function Login() {
     // Xử lý cursor xoay khi bấm nút đăng nhập 
     const [isLoading, setIsLoading] = useState(false);
 
+    // Xử lý lỗi khi đăng nhập 
+    const [errors, setErrors] = useState({});
+
     // Xử lý việc đăng nhập 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setErrors({});
         const email = e.target.email.value;
         const password = e.target.password.value;
 
@@ -28,12 +32,13 @@ export default function Login() {
         try {
             const res = await authService.login(email, password);
             const check = await authService.getAccountStatus(email);
+            console.log(check?.data?.emailVerified)
             if (check?.data?.emailVerified)
                 navigate("/homepage");
             else
                 navigate("/checkYourMail")
         } catch (error) {
-            alert(error.response?.data?.error || "Incorrect email or password!");
+            setErrors({login: "Incorrect email or password!"});
         } finally {
             setIsLoading(false);
         }
@@ -81,6 +86,7 @@ export default function Login() {
                             type="password"
                             placeholder="Enter password"
                             required
+                            error = {errors.login}
                         />
 
                         <div className="login-forgot-password">

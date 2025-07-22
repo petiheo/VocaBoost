@@ -3,6 +3,7 @@ import MainPageLogo from "../assets/Logo.svg";
 import SearchBar from "./SearchBar.jsx";
 import DropdownMenu from "./DropdownMenu.jsx";
 import { useAuth } from "../services/Auth/authContext.jsx";
+import { Bell, Plus } from "../assets/Auth/index.jsx";
 
 const Header = () => {
     const { user, loading } = useAuth();
@@ -10,23 +11,33 @@ const Header = () => {
     return (
         <nav className="header">
             {/* Logo */}
-            <Link to="/" className="header__site-title">
-                <img src={MainPageLogo} alt="Vocaboost Logo" className="header-logo" />
-            </Link>
+            {user ? (
+                <Link to="/homepage" className="header__site-title">
+                    <img src={MainPageLogo} alt="Vocaboost Logo" className="header-logo" />
+                </Link>
+            ) : (
+                <Link to="/" className="header__site-title">
+                    <img src={MainPageLogo} alt="Vocaboost Logo" className="header-logo" />
+                </Link>
+            )}
+
             {/* Search Bar */}
             <div className="header__search-bar">
-                <SearchBar/>
+                <SearchBar />
             </div>
 
             {user ? (
                 <div className="header__user">
 
                     {/* Create list action */}
-                    {/* <CreateList /> */} 
-
+                    <Link to="/" className="homepage_create-list">
+                        <img src={Plus} alt="create-list-icon" style={{width: "30px"}}/>
+                    </Link>
 
                     {/* Notification bell */}
-                    {/* <Notification /> */} 
+                    <div className="homepage__notification">
+                        <img src={Bell} alt="notification-icon"  style={{width: "30px"}}/>
+                    </div>
 
                     {/* Avatar Dropdown */}
                     <div className="homepage__topbar">
