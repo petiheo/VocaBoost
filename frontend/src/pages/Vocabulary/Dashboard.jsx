@@ -13,9 +13,41 @@ export default function Dashboard() {
 
     const navigate = useNavigate();
 
-    const handleCreateNewList = () => {
-    navigate("/vocabulary/create"); 
+    const handleCreateNewList = async () => {
+        try {
+            const payload = {
+                title: "Untitled List",
+                description: "",
+                privacy_setting: "private",
+                tags: [],
+            };
+
+            const res = await vocabularyService.createList(payload);
+            const listId = res?.data?.list?.id;
+
+            if (listId) {
+                navigate(`/vocabulary/create/${listId}`); //  Navigate với ID
+            } else {
+                alert("Failed to create new list.");
+                console.log("Response:", res);
+            }
+        } catch (error) {
+            console.error("Error creating list:", error);
+            alert("Something went wrong. Please try again.");
+        }
     };
+
+    // Dummy data
+    // useEffect(() => {
+    //     const dummyData = Array.from({ length: 20 }).map((_, i) => ({
+    //         title: "IELTS Academic Vocabulary",
+    //         description:
+    //             "A helpful list of commonly used English words to boost your reading and speaking skills",
+    //         owner: "Mia Nguyen Le",
+    //         role: "Teacher",
+    //     }));
+    //     setLists(dummyData);
+    // }, []);
 
     useEffect(() => {
         async function fetchLists() {
@@ -59,21 +91,6 @@ export default function Dashboard() {
         setVisibleRows((prev) => prev + 2);
     };
 
-    const handleDeleteList = async (listId) => {
-        const confirm = window.confirm("Are you sure you want to delete this list?");
-        if (!confirm) return;
-
-        try {
-            await vocabularyService.deleteList(listId);
-            // Cập nhật lại danh sách sau khi xóa
-            setLists(prev => prev.filter(list => list.id !== listId));
-            setActiveListId(null);
-        } catch (err) {
-            console.error("Failed to delete list:", err);
-            alert("Failed to delete list.");
-        }
-    };
-
     return (
         <div className="dashboard">
             <Header />
@@ -99,7 +116,7 @@ export default function Dashboard() {
 
                     <div className="dashboard__list-grid">
                         {lists.slice(0, visibleCount).map((list, idx) => (
-                            <div className="dashboard__list-card" key={idx}>
+                            <div className="dashboard__list-card" key={list.id || idx}>
                                 <div className="dashboard__list-header">
                                     <button className="dashboard__list-title" onClick={() => navigate(`/vocabulary/overview/${list.id}`)}>
                                         {list.title.length > 20
