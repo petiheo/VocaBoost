@@ -2071,6 +2071,13 @@
 .view-list__more-popup .more-option.delete:hover {
   background: #ffe5e5;
 }
+.view-list__more-popup .more-option.edit {
+  color: #d5962c;
+  font-weight: bold;
+}
+.view-list__more-popup .more-option.edit:hover {
+  background: #ffe5d6;
+}
 .view-list__share-popup {
   position: absolute;
   top: 120%;
@@ -2213,6 +2220,12 @@
 .view-list__sort img {
   width: 16px;
   height: 16px;
+}
+.view-list__empty {
+  text-align: center;
+  padding: 80px 0;
+  color: #888;
+  font-size: 1.2rem;
 }
 .view-list__word-box--divider {
   border: none;

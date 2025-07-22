@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams } from 'react-router-dom';
 import { Header, SideBar, Footer } from "../../components";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { UploadImage, MoreIcon, ShareIcon, DropdownIcon } from "../../assets/Vocabulary";
@@ -11,6 +12,8 @@ export default function ViewList() {
   const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const [showShareBox, setShowShareBox] = useState(false);
   const [showMoreBox, setShowMoreBox] = useState(false);
+  const { listId } = useParams();
+
 
   const handleCopy = async (text) => {
     try {
@@ -22,80 +25,33 @@ export default function ViewList() {
   };
 
 
-//   useEffect(() => {
-//     async function fetchData() {
-//       try {
-//         const info = await vocabularyService.getListById(listId);
-//         setListInfo(info);
-//         const wordData = await vocabularyService.getWordsByListId(listId);
-//         setWords(wordData);
-//       } catch (err) {
-//         console.error("Error fetching list info or words:", err);
-//       }
-//     }
-//     fetchData();
-//   }, []);
-
-    // DUMMY DATA for testing
   useEffect(() => {
-    const dummyList = {
-      id: "erg-mgn-qwe",
-      title: "IELTS Academic Vocabulary - Set 1",
-      description: "Essential academic vocabulary for IELTS reading passages.",
-      creator: {
-        display_name: "Mr. John Nguyen",
-      },
-      created_at: "2025-07-03T12:00:00.000Z",
-      privacy_setting: "classroom",
-      wordCount: 3,
-      tags: ["IELTS", "Academic", "Vocabulary"],
-    };
+    async function fetchData() {
+      try {
+        const info = await vocabularyService.getListById(listId);
+        setListInfo(info);
 
-    const dummyWords = [
-      {
-        id: "1",
-        term: "Analyze",
-        definition: "To examine something in detail for purposes of explanation.",
-        phonetics: "/ˈænəlaɪz/",
-        example: "Analyze the data to find trends.",
-        statistic: {
-          reviewed: 5,
-          accuracy: 80,
-          lastReviewed: "2 days ago",
-          nextReview: "In 4 days"
-        }
-      },
-      {
-        id: "2",
-        term: "Hypothesis",
-        definition: "A proposed explanation based on limited evidence.",
-        phonetics: "/haɪˈpɒθəsɪs/",
-        example: "The hypothesis was tested through experiments.",
-        statistic: {
-          reviewed: 5,
-          accuracy: 80,
-          lastReviewed: "2 days ago",
-          nextReview: "In 4 days"
-        }
-      },
-      {
-        id: "3",
-        term: "Variable",
-        definition: "An element that can be changed and may affect the outcome.",
-        phonetics: "/ˈvɛəriəbl/",
-        example: "Temperature is a variable that can affect reaction rates.",
-        statistic: {
-          reviewed: 5,
-          accuracy: 80,
-          lastReviewed: "2 days ago",
-          nextReview: "In 4 days"
-        }
-      },
-    ];
+        const wordData = await vocabularyService.getWordsByListId(listId);
 
-    setListInfo(dummyList);
-    setWords(dummyWords);
-  }, []);
+        // DUMMY thống kê
+        const wordsWithStatistic = wordData.map((word) => ({
+          ...word,
+          statistic: {
+            reviewed: Math.floor(Math.random() * 10) + 1,
+            accuracy: Math.floor(Math.random() * 100),
+            lastReviewed: "2025-07-15",
+            nextReview: "2025-07-25",
+          },
+        }));
+        
+        setWords(wordsWithStatistic);
+
+      } catch (err) {
+        console.error("Error fetching list info or words:", err);
+      }
+    }
+    fetchData();
+  }, [listId]);
 
   return (
     <div className="view-list">
@@ -118,11 +74,16 @@ export default function ViewList() {
                           {showMoreBox && listInfo && (
                             <div className="view-list__more-popup">
                               <div
+                                className="more-option edit"
+                                onClick={() => window.location.href = `/vocabulary/edit/${listInfo.id}`}
+                              >
+                                Edit List
+                              </div>
+                              <div
                                 className="more-option delete"
                                 onClick={async () => {
                                   const confirmed = window.confirm("Are you sure you want to delete this list?");
                                   if (!confirmed) return;
-
                                   try {
                                     await vocabularyService.deleteList(listInfo.id);
                                     window.location.href = "/dashboard";
@@ -150,9 +111,9 @@ export default function ViewList() {
                             <div className="view-list__share-popup">
                                 <div
                                 className="share-option"
-                                onClick={() => handleCopy(`https://yourdomain.com/vocabulary/view/${listInfo.id}`)}
+                                onClick={() => handleCopy(`https://localhost:5173/vocabulary/view/${listInfo.id}`)}
                                 >
-                                https://yourdomain.com/vocabulary/view/{listInfo.id}
+                                https://localhost:5173/vocabulary/view/{listInfo.id}
                                 </div>
                                 <div
                                 className="share-option"
@@ -225,7 +186,10 @@ export default function ViewList() {
               <section className="view-list__words">    
                 <h2>Word List ({listInfo.wordCount} words)</h2>
                 <div className="view-list__word-list">
-                  {words.map((word, index) => (
+                  {words.length === 0 ? (
+                    <div className="view-list__empty">This list currently has no words.</div>
+                  ) : (
+                  words.map((word, index) => (
                     <div key={word.id} className="view-list__word-box">
                       <div className="view-list__word-box--index">{index + 1}</div>
                       <hr className="view-list__word-box--divider" />
@@ -270,7 +234,7 @@ export default function ViewList() {
                         </div>
                       )}
                     </div>
-                  ))}
+                  )))}
                 </div>
               </section>
             </>

@@ -85,6 +85,15 @@
                 background: #ffe5e5;
             }
             }
+
+            &.edit {
+            color: #d5962c;
+            font-weight: bold;
+
+            &:hover {
+                background: #ffe5d6;
+            }
+            }
         }
     }
 
@@ -252,6 +261,13 @@
             width: 16px;
             height: 16px;
         }
+    }
+
+    &__empty {
+        text-align: center;
+        padding: 80px 0;
+        color: #888;
+        font-size: 1.2rem;
     }
 
 
