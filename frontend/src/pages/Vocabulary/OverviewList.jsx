@@ -1,72 +1,69 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Header, SideBar, Footer } from "../../components";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { RightMoreIcon, TotalWordIcon, CategoryIcon, TimeIcon, LearnerIcon } from "../../assets/Vocabulary";
+import { jwtDecode } from "jwt-decode"; // Thư viện để giải mã JWT
 
 
 export default function OverviewList() {
+  const { listId } = useParams(); // Lấy ID từ URL
+  console.log("List ID from params:", listId); // Kiểm tra trong console
   const [listInfo, setListInfo] = useState(null);
   const [words, setWords] = useState([]);
-  const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-    // DUMMY DATA for testing
+  const currentUserId = localStorage.getItem("userId"); // hoặc lấy từ context
+  const [isOwner, setIsOwner] = useState(false);
+
   useEffect(() => {
-    const dummyList = {
-      id: "erg-mgn-qwe",
-      title: "IELTS Academic Vocabulary - Set 1",
-      description: "This list focuses on key academic words often found in scientific articles and exam reading passages. Great for learners preparing for IELTS or TOEFL.",
-      creator: {
-        display_name: "Mr. John Nguyen",
-      },
-      created_at: "2025-07-03T12:00:00.000Z",
-      privacy_setting: "classroom",
-      wordCount: 6,
-      tags: ["IELTS", "Academic", "Vocabulary"],
+    const fetchListAndWords = async () => {
+      try {
+        const list = await vocabularyService.getListById(listId);
+        const words = await vocabularyService.getWordsByListId(listId);
+
+        const token = localStorage.getItem("token");
+        const payload = token ? jwtDecode(token) : null;
+        const userId = payload?.userId || payload?.id;
+        const isMine = list.creator?.id === userId;
+
+        setListInfo({
+          ...list,
+          title: list.title || "Untitled List",
+          description: list.description || "No description provided.",
+          creator: list.creator || { display_name: "Unknown" },
+          wordCount: list.wordCount || words.length || 0,
+          tags: list.tags || []
+        });
+
+        console.log("List creator:", list.creator?.id); // Kiểm tra thông tin danh sách
+        console.log("Current user ID:", userId); // Kiểm tra ID người dùng hiện
+
+        setWords(words || []);
+        setIsOwner(isMine);
+      } catch (error) {
+        console.error("Failed to load list:", error);
+      }
     };
 
-    const dummyWords = [
-      {
-        id: "1",
-        term: "Analyze",
-        definition: "To examine something in detail for purposes of explanation.",
-        phonetics: "/ˈænəlaɪz/",
-      },
-      {
-        id: "2",
-        term: "Hypothesis",
-        definition: "A proposed explanation based on limited evidence.",
-        phonetics: "/haɪˈpɒθəsɪs/",
-      },
-      {
-        id: "3",
-        term: "Variable",
-        definition: "An element that can be changed and may affect the outcome.",
-        phonetics: "/ˈvɛəriəbl/",
-      },
-      {
-        id: "4",
-        term: "Methodology",
-        definition: "A system of methods used in a particular area of study.",
-        phonetics: "/ˌmɛθəˈdɒlədʒi/",
-      },
-      {
-        id: "5",
-        term: "Data",
-        definition: "Facts and statistics collected for reference or analysis.",
-        phonetics: "/ˈdeɪtə/",
-      },
-      {
-        id: "6",
-        term: "Synthesize",
-        definition: "To combine different ideas to form a coherent whole.",
-        phonetics: "/ˈsɪnθəsaɪz/",
-      }
-    ];
+    fetchListAndWords();
+  }, [listId]);
 
-    setListInfo(dummyList);
-    setWords(dummyWords);
-    
-  }, []);
+
+  const handleAddToMyList = async () => {
+    try {
+      await vocabularyService.createList({
+        title: listInfo.title,
+        description: listInfo.description,
+        tags: listInfo.tags,
+        privacy_setting: "private",
+        // có thể clone từ list gốc nếu bạn có cơ chế "copy list"
+      });
+      alert("Added to your lists.");
+    } catch (error) {
+      console.error("Failed to add to list", error);
+      alert("Failed to add.");
+    }
+  };
 
   return (
     <div className="overview-list">
@@ -141,8 +138,22 @@ export default function OverviewList() {
                 </div>
 
                 <div className="overview-list__actions">
-                    <button className="overview-list__button outline">Add to my list</button>
-                    <button className="overview-list__button filled">Review now</button>
+                  {isOwner ? (
+                    <button
+                      className="overview-list__button outline"
+                      onClick={() => window.location.href = `/vocabulary/edit/${listInfo.id}`}
+                    >
+                      Edit List
+                    </button>
+                  ) : (
+                    <button
+                      className="overview-list__button outline"
+                      onClick={() => handleAddToMyList()}
+                    >
+                      Add to my list
+                    </button>
+                  )}
+                  <button className="overview-list__button filled">Review now</button>
                 </div>
               </section>
             </>
