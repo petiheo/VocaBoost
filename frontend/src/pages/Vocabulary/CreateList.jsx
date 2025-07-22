@@ -1,18 +1,34 @@
 import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Header, SideBar, Footer} from "../../components/index.jsx";
-import { UploadImage} from "../../assets/Vocabulary";
+import { UploadImage, UploadedImage} from "../../assets/Vocabulary";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import Select from "react-select";
-// import CreatableSelect from "react-select/creatable";
 
 export default function CreateList() {
     const [privacy, setPrivacy] = useState("private");
+    const navigate = useNavigate();
+
     const [words, setWords] = useState([
         { term: "", definition: "", example: "", image: null, tag: "" },
         { term: "", definition: "", example: "", image: null, tag: "" },
         { term: "", definition: "", example: "", image: null, tag: "" },
     ]);
+    const { listId } = useParams();
 
+
+    const [availableTags, setAvailableTags] = useState([]);
+    const [selectedTags, setSelectedTags] = useState([]); // array of strings  // selected tags
+
+    useEffect(() => {
+    async function fetchTags() {
+        const tags = await vocabularyService.getAllTags();
+        setAvailableTags(tags);
+    }
+    fetchTags();
+    }, []);
+
+    
     const handleDeleteWord = async (wordId) => {
         const confirmed = window.confirm("Are you sure you want to delete this word?");
         if (!confirmed) return;
@@ -26,87 +42,80 @@ export default function CreateList() {
         }
     };  
 
-    const [availableTags, setAvailableTags] = useState([
-    "ielts",
-    "academic",
-    "reading",
-    "business",
-    "english",
-    "core-vocab",
-    "biology",
-    "chemistry"
-    ]);
 
-    const [selectedTags, setSelectedTags] = useState([]); // array of strings   // selected tags
+    const handleCreateList = async (e) => {
+        e.preventDefault();
+        const title = e.target["list-title"].value;
+        const description = e.target["description"].value;
 
-    useEffect(() => {
-    async function fetchTags() {
-        const tags = await vocabularyService.getAllTags();
-        setAvailableTags(tags);
-    }
-    fetchTags();
-    }, []);
-
-const handleCreateList = async (e) => {
-    e.preventDefault();
-    const title = e.target["list-title"].value;
-    const description = e.target["description"].value;
-
-    const data = {
-      title,
-      description,
-      privacy_setting: privacy,
-      tags: selectedTags,
-    };
-
-    try {
-    console.log("Sending to backend:", data);
-
-      const createdList = await vocabularyService.createList(data);
-      console.log("List created:", createdList);
-
-      const validWords = words.filter(w => w.term && w.definition);
-
-      if (validWords.length > 0) {
-        // Bước 1: Thêm từ hàng loạt
-        const wordPayload = {
-          listId: createdList.id,
-          words: validWords.map(w => ({
-            term: w.term,
-            definition: w.definition,
-            phonetics: w.phonetics || "",
-            image_url: w.image || "",
-          })),
+        const data = {
+        title,
+        description,
+        privacy_setting: privacy,
+        tags: selectedTags,
         };
 
-        await vocabularyService.addWordsBulk(wordPayload);
+        try {
+        console.log("Sending to backend:", data);
 
-        // Bước 2: Lấy lại danh sách từ từ backend để có ID
-        const insertedWords = await vocabularyService.getWordsByListId(createdList.id);
+        let actualListId = listId;
+        let createdList;
 
-        // Bước 3: Thêm ví dụ nếu có
-        const exampleRequests = validWords.map((wordInput) => {
-          const match = insertedWords.find(
-            w => w.term === wordInput.term && w.definition === wordInput.definition
-          );
-          if (match && wordInput.example && wordInput.example.trim().length > 0) {
-            return vocabularyService.addExample(match.id, wordInput.example);
-          }
-          return null;
-        });
+        if (!actualListId) {
+            const res = await vocabularyService.createList(data);
+            createdList = res?.data?.list;
+            if (!createdList?.id) {
+                throw new Error("Failed to create new list");
+            }
+            actualListId = createdList.id;
+        } else {
+            await vocabularyService.updateList(actualListId, data);
+            createdList = { id: actualListId };
+        }
 
-        await Promise.all(exampleRequests.filter(Boolean));
-      }
+        const validWords = words.filter(w => w.term && w.definition);
 
-      // Điều hướng hoặc thông báo sau khi tạo thành công
-      alert("List created successfully!");
-      window.location.href = "/dashboard";
+        if (validWords.length > 0) {
+            // Bước 1: Thêm từ hàng loạt
+            const wordPayload = {
+            listId: listId,
+            words: validWords.map(w => ({
+                term: w.term,
+                definition: w.definition,
+                phonetics: w.phonetics || "",
+                image_url: w.image || "",
+            })),
+            };
 
-    } catch (err) {
-      console.error("Error creating list:", err);
-      alert("Failed to create list.");
-    }
-};
+            await vocabularyService.addWordsBulk(wordPayload);
+
+            // Bước 2: Lấy lại danh sách từ từ backend để có ID
+            const insertedWords = await vocabularyService.getWordsByListId(createdList.id);
+
+            // Bước 3: Thêm ví dụ nếu có
+            const exampleRequests = validWords.map((wordInput) => {
+            const match = insertedWords.find(
+                w => w.term === wordInput.term && w.definition === wordInput.definition
+            );
+            if (match && wordInput.example && wordInput.example.trim().length >= 10) {
+                return vocabularyService.addExample(match.id, wordInput.example);
+            }
+            return null;
+            });
+
+            await Promise.all(exampleRequests.filter(Boolean));
+        }
+
+        // Điều hướng hoặc thông báo sau khi tạo thành công
+        alert("List created successfully!");
+        
+        navigate("/vocabulary");
+
+        } catch (err) {
+        console.error("Error creating list:", err);
+        alert("Failed to create list.");
+        }
+    };
 
 
     const handleWordChange = (index, field, value) => {
@@ -120,18 +129,25 @@ const handleCreateList = async (e) => {
     };
 
     const handleImageUpload = async (file, index) => {
-        try {
-            const formData = new FormData();
-            formData.append("image", file);
+    try {
+        const formData = new FormData();
+        formData.append("image", file);
 
-            const res = await vocabularyService.uploadImage(formData);
+        const res = await vocabularyService.uploadImage(formData);
 
-            const updated = [...words];
-            updated[index].image = res.url; // gán url vào word
-            setWords(updated);
-        } catch (err) {
-            console.error("Image upload failed", err);
+        if (res?.url) {
+        const updated = [...words];
+        updated[index].image = res.url;
+        setWords(updated);
+
+        alert("✅ Image uploaded successfully!");
+        } else {
+        alert("❌ Upload failed: No URL returned.");
         }
+    } catch (err) {
+        console.error("Image upload failed", err);
+        alert("❌ Image upload failed.");
+    }
     };
 
 
@@ -231,11 +247,12 @@ const handleCreateList = async (e) => {
                                     </div>
 
                                 <label className="create-list__upload-btn">
-                                <img
-                                    src={word.image || UploadImage}
-                                    alt="Uploaded"
-                                    style={{ width: 30, height: 30, borderRadius: "8px" }}
-                                />
+                                {word.image ? (
+                                <img src={UploadedImage} alt="uploaded icon" className="preview-img" />
+                                ) : (
+                                <img src={UploadImage} alt="upload icon" />
+                                )}
+
                                 <input
                                     type="file"
                                     accept="image/*"
