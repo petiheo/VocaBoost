@@ -8,6 +8,7 @@ import authService from "../../services/Auth/authService";
 import { SignInSignUpBG } from "../../assets/Auth";
 import { useState } from "react";
 import LoadingCursor from "../../components/cursor/LoadingCursor";
+import { useAuth } from "../../services/Auth/authContext";
 
 
 
@@ -21,6 +22,9 @@ export default function Login() {
     // Xử lý lỗi khi đăng nhập 
     const [errors, setErrors] = useState({});
 
+    // Xử lý dữ liệu người dùng. 
+    const { setUser } = useAuth();
+
     // Xử lý việc đăng nhập 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -33,12 +37,15 @@ export default function Login() {
             const res = await authService.login(email, password);
             const check = await authService.getAccountStatus(email);
             console.log(check?.data?.emailVerified)
-            if (check?.data?.emailVerified)
+            if (check?.data?.emailVerified) {
+                setUser(res?.data?.user);
                 navigate("/homepage");
+            }
+
             else
                 navigate("/checkYourMail")
         } catch (error) {
-            setErrors({login: "Incorrect email or password!"});
+            setErrors({ login: "Incorrect email or password!" });
         } finally {
             setIsLoading(false);
         }
@@ -86,7 +93,7 @@ export default function Login() {
                             type="password"
                             placeholder="Enter password"
                             required
-                            error = {errors.login}
+                            error={errors.login}
                         />
 
                         <div className="login-forgot-password">

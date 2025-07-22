@@ -47,7 +47,7 @@ const authService = {
 
   // 8. Verify Email
   verifyEmail: async (token) => {
-    const res = await api.post(`/auth/verify-email/${token}`);
+    const res = await api.get(`/auth/verify-email/${token}`);
     return res.data; 
   },
 

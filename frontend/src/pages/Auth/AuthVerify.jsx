@@ -4,10 +4,12 @@
 import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import authService from "../../services/Auth/authService";
+import { useAuth } from "../../services/Auth/authContext";
 
 export default function AuthVerify() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   useEffect(() => {
     const token = searchParams.get("token");
@@ -29,6 +31,12 @@ export default function AuthVerify() {
           // Decode để lấy thông tin user
           try {
             const payload = JSON.parse(atob(token.split('.')[1]));
+            setUser({
+              id: payload.userId,
+              email: payload.email,
+              role: payload.role
+            })
+            
             localStorage.setItem("user", JSON.stringify({
               id: payload.userId,
               email: payload.email,
@@ -41,14 +49,14 @@ export default function AuthVerify() {
 
           // Chuyển sang homepage/dashboard
           navigate("/select-user-type");
-        } catch(error) {
+        } catch (error) {
           console.log(error.message);
           navigate("/signin");
         }
       }
     }
     handleVerification();
-  }, [searchParams, navigate]);
+  }, [searchParams]);
 
   return <div>Authenticating..</div>;
 }
