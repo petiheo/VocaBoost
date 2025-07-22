@@ -11,7 +11,7 @@ import {
 
 const vocabularyRoutes = [
   {
-    path: "/vocabulary/create",
+    path: "/vocabulary/create/:listId",
     element: <CreateList />
   },
   {

@@ -10,8 +10,8 @@ const vocabularyService = {
 
   // 2. Tạo list mới
   createList: async (data) => {
-    const res = await api.post("/vocabulary/lists", data); //  sửa endpoint
-    return res.data.data || [];
+    const res = await api.post(`/vocabulary/lists`, data);
+    return res.data || {}; // Trả về đối tượng rỗng nếu không có dữ liệu
   },
 
   // 3. Tìm kiếm các danh sách công khai
@@ -23,7 +23,7 @@ const vocabularyService = {
   // 4. Lấy chi tiết một danh sách
   getListById: async (listId) => {
     const res = await api.get(`/vocabulary/lists/${listId}`); //  sửa endpoint
-    return res.data.data || [];
+    return res.data.data.list ||{};
   },
 
   // 5. Cập nhật danh sách
@@ -75,7 +75,7 @@ const vocabularyService = {
   // 12. Lấy tất cả tag có sẵn
   getAllTags: async () => {
     const res = await api.get("/vocabulary/tags");
-    return res.data.data.tags;
+    return res.data.data.tags || [];
   },
 
   // 13. Upload hình ảnh
