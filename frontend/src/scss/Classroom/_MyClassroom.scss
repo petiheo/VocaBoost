@@ -3,6 +3,8 @@
 .my-classroom-container{
   margin: 2em 0;
   display: flex;
+
+  font-family: $font-inter;
 }
 
 .my-classroom-page {
@@ -59,13 +61,16 @@
 
     .btn {
       margin-right: 1rem;
-      padding: 0.4rem 1rem;
+      padding: 0.8rem 1rem;
       border: none;
-      border-radius: 4px;
+      border-radius: 10px;
       cursor: pointer;
 
+      text-decoration: none;
+
       &.light {
-        background-color: #f8f8f8;
+        background-color: #F1EDE4;
+  
       }
 
       &.dark {

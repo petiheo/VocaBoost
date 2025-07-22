@@ -7,12 +7,14 @@ import classroomService from "../../../services/Classroom/classroomService";
 export default function ApproveJoinClassroomRequest() {
     const [requests, setRequests] = useState([]);
     const navigate = useNavigate();
-    
+
     // Truy xuất dữ liệu lớp học được lưu khi users chọn classroom ở trang MyClassroom. 
     const [classroomId, setClassroomId] = useState(() => {
         const selectedClassroom = JSON.parse(localStorage.getItem("selectedClassroom"));
         return selectedClassroom?.id || null;
     });
+
+    const selectedClassroom = JSON.parse(localStorage.getItem("selectedClassroom"));
 
     // Fetch data về trang 
     useEffect(() => {
@@ -38,7 +40,7 @@ export default function ApproveJoinClassroomRequest() {
     const handleApproveJoinRequest = async (id) => {
         try {
             const res = await classroomService.approveJoinRequest({ classroomId, learnerId: id });
-            if (res.success){
+            if (res.success) {
                 console.log("Approve thanh cong");
                 setLearners(requests.filter((r) => r.learner_id !== id));
             }
@@ -51,7 +53,7 @@ export default function ApproveJoinClassroomRequest() {
     const handleRejectJoinRequest = async (id) => {
         try {
             const res = await classroomService.rejectJoinRequest({ classroomId, learnerId: id });
-            if (res.success){
+            if (res.success) {
                 console.log("Reject thanh cong");
                 setRequests(requests.filter((r) => r.learner_id !== id));
             }
@@ -65,13 +67,27 @@ export default function ApproveJoinClassroomRequest() {
     const handleApproveAll = async () => {
         try {
             const res = await classroomService.approveAllJoinRequest({ classroomId });
-            if (res.success){
+            if (res.success) {
                 console.log(res.message);
                 setRequests([]);
             }
         } catch (error) {
             console.log(error.message);
             navigate("/fail");
+        }
+    }
+
+    // Auto-approve 
+    const [autoApprove, setAutoApprove] = useState(selectedClassroom?.is_auto_approval_enabled);
+
+    const toggleAutoApprove = async () => {
+        try {
+            const newValue = !autoApprove;
+            const res = await classroomService.changeAutoApproveSetting(classroomId, { isAutoApprovalEnabled: newValue });
+            setAutoApprove(res?.data?.isAutoApprovalEnabled ?? false);
+            console.log(res.message);
+        } catch (error) {
+            console.log("Lỗi auto approve", error.message);
         }
     }
 
@@ -89,7 +105,10 @@ export default function ApproveJoinClassroomRequest() {
                         <div className="search-block--btn">
                             <button className="btn green" onClick={() => handleApproveAll()}
                             >Approve all</button>
-                            <button className="btn light">Auto-Approval Settings</button>
+                            <button className={`btn ${autoApprove ? "green" : "decline"}`}
+                                onClick={toggleAutoApprove}>
+                                {autoApprove ? "Auto-Approve Enabled" : "Auto-Approve Disabled"}
+                            </button>
                         </div>
                         <div className="search-block--dropdown-menu">
                             <ClassroomDropdownMenu students={requests.length} />

@@ -10,3 +10,4 @@ export {default as MyClassroom} from "./MyClassroom"
 export {default as ViewClassroom} from "./ViewClassroom"
 export {default as AssignmentPage} from './TeacherManageClassroom/AssignmentPage'
 export {default as AssignExercise} from './TeacherManageClassroom/AssignExercise'
+export {default as AssignmentDetail} from './TeacherManageClassroom/AssignmentDetail'

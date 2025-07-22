@@ -24,7 +24,7 @@ export default function CreateClassroom() {
         // Handle API submission or further logic here...
         try {
             const res = await classroomService.createClassroom(data);
-            navigate("my-classroom");
+            navigate("/my-classroom");
 
         } catch (error) {
             setErrors({ server: error.response?.data?.error || "Classroom error." });
@@ -85,8 +85,8 @@ export default function CreateClassroom() {
                             name="limit"
                             type="number"
                             min={1}
-                            step={1}
                             max={100}
+                            step={1}
                             defaultValue={50}
                             onChange={(e) => {
                                 if (parseInt(e.target.value) > 100) {
