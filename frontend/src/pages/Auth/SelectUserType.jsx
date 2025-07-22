@@ -15,7 +15,7 @@ export default function SelectUserType() {
                     <img src={LearnerPattern} alt="learner-pattern" className="learner-pattern" width="60px" />
                 </Link>
 
-                <Link to="/homepage" className="select-teacher-type">
+                <Link to="/teacher-verification" className="select-teacher-type">
                     <h3>Teacher</h3>
                     <div className="pattern">
                         <img src={TeacherPattern1} alt="teacher-pattern1" className="teacher-pattern1" width="60px" />

@@ -47,9 +47,7 @@ const authService = {
 
   // 9. Get account status
   getAccountStatus: async (email) => {
-    const res = await api.post("/auth/get-account-status", {
-      data: {email: email}
-    })
+    const res = await api.post("/auth/get-account-status", {email: email})
     return res.data; 
   },
 

@@ -28,7 +28,7 @@ export default function Login() {
         try {
             const res = await authService.login(email, password);
             const check = await authService.getAccountStatus(email);
-            if (check?.emailVerified)
+            if (check?.data?.emailVerified)
                 navigate("/homepage");
             else
                 navigate("/checkYourMail")

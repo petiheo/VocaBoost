@@ -41,6 +41,11 @@ $text-color: #352D24;
     font-family: $font-inriasans;
   }
 
+  // &__input{
+  //   display: flex;
+  //   gap: 2px; 
+  // }
+
   &__upload-label {
     font-weight: 600;
     font-size: 25px;
@@ -48,6 +53,7 @@ $text-color: #352D24;
 
   &__upload-description {
     font-size: 15px;
+    margin: 0;
     color: #666;
   }
 

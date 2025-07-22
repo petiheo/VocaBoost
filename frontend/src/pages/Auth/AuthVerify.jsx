@@ -29,7 +29,7 @@ export default function AuthVerify() {
       }
 
       // Chuyển sang homepage/dashboard
-      navigate("/homepage");
+      navigate("/select-user-type");
     } else {
       navigate("/login");
     }

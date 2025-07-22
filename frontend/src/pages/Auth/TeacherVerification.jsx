@@ -4,6 +4,7 @@ import { useState } from "react";
 import Logo from "../../components/Logo";
 import { UploadPattern } from "../../assets/icons";
 import AccountPageInput from "../../components/AccountPageInput";
+import { RedAsterisk } from "../../assets/Auth";
 
 export default function TeacherVerification() {
     const [previewImage, setPreviewImage] = useState(null);
@@ -34,14 +35,17 @@ export default function TeacherVerification() {
                     {/* Left side form */}
                     <div className="teacher-verification__form-left">
                         <AccountPageInput
-                            label="Fullname"
+                            label="Full name"
+                            labelIcon={RedAsterisk}
                             name="fullname"
                             type="text"
                             placeholder="Your full name"
                             required
                         />
+
                         <AccountPageInput
                             label="School"
+                            labelIcon={RedAsterisk}
                             name="school"
                             type="text"
                             placeholder="University of Science, VNU-HCM"
@@ -49,6 +53,7 @@ export default function TeacherVerification() {
                         />
                         <AccountPageInput
                             label="School Email"
+                            labelIcon = {RedAsterisk}
                             name="email"
                             type="text"
                             placeholder="example@hcmus.edu.vn"
@@ -84,7 +89,7 @@ export default function TeacherVerification() {
 
                             {previewImage && (
                                 <div className="teacher-verification__preview">
-                                    <img src={previewImage} alt="Preview"  />
+                                    <img src={previewImage} alt="Preview" />
                                 </div>
                             )}
                         </div>
