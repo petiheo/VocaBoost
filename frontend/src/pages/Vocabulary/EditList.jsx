@@ -16,18 +16,14 @@ export default function EditList() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [words, setWords] = useState([]);
+    const [originalList, setOriginalList] = useState(null);
+    const [originalWords, setOriginalWords] = useState([]);
 
     const handleDeleteWord = async (wordId) => {
         const confirmed = window.confirm("Are you sure you want to delete this word?");
         if (!confirmed) return;
 
-        try {
-            await vocabularyService.deleteWord(wordId); // gọi backend
-            setWords(prev => prev.filter(w => w.id !== wordId)); // cập nhật UI
-        } catch (err) {
-            console.error("Failed to delete word:", err);
-            alert("Failed to delete word.");
-        }
+        setWords(prev => prev.filter(w => w.id !== wordId)); // cập nhật UI
     };
 
 
@@ -36,106 +32,104 @@ export default function EditList() {
             const tags = await vocabularyService.getAllTags();
             setAvailableTags(tags);
 
-            const listRes = await vocabularyService.getListById(listId);
-            const wordRes = await vocabularyService.getWordsByListId(listId);
-            const list = listRes.data;
-            const fetchedWords = wordRes.data;
+            const list = await vocabularyService.getListById(listId);
+            const words = await vocabularyService.getWordsByListId(listId);
 
-            setTitle(list.title);
-            setDescription(list.description);
-            setPrivacy(list.privacy_setting);
-            setSelectedTags(list.tags || []);
-            setWords(fetchedWords.map(w => ({
+            const mappedWords = words.map(w => ({
                 id: w.id,
                 term: w.term,
                 definition: w.definition,
                 phonetics: w.phonetics || "",
                 image: w.image_url || "",
                 example: "", // cần lấy từ API nếu có example riêng
-            })));
+            }));
+
+            setTitle(list.title);
+            setDescription(list.description);
+            setPrivacy(list.privacy_setting);
+            setSelectedTags(list.tags || []);
+            setWords(mappedWords);
+
+            setOriginalList({
+                title: list.title,
+                description: list.description,
+                privacy: list.privacy_setting, 
+                tags: list.tags || [],
+            });
+            setOriginalWords(mappedWords);
         }
         fetchData();
     }, [listId]);
 
-
-    // useEffect(() => {
-    // // Fake data for testing
-    // setTitle("Dummy List for Test");
-    // setDescription("This is a sample list for testing Edit view");
-    // setPrivacy("private");
-    // setSelectedTags(["ielts", "core-vocab"]);
-    // setAvailableTags(["ielts", "core-vocab", "academic", "reading"]);
-
-    // setWords([
-    //     {
-    //     id: "word-1",
-    //     term: "Analyze",
-    //     definition: "Examine in detail",
-    //     phonetics: "/ˈænəlaɪz/",
-    //     image: "", // hoặc link ảnh online
-    //     example: "Please analyze the results.",
-    //     },
-    //     {
-    //     id: "word-2",
-    //     term: "Context",
-    //     definition: "Surrounding situation",
-    //     phonetics: "/ˈkɒntɛkst/",
-    //     image: "",
-    //     example: "Understand the context of this quote.",
-    //     }
-    // ]);
-    // }, []);
-
     const handleUpdateList = async (e) => {
     e.preventDefault();
+
     try {
+        if (!title.trim() || !description.trim()) {
+        alert("Title and description are required.");
+        return;
+        }
+
+        const hasInvalid = words.some(word => !word.term?.trim() || !word.definition?.trim());
+        if (hasInvalid) {
+        alert("Each word must have both term and definition.");
+        return;
+        }
+
         const updatePayload = {
         title,
         description,
         privacy_setting: privacy,
         tags: selectedTags,
         };
+
         await vocabularyService.updateList(listId, updatePayload);
 
+        // Xoá những từ đã bị xoá local
+        const originalWordIds = new Set(originalWords.map(w => w.id));
+        const currentWordIds = new Set(words.filter(w => w.id).map(w => w.id));
+        const deletedWordIds = [...originalWordIds].filter(id => !currentWordIds.has(id));
+
+        for (const deletedId of deletedWordIds) {
+        await vocabularyService.deleteWord(deletedId);
+        }
+
+        // Xử lý update + thêm mới
         for (const word of words) {
-        // nếu từ đã tồn tại
-        if (word.id) {
-            const wordPayload = {
+        const wordPayload = {
             term: word.term,
             definition: word.definition,
             phonetics: word.phonetics || "",
-            image_url: word.image || "",
-            };
-            await vocabularyService.updateWord(word.id, wordPayload);
+            ...(word.image ? { image_url: word.image } : {}),
+        };
 
-            // nếu có ví dụ, gọi thêm
-            if (word.example && word.example.trim().length > 0) {
+        if (word.id) {
+            await vocabularyService.updateWord(word.id, wordPayload);
+            if (word.example?.trim()) {
             await vocabularyService.addExample(word.id, word.example);
             }
-
-        } else if (word.term && word.definition) {
-            // nếu là từ mới
-            const newWordPayload = {
+        } else { // nếu không có ID thì coi như là thêm mới
+            const newWord = await vocabularyService.addWord({
             listId,
-            term: word.term,
-            definition: word.definition,
-            phonetics: word.phonetics || "",
-            image_url: word.image || "",
-            };
-            const newWord = await vocabularyService.addWord(newWordPayload);
+            ...wordPayload,
+            });
 
-            if (word.example && word.example.trim().length > 0) {
+            if (word.example?.trim()) {
             await vocabularyService.addExample(newWord.id, word.example);
             }
         }
         }
 
-        navigate("/dashboard");
+        alert("List updated successfully!");
+        navigate("/vocabulary");
 
     } catch (err) {
-        console.error("Error updating list:", err);
+        console.error("Error updating list:", err.response?.data || err.message);
+        alert("Failed to update list.");
     }
     };
+  
+
 
     const handleWordChange = (index, field, value) => {
         const updated = [...words];
@@ -165,7 +159,7 @@ export default function EditList() {
             <Header />
             <div className="edit-list__content">
                 <SideBar />
-                <form className="edit-list__form" onSubmit={handleUpdateList}>
+                <form className="edit-list__form">
                     <h1 className="edit-list__header">Edit List</h1>
 
                     <textarea
@@ -292,12 +286,24 @@ export default function EditList() {
                             type="button"
                             value="Cancel"
                             className="edit-list__form--cancel"
-                            onClick={() => navigate("/vocabulary")}
+                            onClick={() => {
+                                    if (!originalList) return;
+                                    const confirmed = window.confirm("Discard all changes?");
+                                    if (!confirmed) return;
+
+                                    setTitle(originalList.title);
+                                    setDescription(originalList.description);
+                                    setPrivacy(originalList.privacy);
+                                    setSelectedTags(originalList.tags);
+                                    setWords(originalWords);
+                                    navigate("/vocabulary");
+                                }}
                         />
                         <input
-                            type="submit"
+                            type="button"
                             value="Save Changes"
                             className="edit-list__form--submit"
+                            onClick={handleUpdateList}
                         />
                     </div>
                 </form>
