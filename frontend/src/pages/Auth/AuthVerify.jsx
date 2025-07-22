@@ -30,13 +30,14 @@ export default function AuthVerify() {
 
           // Decode để lấy thông tin user
           try {
+            // Chưa kiểm tra phần decode
             const payload = JSON.parse(atob(token.split('.')[1]));
             setUser({
               id: payload.userId,
               email: payload.email,
               role: payload.role
             })
-            
+
             localStorage.setItem("user", JSON.stringify({
               id: payload.userId,
               email: payload.email,
