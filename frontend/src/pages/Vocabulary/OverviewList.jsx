@@ -96,17 +96,22 @@ export default function OverviewList() {
               </section>  
 
               <section className="overview-list__sample">
-                <h2>Sample word</h2>
-                <div className="sample-table">
-                    {words.slice(0, 5).map((word) => (
-                    <div key={word.id} className="sample-row">
-                        <div className="sample-cell sample-term"><strong>{word.term}</strong></div>
-                        <div className="sample-cell sample-phonetics">{word.phonetics}</div>
-                        <div className="sample-cell sample-definition">{word.definition}</div>
-                    </div>
-                    ))}
-                </div>
-
+                  {words.length === 0 ? (
+                    <div className="view-list__empty">This list currently has no words.</div>
+                  ) : (
+                    <>
+                      <h2>Sample word</h2>
+                      <div className="sample-table">
+                          {words.slice(0, 5).map((word) => (
+                          <div key={word.id} className="sample-row">
+                              <div className="sample-cell sample-term"><strong>{word.term}</strong></div>
+                              <div className="sample-cell sample-phonetics">{word.phonetics}</div>
+                              <div className="sample-cell sample-definition">{word.definition}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 <button className="sample-view-button" onClick={() => window.location.href = `/vocabulary/view/${listInfo.id}`}>
                     View list to see more
                     <img src={RightMoreIcon} alt="arrow-icon" className="sapmple-view-button__icon"/>
