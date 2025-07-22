@@ -3,6 +3,7 @@ classroomRouter = express.Router();
 
 const classroomValidator = require('../validators/classroom.validator');
 const classroomController = require('../controllers/classroom.controller');
+const rateLimiter = require('../middlewares/rateLimiter.middleware');
 const {
   requireRole,
   hasClassroomAccess,
@@ -11,6 +12,7 @@ const {
 const authenticate = require('../middlewares/auth.middleware');
 
 classroomRouter.use(authenticate);
+classroomRouter.use(rateLimiter);
 
 // Tạo lớp học mới
 classroomRouter.post(
@@ -167,6 +169,14 @@ classroomRouter.post('/:classroomId/leave',
   requireClassRole('learner'),
   classroomController.leaveClassroom
 );
+
+classroomRouter.get(
+  '/:classroomId/assignments/overdue',
+  hasClassroomAccess,
+  requireClassRole('learner'),
+  classroomController.getLearnerOverdueAssignments
+);
+
 
 
 module.exports = classroomRouter;
