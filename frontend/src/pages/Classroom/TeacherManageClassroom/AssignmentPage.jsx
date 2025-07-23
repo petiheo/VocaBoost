@@ -65,13 +65,6 @@ export default function AssignmentPage() {
                             </div>
                             ))
                         ):(<p>No assignment available</p>)}
-                        {/* {mockAssignments.map((item, i) => (
-                            <div className="assignment-card" key={i}>
-                                <h4>{item.title}</h4>
-                                <p className="assignment-page__item">{item.words} word</p>
-                                <p className="due">Due: {item.dueDate}</p>
-                            </div>
-                        ))} */}
                     </div>
 
                     {/* See more */}

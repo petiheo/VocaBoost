@@ -52,17 +52,18 @@ function AssignExercise() {
 
     const handleCreateAssignment = async (e) => {
         e.preventDefault();
-        const vocabListId = e.target["vocabulary-list"].value; // chinh lai thanh id
-        const title = e.target["vocabulary-list"].value;
-        const wordsPerReview = e.target["words_per_review"];
+        const vocabListId = "3ecb287e-453a-4c97-a590-e85742d0b9d2"; // chinh lai thanh id
+        const title = selectedVocab;
+        const wordsPerReview = parseInt(e.target["words_per_review"].value);
+        const formatDate = (dateStr) => new Date(`${dateStr}T10:00:00Z`).toISOString();
 
         const data = {
             vocabListId,
             title,
-            exerciseMethod: method,
+            exerciseMethod: method.toLowerCase(),
             wordsPerReview,
-            startDate,
-            dueDate
+            startDate: formatDate(startDate),
+            dueDate: formatDate(dueDate)
         };
 
         try {
@@ -71,8 +72,8 @@ function AssignExercise() {
             navigate("/classroom/assignment-page");
 
         } catch (error) {
-            setErrors({ server: error.response?.data?.error || "Assignment error." });
-            console.error(error);
+            // setErrors({ server: error.response?.data?.error || "Assignment error." });
+            console.error(error.message);
         }
 
     }
@@ -147,6 +148,7 @@ function AssignExercise() {
                                     key={m}
                                     className={method === m ? 'active' : ''}
                                     onClick={() => setMethod(m)}
+                                    type = "button"
                                 >
                                     {m}
                                 </button>
@@ -161,17 +163,17 @@ function AssignExercise() {
                             className='form-group__word-number'
                             name="words_per_review"
                             type="number"
-                            min={1}
-                            max={100}
+                            min={5}
+                            max={30}
                             step={1}
                             defaultValue={20}
                             // Xử lý dữ liệu nhập vào
                             onChange={(e) => {
-                                if (parseInt(e.target.value) > 100) {
-                                    e.target.value = 100;
+                                if (parseInt(e.target.value) > 30) {
+                                    e.target.value = 30;
                                 }
-                                else if (parseInt(e.target.value) <= 0) {
-                                    e.target.value = 1;
+                                else if (parseInt(e.target.value) < 5) {
+                                    e.target.value = 5;
                                 }
                             }}
                             required

@@ -90,7 +90,7 @@ const classroomService = {
         return res.data;
     },
 
-    //15. Create a assignment (chua link)
+    //15. Create a assignment (chua hoan thien)
     createAssignment: async (classroomId, data) => {
         const res = await api.post(`/classroom/${classroomId}/assignment`, {
             vocabListId: data.vocabListId,
@@ -111,7 +111,7 @@ const classroomService = {
         return res.data;
     },
 
-    //18. Get Assignments by Teacher (Teacher) (chua link)
+    //18. Get Assignments by Teacher (Teacher) 
     getAssignmentsByTeacher: async (classroomId) => {
         const res = await api.get(`/classroom/${classroomId}/assignments`);
         return res.data;
