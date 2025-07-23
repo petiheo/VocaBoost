@@ -133,7 +133,7 @@ const classroomService = {
         return res.data;
     },
 
-    //21. Get Assignments Details (Teacher) (chua link)
+    //21. Get Assignments Details (Teacher) 
     getAssignmentDetails: async (classroomId, assignmentId) => {
         const res = await api.get(`/classroom/${classroomId}/${assignmentId}`);
         return res.data;
@@ -145,7 +145,7 @@ const classroomService = {
         return res.data;
     },
 
-    //23. Delete Assignments (Teacher) (chua link)
+    //23. Delete Assignments (Teacher) 
     deleteAssignment: async (classroomId, assignmentId) => {
         const res = await api.delete(`/classroom/${classroomId}/${assignmentId}`);
         return res.data;
