@@ -3,11 +3,8 @@ import { ClassroomTitle, TeacherClassroomMenuTab } from "../../../components";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import classroomService from "../../../services/Classroom/classroomService";
-const mockAssignments = Array(8).fill({
-    title: "Unit 1 Vocabulary",
-    words: 20,
-    dueDate: "April 25, 2025",
-});
+import {format} from 'date-fns';
+
 
 export default function AssignmentPage() {
     // Xử lý việc navigate
@@ -21,18 +18,26 @@ export default function AssignmentPage() {
 
     // Xử lý việc fetch data về page
     const [assignments, setAssignments] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
+        if (!classroomId || isLoading) {
+            return;
+        }
+
         const fetchAssignments = async () => {
-            try{
+            try {
+                setIsLoading(true);
                 const res = await classroomService.getAssignmentsByTeacher(classroomId);
-                if(res.success && Array.isArray(res.data)){
+                if (res.success && Array.isArray(res.data)) {
                     setAssignments(res.data);
                     console.log("Fetch assignments thanh cong");
                 }
-            }catch(error){
+            } catch (error) {
                 console.log("Loi khong fetch duoc assignments");
                 navigate("/fail");
+            }finally{
+                setIsLoading(false);
             }
         }
         fetchAssignments();
@@ -50,21 +55,27 @@ export default function AssignmentPage() {
 
                     {/* Controls */}
                     <div className="controls">
-                        <Link to = "/assign-exercise" className="btn dark">+ Assign Exercise</Link>
+                        <Link to="/assign-exercise" className="btn dark">+ Assign Exercise</Link>
                         <div className="sort">Sort by ▼</div>
                     </div>
 
                     {/* Grid */}
                     <div className="assignment-grid">
-                        {assignments.length > 0? (
+                        {assignments.length > 0 ? (
                             assignments.map((assignment) => (
-                            <div className="assignment-card" key={assignment?.id}>
-                                <h4>{assignment?.title}</h4>
-                                <p className="assignment-page__item">{assignment?.words_per_review} word</p>
-                                <p className="due">Due: {assignment?.due_date}</p>
-                            </div>
+                                <div className="assignment-card"
+                                    key={assignment?.id}
+                                    onClick={() => {
+                                        localStorage.setItem("selectedAssignment", JSON.stringify(assignment));
+                                        navigate(`/classroom/assignment-detail`);
+                                    }}
+                                >
+                                    <h4>{assignment?.title}</h4>
+                                    <p className="assignment-page__item">{assignment?.words_per_review} word</p>
+                                    <p className="due">Due: {assignment?.due_date ? format(new Date(assignment.due_date), 'd/M/yyyy') : 'N/A'}</p>
+                                </div>
                             ))
-                        ):(<p>No assignment available</p>)}
+                        ) : (<p>No assignment available</p>)}
                     </div>
 
                     {/* See more */}

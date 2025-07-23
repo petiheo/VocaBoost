@@ -23,10 +23,20 @@ export default function MyClassroomPage() {
   useEffect(() => {
     const fetchClassroom = async () => {
       try {
-        const res = await classroomService.myClassroom();
-        if (res.success && Array.isArray(res.data)) {
-          setClassrooms(res.data);
-        }
+        // Trường hợp là giáo viên
+        // if(user?.role === "teacher"){
+          const res = await classroomService.myClassroom();
+          if (res.success && Array.isArray(res.data)) {
+            setClassrooms(res.data);
+          }
+        // }
+        // Trường hợp là học sinh
+        // else if(user?.role === "learner"){
+        //   const res = await classroomService.getMyJoined();
+        //   if (res.success && Array.isArray(res.data)) {
+        //     setClassrooms(res.data);
+        //   }
+        // }
       } catch (error) {
         console.error("Lỗi khi lấy danh sách lớp học:", error);
       };

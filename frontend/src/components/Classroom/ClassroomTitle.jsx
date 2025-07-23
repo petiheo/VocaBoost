@@ -8,12 +8,12 @@ export default function ClassroomTitle() {
     const navigate = useNavigate();
     const { user, loading } = useAuth(); // load du lieu cua tai khoan
 
+    // load du lieu cua lop hoc duoc chon 
+    const selectedClassroom = JSON.parse(localStorage.getItem("selectedClassroom"));
+
     // quan ly trang thai "..."
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
-
-    // load du lieu cua lop hoc duoc chon 
-    const selectedClassroom = JSON.parse(localStorage.getItem("selectedClassroom"));
 
     // Handle click outside dropdown
     useEffect(() => {
@@ -27,19 +27,7 @@ export default function ClassroomTitle() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
-
-    // Xu ly ham copy 
-    const [copied, setCopied] = useState(false)
-    const handleCopy = async (join_code) => {
-        try {
-            await navigator.clipboard.writeText(join_code);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (err) {
-            console.log("Không thể sao chép", err);
-        }
-    }
-
+    
     const handleRemoveClassroom = async () => {
         console.log("Remove clicked");
         // Thêm logic xóa classroom ở đây nếu cần
@@ -53,6 +41,19 @@ export default function ClassroomTitle() {
             console.log("Lỗi xoá lớp học ở ClassroomTitle", err);
         }
     };
+
+    // Xu ly ham copy 
+    const [copied, setCopied] = useState(false)
+    const handleCopy = async (join_code) => {
+        try {
+            await navigator.clipboard.writeText(join_code);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.log("Không thể sao chép", err);
+        }
+    }
+
 
     if (!selectedClassroom || !selectedClassroom.id) {
         return <div className="class-header">No classroom selected</div>;

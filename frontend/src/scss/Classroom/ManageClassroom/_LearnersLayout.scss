@@ -1,12 +1,16 @@
-.learners-layout{
+.learners-layout {
     grid-template-rows: 10% 80% 10%;
-    &__body{
+    background: #FFFCF7;
+
+    &__body {
         margin: 2em 0;
         display: flex;
         gap: 2em;
-        
+
     }
-    &__content{
+
+    &__content {
+        background: #FFFCF7;
         width: 70%;
         margin: 0 auto;
         gap: 2em;

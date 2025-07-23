@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Header, SideBar, Footer } from '../../../components';
 import classroomService from '../../../services/Classroom/classroomService';
+import { useNavigate } from 'react-router-dom';
 
 const vocabularyOptions = [
     'Unit 1 Vocabulary',
@@ -16,13 +17,6 @@ function AssignExercise() {
         return selectedClassroom?.id || null;
     });
 
-    // Xử lý phần tìm kiếm vocabulary list 
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [selectedVocab, setSelectedVocab] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
-    const [showError, setShowError] = useState(false);
-    const dropdownRef = useRef(null);
-
     // Xử lý phần method
     const [method, setMethod] = useState('Fill-in-blank');
 
@@ -31,6 +25,14 @@ function AssignExercise() {
     const [startDate, setStartDate] = useState(today);
     const [dueDate, setDueDate] = useState(today);
 
+    // Xử lý phần tìm kiếm vocabulary list 
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [selectedVocab, setSelectedVocab] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showError, setShowError] = useState(false);
+    const dropdownRef = useRef(null);
+
+    // Xử lý thanh chọn list từ vựng
     const filteredOptions = vocabularyOptions.filter(option =>
         option.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -50,21 +52,54 @@ function AssignExercise() {
         }
     };
 
+    // Xử lý method truyền cho back end
+    const methodMapping = {
+        "Flashcard": "flashcard",
+        "Fill-in-blank": "fill_blank",
+        "Word Association": "word_association"
+    };
+
+
+    const navigate = useNavigate();
+    const [errors, setErrors] = useState({});
+
+
     const handleCreateAssignment = async (e) => {
         e.preventDefault();
         const vocabListId = "3ecb287e-453a-4c97-a590-e85742d0b9d2"; // chinh lai thanh id
-        const title = selectedVocab;
+        const title = searchTerm;
         const wordsPerReview = parseInt(e.target["words_per_review"].value);
         const formatDate = (dateStr) => new Date(`${dateStr}T10:00:00Z`).toISOString();
+
+
+        const newErrors = {};
+
+        if (startDate === dueDate) {
+            newErrors.date =  "The start date must be different from the due date.";
+        }
+
+        if (title.length === 0) {
+            newErrors.title = "The title cannot be empty.";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            console.log("Oke");
+            setErrors(newErrors);
+            return;
+        }
 
         const data = {
             vocabListId,
             title,
-            exerciseMethod: method.toLowerCase(),
+            exerciseMethod: methodMapping[method],
             wordsPerReview,
             startDate: formatDate(startDate),
             dueDate: formatDate(dueDate)
         };
+
+        console.log(
+            data.vocabListId, data.title, data.exerciseMethod, data.wordsPerReview, data.startDate, data.dueDate
+        );
 
         try {
             const res = await classroomService.createAssignment(classroomId, data);
@@ -72,7 +107,6 @@ function AssignExercise() {
             navigate("/classroom/assignment-page");
 
         } catch (error) {
-            // setErrors({ server: error.response?.data?.error || "Assignment error." });
             console.error(error.message);
         }
 
@@ -110,13 +144,13 @@ function AssignExercise() {
                                 name="vocabulary-list"
                                 type="text"
                                 value={searchTerm}
+                                placeholder="Enter list you want to find"
+                                // required
                                 onChange={(e) => {
                                     setSearchTerm(e.target.value);
                                     setDropdownOpen(true);
                                 }}
                                 onBlur={handleBlur}
-                                placeholder="Enter list you want to find"
-                                required
                             />
                             {dropdownOpen && filteredOptions.length > 0 && (
                                 <div className="dropdown-options">
@@ -137,7 +171,7 @@ function AssignExercise() {
                                 </div>
                             )}
                         </div>
-                        {showError && <div className="error">Vocabulary list does not exist.</div>}
+                        {(errors.title || showError) && <div className="input-error">{errors.title}</div>}
                     </div>
 
                     <div className="form-group method-select">
@@ -148,17 +182,16 @@ function AssignExercise() {
                                     key={m}
                                     className={method === m ? 'active' : ''}
                                     onClick={() => setMethod(m)}
-                                    type = "button"
+                                    type="button"
                                 >
                                     {m}
                                 </button>
                             ))}
                         </div>
                     </div>
-                    <input type="hidden" name="method" value={method} />
 
                     <div className="form-group__word">
-                        <label>Word per review:</label>
+                        <label>Word per review (from 5 to 30):</label>
                         <input
                             className='form-group__word-number'
                             name="words_per_review"
@@ -187,7 +220,6 @@ function AssignExercise() {
                             value={startDate}
                             min={today}
                             onChange={(e) => setStartDate(e.target.value)}
-                            // popperPlacement="right-start"
                             required
                         />
                     </div>
@@ -201,6 +233,7 @@ function AssignExercise() {
                             onChange={(e) => setDueDate(e.target.value)}
                             required
                         />
+                        {errors.date && <div className="input-error">{errors.date}</div>}
                     </div>
 
                     <input className="assign-btn"

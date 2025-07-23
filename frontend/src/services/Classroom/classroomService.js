@@ -103,7 +103,11 @@ const classroomService = {
         return res.data;
     },
 
-    //16. Get All Classroom by Learner (Learner) (chua link)
+    //16. Get All Classroom by Learner (Learner) (chua test)
+    getMyJoined: async () => {
+        const res = await api.get("/classroom/my-joined");
+        return res.data; 
+    },
 
     //17. Get Invitations (Teacher)
     getInvitations: async (classroomId) => {

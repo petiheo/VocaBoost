@@ -1607,6 +1607,7 @@ h2 {
 
 .learners-layout {
   grid-template-rows: 10% 80% 10%;
+  background: #FFFCF7;
 }
 .learners-layout__body {
   margin: 2em 0;
@@ -1614,6 +1615,7 @@ h2 {
   gap: 2em;
 }
 .learners-layout__content {
+  background: #FFFCF7;
   width: 70%;
   margin: 0 auto;
   gap: 2em;
@@ -1752,24 +1754,30 @@ h2 {
 
 .assignment-detail-page {
   display: flex;
+  background: #FFFCF7;
+}
+.assignment-detail-page .content {
+  width: 100%;
 }
 .assignment-detail-page .content .assignment-detail__container {
-  background-color: #fff;
-  padding: 2rem;
+  background: #FFFCF7;
   border-radius: 8px;
 }
 .assignment-detail-page .content .assignment-detail__container h1 {
+  font-family: "Lalezar", sans-serif;
   font-size: 1.8rem;
+  margin: 0;
   margin-bottom: 1.5rem;
 }
 .assignment-detail-page .content .assignment-detail__container .assignment-box {
-  background-color: #fff7e6;
+  background-color: #FFFAEF;
   border-radius: 10px;
   padding: 1rem 1.5rem;
   margin-bottom: 2rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 .assignment-detail-page .content .assignment-detail__container .assignment-box .assignment-header {
+  font-family: "Inria Sans", sans-serif;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1785,25 +1793,30 @@ h2 {
   cursor: pointer;
 }
 .assignment-detail-page .content .assignment-detail__container .assignment-box .assignment-meta {
+  font-family: "Inter", sans-serif;
   margin-top: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
 }
 .assignment-detail-page .content .assignment-detail__container .assignment-box .assignment-meta p {
   margin: 0.3rem 0;
 }
 .assignment-detail-page .content .assignment-detail__container .word-list {
+  margin-top: 2em;
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-.assignment-detail-page .content .assignment-detail__container .word-list .word-card {
-  background-color: #fff7d6;
+.assignment-detail-page .content .assignment-detail__container .word-card {
+  background-color: #FFF7DD;
   border-radius: 8px;
   padding: 1rem;
+  font-family: "Inria Sans", sans-serif;
 }
-.assignment-detail-page .content .assignment-detail__container .word-list .word-card strong {
+.assignment-detail-page .content .assignment-detail__container .word-card strong {
   display: block;
   font-size: 1.1rem;
-  margin-bottom: 0.4rem;
 }
 .assignment-detail-page .content .assignment-detail__container .see-more {
   text-align: center;
@@ -2023,6 +2036,14 @@ h2 {
   font-size: 0.9rem;
 }
 
+.input-error {
+  text-align: left;
+  color: red;
+  font-size: 0.9rem;
+  font-family: "Lalezar", sans-serif;
+  margin-top: 4px;
+}
+
 .input {
   color: #352D24;
   font-family: "Lalezar", sans-serif;
@@ -2033,12 +2054,6 @@ h2 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-.input .input-error {
-  text-align: left;
-  color: red;
-  font-size: 0.9rem;
-  margin-top: 4px;
 }
 .input__submit {
   background-color: #3492EA;
