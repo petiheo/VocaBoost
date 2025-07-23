@@ -1,7 +1,7 @@
 // Lý do: Sau khi đăng nhập, backend của bạn sẽ redirect người dùng tới: http://localhost:5173/auth/verify-email?token=<jwt_token>
 //  Mà frontend (React) không thể tự xử lý token trong URL nếu bạn không có route /auth/success tương ứng.
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import authService from "../../services/Auth/authService";
 import { useAuth } from "../../services/Auth/authContext";
@@ -10,6 +10,8 @@ export default function AuthVerify() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { setUser } = useAuth();
+
+  const hasRun = useRef(false);
 
   useEffect(() => {
     
