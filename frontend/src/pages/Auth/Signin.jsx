@@ -25,12 +25,14 @@ export default function Login() {
     // Xử lý dữ liệu người dùng. 
     const { setUser } = useAuth();
 
+    // Xử lý xoá hết input khi đăng nhập sai 
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
     // Xử lý việc đăng nhập 
     const handleLogin = async (e) => {
         e.preventDefault();
         setErrors({});
-        const email = e.target.email.value;
-        const password = e.target.password.value;
 
         setIsLoading(true);
         try {
@@ -45,6 +47,8 @@ export default function Login() {
             else
                 navigate("/checkYourMail")
         } catch (error) {
+            setEmail("");
+            setPassword("");
             setErrors({ login: "Incorrect email or password!" });
         } finally {
             setIsLoading(false);
@@ -85,6 +89,8 @@ export default function Login() {
                             type="text"
                             placeholder="Enter your email"
                             required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
 
                         <AccountPageInput
@@ -94,6 +100,8 @@ export default function Login() {
                             placeholder="Enter password"
                             required
                             error={errors.login}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
 
                         <div className="login-forgot-password">

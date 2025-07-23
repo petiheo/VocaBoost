@@ -12,6 +12,10 @@ export default function AuthVerify() {
   const { setUser } = useAuth();
 
   useEffect(() => {
+    
+    // Dùng để kiểm tra useEffect chạy 2 lần do StrictMode 
+    if (hasRun.current) return;
+    hasRun.current = true;
     const token = searchParams.get("token");
 
     const handleVerification = async () => {
