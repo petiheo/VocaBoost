@@ -50,7 +50,7 @@ authRouter.post(
   authController.resetPassword
 );
 
-authRouter.post('/verify-email/:token', authController.verifyEmail);
+authRouter.get('/verify-email/:token', authController.verifyEmail);
 
 authRouter.post(
   '/resend-verification',

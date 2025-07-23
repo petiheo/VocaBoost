@@ -225,25 +225,22 @@ class ClassroomService {
   async inviteLearner(classroomId, email) {
     const classroom = await classroomModel.getClassroomById(classroomId);
 
-    // // Load thông tin giáo viên
-    // const teacher = await userModel.findById(classroom.teacher_id);
-    // if (!teacher) {
-    //   throw new Error('Teacher not found.');
-    // }
+    const teacher = await classroomModel.findById(classroom.teacher_id);
+    if (!teacher) {
+      throw new Error('Teacher not found.');
+    }
 
-    // // Không cho mời chính mình
-    // if (teacher.email.toLowerCase() === email.toLowerCase()) {
-    //   throw new Error("You cannot invite yourself to your own classroom.");
-    // }
+    if (teacher.email.toLowerCase() === email.toLowerCase()) {
+      throw new Error("You cannot invite yourself to your own classroom.");
+    }
 
-    // Kiểm tra học sinh đã là thành viên chưa
-    // const user = await userModel.findByEmail(email);
-    // if (user) {
-    //   const member = await classroomModel.findMemberStatus(classroomId, user.id);
-    //   if (member?.join_status === 'joined') {
-    //     throw new Error('This learner is already a member of the classroom.');
-    //   }
-    // }
+    const learner = await classroomModel.findByEmail(email);
+    if (learner) {
+      const member = await classroomModel.findMemberStatus(classroomId, learner.id);
+      if (member?.join_status === 'joined') {
+        throw new Error('This learner is already a member of the classroom.');
+      }
+    }
 
     const token = generateInvitationToken({ classroomId, email });
     const expiresAt = new Date(Date.now() + ms('7d')).toISOString();
@@ -492,6 +489,33 @@ class ClassroomService {
       due_date: item.assignments.due_date,
       learner_status: item.status,
     }));
+  }
+
+  async getLearnerOverdueAssignments(classroomId, learnerId) {
+    const raw = await classroomModel.getLearnerAssignmentsByStatus(
+      classroomId,
+      learnerId,
+      ['not_started', 'in_progress', 'late', 'interrupted']
+    );
+
+    return raw
+      .filter((item) => {
+        const status = computeAssignmentStatus(
+          item.assignments.start_date,
+          item.assignments.due_date
+        );
+        return status === 'overdue';
+      })
+      .map((item) => ({
+        assignment_id: item.assignment_id,
+        title: item.assignments.title,
+        exercise_method: item.assignments.exercise_method,
+        completed_sublist_index: item.completed_sublist_index,
+        sublist_count: item.assignments.sublist_count,
+        due_date: item.assignments.due_date,
+        status : 'overdue',
+        learner_status: item.status,
+      }));
   }
 
   async getAssignmentDetails(classroomId, assignmentId) {

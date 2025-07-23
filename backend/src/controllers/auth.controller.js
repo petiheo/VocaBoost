@@ -285,6 +285,13 @@ class AuthController {
       }
 
       const token = generateEmailVerificationToken(userData.id);
+      await authService.insertIntoAuthTokens(
+        token,
+        userData.id,
+        `email_verification`,
+        '24h'
+      );
+
       await emailService.sendEmailVerification(email, token);
       return res.status(200).json({
         success: true,
