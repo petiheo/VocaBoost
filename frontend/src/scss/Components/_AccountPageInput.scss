@@ -2,6 +2,14 @@
 
 $text-color: #352D24;
 
+.input-error {
+    text-align: left;
+    color: red;
+    font-size: 0.9rem;
+    font-family: $font-lalezar;
+    margin-top: 4px;
+}
+
 .input {
 
     color: $text-color;
@@ -14,14 +22,8 @@ $text-color: #352D24;
         justify-content: center;
         align-items: center;
     }
-    
-    .input-error {
-        text-align: left;
-        color: red;
-        font-size: 0.9rem;
-        margin-top: 4px;
-    }
-    
+
+
     &__submit {
         background-color: #3492EA;
         border: none;

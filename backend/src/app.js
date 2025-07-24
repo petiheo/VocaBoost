@@ -5,6 +5,7 @@ const logger = require('./utils/logger');
 const securityMiddleware = require('./middlewares/security.middleware');
 
 const router = require('./routes/index.route');
+const cors = require('cors');
 
 require('./config/passport');
 
