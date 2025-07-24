@@ -1,20 +1,8 @@
-const { body, validationResult } = require('express-validator');
-
-const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({
-      success: false,
-      error: 'Validation failed',
-      details: errors.array().map((err) => ({
-        field: err.param,
-        message: err.msg,
-        value: err.value,
-      })),
-    });
-  }
-  next();
-};
+const { body } = require('express-validator');
+const {
+  commonValidators,
+  handleValidationErrors,
+} = require('./common.validator');
 
 const teacherValidators = {
   submitVerification: [
@@ -34,15 +22,7 @@ const teacherValidators = {
       .isLength({ min: 2, max: 200 })
       .withMessage('Institution name must be between 2 and 200 characters'),
 
-    body('schoolEmail')
-      .trim()
-      .notEmpty()
-      .withMessage('School email is required')
-      .isEmail()
-      .withMessage('Invalid email format')
-      .normalizeEmail()
-      .isLength({ max: 255 })
-      .withMessage('Email too long'),
+    commonValidators.email('schoolEmail'),
 
     body('additionalNotes')
       .optional()
