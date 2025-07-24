@@ -1,31 +1,70 @@
-const authenticate = (req, res, next) => {
-  // Tạm gán mock user để test
-  req.user = {
-    userId: '16ba97c6-15f3-4515-88af-fd74285d47ae',
-    email: 'teacher@vocaboost.com',
-    role: 'teacher',
+const { verifyToken } = require('../helpers/jwt.helper');
+const userModel = require('../models/user.model');
 
-    // // Mock học viên 1
-    //   userId: '9e4da817-8fb9-422c-9cfe-122752a3ff5d',
-    //   email: 'learner1@vb.com',
-    //   role: 'learner'
+const authMiddleware = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        success: false,
+        message: 'No token provided',
+      });
+    }
 
-    // // Mock học viên 2
-    //   userId: 'e4a1362e-eeac-43bc-87ff-f4121ed11dab',
-    //   email: 'learner2@vb.com',
-    //   role: 'learner'
+    const token = authHeader.substring(7);
+    const decoded = verifyToken(token);
 
-    // // Mock học viên 3
-    //   userId: '653d9fb9-54db-415a-91e2-f3aa549f1eba',
-    //   email: '',
-    //   role: 'learner'learner3@vb.com
+    const user = await userModel.findById(decoded.userId);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
 
-    // // Mock học viên 4 (Quang Nghi)
-    //   userId: 'e3d2f7a8-4c92-4e3e-87f4-bd3a7cd62db9',
-    //   email: 'bin01677952356@gmail.com',
-    //   role: 'learner'
-  };
-  next();
+    if (user.account_status !== 'active') {
+      return res.status(403).json({
+        success: false,
+        message: `Account ${user.account_status}. Please contact support.`,
+      });
+    }
+
+    if (user.email_verified === false) {
+      return res.status(403).json({
+        success: false,
+        message: 'Email verification required',
+      });
+    }
+
+    // Attach user info to request
+    req.user = {
+      userId: decoded.userId,
+      email: decoded.email,
+      role: user.role, // Use current role from DB, not from token
+    };
+
+    next();
+  } catch (error) {
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token',
+      });
+    }
+
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token expired',
+      });
+    }
+
+    console.error('Auth middleware error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Authentication error',
+    });
+  }
 };
 
-module.exports = authenticate;
+module.exports = authMiddleware;

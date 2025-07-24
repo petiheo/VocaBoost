@@ -258,10 +258,25 @@ class AuthController {
       }
 
       await authService.updateUsedAt(token);
-      await authService.verifyEmail(decoded.userId);
+      const userData = await authService.verifyEmail(decoded.userId);
+      const accessToken = generateToken({
+        userId: userData.id,
+        email: userData.email,
+        role: userData.role,
+      });
+
       return res.status(200).json({
         success: true,
         message: 'Email verified successfully.',
+        data: {
+          user: {
+            id: userData.id,
+            email: userData.email,
+            role: userData.role,
+            status: userData.status,
+          },
+          token: accessToken,
+        },
       });
     } catch (error) {
       logger.error('Verify email error: ', error);
