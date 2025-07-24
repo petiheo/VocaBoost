@@ -1,6 +1,17 @@
 const supabase = require('../config/database');
 
 class UserModel {
+  async findById(id) {
+    const { data, error } = await supabase
+      .from('users')
+      .select()
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
   async findByEmail(email) {
     const { data, error } = await supabase
       .from('users')
