@@ -2246,8 +2246,11 @@ h2 {
 }
 
 .sidebar {
-  position: relative;
+
+  position: fixed;
   z-index: 1000;
+  top: 0%;
+  width: 15rem;
   background: #241F1F;
   color: white;
   height: 100%;
@@ -2320,6 +2323,32 @@ h2 {
 .sidebar .sidebar__link .sidebar__label {
   white-space: nowrap;
 }
+
+.learner-submenu {
+  display: flex;
+  justify-content: center;
+  gap: 10rem;
+  border-bottom: 0.2rem solid #dcdcdc;
+  padding: 0rem;
+}
+
+.submenu-tab {
+  font-family: "Lalezar", sans-serif;
+  font-weight: lighter;
+  font-size: 1.5rem;
+  color: #2b1e17;
+  text-decoration: none;
+  padding: 0.5rem 4rem 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+.submenu-tab.active {
+  background-color: #F8EED3;
+}
+.submenu-tab:hover {
+  background-color: #F8EED3;
+}
+
 
 @keyframes fadeIn {
   from {
