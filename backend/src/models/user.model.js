@@ -120,13 +120,18 @@ class UserModel {
   }
 
   async verifyEmail(id) {
-    return await supabase
+    const { data, error } = await supabase
       .from('users')
       .update({
         email_verified: true,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', id);
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
   }
 }
 
