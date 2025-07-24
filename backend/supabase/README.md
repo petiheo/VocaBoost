@@ -13,6 +13,7 @@ choco install supabase
 ```
 
 ## II. Quản lý Database
+
 ### 1. Đăng nhập vào Supabase
 
 ```bash
@@ -20,7 +21,6 @@ supabase login
 ```
 
 Lệnh này sẽ mở trình duyệt để đăng nhập vào tài khoản Supabase.
-
 
 ### 2. Khởi động local development (optional - không dùng local, dùng cloud cũng được)
 
@@ -49,6 +49,7 @@ service_role key: your-service-role-key
 ```
 
 ### 3. Kết nối với database trên cloud
+
 ```bash
 # Login vào Supabase
 supabase login
@@ -149,19 +150,20 @@ supabase db reset
 
 # Test và commit
 ```
+
 ## VI. Commands cheat sheet
 
-| Command | Mô tả |
-|---------|--------|
-| `supabase start` | Khởi động local stack |
-| `supabase stop` | Dừng local stack |
-| `supabase status` | Kiểm tra trạng thái services |
-| `supabase db reset` | Reset database và chạy migrations |
-| `supabase db push` | Push migrations lên remote |
-| `supabase db pull` | Pull schema từ remote |
-| `supabase migration new <name>` | Tạo migration mới |
-| `supabase migration list` | Liệt kê migrations |
-| `supabase db diff` | So sánh schema changes |
+| Command                         | Mô tả                             |
+| ------------------------------- | --------------------------------- |
+| `supabase start`                | Khởi động local stack             |
+| `supabase stop`                 | Dừng local stack                  |
+| `supabase status`               | Kiểm tra trạng thái services      |
+| `supabase db reset`             | Reset database và chạy migrations |
+| `supabase db push`              | Push migrations lên remote        |
+| `supabase db pull`              | Pull schema từ remote             |
+| `supabase migration new <name>` | Tạo migration mới                 |
+| `supabase migration list`       | Liệt kê migrations                |
+| `supabase db diff`              | So sánh schema changes            |
 
 ## 🔗 Tài liệu tham khảo
 
