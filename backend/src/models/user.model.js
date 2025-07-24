@@ -144,6 +144,34 @@ class UserModel {
     if (error) throw error;
     return data;
   }
+
+  async hasReportedWord(reporterId, wordId) {
+    const { data, error } = await supabase
+      .from('reports')
+      .select()
+      .eq('reporter_id', reporterId)
+      .eq('word_id', wordId)
+      .eq('status', 'open')
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async createReport(reporterId, wordId, reason) {
+    const { data, error } = await supabase
+      .from('reports')
+      .insert({
+        reporter_id: reporterId,
+        word_id: wordId,
+        reason: reason,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
 }
 
 module.exports = new UserModel();
