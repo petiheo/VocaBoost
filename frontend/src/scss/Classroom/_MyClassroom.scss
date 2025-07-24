@@ -1,0 +1,138 @@
+@use '../Fonts' as *; 
+
+.my-classroom-container{
+  margin: 2em 0;
+  display: flex;
+
+  font-family: $font-inter;
+}
+
+.my-classroom-page {
+  font-family: $font-inriasans;
+  width: 80%;
+  margin: auto;
+
+  .my-classroom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    .role-switch button {
+      margin-left: 0.5rem;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+
+      &.active {
+        background-color: #222;
+        color: #fff;
+      }
+    }
+  }
+
+  .tab {
+    display: flex;
+    margin-top: 1.5rem;
+
+    .tab {
+      margin-right: 1rem;
+      padding: 0.5rem 1rem;
+      background-color: #f3eacc;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+
+      &.active {
+        background-color: #fff4c2;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+
+    .btn {
+      margin-right: 1rem;
+      padding: 0.8rem 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+
+      text-decoration: none;
+
+      &.light {
+        background-color: #F1EDE4;
+  
+      }
+
+      &.dark {
+        background-color: #222;
+        color: #fff;
+      }
+    }
+
+    .total {
+      color: #888;
+    }
+  }
+
+  .classroom-list {
+
+    .classroom-card {
+      background-color: #F9F3E4;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border: 1px solid #eee;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+
+      .info span {
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      .info h3 {
+        margin: 0.3rem 0 0;
+      }
+    }
+  }
+
+  .see-more {
+    text-align: center;
+    margin: 1.5rem 0;
+
+    .see-more-btn {
+      background: none;
+      border: none;
+      color: #555;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+  }
+
+  .footer {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #1e1e1e;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    border-top: 2px solid #333;
+
+    .logo {
+      font-weight: bold;
+    }
+
+    .contact p {
+      margin: 0;
+    }
+  }
+}
