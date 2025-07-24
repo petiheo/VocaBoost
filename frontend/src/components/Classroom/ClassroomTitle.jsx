@@ -27,7 +27,22 @@ export default function ClassroomTitle() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
-    
+
+    //Xử lý leave classroom (Learner) 
+    const handleLeaveClassroom = async () => {
+        console.log("Remove clicked");
+        try {
+            const res = await classroomService.leaveClassroom(selectedClassroom.id);
+            if (res.success) {
+                console.log("Rời lớp học thành công")
+                navigate("/my-classroom");
+            }
+        } catch (err) {
+            console.log("Lỗi rời lớp học ở ClassroomTitle", err);
+        }
+    }
+
+    // Xử lý remove classroom của teacher
     const handleRemoveClassroom = async () => {
         console.log("Remove clicked");
         // Thêm logic xóa classroom ở đây nếu cần
@@ -62,21 +77,33 @@ export default function ClassroomTitle() {
     return (
         <div className="class-header">
             {/* {user?.role === "teacher" ? ( */}
-            <div className="dropdown-container" ref={dropdownRef}>
-                <button
-                    className="dropdown-toggle"
-                    onClick={() => setShowDropdown(!showDropdown)}
-                >
-                    ⋯
-                </button>
-                {showDropdown && (
-                    <div className="dropdown-menu">
-                        <button onClick={handleRemoveClassroom} className="dropdown-item">Remove</button>
-                    </div>
-                )}
-            </div>
-            {/* ):(
-                <></>
+                <div className="dropdown-container" ref={dropdownRef}>
+                    <button
+                        className="dropdown-toggle"
+                        onClick={() => setShowDropdown(!showDropdown)}
+                    >
+                        ⋯
+                    </button>
+                    {showDropdown && (
+                        <div className="dropdown-menu">
+                            <button onClick={handleRemoveClassroom} className="dropdown-item">Remove</button>
+                        </div>
+                    )}
+                </div>
+            {/* ) : (
+                <div className="dropdown-container" ref={dropdownRef}>
+                    <button
+                        className="dropdown-toggle"
+                        onClick={() => setShowDropdown(!showDropdown)}
+                    >
+                        ⋯
+                    </button>
+                    {showDropdown && (
+                        <div className="dropdown-menu">
+                            <button onClick={handleLeaveClassroom} className="dropdown-item">Remove</button>
+                        </div>
+                    )}
+                </div>
             )} */}
 
 
