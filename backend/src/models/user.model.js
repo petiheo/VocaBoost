@@ -172,6 +172,21 @@ class UserModel {
     if (error) throw error;
     return data;
   }
+
+  async updateDailyGoal(userId, dailyGoal) {
+    const { data, error } = await supabase
+      .from('user_settings')
+      .update({
+        daily_goal: dailyGoal,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
 }
 
 module.exports = new UserModel();

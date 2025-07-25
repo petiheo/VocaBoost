@@ -25,15 +25,18 @@ class UserController {
   async updateProfile(req, res) {
     try {
       const userId = req.user.userId;
-      const { displayName, removeAvatar } = req.body;
+      const { displayName, removeAvatar, dailyGoal } = req.body;
       const avatarFile = req.file;
 
       if (displayName) await userModel.updateDisplayName(userId, displayName);
-      if (avatarFile) await userService.updateAvatar(userId, avatarFile);
-      else if (removeAvatar) await userService.removeAvatar(userId);
+      if (dailyGoal) await userModel.updateDailyGoal(userId, dailyGoal);
+      if (avatarFile) {
+        await userService.updateAvatar(userId, avatarFile);
+      } else if (removeAvatar) {
+        await userService.removeAvatar(userId);
+      }
 
       const updatedProfile = await userService.getProfile(userId);
-
       return res.status(200).json({
         success: true,
         message: 'Profile updated successfully',

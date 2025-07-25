@@ -16,6 +16,11 @@ const userValidators = {
       .isBoolean()
       .withMessage('removeAvatar must be a boolean'),
 
+    body('dailyGoal')
+      .optional()
+      .isInt({ min: 1, max: 1000 })
+      .withMessage('Daily goal must be between 1 and 1000'),
+
     handleValidationErrors,
   ],
 
