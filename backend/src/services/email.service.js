@@ -56,10 +56,7 @@ class EmailService {
       for (const file of partialFiles) {
         if (file.endsWith('.hbs')) {
           const name = path.basename(file, '.hbs');
-          const content = await fs.readFile(
-            path.join(partialsDir, file),
-            'utf8'
-          );
+          const content = await fs.readFile(path.join(partialsDir, file), 'utf8');
           handlebars.registerPartial(name, content);
         }
       }
@@ -76,10 +73,7 @@ class EmailService {
       for (const file of templateFiles) {
         if (file.endsWith('.hbs')) {
           const name = path.basename(file, '.hbs');
-          const content = await fs.readFile(
-            path.join(templatesPath, file),
-            'utf8'
-          );
+          const content = await fs.readFile(path.join(templatesPath, file), 'utf8');
           this.templates.set(name, handlebars.compile(content));
         }
       }
@@ -303,7 +297,7 @@ class EmailService {
         text: `Join class here: ${inviteUrl}`,
       });
     } catch (error) {
-      console.error(`Failed to send invitation to ${to}:`, error);
+      logger.error(`Failed to send invitation to ${to}:`, error);
       throw error;
     }
   }

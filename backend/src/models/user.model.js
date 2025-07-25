@@ -80,7 +80,7 @@ class UserModel {
     return data;
   }
 
-  async updateAvartar(id, avatarUrl) {
+  async updateAvatar(id, avatarUrl) {
     const { data, error } = await supabase
       .from('users')
       .update({
