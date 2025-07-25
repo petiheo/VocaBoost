@@ -21,14 +21,14 @@ class ClassroomController {
         message: 'Classroom created successfully',
         data: newClassroom,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[createClassroom] Error creating classroom for teacher ${req.user?.userId}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Internal server error',
+        message: error.message || 'Internal server error',
       });
     }
   }
@@ -97,14 +97,14 @@ class ClassroomController {
         success: true,
         data: pendingRequests,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[getPendingJoinRequests] Error getting join requests for classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to fetch join requests.',
+        message: error.message || 'Failed to fetch join requests.',
       });
     }
   }
@@ -127,14 +127,14 @@ class ClassroomController {
         success: true,
         message: 'Join request approved.',
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[approveJoinRequest] Error approving join request for learner ${req.body?.learnerId} in classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to approve join request.',
+        message: error.message || 'Failed to approve join request.',
       });
     }
   }
@@ -157,14 +157,14 @@ class ClassroomController {
         success: true,
         message: 'Join request rejected.',
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[rejectJoinRequest] Error rejecting join request for learner ${req.body?.learnerId} in classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to reject join request.',
+        message: error.message || 'Failed to reject join request.',
       });
     }
   }
@@ -179,14 +179,14 @@ class ClassroomController {
         success: true,
         message: `Approved ${result} learners.`,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[approveAllJoinRequests] Error approving all requests for classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to approve join requests.',
+        message: error.message || 'Failed to approve join requests.',
       });
     }
   }
@@ -201,14 +201,14 @@ class ClassroomController {
         success: true,
         data: learners,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[getJoinedLearners] Error fetching learner list for classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to fetch learner list.',
+        message: error.message || 'Failed to fetch learner list.',
       });
     }
   }
@@ -231,14 +231,14 @@ class ClassroomController {
         success: true,
         message: 'Learner has been removed from the classroom.',
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[removeLearner] Error removing learner ${req.body?.learnerId} from classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to remove learner.',
+        message: error.message || 'Failed to remove learner.',
       });
     }
   }
@@ -253,14 +253,14 @@ class ClassroomController {
         success: true,
         message: 'Classroom has been deleted.',
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[deleteClassroom] Error deleting classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to delete classroom.',
+        message: error.message || 'Failed to delete classroom.',
       });
     }
   }
@@ -280,14 +280,14 @@ class ClassroomController {
         success: true,
         data: results,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[searchLearnersByDisplayName] Error searching learners in classroom ${req.classroom?.id} with query "${req.query?.q}":`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to search learners.',
+        message: error.message || 'Failed to search learners.',
       });
     }
   }
@@ -310,14 +310,14 @@ class ClassroomController {
         success: true,
         message: 'Invitation has been sent.',
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[inviteLearner] Error inviting learner with email ${req.body?.email} to classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to sent invitation.',
+        message: error.message || 'Failed to sent invitation.',
       });
     }
   }
@@ -341,14 +341,14 @@ class ClassroomController {
         message: 'You have successfully joined the classroom.',
         data: result,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[acceptInvitation] Error accepting invitation for user ${req.user?.userId}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to accept invitation.',
+        message: error.message || 'Failed to accept invitation.',
       });
     }
   }
@@ -371,14 +371,14 @@ class ClassroomController {
         success: true,
         message: 'Invitation has been cancelled.',
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[cancelInvitation] Error canceling invitation for email ${req.body?.email} in classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to cancel invitation.',
+        message: error.message || 'Failed to cancel invitation.',
       });
     }
   }
@@ -424,14 +424,14 @@ class ClassroomController {
         message: 'Assignment created successfully.',
         data: assignment,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[createAssignment] Error creating assignment in classroom ${req.classroom?.id} by teacher ${req.user?.userId}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to create assignment.',
+        message: error.message || 'Failed to create assignment.',
       });
     }
   }
@@ -445,14 +445,14 @@ class ClassroomController {
         success: true,
         data: result,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[getMyJoinedClassrooms] Error getting joined classrooms for learner ${req.user?.userId}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to get joined classrooms.',
+        message: error.message || 'Failed to get joined classrooms.',
       });
     }
   }
@@ -468,14 +468,14 @@ class ClassroomController {
         success: true,
         data: invitations,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[getClassroomInvitations] Error getting invitations for classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to get invitations.',
+        message: error.message || 'Failed to get invitations.',
       });
     }
   }
@@ -491,14 +491,14 @@ class ClassroomController {
         success: true,
         data: assignments,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[getClassroomAssignments] Error retrieving assignments for classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to retrieve assignments',
+        message: error.message || 'Failed to retrieve assignments',
       });
     }
   }
@@ -517,14 +517,14 @@ class ClassroomController {
         success: true,
         data: result,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[getLearnerToReviewAssignments] Error loading assignments for learner ${req.user?.userId} in classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to load assignments.',
+        message: error.message || 'Failed to load assignments.',
       });
     }
   }
@@ -543,14 +543,14 @@ class ClassroomController {
         success: true,
         data: result,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[getLearnerReviewedAssignments] Error loading reviewed assignments for learner ${req.user?.userId} in classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to load reviewed assignments.',
+        message: error.message || 'Failed to load reviewed assignments.',
       });
     }
   }
@@ -569,7 +569,7 @@ class ClassroomController {
         success: true,
         data: result,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[getLearnerOverdueAssignments] Error loading overdue assignments for learner ${req.user?.userId} in classroom ${req.classroom?.id}:`,
         err
@@ -577,7 +577,7 @@ class ClassroomController {
 
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to load overdue assignments.',
+        message: error.message || 'Failed to load overdue assignments.',
       });
     }
   }
@@ -596,14 +596,14 @@ class ClassroomController {
         success: true,
         data: result,
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[getAssignmentDetails] Error fetching details for assignment ${req.params?.assignmentId} in classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to get assignment details.',
+        message: error.message || 'Failed to get assignment details.',
       });
     }
   }
@@ -633,14 +633,14 @@ class ClassroomController {
           isAutoApprovalEnabled: updatedClassroom.is_auto_approval_enabled,
         },
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[changeAutoApproveSetting] Error updating auto-approve setting for classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to update auto-approve setting.',
+        message: error.message || 'Failed to update auto-approve setting.',
       });
     }
   }
@@ -657,14 +657,14 @@ class ClassroomController {
         success: true,
         message: 'Assignment deleted successfully.',
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[deleteAssignment] Error deleting assignment ${req.params?.assignmentId} in classroom ${req.classroom?.id} by user ${req.user?.userId}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to delete assignment.',
+        message: error.message || 'Failed to delete assignment.',
       });
     }
   }
@@ -680,14 +680,14 @@ class ClassroomController {
         success: true,
         message: 'You have left the classroom.',
       });
-    } catch (err) {
+    } catch (error) {
       logger.error(
         `[leaveClassroom] Error while learner ${req.user?.userId} trying to leave classroom ${req.classroom?.id}:`,
         err
       );
       return res.status(500).json({
         success: false,
-        message: err.message || 'Failed to leave the classroom.',
+        message: error.message || 'Failed to leave the classroom.',
       });
     }
   }
