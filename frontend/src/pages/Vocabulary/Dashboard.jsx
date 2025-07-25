@@ -9,7 +9,11 @@ export default function Dashboard() {
     const [visibleRows, setVisibleRows] = useState(2);
     const [columns, setColumns] = useState(3);
     const [activeListId, setActiveListId] = useState(null);
-
+    const [filterMode, setFilterMode] = useState(null); // 'alphabet' | 'tag' | null
+    const [showFilterOptions, setShowFilterOptions] = useState(false);
+    const [alphabetFilter, setAlphabetFilter] = useState(null);
+    const [tagFilter, setTagFilter] = useState(null);
+    const [tags, setAvailableTags] = useState([]);
 
     const navigate = useNavigate();
 
@@ -37,18 +41,6 @@ export default function Dashboard() {
         }
     };
 
-    // Dummy data
-    // useEffect(() => {
-    //     const dummyData = Array.from({ length: 20 }).map((_, i) => ({
-    //         title: "IELTS Academic Vocabulary",
-    //         description:
-    //             "A helpful list of commonly used English words to boost your reading and speaking skills",
-    //         owner: "Mia Nguyen Le",
-    //         role: "Teacher",
-    //     }));
-    //     setLists(dummyData);
-    // }, []);
-
     useEffect(() => {
         async function fetchLists() {
             try {
@@ -59,6 +51,7 @@ export default function Dashboard() {
                     description: list.description,
                     owner: list.creator?.display_name || "Unknown",
                     role: list.creator?.role || "unknown",  
+                    tags: list.tags || [],
                 })));
             } catch (err) {
                 console.error("Failed to fetch lists:", err);
@@ -91,6 +84,26 @@ export default function Dashboard() {
         setVisibleRows((prev) => prev + 2);
     };
 
+    const filteredLists = lists.filter(list => {
+        const matchAlphabet = filterMode === "alphabet" && alphabetFilter
+            ? list.title?.toLowerCase().startsWith(alphabetFilter.toLowerCase())
+            : true;
+
+        const matchTag = filterMode === "tag" && tagFilter
+            ? (list.tags || []).includes(tagFilter)
+            : true;
+
+        return matchAlphabet && matchTag;
+    });
+
+    useEffect(() => {
+        async function fetchTags() {
+            const tags = await vocabularyService.getAllTags();
+            setAvailableTags(tags);
+        }
+        fetchTags();
+    }, []);
+
     return (
         <div className="dashboard">
             <Header />
@@ -105,17 +118,80 @@ export default function Dashboard() {
                             Create New List
                         </button>
 
-                        <div className="dashboard__filter-bar">
-                            <span className="dashboard__list-count">All lists: {lists.length}</span>
-                            <button className="dashboard__filter-button">
-                                Filter by
-                                <img src={DropdownIcon} alt="dropdown" />
-                            </button>
+                        <div className="dashboard__filter-dropdown">
+                            <div className="dashboard__filter-bar">
+                                <span className="dashboard__list-count">All lists: {lists.length}</span>
+
+                                <div className="dashboard__filter-dropdown">
+                                    <button
+                                    className="dashboard__filter-button"
+                                    onClick={() => setShowFilterOptions(prev => !prev)}
+                                    >
+                                    Filter by
+                                    <img src={DropdownIcon} alt="dropdown" />
+                                    </button>
+
+                                    {showFilterOptions && (
+                                    <div className="dashboard__filter-options">
+                                        <div onClick={() => {
+                                        setFilterMode("alphabet");
+                                        setShowFilterOptions(false);
+                                        }} className="filter-option">Alphabet</div>
+
+                                        <div onClick={() => {
+                                        setFilterMode("tag");
+                                        setShowFilterOptions(false);
+                                        }} className="filter-option">Tag</div>
+
+                                        <hr />
+
+                                        <div onClick={() => {
+                                        setFilterMode(null);
+                                        setAlphabetFilter(null);
+                                        setTagFilter(null);
+                                        setShowFilterOptions(false);
+                                        }} className="filter-option logout">Clear</div>
+                                    </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {filterMode === "alphabet" && (
+                            <div className="dashboard__alphabet-filter">
+                                {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(char => (
+                                <button
+                                    key={char}
+                                    className={`alphabet-button ${alphabetFilter === char ? "active" : ""}`}
+                                    onClick={() => setAlphabetFilter(prev => prev === char ? null : char)}
+                                >
+                                    {char}
+                                </button>
+                                ))}
+                            </div>
+                            )}
+
+                            {filterMode === "tag" && (
+                            <div className="dashboard__tag-filter">
+                                {tags.length === 0 ? (
+                                <p className="no-tags">No tags available</p>
+                                ) : (
+                                tags.map(tag => (
+                                    <button
+                                    key={tag}
+                                    className={`tag-button ${tagFilter === tag ? "active" : ""}`}
+                                    onClick={() => setTagFilter(prev => prev === tag ? null : tag)}
+                                    >
+                                    {tag}
+                                    </button>
+                                ))
+                                )}
+                            </div>
+                            )}
                         </div>
                     </div>
 
                     <div className="dashboard__list-grid">
-                        {lists.slice(0, visibleCount).map((list, idx) => (
+                        {filteredLists.slice(0, visibleCount).map((list, idx) => (
                             <div className="dashboard__list-card" key={list.id || idx}>
                                 <div className="dashboard__list-header">
                                     <button className="dashboard__list-title" onClick={() => navigate(`/vocabulary/overview/${list.id}`)}>
