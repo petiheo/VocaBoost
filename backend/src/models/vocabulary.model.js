@@ -10,7 +10,7 @@ class VocabularyModel {
 
   async findUserLists(userId, options) {
     const { q, privacy, sortBy, page, limit, from, to } = options;
-    let query = supabase.from('vocab_lists').select('id, title, privacy_setting, word_count, updated_at, tags(name)', { count: 'exact' }).eq('creator_id', userId);
+    let query = supabase.from('vocab_lists').select('id, title, privacy_setting, word_count, updated_at, tags(name), creator:users(id, display_name, role)', { count: 'exact' }).eq('creator_id', userId);
 
     if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
     if (privacy) query = query.eq('privacy_setting', privacy);
