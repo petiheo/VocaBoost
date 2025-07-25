@@ -1,6 +1,7 @@
 const userService = require('../services/user.service');
 const logger = require('../utils/logger');
 const wordModel = require('../models/word.model');
+const userModel = require('../models/user.model');
 
 class UserController {
   async getProfile(req, res) {
@@ -16,7 +17,33 @@ class UserController {
       logger.error(`Error getting profile for user ${req.user?.userId}:`, error);
       return res.status(500).json({
         success: false,
-        message: error.message || 'Failed to get profile',
+        message: error.message || 'Get profile failed',
+      });
+    }
+  }
+
+  async updateProfile(req, res) {
+    try {
+      const userId = req.user.userId;
+      const { displayName, removeAvatar } = req.body;
+      const avatarFile = req.file;
+
+      if (displayName) await userModel.updateDisplayName(userId, displayName);
+      if (avatarFile) await userService.updateAvatar(userId, avatarFile);
+      else if (removeAvatar) await userService.removeAvatar(userId);
+
+      const updatedProfile = await userService.getProfile(userId);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Profile updated successfully',
+        data: updatedProfile,
+      });
+    } catch (error) {
+      logger.error('Update profile failed:', error);
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'Update profile failed',
       });
     }
   }
@@ -55,7 +82,7 @@ class UserController {
       logger.error(`Report word by user ${req.user?.userId} failed:`, error);
       return res.status(500).json({
         success: false,
-        message: error.message || 'Failed to report word',
+        message: error.message || 'Report word failed',
       });
     }
   }

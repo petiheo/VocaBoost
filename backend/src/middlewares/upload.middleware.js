@@ -52,6 +52,8 @@ const uploadMiddleware = {
     handleMulterError,
   ],
 
+  userAvatar: [uploadInstances.userAvatar.single('avatar'), handleMulterError],
+
   singleFile: (fieldName = 'file') => [
     uploadInstances.generic.single(fieldName),
     handleMulterError,
@@ -63,10 +65,7 @@ const uploadMiddleware = {
   ],
 
   // Upload files with different field names
-  fields: (fields) => [
-    uploadInstances.generic.fields(fields),
-    handleMulterError,
-  ],
+  fields: (fields) => [uploadInstances.generic.fields(fields), handleMulterError],
 };
 
 module.exports = uploadMiddleware;

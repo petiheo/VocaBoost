@@ -1,9 +1,9 @@
 const userModel = require('../models/user.model');
 const logger = require('../utils/logger');
 const userProfileModel = require('../models/userProfile.model');
-const teacherRequestModel = require('../models/teacherRequest.model');
 const classroomModel = require('../models/classroom.model');
 const teacherService = require('./teacher.service');
+const storageService = require('./storage.service');
 
 class UserService {
   async getProfile(userId) {
@@ -45,6 +45,15 @@ class UserService {
     const report = await userModel.createReport(reporterId, wordId, reason);
     logger.info(`Content reported: Word ${wordId} by user ${reporterId}`);
     return report;
+  }
+
+  async updateAvatar(userId, avatarFile) {
+    const uploadResult = await storageService.uploadUserAvatar(avatarFile, userId);
+    return await userModel.updateAvartar(userId, uploadResult.url);
+  }
+
+  async removeAvatar(userId) {
+    return await userModel.updateAvartar(userId, null);
   }
 }
 

@@ -14,6 +14,20 @@ const STORAGE_BUCKETS = {
     ],
     description: 'Teacher verification documents',
   },
+
+  USER_AVATARS: {
+    name: 'user-avatars',
+    public: true,
+    fileSizeLimit: 5 * 1024 * 1024, // 5MB
+    allowedMimeTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/jpg',
+      'image/gif',
+      'image/webp',
+    ],
+    description: 'User profile pictures',
+  },
 };
 
 // File upload limits

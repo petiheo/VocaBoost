@@ -2,6 +2,23 @@ const { body } = require('express-validator');
 const { handleValidationErrors } = require('./common.validator');
 
 const userValidators = {
+  updateProfile: [
+    body('displayName')
+      .optional()
+      .trim()
+      .isLength({ min: 2, max: 50 })
+      .withMessage('Display name must be between 2 and 50 characters')
+      .matches(/^[a-zA-Z0-9\s\u00C0-\u1EF9_-]+$/)
+      .withMessage('Display name contains invalid characters'),
+
+    body('removeAvatar')
+      .optional()
+      .isBoolean()
+      .withMessage('removeAvatar must be a boolean'),
+
+    handleValidationErrors,
+  ],
+
   reportContent: [
     body('wordId')
       .trim()
