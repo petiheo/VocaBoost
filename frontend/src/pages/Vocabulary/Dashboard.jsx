@@ -13,7 +13,7 @@ export default function Dashboard() {
     const [showFilterOptions, setShowFilterOptions] = useState(false);
     const [alphabetFilter, setAlphabetFilter] = useState(null);
     const [tagFilter, setTagFilter] = useState(null);
-    const [tags, setAvailableTags] = useState([]);
+    const [availableTags, setAvailableTags] = useState([]);
 
     const navigate = useNavigate();
 
@@ -98,8 +98,8 @@ export default function Dashboard() {
 
     useEffect(() => {
         async function fetchTags() {
-            const tags = await vocabularyService.getAllTags();
-            setAvailableTags(tags);
+            const availableTags = await vocabularyService.getAllTags();
+            setAvailableTags(availableTags);
         }
         fetchTags();
     }, []);
@@ -172,10 +172,10 @@ export default function Dashboard() {
 
                             {filterMode === "tag" && (
                             <div className="dashboard__tag-filter">
-                                {tags.length === 0 ? (
+                                {availableTags.length === 0 ? (
                                 <p className="no-tags">No tags available</p>
                                 ) : (
-                                tags.map(tag => (
+                                availableTags.map(tag => (
                                     <button
                                     key={tag}
                                     className={`tag-button ${tagFilter === tag ? "active" : ""}`}
