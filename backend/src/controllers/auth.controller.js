@@ -129,33 +129,29 @@ class AuthController {
   }
 
   async googleCallback(req, res, next) {
-    passport.authenticate(
-      'google',
-      { session: false },
-      async (err, user, info) => {
-        const frontendUrl = process.env.FRONTEND_URL;
-        try {
-          if (err) {
-            logger.error('Google OAuth Error:', err);
-            return res.redirect(`${frontendUrl}/login?error=oauth_failed`);
-          }
-
-          if (!user) {
-            return res.redirect(`${frontendUrl}/login?error=access_denied`);
-          }
-
-          const accessToken = generateToken({
-            userId: user.id,
-            email: user.email,
-            role: user.role,
-          });
-          res.redirect(`${frontendUrl}/auth/success?token=${accessToken}`);
-        } catch (error) {
-          logger.error('Google callback processing error:', error);
-          res.redirect(`${frontendUrl}/login?error=processing_failed`);
+    passport.authenticate('google', { session: false }, async (err, user, info) => {
+      const frontendUrl = process.env.FRONTEND_URL;
+      try {
+        if (err) {
+          logger.error('Google OAuth Error:', err);
+          return res.redirect(`${frontendUrl}/login?error=oauth_failed`);
         }
+
+        if (!user) {
+          return res.redirect(`${frontendUrl}/login?error=access_denied`);
+        }
+
+        const accessToken = generateToken({
+          userId: user.id,
+          email: user.email,
+          role: user.role,
+        });
+        res.redirect(`${frontendUrl}/auth/success?token=${accessToken}`);
+      } catch (error) {
+        logger.error('Google callback processing error:', error);
+        res.redirect(`${frontendUrl}/login?error=processing_failed`);
       }
-    )(req, res, next);
+    })(req, res, next);
   }
 
   // TODO: frontend sẽ xử lý xóa JWT, sau này có thể triển khai thêm blacklist token
@@ -183,8 +179,7 @@ class AuthController {
       if (!userData) {
         return res.status(200).json({
           success: true,
-          message:
-            'If the email exists, password reset instructions have been sent',
+          message: 'If the email exists, password reset instructions have been sent',
         });
       }
 
@@ -199,8 +194,7 @@ class AuthController {
 
       return res.status(200).json({
         success: true,
-        message:
-          'If the email exists, password reset instructions have been sent',
+        message: 'If the email exists, password reset instructions have been sent',
       });
     } catch (error) {
       logger.error('Forgot password error: ', error);
@@ -310,8 +304,7 @@ class AuthController {
       await emailService.sendEmailVerification(email, token);
       return res.status(200).json({
         success: true,
-        message:
-          'Verification email resent successfully. Please check your inbox',
+        message: 'Verification email resent successfully. Please check your inbox',
       });
     } catch (error) {
       logger.error('Resend verification error: ', error);
@@ -343,7 +336,7 @@ class AuthController {
         },
       });
     } catch (error) {
-      console.error('Get account status error: ', error);
+      logger.error('Get account status error: ', error);
       return res.status(500).json({
         success: false,
         message: 'Internal server error',

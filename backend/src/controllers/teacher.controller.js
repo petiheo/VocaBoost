@@ -39,7 +39,7 @@ class TeacherController {
         },
       });
     } catch (error) {
-      console.error('Submit verification error:', error);
+      logger.error('Submit verification error:', error);
       return res.status(400).json({
         success: false,
         message: error.message || 'Submit verification request failed',
@@ -57,7 +57,7 @@ class TeacherController {
         data: result,
       });
     } catch (error) {
-      console.error('Get verification status error:', error);
+      logger.error('Get verification status error:', error);
       return res.status(400).json({
         success: false,
         message: 'Failed to get verification status',

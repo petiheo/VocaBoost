@@ -1,5 +1,6 @@
 const { verifyToken } = require('../helpers/jwt.helper');
 const userModel = require('../models/user.model');
+const logger = require('../utils/logger');
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -59,7 +60,7 @@ const authMiddleware = async (req, res, next) => {
       });
     }
 
-    console.error('Auth middleware error:', error);
+    logger.error('Auth middleware error:', error);
     return res.status(500).json({
       success: false,
       message: 'Authentication error',
