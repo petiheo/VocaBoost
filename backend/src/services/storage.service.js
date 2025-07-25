@@ -47,7 +47,12 @@ class StorageService {
 
   // Generic upload method
   async uploadFile(file, options = {}) {
-    const { bucketName, folder = '', fileName = null } = options;
+    const {
+      bucketName,
+      folder = '',
+      fileName = null,
+      allowOverwrite = false,
+    } = options;
 
     try {
       const bucketConfig = Object.values(this.buckets).find(
@@ -63,16 +68,14 @@ class StorageService {
         const fileExt = storageHelpers.getFileExtension(file.originalname);
         generatedFileName = `${timestamp}-${randomString}${fileExt}`;
       }
-      const filePath = folder
-        ? `${folder}/${generatedFileName}`
-        : generatedFileName;
+      const filePath = folder ? `${folder}/${generatedFileName}` : generatedFileName;
 
       // Upload to Supabase Storage
       const { data, error } = await supabaseService.storage
         .from(bucketName)
         .upload(filePath, file.buffer, {
           contentType: file.mimetype,
-          upsert: false,
+          upsert: allowOverwrite,
         });
       if (error) throw error;
 
@@ -109,6 +112,15 @@ class StorageService {
     return this.uploadFile(file, {
       bucketName: this.buckets.TEACHER_CREDENTIALS.name,
       folder: userId,
+    });
+  }
+
+  async uploadUserAvatar(file, userId) {
+    const fileName = `${userId}-avatar${storageHelpers.getFileExtension(file.originalname)}`;
+    return this.uploadFile(file, {
+      bucketName: this.buckets.USER_AVATARS.name,
+      fileName,
+      allowOverwrite: true,
     });
   }
 }

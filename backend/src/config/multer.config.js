@@ -13,10 +13,7 @@ const createFileFilter = (allowedMimeTypes) => {
     if (allowedMimeTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(
-        new Error(`${STORAGE_ERRORS.INVALID_FILE_TYPE}: ${file.mimetype}`),
-        false
-      );
+      cb(new Error(`${STORAGE_ERRORS.INVALID_FILE_TYPE}: ${file.mimetype}`), false);
     }
   };
 };
@@ -29,6 +26,15 @@ const multerConfigs = {
     ),
     limits: {
       fileSize: STORAGE_BUCKETS.TEACHER_CREDENTIALS.fileSizeLimit,
+      files: 1,
+    },
+  },
+
+  userAvatar: {
+    storage,
+    fileFilter: createFileFilter(UPLOAD_LIMITS.ALLOWED_IMAGE_TYPES),
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB
       files: 1,
     },
   },
@@ -46,6 +52,7 @@ const multerConfigs = {
 // Create multer instances
 const uploadInstances = {
   teacherCredentials: multer(multerConfigs.teacherCredentials),
+  userAvatar: multer(multerConfigs.userAvatar),
   generic: multer(multerConfigs.generic),
 };
 

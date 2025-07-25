@@ -80,11 +80,11 @@ class UserModel {
     return data;
   }
 
-  async updateAvartar(id, avatar) {
+  async updateAvartar(id, avatarUrl) {
     const { data, error } = await supabase
       .from('users')
       .update({
-        avatar_url: avatar,
+        avatar_url: avatarUrl,
         updated_at: new Date().toISOString(),
       })
       .eq('id', id)
@@ -140,6 +140,49 @@ class UserModel {
       .eq('id', id)
       .select()
       .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async hasReportedWord(reporterId, wordId) {
+    const { data, error } = await supabase
+      .from('reports')
+      .select()
+      .eq('reporter_id', reporterId)
+      .eq('word_id', wordId)
+      .eq('status', 'open')
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async createReport(reporterId, wordId, reason) {
+    const { data, error } = await supabase
+      .from('reports')
+      .insert({
+        reporter_id: reporterId,
+        word_id: wordId,
+        reason: reason,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async updateDailyGoal(userId, dailyGoal) {
+    const { data, error } = await supabase
+      .from('user_settings')
+      .update({
+        daily_goal: dailyGoal,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
 
     if (error) throw error;
     return data;
