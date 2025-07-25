@@ -117,7 +117,29 @@
     gap: 2rem;
     margin-top: 1.5rem;
   }
-  
+
+  &__delete-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+  }
+
+  &__delete-selected {
+    background-color: #2a1e17; // màu đen nâu gần giống ảnh
+    color: #f3e8cd;
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #2a1e17;
+      opacity: 0.8;
+    }
+  }
+
   &__word-box {
     background-color: #fff4e5;
     border-radius: 12px;
@@ -131,6 +153,11 @@
       font-size: 1.25rem;
       margin-bottom: 0.25rem;
     }
+
+    &--selected {
+      border: 1px solid  #2a1e17;
+      background-color: #FFF1D9;
+    } 
   
     &--row {
       display: flex;
@@ -170,7 +197,7 @@
     &--remove {
       background: none;
       border: none;
-      font-size: 1.25rem;
+      font-size: 1.5rem;
       color: #a30000;
       cursor: pointer;
       padding: 0;
@@ -179,18 +206,6 @@
         color: #d10000;
       }
     }
-  //   &--tag-select {
-  //   background-color: #352D24;
-  //   padding: 10px 20px;
-  //   border-radius: 8px;
-  //   border: none;
-  //   font-size: 14px;
-  //   color: #F8EED3;
-  //   appearance: none; // ẩn mũi tên mặc định của trình duyệt
-  //   font-weight: bold;
-  //   margin: 1rem 1rem 1rem 0;
-  // }
-
   }
   
   &__upload-btn {

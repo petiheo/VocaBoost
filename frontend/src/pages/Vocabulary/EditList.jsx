@@ -18,12 +18,13 @@ export default function EditList() {
     const [words, setWords] = useState([]);
     const [originalList, setOriginalList] = useState(null);
     const [originalWords, setOriginalWords] = useState([]);
+    const [selectedWordIds, setSelectedWordIds] = useState(new Set());
 
-    const handleDeleteWord = async (wordId) => {
+    const handleDeleteWord = async (index) => {
         const confirmed = window.confirm("Are you sure you want to delete this word?");
         if (!confirmed) return;
 
-        setWords(prev => prev.filter(w => w.id !== wordId)); // cập nhật UI
+        setWords(prev => prev.filter((_, i) => i !== index)); // cập nhật UI
     };
 
 
@@ -203,18 +204,53 @@ export default function EditList() {
                     />
 
                     <h2 className="edit-list__header">Words</h2>
+                    {selectedWordIds.size > 0 && (
+                        <div className="edit-list__delete-wrapper">
+                            <button
+                                type="button"
+                                className="edit-list__delete-selected"
+                                onClick={() => {
+                                const confirmed = window.confirm("Delete selected words?");
+                                if (!confirmed) return;
+                                setWords(words.filter((word) => !selectedWordIds.has(word.id)));
+                                setSelectedWordIds(new Set());
+                                }}  
+                            >
+                                Delete selected
+                            </button>
+                        </div>
+                    )}
                     <div className="edit-list__word-list">
-                        {words.map((word, index) => (
-                            <div key={word.id || index} className="edit-list__word-box">
-                                <div className="edit-list__word-box--header">
-                                    <div className="edit-list__word-box--index">{index + 1}</div>
+                          {words.map((word, index) => (
+                            <div
+                                key={word.id || index}
+                                className={`edit-list__word-box ${selectedWordIds.has(word.id) ? 'edit-list__word-box--selected' : ''}`}
+                                onClick={(e) => {
+                                    // Để không click nhầm nút bên trong (như nút xoá), dùng stopPropagation khi cần
+                                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT' && !e.target.closest('label')) {
+                                    const updated = new Set(selectedWordIds);
+                                    if (updated.has(word.id)) {
+                                        updated.delete(word.id);
+                                    } else {
+                                        updated.add(word.id);
+                                    }
+                                    setSelectedWordIds(updated);
+                                    }
+                                }}
+                            >
+                            <div className="edit-list__word-box--header">
+                                <div className="edit-list__word-box--index">{index + 1}</div>
                                     <button
-                                    className="edit-list__word-box--remove"
-                                    onClick={() => handleDeleteWord(word.id)}
-                                    >
-                                    ×
+                                        className="edit-list__word-box--remove"
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // ngăn click xoá làm toggle chọn
+                                            handleDeleteWord(index);
+                                        }}
+                                        >
+                                        ×
                                     </button>
-                                </div>
+                            </div>
                             <hr className="edit-list__word-box--divider" />
 
                             <div className="edit-list__word-box--row">
@@ -272,7 +308,7 @@ export default function EditList() {
                                 <button type="button" className="edit-list__ai-btn">AI</button>
                             </div>
                         </div>
-                        ))}
+                          ))}
                     </div>
 
                     <div className="edit-list__add-button-wrapper">

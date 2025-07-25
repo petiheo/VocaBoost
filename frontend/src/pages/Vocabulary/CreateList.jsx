@@ -20,6 +20,7 @@ export default function CreateList() {
 
     const [availableTags, setAvailableTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]); // array of strings  // selected tags
+    const [selectedWordIds, setSelectedWordIds] = useState(new Set());
 
     useEffect(() => {
     async function fetchTags() {
@@ -34,8 +35,8 @@ export default function CreateList() {
         const confirmed = window.confirm("Are you sure you want to delete this word?");
         if (!confirmed) return;
 
-        setWords(prev => prev.filter((_, i) => i !== index));
-    };  
+        setWords(prev => prev.filter((_, i) => i !== index)); // cập nhật UI
+    };
 
 
     const handleCreateList = async (e) => {
@@ -195,20 +196,53 @@ export default function CreateList() {
                     />
 
                     <h1 className="create-list__header">Add words</h1>
-
+                    {selectedWordIds.size > 0 && (
+                        <div className="create-list__delete-wrapper">
+                            <button
+                                type="button"
+                                className="create-list__delete-selected"
+                                onClick={() => {
+                                const confirmed = window.confirm("Delete selected words?");
+                                if (!confirmed) return;
+                                setWords(words.filter((_, i) => !selectedWordIds.has(i)));
+                                setSelectedWordIds(new Set());
+                                }}  
+                            >
+                                Delete selected
+                            </button>
+                        </div>
+                    )}
                     <div className="create-list__word-list">
-                        {words.map((word, index) => (
-                                <div key={word.id || index} className="create-list__word-box">
-                                    <div className="create-list__word-box--header">
-                                        <div className="create-list__word-box--index">{index + 1}</div>
+                            {words.map((word, index) => (
+                                <div
+                                    key={word.id || index}
+                                    className={`create-list__word-box ${selectedWordIds.has(index) ? 'create-list__word-box--selected' : ''}`}
+                                    onClick={(e) => {
+                                        // Để không click nhầm nút bên trong (như nút xoá), dùng stopPropagation khi cần
+                                        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT' && !e.target.closest('label')) {
+                                        const updated = new Set(selectedWordIds);
+                                        if (updated.has(index)) {
+                                            updated.delete(index);
+                                        } else {
+                                            updated.add(index);
+                                        }
+                                        setSelectedWordIds(updated);
+                                        }
+                                    }}
+                                >
+                                <div className="create-list__word-box--header">
+                                    <div className="create-list__word-box--index">{index + 1}</div>
                                         <button
-                                        type="button"
-                                        className="create-list__word-box--remove"
-                                        onClick={() => handleDeleteWord(index)}
-                                        >
-                                        ×
+                                            className="create-list__word-box--remove"
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // ngăn click xoá làm toggle chọn
+                                                handleDeleteWord(index);
+                                            }}
+                                            >
+                                            ×
                                         </button>
-                                    </div>
+                                </div>
 
                                 <hr className="create-list__word-box--divider" />
                                 <div className="create-list__word-box--row">
