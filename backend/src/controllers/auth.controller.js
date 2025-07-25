@@ -71,7 +71,7 @@ class AuthController {
       if (!userData) {
         return res.status(401).json({
           success: false,
-          error: 'Invalid email or password',
+          message: 'Invalid email or password',
         });
       }
 
@@ -82,21 +82,21 @@ class AuthController {
       if (!isValidPassword) {
         return res.status(401).json({
           success: false,
-          error: 'Invalid email or password',
+          message: 'Invalid email or password',
         });
       }
 
       if (userData.account_status === 'inactive') {
         return res.status(403).json({
           success: false,
-          error: 'Account has been deactivated',
+          message: 'Account has been deactivated',
         });
       }
 
       if (userData.account_status === 'suspended') {
         return res.status(403).json({
           success: false,
-          error: 'Account has been suspended',
+          message: 'Account has been suspended',
         });
       }
 
@@ -308,7 +308,7 @@ class AuthController {
       });
     } catch (error) {
       logger.error('Resend verification error: ', error);
-      return res.status(404).json({
+      return res.status(400).json({
         success: false,
         message: 'Email not found or already verified',
       });
