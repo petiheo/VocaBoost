@@ -1,4 +1,5 @@
 const { body } = require('express-validator');
+const { handleValidationErrors } = require('./common.validator');
 
 const classroomValidator = {
   create: [
@@ -20,6 +21,8 @@ const classroomValidator = {
       .notEmpty()
       .isInt({ min: 1, max: 100 })
       .withMessage('capacity_limit must be an integer between 1 and 100'),
+    
+    handleValidationErrors,
   ],
 
   createAssignment: [
@@ -82,6 +85,8 @@ const classroomValidator = {
 
         return true;
       }),
+    
+    handleValidationErrors,
   ],
 };
 

@@ -114,7 +114,7 @@ class AuthController {
             id: userData.id,
             email,
             role: userData.role,
-            avataUrl: userData.avatar_url,
+            avatarUrl: userData.avatar_url,
           },
           token: accessToken,
         },

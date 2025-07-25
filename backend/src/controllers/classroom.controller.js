@@ -46,7 +46,7 @@ class ClassroomController {
     } catch (error) {
       logger.error(
         `[getMyClassrooms] Error fetching classrooms for teacher ${req.user?.userId}:`,
-        err
+        error
       );
       return res.status(500).json({
         success: false,
@@ -77,7 +77,7 @@ class ClassroomController {
     } catch (error) {
       logger.error(
         `[requestJoinByCode] Error handling join request for user ${req.user?.userId} with code ${req.body?.joinCode}:`,
-        err
+        error
       );
       return res.status(500).json({
         success: false,
