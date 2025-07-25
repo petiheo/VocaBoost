@@ -3,6 +3,24 @@ const logger = require('../utils/logger');
 const wordModel = require('../models/word.model');
 
 class UserController {
+  async getProfile(req, res) {
+    try {
+      const userId = req.user.userId;
+      const profile = await userService.getProfile(userId);
+
+      return res.status(200).json({
+        success: true,
+        data: profile,
+      });
+    } catch (error) {
+      logger.error(`Error getting profile for user ${req.user?.userId}:`, error);
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to get profile',
+      });
+    }
+  }
+
   async reportContent(req, res) {
     try {
       const reporterId = req.user.userId;

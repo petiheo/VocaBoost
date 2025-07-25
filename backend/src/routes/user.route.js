@@ -7,6 +7,8 @@ const userController = require('../controllers/user.controller');
 
 userRouter.use(authMiddleware);
 
+userRouter.get('/profile', userController.getProfile);
+
 userRouter.post(
   '/report',
   rateLimiter,

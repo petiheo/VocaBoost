@@ -60,6 +60,17 @@ class ClassroomModel {
     return data;
   }
 
+  async getClassroomCount(teacherId) {
+    const { count, error } = await supabase
+      .from('classrooms')
+      .select('*', { count: 'exact', head: true })
+      .eq('teacher_id', teacherId)
+      .neq('classroom_status', 'deleted');
+
+    if (error) throw error;
+    return count || 0;
+  }
+
   async findMemberStatus(classroomId, userId) {
     const { data, error } = await supabase
       .from('classroom_members')
@@ -390,9 +401,7 @@ class ClassroomModel {
 
     if (error) throw error;
 
-    return data.filter(
-      (item) => item.assignments?.classroom_id === classroomId
-    );
+    return data.filter((item) => item.assignments?.classroom_id === classroomId);
   }
 
   async hasLearnerAssignment(assignmentId, learnerId) {
@@ -467,7 +476,7 @@ class ClassroomModel {
     const { data, error } = await supabase
       .from('assignment_sublists')
       .select('*')
-      .eq('assignment_id', assignmentId)
+      .eq('assignment_id', assignmentId);
 
     if (error) throw error;
     return data;
@@ -552,10 +561,7 @@ class ClassroomModel {
   }
 
   async deleteVocabLists(listIds) {
-    const { error } = await supabase
-      .from('vocab_lists')
-      .delete()
-      .in('id', listIds);
+    const { error } = await supabase.from('vocab_lists').delete().in('id', listIds);
 
     if (error) throw error;
   }
