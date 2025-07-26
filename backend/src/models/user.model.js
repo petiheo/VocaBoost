@@ -187,6 +187,36 @@ class UserModel {
     if (error) throw error;
     return data;
   }
+
+  async updateUserStatus(userId, newStatus) {
+    const { data, error } = supabase
+      .from('users')
+      .update({
+        status: newStatus,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async updateUserRole(userId, newRole) {
+    const { data, error } = supabase
+      .from('users')
+      .update({
+        role: newRole,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
 }
 
 module.exports = new UserModel();
