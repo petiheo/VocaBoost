@@ -52,7 +52,8 @@ $text-color: #352D24;
     }
 
     &__text,
-    &__password {
+    &__password,
+    &__email {
         align-items: flex-start;
 
         background-color: #D6D6D6;
