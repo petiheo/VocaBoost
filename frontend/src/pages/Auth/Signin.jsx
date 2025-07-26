@@ -38,9 +38,9 @@ export default function Login() {
         try {
             const res = await authService.login(email, password);
             const check = await authService.getAccountStatus(email);
-            console.log(check?.data?.emailVerified)
-            if (check?.data?.emailVerified) {
-                setUser(res?.data?.user);
+            console.log(check?.data?.data?.emailVerified)
+            if (check?.data?.data?.emailVerified) {
+                setUser(res?.data?.data?.user);
                 navigate("/homepage");
             }
 
