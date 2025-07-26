@@ -95,8 +95,13 @@ class AuthService {
       throw new Error('Invalid email or password');
     }
 
+    // Check if user has a password (Google OAuth users don't have passwords)
+    if (!userData.password_hash) {
+      throw new Error('This account was created with Google. Please sign in with Google instead.');
+    }
+
     // Validate password
-    const isValidPassword = await this.validatePassword(password, userData.password);
+    const isValidPassword = await this.validatePassword(password, userData.password_hash);
     if (!isValidPassword) {
       throw new Error('Invalid email or password');
     }

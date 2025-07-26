@@ -38,9 +38,8 @@ export default function Login() {
         try {
             const res = await authService.login(email, password);
             const check = await authService.getAccountStatus(email);
-            console.log(check?.data?.data?.emailVerified)
-            if (check?.data?.data?.emailVerified) {
-                setUser(res?.data?.data?.user);
+            if (check?.data?.emailVerified) {
+                setUser(res?.data?.user);
                 navigate("/homepage");
             }
 
@@ -49,7 +48,10 @@ export default function Login() {
         } catch (error) {
             setEmail("");
             setPassword("");
-            setErrors({ login: "Incorrect email or password!" });
+            
+            // Use backend error message if available, otherwise fallback
+            const errorMessage = error.response?.data?.message || "Incorrect email or password!";
+            setErrors({ login: errorMessage });
         } finally {
             setIsLoading(false);
         }

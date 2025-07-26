@@ -33,6 +33,9 @@ class AuthController {
       if (error.message === 'Invalid email or password') {
         return ResponseUtils.unauthorized(res, error.message);
       }
+      if (error.message === 'This account was created with Google. Please sign in with Google instead.') {
+        return ResponseUtils.error(res, error.message, 400);
+      }
       if (
         error.message === 'Account has been deactivated' ||
         error.message === 'Account has been suspended'
