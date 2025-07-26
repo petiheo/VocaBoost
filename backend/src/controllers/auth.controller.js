@@ -33,7 +33,10 @@ class AuthController {
       if (error.message === 'Invalid email or password') {
         return ResponseUtils.unauthorized(res, error.message);
       }
-      if (error.message === 'This account was created with Google. Please sign in with Google instead.') {
+      if (
+        error.message ===
+        'This account was created with Google. Please sign in with Google instead.'
+      ) {
         return ResponseUtils.error(res, error.message, 400);
       }
       if (
@@ -64,7 +67,7 @@ class AuthController {
           email: user.email,
           role: user.role,
         });
-        
+
         // Pass isNewUser as separate URL parameter
         const redirectUrl = `${frontendUrl}/auth/success?token=${accessToken}&isNewUser=${user.isNewUser}`;
         res.redirect(redirectUrl);
@@ -99,7 +102,7 @@ class AuthController {
 
       return ResponseUtils.success(
         res,
-        'If the email exists, password reset instructions have been sent'
+        "If your email is registered, you'll receive a password reset link shortly."
       );
     } catch (error) {
       return ErrorHandler.handleError(

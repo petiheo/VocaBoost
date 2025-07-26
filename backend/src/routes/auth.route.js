@@ -9,12 +9,17 @@ const authController = require('../controllers/auth.controller');
 // Registration & Login & Logout
 authRouter.post(
   '/register',
-  rateLimiter,
+  // rateLimiter,
   authValidators.register,
   authController.register
 );
 
-authRouter.post('/login', rateLimiter, authValidators.login, authController.login);
+authRouter.post(
+  '/login',
+  // rateLimiter,
+  authValidators.login,
+  authController.login
+);
 
 authRouter.post('/logout', rateLimiter, authController.logout);
 
