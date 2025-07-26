@@ -1,8 +1,5 @@
 const { body } = require('express-validator');
-const {
-  commonValidators,
-  handleValidationErrors,
-} = require('./common.validator');
+const { commonValidators, handleValidationErrors } = require('./common.validator');
 
 const authValidators = {
   register: [

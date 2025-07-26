@@ -8,13 +8,20 @@ class ErrorHandler {
     };
   }
 
-  static handleError(res, error, context, userMessage = 'Operation failed', statusCode = 500) {
+  static handleError(
+    res,
+    error,
+    context,
+    userMessage = 'Operation failed',
+    statusCode = 500
+  ) {
     logger.error(`[${context}] Error:`, error);
-    
+
     // Don't expose internal error details in production
-    const message = process.env.NODE_ENV === 'production' 
-      ? userMessage 
-      : error.message || userMessage;
+    const message =
+      process.env.NODE_ENV === 'production'
+        ? userMessage
+        : error.message || userMessage;
 
     return ResponseUtils.error(res, message, statusCode);
   }
@@ -22,7 +29,7 @@ class ErrorHandler {
   static handleDatabaseError(res, error, operation, resource) {
     const context = `Database ${operation} - ${resource}`;
     const userMessage = `Failed to ${operation.toLowerCase()} ${resource.toLowerCase()}`;
-    
+
     return this.handleError(res, error, context, userMessage, 500);
   }
 

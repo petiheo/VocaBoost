@@ -52,19 +52,21 @@ class ClassroomModel {
   async findByTeacherIdWithAssignmentCounts(teacherId) {
     const { data, error } = await supabase
       .from('classrooms')
-      .select(`
+      .select(
+        `
         *,
         assignments!inner(id)
-      `)
+      `
+      )
       .eq('teacher_id', teacherId)
       .neq('classroom_status', 'deleted');
 
     if (error) throw error;
 
-    return data.map(classroom => ({
+    return data.map((classroom) => ({
       ...classroom,
       assignment_count: classroom.assignments ? classroom.assignments.length : 0,
-      assignments: undefined
+      assignments: undefined,
     }));
   }
 
@@ -394,8 +396,8 @@ class ClassroomModel {
     return data.map((entry) => {
       const assignments = entry.classrooms.assignments || [];
       const now = new Date();
-      
-      const assignedCount = assignments.filter(assignment => {
+
+      const assignedCount = assignments.filter((assignment) => {
         const startDate = new Date(assignment.start_date);
         const dueDate = new Date(assignment.due_date);
         return startDate <= now && now <= dueDate;
@@ -429,15 +431,13 @@ class ClassroomModel {
       .from('learner_assignments')
       .select('assignment_id')
       .eq('learner_id', learnerId)
-      .in('assignment_id', 
-        supabase
-          .from('assignments')
-          .select('id')
-          .eq('classroom_id', classroomId)
+      .in(
+        'assignment_id',
+        supabase.from('assignments').select('id').eq('classroom_id', classroomId)
       );
 
     if (error) throw error;
-    return data.map(row => row.assignment_id);
+    return data.map((row) => row.assignment_id);
   }
 
   async createLearnerAssignmentsBatch(assignments) {

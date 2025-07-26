@@ -21,7 +21,7 @@ const classroomValidator = {
       .notEmpty()
       .isInt({ min: 1, max: 100 })
       .withMessage('capacity_limit must be an integer between 1 and 100'),
-    
+
     handleValidationErrors,
   ],
 
@@ -85,7 +85,7 @@ const classroomValidator = {
 
         return true;
       }),
-    
+
     handleValidationErrors,
   ],
 };
