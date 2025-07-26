@@ -2,15 +2,15 @@ import api from "../../lib/api";
 
 const authService = {
   register: async (data) => {
-    const res = await api.post("/auth/register", data); //  FIX
+    const res = await api.post("/auth/register", data);
     return res.data;
   },
 
   //1.  Đăng nhập
   login: async (email, password) => {
-    const res = await api.post("/auth/login", { email, password }); //  FIX
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
+    const res = await api.post("/auth/login", { email, password });
+    localStorage.setItem("token", res.data.data.token);
+    localStorage.setItem("user", JSON.stringify(res.data.data.user));
     return res.data;
   },
 
@@ -29,12 +29,11 @@ const authService = {
 
   // 5. Quên mật khẩu 
   forgotPassword: async (email) => {
-    return await api.post("/auth/forgot-password", { email }); //  FIX
+    return await api.post("/auth/forgot-password", { email });
   },
 
   // 7. Đặt lại mật khẩu
-  resetPassword: async (newPassword) => {
-    const token = localStorage.getItem("token");
+  resetPassword: async (token, newPassword) => {
     if (!token) {
       throw new Error("Token không tồn tại. Vui lòng thử lại từ liên kết đặt lại mật khẩu.");
     }
