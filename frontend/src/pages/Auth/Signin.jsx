@@ -36,15 +36,24 @@ export default function Login() {
 
         setIsLoading(true);
         try {
-            const res = await authService.login(email, password);
+            // First check if email is verified without storing tokens
+            const res = await authService.loginWithoutStorage(email, password);
             const check = await authService.getAccountStatus(email);
+            
             if (check?.data?.emailVerified) {
+                // Only store tokens for verified users
+                authService.storeUserSession(res);
                 setUser(res?.data?.user);
                 navigate("/homepage");
+            } else {
+                // Don't store tokens for unverified users
+                navigate("/checkYourMail", { 
+                    state: { 
+                        fromSignUp: false, 
+                        email: email 
+                    } 
+                });
             }
-
-            else
-                navigate("/checkYourMail")
         } catch (error) {
             setEmail("");
             setPassword("");
