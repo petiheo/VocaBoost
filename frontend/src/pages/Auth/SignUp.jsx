@@ -33,8 +33,8 @@ export default function SignUp() {
 
         const newErrors = {};
 
-        if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
-            newErrors.password = "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters!";
+        if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
+            newErrors.password = "Password must at least 8 characters, contain uppercase, lowercase and number";
         }
 
         if (password !== confirmPassword) {
@@ -51,7 +51,12 @@ export default function SignUp() {
         setIsLoading(true);
         try {
             const res = await authService.register({ email, password });
-            navigate("/checkYourMail");
+            navigate("/checkYourMail", { 
+                state: { 
+                    fromSignUp: true, 
+                    email: email 
+                } 
+            });
         } catch (error) {
             setErrors({email: "Your email is already registered."});
             setEmail("");
