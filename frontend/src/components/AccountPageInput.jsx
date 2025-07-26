@@ -24,7 +24,8 @@ const Input = (props) => {
                     value={props.value}
                     onChange={props.onChange}
                     pattern={props.pattern}
-                    required
+                    required={props.required}
+                    disabled={props.disabled}
                     className={`input__${props.type || ''}`}
                 />
             </div>

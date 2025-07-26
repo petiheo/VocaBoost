@@ -108,7 +108,11 @@ export default function Login() {
                             <Link to="/forgot-password">Forgot password?</Link>
                         </div>
 
-                        <AccountPageInput type="submit" value="Sign in" />
+                        <AccountPageInput 
+                            type="submit" 
+                            value={isLoading ? "Signing in..." : "Sign in"}
+                            disabled={isLoading}
+                        />
 
                     </form>
 

@@ -119,7 +119,11 @@ export default function SignUp() {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                         />
 
-                        <AccountPageInput type="submit" value="Sign up" />
+                        <AccountPageInput 
+                            type="submit" 
+                            value={isLoading ? "Registering..." : "Sign up"}
+                            disabled={isLoading}
+                        />
                     </form>
 
 
