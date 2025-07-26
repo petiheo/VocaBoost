@@ -14,6 +14,18 @@ const authService = {
     return res.data;
   },
 
+  // Login without storing tokens (for verification check)
+  loginWithoutStorage: async (email, password) => {
+    const res = await api.post("/auth/login", { email, password });
+    return res.data;
+  },
+
+  // Store user session after verification
+  storeUserSession: (userData) => {
+    localStorage.setItem("token", userData.data.token);
+    localStorage.setItem("user", JSON.stringify(userData.data.user));
+  },
+
 
   // 4. Đăng xuất
   logout: async () => {
@@ -54,6 +66,12 @@ const authService = {
   getAccountStatus: async (email) => {
     const res = await api.post("/auth/get-account-status", {email: email})
     return res.data; 
+  },
+
+  // 10. Resend verification email
+  resendVerification: async (email) => {
+    const res = await api.post("/auth/resend-verification", { email });
+    return res.data;
   },
 
   getToken: () => localStorage.getItem("token"),
