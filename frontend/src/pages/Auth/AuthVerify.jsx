@@ -31,7 +31,7 @@ export default function AuthVerify() {
           const result = await authService.verifyEmail(token);
 
           if (!result.success) {
-            throw new Error(result.error || "Email verification failed");
+            throw new Error(result.message || "Email verification failed");
           }
 
           // Decode để lấy thông tin user
