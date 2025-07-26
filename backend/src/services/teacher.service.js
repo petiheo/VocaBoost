@@ -34,7 +34,7 @@ class TeacherService {
 
       if (data.fullName) await userModel.updateDisplayName(userId, data.fullName);
       await userModel.updateUserStatus(userId, 'pending_verification');
-      await userModel.updateUserRole(userId, 'teaacher');
+      await userModel.updateUserRole(userId, 'teacher');
       return teacherRequest;
     } catch (error) {
       logger.error('Submit verification failed: ', error);

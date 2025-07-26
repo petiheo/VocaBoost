@@ -189,10 +189,10 @@ class UserModel {
   }
 
   async updateUserStatus(userId, newStatus) {
-    const { data, error } = supabase
+    const { data, error } = await supabase
       .from('users')
       .update({
-        status: newStatus,
+        account_status: newStatus,
         updated_at: new Date().toISOString(),
       })
       .eq('id', userId)
@@ -204,7 +204,7 @@ class UserModel {
   }
 
   async updateUserRole(userId, newRole) {
-    const { data, error } = supabase
+    const { data, error } = await supabase
       .from('users')
       .update({
         role: newRole,
