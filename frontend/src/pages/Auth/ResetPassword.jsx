@@ -7,13 +7,16 @@ export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [token, setToken] = useState("");
 
-  // Lấy token từ URL và lưu vào localStorage
+  // Lấy token từ URL parameters
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
-    const token = query.get("token");
-    if (token) {
-      localStorage.setItem("token", token);
+    const resetToken = query.get("token");
+    if (resetToken) {
+      setToken(resetToken);
+    } else {
+      setErrorMessage("Token không hợp lệ. Vui lòng yêu cầu đặt lại mật khẩu mới.");
     }
   }, []);
 
@@ -22,8 +25,13 @@ export default function ResetPassword() {
     setErrorMessage("");
     setSuccessMessage("");
 
+    if (!token) {
+      setErrorMessage("Token không hợp lệ. Vui lòng yêu cầu đặt lại mật khẩu mới.");
+      return;
+    }
+
     try {
-      const res = await authService.resetPassword(password);
+      const res = await authService.resetPassword(token, password);
       setSuccessMessage(res.message || "Đặt lại mật khẩu thành công!");
     } catch (error) {
       const msg =
