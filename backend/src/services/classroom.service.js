@@ -5,10 +5,7 @@ const {
 } = require('../helpers/classroom.helper');
 const ms = require('ms');
 const emailService = require('../services/email.service');
-const { generateInvitationToken } = require('../helpers/jwt.helper');
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET;
-
+const { generateInvitationToken, verifyToken } = require('../helpers/jwt.helper');
 class ClassroomService {
   async createClassroom({
     name,
@@ -32,28 +29,10 @@ class ClassroomService {
   }
 
   async getClassroomsByTeacherId(teacherId) {
-    const classrooms = await classroomModel.findByTeacherId(teacherId);
-
-    const updated = await Promise.all(
-      classrooms.map(async (classroom) => {
-        const assignments = await classroomModel.getAssignmentsByClassroom(
-          classroom.id
-        );
-        const count = assignments.length;
-
-        return {
-          ...classroom,
-          assignment_count: count,
-        };
-      })
-    );
-
-    return updated;
+    return await classroomModel.findByTeacherIdWithAssignmentCounts(teacherId);
   }
 
-  async handleJoinRequestByCode(joinCode, user) {
-    const classroom = await classroomModel.getClassroomByCode(joinCode);
-
+  _validateClassroomForJoin(classroom, user) {
     if (!classroom || classroom.classroom_status === 'deleted') {
       throw new Error('Classroom not found or has been deleted.');
     }
@@ -67,11 +46,9 @@ class ClassroomService {
     if (classroom.teacher_id === user.userId) {
       throw new Error('You are the owner of this classroom.');
     }
+  }
 
-    const existingMember = await classroomModel.findMemberStatus(
-      classroom.id,
-      user.userId
-    );
+  _validateExistingMembership(existingMember) {
     if (existingMember) {
       if (existingMember.join_status === 'joined') {
         throw new Error('You are already a member of this classroom.');
@@ -80,28 +57,40 @@ class ClassroomService {
         throw new Error('You have already requested to join.');
       }
     }
+  }
 
+  _validateClassroomCapacity(classroom) {
     if (classroom.learner_count >= classroom.capacity_limit) {
       throw new Error('This classroom is full.');
     }
+  }
 
-    await classroomModel.createJoinRequest(
-      classroom.id,
-      user.userId,
-      user.email
-    );
-
-    const isAuto = classroom.is_auto_approval_enabled;
-    if (isAuto) {
+  async _processAutoApproval(classroom, user) {
+    if (classroom.is_auto_approval_enabled) {
       await classroomModel.updateLearnerStatus(classroom.id, user.userId, {
         join_status: 'joined',
         joined_at: new Date().toISOString(),
       });
-
       return { autoApproved: true };
     }
-
     return { autoApproved: false };
+  }
+
+  async handleJoinRequestByCode(joinCode, user) {
+    const classroom = await classroomModel.getClassroomByCode(joinCode);
+
+    this._validateClassroomForJoin(classroom, user);
+
+    const existingMember = await classroomModel.findMemberStatus(
+      classroom.id,
+      user.userId
+    );
+    this._validateExistingMembership(existingMember);
+    this._validateClassroomCapacity(classroom);
+
+    await classroomModel.createJoinRequest(classroom.id, user.userId, user.email);
+
+    return await this._processAutoApproval(classroom, user);
   }
 
   async getPendingJoinRequests(classroomId) {
@@ -109,10 +98,7 @@ class ClassroomService {
   }
 
   async approveJoinRequest(classroomId, learnerId) {
-    const learner = await classroomModel.findMemberStatus(
-      classroomId,
-      learnerId
-    );
+    const learner = await classroomModel.findMemberStatus(classroomId, learnerId);
     const classroom = await classroomModel.getClassroomById(classroomId);
 
     if (!learner) {
@@ -134,10 +120,7 @@ class ClassroomService {
   }
 
   async rejectJoinRequest(classroomId, learnerId) {
-    const learner = await classroomModel.findMemberStatus(
-      classroomId,
-      learnerId
-    );
+    const learner = await classroomModel.findMemberStatus(classroomId, learnerId);
 
     if (!learner) {
       throw new Error('Learner is not part of this classroom.');
@@ -158,18 +141,13 @@ class ClassroomService {
     const availableSlots = classroom.capacity_limit - currentCount;
     let approvedCount = 0;
 
-    const pendingList =
-      await classroomModel.getPendingJoinRequests(classroomId);
+    const pendingList = await classroomModel.getPendingJoinRequests(classroomId);
 
     for (const learner of pendingList.slice(0, availableSlots)) {
-      await classroomModel.updateLearnerStatus(
-        classroomId,
-        learner.learner_id,
-        {
-          join_status: 'joined',
-          joined_at: new Date().toISOString(),
-        }
-      );
+      await classroomModel.updateLearnerStatus(classroomId, learner.learner_id, {
+        join_status: 'joined',
+        joined_at: new Date().toISOString(),
+      });
 
       approvedCount++;
     }
@@ -181,19 +159,14 @@ class ClassroomService {
   }
 
   async removeLearner(classroomId, learnerId) {
-    const learner = await classroomModel.findMemberStatus(
-      classroomId,
-      learnerId
-    );
+    const learner = await classroomModel.findMemberStatus(classroomId, learnerId);
 
     if (!learner) {
       throw new Error('Learner is not found in this classroom.');
     }
 
     if (learner.join_status !== 'joined') {
-      throw new Error(
-        'Cannot remove learner who is not currently in the class.'
-      );
+      throw new Error('Cannot remove learner who is not currently in the class.');
     }
 
     await classroomModel.updateLearnerStatus(classroomId, learnerId, {
@@ -231,7 +204,7 @@ class ClassroomService {
     }
 
     if (teacher.email.toLowerCase() === email.toLowerCase()) {
-      throw new Error("You cannot invite yourself to your own classroom.");
+      throw new Error('You cannot invite yourself to your own classroom.');
     }
 
     const learner = await classroomModel.findByEmail(email);
@@ -255,36 +228,30 @@ class ClassroomService {
     await emailService.sendClassInvitation(email, token, classroom);
   }
 
-  async acceptInvitation(token, user) {
-    let decoded;
+  _verifyInvitationToken(token) {
     try {
-      decoded = jwt.verify(token, JWT_SECRET);
+      const decoded = verifyToken(token);
+      if (decoded.type !== 'classroom_invitation') {
+        throw new Error('Invalid invitation token type.');
+      }
+      return decoded;
     } catch (err) {
       throw new Error('Invalid or expired invitation token.');
     }
+  }
 
-    if (decoded.type !== 'classroom_invitation') {
-      throw new Error('Invalid invitation token type.');
-    }
-
-    const classroomId = decoded.classroomId;
-    const invitedEmail = decoded.email;
-
-    const invitation = await classroomModel.getInvitationByToken(token);
-    const classroom = await classroomModel.getClassroomById(
-      invitation.classroom_id
-    );
-
-    if (invitedEmail !== user.email || classroomId !== classroom.id) {
+  _validateInvitationAccess(decoded, user, classroom) {
+    if (decoded.email !== user.email || decoded.classroomId !== classroom.id) {
       throw new Error('This invitation was not sent to your account.');
     }
+  }
 
+  _validateInvitationStatus(invitation) {
     if (!invitation) {
       throw new Error('Invalid or expired invitation link.');
     }
 
     if (invitation.status === 'rejected') {
-      // cancelled
       throw new Error('This invitation has been cancelled.');
     }
 
@@ -295,24 +262,30 @@ class ClassroomService {
     if (new Date(invitation.expires_at) < new Date()) {
       throw new Error('This invitation has expired.');
     }
+  }
 
+  async _validateInvitationConstraints(classroom, user) {
     if (classroom.learner_count >= classroom.capacity_limit) {
       throw new Error('This classroom is full.');
     }
 
-    const member = await classroomModel.findMemberStatus(
-      classroom.id,
-      user.userId
-    );
+    const member = await classroomModel.findMemberStatus(classroom.id, user.userId);
     if (member?.join_status === 'joined') {
       throw new Error('You are already a member of this classroom.');
     }
+  }
 
-    await classroomModel.addLearnerToClass(
-      classroom.id,
-      user.userId,
-      user.email
-    );
+  async acceptInvitation(token, user) {
+    const decoded = this._verifyInvitationToken(token);
+
+    const invitation = await classroomModel.getInvitationByToken(token);
+    const classroom = await classroomModel.getClassroomById(invitation.classroom_id);
+
+    this._validateInvitationAccess(decoded, user, classroom);
+    this._validateInvitationStatus(invitation);
+    await this._validateInvitationConstraints(classroom, user);
+
+    await classroomModel.addLearnerToClass(classroom.id, user.userId, user.email);
     await classroomModel.updateInvitationStatus(invitation.id, 'joined');
 
     return { classroomId: classroom.id };
@@ -332,28 +305,34 @@ class ClassroomService {
     await classroomModel.cancelInvitation(classroomId, email);
   }
 
-  async createAssignment({
-    classroomId,
-    teacherId,
-    vocabListId,
-    title,
-    exerciseMethod,
-    wordsPerReview,
-    startDate,
-    dueDate,
-  }) {
+  _validateAssignmentData(assignmentData) {
+    const { wordsPerReview } = assignmentData;
     if (wordsPerReview < 5 || wordsPerReview > 30) {
       throw new Error('wordsPerReview must be between 5 and 30.');
     }
+  }
 
-    const allWords = await classroomModel.getWordsByListId(vocabListId); // vocabModel
+  async _getAndValidateWords(vocabListId) {
+    const allWords = await classroomModel.getWordsByListId(vocabListId);
     if (!allWords || allWords.length === 0) {
       throw new Error('Vocabulary list not found or empty.');
     }
+    return allWords;
+  }
 
-    const sublistCount = Math.ceil(allWords.length / wordsPerReview);
+  async _createAssignmentRecord(assignmentData, sublistCount) {
+    const {
+      classroomId,
+      teacherId,
+      vocabListId,
+      title,
+      exerciseMethod,
+      wordsPerReview,
+      startDate,
+      dueDate,
+    } = assignmentData;
 
-    const assignment = await classroomModel.createAssignment({
+    return await classroomModel.createAssignment({
       classroom_id: classroomId,
       vocab_list_id: vocabListId,
       teacher_id: teacherId,
@@ -364,8 +343,11 @@ class ClassroomService {
       start_date: startDate,
       due_date: dueDate,
     });
+  }
 
-    const assignmentId = assignment.id;
+  async _generateAssignmentSublists(assignmentId, allWords, assignmentData) {
+    const { wordsPerReview, teacherId, title } = assignmentData;
+    const sublistCount = Math.ceil(allWords.length / wordsPerReview);
 
     for (let i = 0; i < sublistCount; i++) {
       const start = i * wordsPerReview;
@@ -373,8 +355,7 @@ class ClassroomService {
       const subWords = allWords.slice(start, end);
 
       const clonedListId = await classroomModel.cloneListWithWords({
-        // vocabModel
-        originalListId: vocabListId,
+        originalListId: assignmentData.vocabListId,
         creatorId: teacherId,
         title: `${title} - Sublist ${i + 1}`,
         words: subWords,
@@ -386,32 +367,27 @@ class ClassroomService {
         vocab_list_id: clonedListId,
       });
     }
+  }
+
+  async createAssignment(assignmentData) {
+    this._validateAssignmentData(assignmentData);
+
+    const allWords = await this._getAndValidateWords(assignmentData.vocabListId);
+    const sublistCount = Math.ceil(allWords.length / assignmentData.wordsPerReview);
+
+    const assignment = await this._createAssignmentRecord(
+      assignmentData,
+      sublistCount
+    );
+    await this._generateAssignmentSublists(assignment.id, allWords, assignmentData);
 
     return assignment;
   }
 
   async getJoinedClassroomsByLearner(learnerId) {
-    const classrooms =
-      await classroomModel.getJoinedClassroomsByLearner(learnerId);
-
-    const result = [];
-
-    for (const classroom of classrooms) {
-      const assignments = await classroomModel.getAssignmentsByClassroom(
-        classroom.id
-      );
-
-      const assignedCount = assignments.filter(
-        (a) => computeAssignmentStatus(a.start_date, a.due_date) === 'assigned'
-      ).length;
-
-      result.push({
-        ...classroom,
-        assignment_count: assignedCount,
-      });
-    }
-
-    return result;
+    return await classroomModel.getJoinedClassroomsByLearnerWithAssignmentCounts(
+      learnerId
+    );
   }
 
   async getClassroomInvitations(classroomId) {
@@ -434,17 +410,21 @@ class ClassroomService {
       (a) => computeAssignmentStatus(a.start_date, a.due_date) === 'assigned'
     );
 
-    for (const assignment of assignedAssignments) {
-      const hasRecord = await classroomModel.hasLearnerAssignment(
-        assignment.id,
+    const existingAssignmentIds =
+      await classroomModel.getLearnerAssignmentsByClassroomAndLearner(
+        classroomId,
         learnerId
       );
-      if (!hasRecord) {
-        await classroomModel.createLearnerAssignment({
-          assignment_id: assignment.id,
-          learner_id: learnerId,
-        });
-      }
+
+    const missingAssignments = assignedAssignments
+      .filter((assignment) => !existingAssignmentIds.includes(assignment.id))
+      .map((assignment) => ({
+        assignment_id: assignment.id,
+        learner_id: learnerId,
+      }));
+
+    if (missingAssignments.length > 0) {
+      await classroomModel.createLearnerAssignmentsBatch(missingAssignments);
     }
 
     const raw = await classroomModel.getLearnerAssignmentsByStatus(
@@ -513,7 +493,7 @@ class ClassroomService {
         completed_sublist_index: item.completed_sublist_index,
         sublist_count: item.assignments.sublist_count,
         due_date: item.assignments.due_date,
-        status : 'overdue',
+        status: 'overdue',
         learner_status: item.status,
       }));
   }
@@ -530,8 +510,7 @@ class ClassroomService {
     const allWords = await classroomModel.getAssignmentVocabulary(
       assignment.vocab_list_id
     );
-    const reviewedCount =
-      await classroomModel.countLearnersCompleted(assignmentId);
+    const reviewedCount = await classroomModel.countLearnersCompleted(assignmentId);
 
     return {
       title: assignment.title,
@@ -552,7 +531,7 @@ class ClassroomService {
       classroomId,
       assignmentId
     );
-    
+
     if (!assignment) {
       throw new Error('Assignment not found.');
     }
@@ -569,12 +548,12 @@ class ClassroomService {
     await classroomModel.deleteAssignmentRecord(assignmentId);
   }
 
-  async leaveClassroom(classroomId, learnerId){
+  async leaveClassroom(classroomId, learnerId) {
     await classroomModel.updateLearnerStatus(classroomId, learnerId, {
       join_status: 'rejected',
       left_at: new Date().toISOString(),
     });
-    
+
     await classroomModel.deleteLearnerAssignmentsByLearnerId(learnerId);
   }
 }

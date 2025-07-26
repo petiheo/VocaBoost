@@ -6,6 +6,11 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY
 );
 
+const supabaseService = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
+
 const testConnection = async () => {
   try {
     const { data, error } = await supabase.from('users').select('count').limit(1);
@@ -18,4 +23,7 @@ const testConnection = async () => {
 };
 testConnection();
 
-module.exports = supabase;
+module.exports = {
+  supabase,
+  supabaseService,
+};

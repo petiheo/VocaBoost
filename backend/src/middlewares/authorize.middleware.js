@@ -1,4 +1,5 @@
 const classroomModel = require('../models/classroom.model');
+const logger = require('../utils/logger');
 
 const requireRole = (...roles) => {
   return (req, res, next) => {
@@ -60,7 +61,7 @@ const hasClassroomAccess = async (req, res, next) => {
       message: 'You do not have access to this classroom.',
     });
   } catch (err) {
-    console.error('hasClassroomAccess error:', err);
+    logger.error('hasClassroomAccess error:', err);
     return res.status(500).json({
       success: false,
       message: 'Internal server error during access check.',
