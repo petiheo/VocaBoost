@@ -1,6 +1,7 @@
 const classroomService = require('../services/classroom.service');
 const { validationResult } = require('express-validator');
 const logger = require('../utils/logger');
+const ErrorHandler = require('../utils/errorHandler');
 
 class ClassroomController {
   async createClassroom(req, res) {
@@ -383,41 +384,34 @@ class ClassroomController {
     }
   }
 
+  _extractAssignmentData(req) {
+    const classroomId = req.classroom.id;
+    const teacherId = req.user.userId;
+    const {
+      vocabListId,
+      title,
+      exerciseMethod,
+      wordsPerReview,
+      startDate,
+      dueDate,
+    } = req.body;
+
+    return {
+      classroomId,
+      teacherId,
+      vocabListId,
+      title,
+      exerciseMethod,
+      wordsPerReview,
+      startDate,
+      dueDate,
+    };
+  }
+
   async createAssignment(req, res) {
-    // Bắt lỗi từ validator
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        errors: errors.array().map((err) => ({
-          field: err.path,
-          message: err.msg,
-        })),
-      });
-    }
-
     try {
-      const classroomId = req.classroom.id;
-      const teacherId = req.user.userId;
-      const {
-        vocabListId,
-        title,
-        exerciseMethod,
-        wordsPerReview,
-        startDate,
-        dueDate,
-      } = req.body;
-
-      const assignment = await classroomService.createAssignment({
-        classroomId,
-        teacherId,
-        vocabListId,
-        title,
-        exerciseMethod,
-        wordsPerReview,
-        startDate,
-        dueDate,
-      });
+      const assignmentData = this._extractAssignmentData(req);
+      const assignment = await classroomService.createAssignment(assignmentData);
 
       return res.status(201).json({
         success: true,
@@ -425,14 +419,12 @@ class ClassroomController {
         data: assignment,
       });
     } catch (error) {
-      logger.error(
-        `[createAssignment] Error creating assignment in classroom ${req.classroom?.id} by teacher ${req.user?.userId}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'createAssignment',
+        'Failed to create assignment.'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to create assignment.',
-      });
     }
   }
 
