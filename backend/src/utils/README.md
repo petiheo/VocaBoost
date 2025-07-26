@@ -30,11 +30,14 @@ ResponseUtils.success(res, 'User created successfully', userData, 201);
 ```
 
 **Output:**
+
 ```json
 {
   "success": true,
   "message": "Operation completed successfully",
-  "data": { /* optional data */ }
+  "data": {
+    /* optional data */
+  }
 }
 ```
 
@@ -52,11 +55,14 @@ ResponseUtils.error(res, 'Validation failed', 400, validationErrors);
 ```
 
 **Output:**
+
 ```json
 {
   "success": false,
   "message": "Error description",
-  "details": { /* optional error details */ }
+  "details": {
+    /* optional error details */
+  }
 }
 ```
 
@@ -107,9 +113,9 @@ try {
   // operation
 } catch (error) {
   return ErrorHandler.handleError(
-    res, 
-    error, 
-    'getUserProfile', 
+    res,
+    error,
+    'getUserProfile',
     'Failed to get user profile'
   );
 }
@@ -164,7 +170,7 @@ class UserController {
     try {
       const userId = req.user.userId;
       const profile = await userService.getProfile(userId);
-      
+
       return ResponseUtils.success(res, 'Profile retrieved successfully', profile);
     } catch (error) {
       return ErrorHandler.handleError(
@@ -207,12 +213,12 @@ class UserService {
     if (!data.email) {
       throw new Error('Email is required');
     }
-    
+
     const existingUser = await userModel.findByEmail(data.email);
     if (existingUser && existingUser.id !== userId) {
       throw new Error('Email already in use');
     }
-    
+
     return await userModel.update(userId, data);
   }
 }
@@ -232,20 +238,26 @@ class UserService {
 All responses follow this consistent structure:
 
 ### Success Response
+
 ```json
 {
   "success": true,
   "message": "Operation description",
-  "data": { /* response data */ }
+  "data": {
+    /* response data */
+  }
 }
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
   "message": "Error description",
-  "details": { /* optional error details */ }
+  "details": {
+    /* optional error details */
+  }
 }
 ```
 

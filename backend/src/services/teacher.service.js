@@ -32,8 +32,7 @@ class TeacherService {
         additionalNotes: data.additionalNotes,
       });
 
-      if (data.fullName)
-        await userModel.updateDisplayName(userId, data.fullName);
+      if (data.fullName) await userModel.updateDisplayName(userId, data.fullName);
       return teacherRequest;
     } catch (error) {
       logger.error('Submit verification failed: ', error);

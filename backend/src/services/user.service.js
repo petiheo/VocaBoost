@@ -63,11 +63,11 @@ class UserService {
     if (displayName) {
       await userModel.updateDisplayName(userId, displayName);
     }
-    
+
     if (dailyGoal) {
       await userModel.updateDailyGoal(userId, dailyGoal);
     }
-    
+
     // Handle avatar updates
     if (avatarFile) {
       await this.updateAvatar(userId, avatarFile);

@@ -59,7 +59,7 @@ class AuthService {
 
     // Create user
     const userData = await this.insertIntoUsers(email, password, role);
-    
+
     // Generate verification token and send email
     const verificationToken = generateEmailVerificationToken(userData.id);
     await this.insertIntoAuthTokens(
@@ -136,12 +136,7 @@ class AuthService {
     }
 
     const resetToken = generateResetToken(userData.id);
-    await this.insertIntoAuthTokens(
-      resetToken,
-      userData.id,
-      'password_reset',
-      '1h'
-    );
+    await this.insertIntoAuthTokens(resetToken, userData.id, 'password_reset', '1h');
     await emailService.sendPasswordReset(email, resetToken);
   }
 

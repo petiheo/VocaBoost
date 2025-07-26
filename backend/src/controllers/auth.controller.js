@@ -8,9 +8,9 @@ class AuthController {
     try {
       const { email, password, role = 'learner' } = req.body;
       const result = await authService.registerUser(email, password, role);
-      
+
       return ResponseUtils.success(
-        res, 
+        res,
         'Registration successful. Please check your email for verification.',
         result,
         201
@@ -19,12 +19,7 @@ class AuthController {
       if (error.message === 'Email already registered') {
         return ResponseUtils.conflict(res, error.message);
       }
-      return ErrorHandler.handleError(
-        res, 
-        error, 
-        'register', 
-        'Registration failed'
-      );
+      return ErrorHandler.handleError(res, error, 'register', 'Registration failed');
     }
   }
 
@@ -32,22 +27,19 @@ class AuthController {
     try {
       const { email, password } = req.body;
       const result = await authService.loginUser(email, password);
-      
+
       return ResponseUtils.success(res, 'Login successful', result);
     } catch (error) {
       if (error.message === 'Invalid email or password') {
         return ResponseUtils.unauthorized(res, error.message);
       }
-      if (error.message === 'Account has been deactivated' || 
-          error.message === 'Account has been suspended') {
+      if (
+        error.message === 'Account has been deactivated' ||
+        error.message === 'Account has been suspended'
+      ) {
         return ResponseUtils.forbidden(res, error.message);
       }
-      return ErrorHandler.handleError(
-        res, 
-        error, 
-        'login', 
-        'Login failed'
-      );
+      return ErrorHandler.handleError(res, error, 'login', 'Login failed');
     }
   }
 
@@ -98,16 +90,16 @@ class AuthController {
     try {
       const { email } = req.body;
       await authService.sendPasswordReset(email);
-      
+
       return ResponseUtils.success(
-        res, 
+        res,
         'If the email exists, password reset instructions have been sent'
       );
     } catch (error) {
       return ErrorHandler.handleError(
-        res, 
-        error, 
-        'forgotPassword', 
+        res,
+        error,
+        'forgotPassword',
         'Forgot password failed'
       );
     }
@@ -117,9 +109,9 @@ class AuthController {
     try {
       const { token, newPassword } = req.body;
       await authService.resetPassword(token, newPassword);
-      
+
       return ResponseUtils.success(
-        res, 
+        res,
         'Password has been reset successfully. Please login with your new password.'
       );
     } catch (error) {
@@ -127,9 +119,9 @@ class AuthController {
         return ResponseUtils.error(res, error.message, 400);
       }
       return ErrorHandler.handleError(
-        res, 
-        error, 
-        'resetPassword', 
+        res,
+        error,
+        'resetPassword',
         'Reset password failed'
       );
     }
@@ -139,20 +131,16 @@ class AuthController {
     try {
       const token = req.params.token;
       const result = await authService.verifyEmailToken(token);
-      
-      return ResponseUtils.success(
-        res, 
-        'Email verified successfully.',
-        result
-      );
+
+      return ResponseUtils.success(res, 'Email verified successfully.', result);
     } catch (error) {
       if (error.message === 'Invalid or expired verification token') {
         return ResponseUtils.error(res, error.message, 400);
       }
       return ErrorHandler.handleError(
-        res, 
-        error, 
-        'verifyEmail', 
+        res,
+        error,
+        'verifyEmail',
         'Invalid or expired verification token'
       );
     }
@@ -162,9 +150,9 @@ class AuthController {
     try {
       const { email } = req.body;
       await authService.resendVerification(email);
-      
+
       return ResponseUtils.success(
-        res, 
+        res,
         'Verification email resent successfully. Please check your inbox'
       );
     } catch (error) {
@@ -172,9 +160,9 @@ class AuthController {
         return ResponseUtils.error(res, error.message, 400);
       }
       return ErrorHandler.handleError(
-        res, 
-        error, 
-        'resendVerification', 
+        res,
+        error,
+        'resendVerification',
         'Email not found or already verified'
       );
     }
@@ -184,16 +172,16 @@ class AuthController {
     try {
       const { email } = req.body;
       const result = await authService.getAccountStatus(email);
-      
+
       return ResponseUtils.success(res, 'Account status retrieved', result);
     } catch (error) {
       if (error.message === 'Email not found') {
         return ResponseUtils.notFound(res, error.message);
       }
       return ErrorHandler.handleError(
-        res, 
-        error, 
-        'getAccountStatus', 
+        res,
+        error,
+        'getAccountStatus',
         'Internal server error',
         500
       );

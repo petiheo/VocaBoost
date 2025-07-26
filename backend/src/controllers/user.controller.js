@@ -25,8 +25,12 @@ class UserController {
       const updateData = req.body;
       const avatarFile = req.file;
 
-      const updatedProfile = await userService.updateProfile(userId, updateData, avatarFile);
-      
+      const updatedProfile = await userService.updateProfile(
+        userId,
+        updateData,
+        avatarFile
+      );
+
       return ResponseUtils.success(
         res,
         'Profile updated successfully',
@@ -49,7 +53,7 @@ class UserController {
       const { wordId, reason } = req.body;
 
       const result = await userService.reportWord(reporterId, wordId, reason);
-      
+
       return ResponseUtils.success(
         res,
         result.message,
