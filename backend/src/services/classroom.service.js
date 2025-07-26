@@ -32,23 +32,7 @@ class ClassroomService {
   }
 
   async getClassroomsByTeacherId(teacherId) {
-    const classrooms = await classroomModel.findByTeacherId(teacherId);
-
-    const updated = await Promise.all(
-      classrooms.map(async (classroom) => {
-        const assignments = await classroomModel.getAssignmentsByClassroom(
-          classroom.id
-        );
-        const count = assignments.length;
-
-        return {
-          ...classroom,
-          assignment_count: count,
-        };
-      })
-    );
-
-    return updated;
+    return await classroomModel.findByTeacherIdWithAssignmentCounts(teacherId);
   }
 
   async handleJoinRequestByCode(joinCode, user) {
@@ -391,27 +375,7 @@ class ClassroomService {
   }
 
   async getJoinedClassroomsByLearner(learnerId) {
-    const classrooms =
-      await classroomModel.getJoinedClassroomsByLearner(learnerId);
-
-    const result = [];
-
-    for (const classroom of classrooms) {
-      const assignments = await classroomModel.getAssignmentsByClassroom(
-        classroom.id
-      );
-
-      const assignedCount = assignments.filter(
-        (a) => computeAssignmentStatus(a.start_date, a.due_date) === 'assigned'
-      ).length;
-
-      result.push({
-        ...classroom,
-        assignment_count: assignedCount,
-      });
-    }
-
-    return result;
+    return await classroomModel.getJoinedClassroomsByLearnerWithAssignmentCounts(learnerId);
   }
 
   async getClassroomInvitations(classroomId) {
@@ -434,17 +398,20 @@ class ClassroomService {
       (a) => computeAssignmentStatus(a.start_date, a.due_date) === 'assigned'
     );
 
-    for (const assignment of assignedAssignments) {
-      const hasRecord = await classroomModel.hasLearnerAssignment(
-        assignment.id,
-        learnerId
-      );
-      if (!hasRecord) {
-        await classroomModel.createLearnerAssignment({
-          assignment_id: assignment.id,
-          learner_id: learnerId,
-        });
-      }
+    const existingAssignmentIds = await classroomModel.getLearnerAssignmentsByClassroomAndLearner(
+      classroomId,
+      learnerId
+    );
+
+    const missingAssignments = assignedAssignments
+      .filter(assignment => !existingAssignmentIds.includes(assignment.id))
+      .map(assignment => ({
+        assignment_id: assignment.id,
+        learner_id: learnerId,
+      }));
+
+    if (missingAssignments.length > 0) {
+      await classroomModel.createLearnerAssignmentsBatch(missingAssignments);
     }
 
     const raw = await classroomModel.getLearnerAssignmentsByStatus(
