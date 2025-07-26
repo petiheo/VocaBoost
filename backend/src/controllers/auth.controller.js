@@ -1,8 +1,8 @@
 const authService = require('../services/auth.service');
-const { verifyToken } = require('../helpers/jwt.helper');
+const { generateToken } = require('../helpers/jwt.helper');
 const passport = require('passport');
 const { ResponseUtils, ErrorHandler } = require('../utils');
-
+const logger = require('../utils/logger');
 class AuthController {
   async register(req, res) {
     try {
@@ -61,7 +61,10 @@ class AuthController {
           email: user.email,
           role: user.role,
         });
-        res.redirect(`${frontendUrl}/auth/success?token=${accessToken}`);
+        
+        // Pass isNewUser as separate URL parameter
+        const redirectUrl = `${frontendUrl}/auth/success?token=${accessToken}&isNewUser=${user.isNewUser}`;
+        res.redirect(redirectUrl);
       } catch (error) {
         logger.error('Google callback processing error:', error);
         res.redirect(`${frontendUrl}/login?error=processing_failed`);
