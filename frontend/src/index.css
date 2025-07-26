@@ -337,6 +337,24 @@
 .teacher-verification__submit {
   margin-top: 32px;
 }
+.teacher-verification__success {
+  padding: 12px;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-family: "Inria Sans", sans-serif;
+}
+.teacher-verification__error {
+  padding: 12px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-family: "Inria Sans", sans-serif;
+}
 
 .logo {
   margin: 20px;
@@ -2076,6 +2094,17 @@ h2 {
   font-family: "Lalezar", sans-serif;
   font-size: 1.3888888889vw;
   color: white;
+  transition: all 0.3s ease;
+}
+.input__submit:hover:not(:disabled) {
+  background-color: #2980d6;
+  cursor: pointer;
+}
+.input__submit:disabled {
+  background-color: #9ca3af;
+  color: #d1d5db;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 .input__text, .input__password {
   align-items: flex-start;
@@ -2261,8 +2290,7 @@ h2 {
 }
 
 .sidebar {
-
-  position: fixed;
+  position: relative;
   z-index: 1000;
   top: 0%;
   width: 15rem;
@@ -2338,32 +2366,6 @@ h2 {
 .sidebar .sidebar__link .sidebar__label {
   white-space: nowrap;
 }
-
-.learner-submenu {
-  display: flex;
-  justify-content: center;
-  gap: 10rem;
-  border-bottom: 0.2rem solid #dcdcdc;
-  padding: 0rem;
-}
-
-.submenu-tab {
-  font-family: "Lalezar", sans-serif;
-  font-weight: lighter;
-  font-size: 1.5rem;
-  color: #2b1e17;
-  text-decoration: none;
-  padding: 0.5rem 4rem 0.5rem;
-  border-radius: 8px;
-  transition: background-color 0.3s;
-}
-.submenu-tab.active {
-  background-color: #F8EED3;
-}
-.submenu-tab:hover {
-  background-color: #F8EED3;
-}
-
 
 @keyframes fadeIn {
   from {
