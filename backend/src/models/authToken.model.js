@@ -1,9 +1,9 @@
 const supabase = require('../config/database');
 
 class AuthToken {
-  async create(token, userId, tokenType, expiresAt) {
-    const { data, error } = supabase
-      .from('tokens')
+  static async create(token, userId, tokenType, expiresAt) {
+    const { data, error } = await supabase
+      .from('auth_tokens')
       .insert({
         token: token,
         user_id: userId,
@@ -15,6 +15,24 @@ class AuthToken {
     if (error) throw error;
     return data;
   }
+
+  static async get(token) {
+    const { data, error } = await supabase
+      .from('auth_tokens')
+      .select()
+      .eq('token', token)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateUsedAt(token) {
+    return await supabase
+      .from('auth_tokens')
+      .update({ used_at: new Date().toISOString() })
+      .eq('token', token);
+  }
 }
 
-module.exports = new AuthToken();
+module.exports = AuthToken;
