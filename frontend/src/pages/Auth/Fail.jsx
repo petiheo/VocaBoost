@@ -3,7 +3,7 @@ import FailBackground from "../../assets/icons/Fail/FailBackground.svg"
 import FailPattern from "../../assets/icons/Fail/FailPattern.svg"
 
 
-export default function CheckYourMail() {
+export default function Fail() {
     return (
         <div className="fail-container"
             style={{

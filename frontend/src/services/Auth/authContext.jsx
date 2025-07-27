@@ -11,9 +11,31 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const currentUser = authService.getCurrentUser();
-        if (currentUser) setUser(currentUser);
-        setLoading(false);
+        const checkUserSession = async () => {
+            const currentUser = authService.getCurrentUser();
+            if (currentUser) {
+                try {
+                    // Check if user's email is verified
+                    const accountStatus = await authService.getAccountStatus(currentUser.email);
+                    console.log('account status:::', accountStatus);
+                    
+                    if (accountStatus?.data?.emailVerified) {
+                        setUser(currentUser);
+                    } else {
+                        // Clear session for unverified users
+                        await authService.logout();
+                        setUser(null);
+                    }
+                } catch (error) {
+                    // If there's an error checking status, clear the session
+                    await authService.logout();
+                    setUser(null);
+                }
+            }
+            setLoading(false);
+        };
+
+        checkUserSession();
     }, []);
 
     const logout = async () => {

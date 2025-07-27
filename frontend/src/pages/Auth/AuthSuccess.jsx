@@ -3,37 +3,54 @@
 
 import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../../services/Auth/authContext";
+import authService from "../../services/Auth/authService";
 
 export default function AuthSuccess() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   useEffect(() => {
-    const token = searchParams.get("token");
+    const handleGoogleAuth = async () => {
+      const token = searchParams.get("token");
+      const isNewUser = searchParams.get("isNewUser") === "true";
 
-    if (token) {
-      // Lưu token
-      localStorage.setItem("token", token);
+      if (token) {
+        // Store token temporarily
+        localStorage.setItem("token", token);
 
-      // (Tùy chọn) Giải mã token để lấy thông tin user
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        localStorage.setItem("user", JSON.stringify({
-          id: payload.userId,
-          email: payload.email,
-          role: payload.role
-        }));
-      } catch {
-        // Nếu token không decode được thì bỏ qua
-        return; 
+        try {
+          // Validate token with server instead of client-side decoding
+          const validation = await authService.validateToken();
+          
+          if (validation && validation.success) {
+            const userObject = validation.data;
+            // Store token and user manually since validateToken doesn't return the same structure as login
+            localStorage.setItem("user", JSON.stringify(userObject));
+            setUser(userObject);
+            
+            // Navigate based on user status
+            if (isNewUser) {
+              navigate("/select-user-type");
+            } else {
+              navigate("/homepage");
+            }
+          } else {
+            throw new Error("Token validation failed");
+          }
+        } catch (error) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          navigate("/signin");
+        }
+      } else {
+        navigate("/signin");
       }
+    };
 
-      // Chuyển sang homepage/dashboard
-      navigate("/homepage");
-    } else {
-      navigate("/login");
-    }
-  }, [searchParams, navigate]);
+    handleGoogleAuth();
+  }, [searchParams, navigate, setUser]);
 
   return <div>Authenticating via Google...</div>;
 }

@@ -27,14 +27,19 @@ passport.use(
         const avatarUrl = profile.photos[0]?.value;
 
         let user = await userModel.findByEmail(email);
+        let isNewUser = false;
+        
         if (user) {
+          // Existing user - update Google info if missing
           if (!user.google_id)
             user = await userModel.updateGoogleId(user.id, googleId);
           if (!user.display_name)
             user = await userModel.updateDisplayName(user.id, displayName);
           if (!user.avatar_url)
-            user = await userModel.updateAvartar(user.id, avatarUrl);
+            user = await userModel.updateAvatar(user.id, avatarUrl);
         } else {
+          // New user - create account
+          isNewUser = true;
           user = await userModel.createGoogleUser({
             email,
             googleId,
@@ -50,6 +55,7 @@ passport.use(
           role: user.role,
           displayName: user.display_name,
           avatarUrl: user.avatar_url,
+          isNewUser: isNewUser,
         });
       } catch (error) {
         logger.error('Google OAuth Error:', error);

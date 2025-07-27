@@ -5,33 +5,77 @@ import MainPageLogo from "../../assets/Logo.svg";
 import { GoogleLogo } from "../../assets/icons/index";
 import { useNavigate } from 'react-router-dom' // Import useNavigate for navigation
 import authService from "../../services/Auth/authService";
+import { SignInSignUpBG } from "../../assets/Auth";
+import { useState } from "react";
+import LoadingCursor from "../../components/cursor/LoadingCursor";
+import { useAuth } from "../../services/Auth/authContext";
+import { handleLoginError, clearAuthErrors } from "../../utils/authErrorHandler";
 
 
 
-export default function Login() {
+export default function Signin() {
+    // Xử lý việc navigate trang
+    const navigate = useNavigate();
 
-    const navigate = useNavigate()
+    // Xử lý cursor xoay khi bấm nút đăng nhập 
+    const [isLoading, setIsLoading] = useState(false);
 
+    // Xử lý lỗi khi đăng nhập 
+    const [errors, setErrors] = useState({});
+
+    // Xử lý dữ liệu người dùng. 
+    const { setUser } = useAuth();
+
+    // Xử lý xoá hết input khi đăng nhập sai 
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const clearForm = () => {
+        setEmail("");
+        setPassword("");
+    };
+
+    // Xử lý việc đăng nhập 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const email = e.target.email.value;
-        const password = e.target.password.value;
+        clearAuthErrors(setErrors);
 
-
+        setIsLoading(true);
         try {
-            const res = await authService.login(email, password);
-            alert(res.message || "Sign in successfully");
-            navigate("/homepage");
+            // First check if email is verified without storing tokens
+            const res = await authService.loginWithoutStorage(email, password);
+            const check = await authService.getAccountStatus(email);
+            
+            if (check?.data?.emailVerified) {
+                // Only store tokens for verified users
+                authService.storeUserSession(res);
+                setUser(res?.data?.user);
+                navigate("/homepage");
+            } else {
+                // Don't store tokens for unverified users
+                navigate("/checkYourMail", { 
+                    state: { 
+                        fromSignUp: false, 
+                        email: email 
+                    } 
+                });
+            }
         } catch (error) {
-            alert(error.response?.data?.error || "Incorrect email or password!");
+            handleLoginError(error, setErrors, clearForm);
+        } finally {
+            setIsLoading(false);
         }
     };
 
+    // Đăng nhập bằng google
     const handleGoogleLogin = () => {
-        window.location.href = "http://localhost:3000/api/auth/google";
+        window.location.href = import.meta.env.VITE_GOOGLE_AUTH_URL || "http://localhost:3000/api/auth/google";
     };
+
     return (
         <div className="grid-container">
+            {/* Xử lý cursor */}
+            <LoadingCursor loading={isLoading} />
             <div className="left-grid">
                 <Link to="/" className="login-logo">
                     <img src={MainPageLogo} alt="logo-page" />
@@ -53,25 +97,34 @@ export default function Login() {
                     <form className="login-form" onSubmit={handleLogin}>
                         <AccountPageInput
                             label="Email:"
-                            name="email" 
-                            type="text" 
-                            placeholder="Enter your email" 
+                            name="email"
+                            type="text"
+                            placeholder="Enter your email"
                             required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
 
                         <AccountPageInput
-                            label="Password:" 
-                            name="password" 
-                            type="password" 
-                            placeholder="Enter password" 
+                            label="Password:"
+                            name="password"
+                            type="password"
+                            placeholder="Enter password"
                             required
+                            error={errors.login}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
 
                         <div className="login-forgot-password">
                             <Link to="/forgot-password">Forgot password?</Link>
                         </div>
 
-                        <AccountPageInput type="submit" value="Sign in" />
+                        <AccountPageInput 
+                            type="submit" 
+                            value={isLoading ? "Signing in..." : "Sign in"}
+                            disabled={isLoading}
+                        />
 
                     </form>
 
@@ -84,7 +137,7 @@ export default function Login() {
             </div>
 
             <div className="right-grid">
-
+                <img src={SignInSignUpBG} alt="sign-in-sign-up-background" />
             </div>
         </div>
     );

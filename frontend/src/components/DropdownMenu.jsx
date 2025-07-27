@@ -58,10 +58,10 @@ const DropdownMenu = () => {
                         My Profile
                         <img src={DropDownMenuPattern1} alt="drop-down-menu-pattern1" className="drop-down-menu-pattern1" />
                     </Link>
-                    <Link to="/homepage" className="dropdown__item">
+                    {/* <Link to="/homepage" className="dropdown__item">
                         Setting
                         <img src={DropDownMenuPattern1} alt="drop-down-menu-pattern1" className="drop-down-menu-pattern1" />
-                    </Link>
+                    </Link> */}
                     <img src={DropDownMenuPattern3} alt="drop-down-menu-pattern3" className="drop-down-menu-pattern3" />
                     <button onClick={handleLogOut} className="dropdown__item">
                         Log out
