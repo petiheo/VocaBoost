@@ -175,8 +175,8 @@ grep -r "templates.set" src/services/email.service.js
 
 ```javascript
 // In email.service.js
-console.log('Rendering template:', templateName);
-console.log('Template data:', JSON.stringify(data, null, 2));
+logger.info('Rendering template:', templateName);
+logger.info('Template data:', JSON.stringify(data, null, 2));
 ```
 
 ### Check Email Headers

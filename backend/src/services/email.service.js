@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
 const fs = require('fs').promises;
 const path = require('path');
+const logger = require('../utils/logger');
 
 class EmailService {
   constructor() {
@@ -37,9 +38,9 @@ class EmailService {
       });
 
       await this.transporter.verify();
-      console.log('✅ SMTP configuration verified successfully');
+      logger.info('SMTP configuration verified successfully');
     } catch (error) {
-      console.error('❌ SMTP configuration failed:', error.message);
+      logger.error('SMTP configuration failed:', error.message);
       this.transporter = null;
     }
   }
@@ -55,10 +56,7 @@ class EmailService {
       for (const file of partialFiles) {
         if (file.endsWith('.hbs')) {
           const name = path.basename(file, '.hbs');
-          const content = await fs.readFile(
-            path.join(partialsDir, file),
-            'utf8'
-          );
+          const content = await fs.readFile(path.join(partialsDir, file), 'utf8');
           handlebars.registerPartial(name, content);
         }
       }
@@ -75,17 +73,14 @@ class EmailService {
       for (const file of templateFiles) {
         if (file.endsWith('.hbs')) {
           const name = path.basename(file, '.hbs');
-          const content = await fs.readFile(
-            path.join(templatesPath, file),
-            'utf8'
-          );
+          const content = await fs.readFile(path.join(templatesPath, file), 'utf8');
           this.templates.set(name, handlebars.compile(content));
         }
       }
 
-      console.log(`✅ Compiled ${this.templates.size} email templates`);
+      logger.info(`Compiled ${this.templates.size} email templates`);
     } catch (error) {
-      console.error('❌ Failed to compile templates:', error);
+      logger.error('Failed to compile templates:', error);
       // Fallback to inline templates if file loading fails
       this.setupFallbackTemplates();
     }
@@ -157,7 +152,7 @@ class EmailService {
 
   async sendEmail(options) {
     if (!this.transporter) {
-      console.error('Email service is not available');
+      logger.error('Email service is not available');
       return;
     }
 
@@ -167,14 +162,14 @@ class EmailService {
         ...options,
       });
 
-      console.log(`✅ Email sent: ${info.messageId}`);
+      logger.info(`✅ Email sent: ${info.messageId}`);
 
       // Log to audit trail
       await this.logEmailSent(options.to, options.subject);
 
       return info;
     } catch (error) {
-      console.error('❌ Failed to send email:', error.message);
+      logger.error('❌ Failed to send email:', error.message);
       throw error;
     }
   }
@@ -255,14 +250,14 @@ class EmailService {
     const successful = results.filter((r) => r.status === 'fulfilled').length;
     const failed = results.filter((r) => r.status === 'rejected').length;
 
-    console.log(`Batch email results: ${successful} sent, ${failed} failed`);
+    logger.info(`Batch email results: ${successful} sent, ${failed} failed`);
     return { successful, failed, results };
   }
 
   // Audit logging
   async logEmailSent(to, subject) {
     // In production, this would write to database
-    console.log(
+    logger.info(
       `📧 Email sent to: ${to}, Subject: ${subject}, Time: ${new Date().toISOString()}`
     );
   }
@@ -280,20 +275,29 @@ class EmailService {
     );
     await fs.writeFile(previewPath, html);
 
-    console.log(`📧 Email preview saved to: ${previewPath}`);
+    logger.info(`📧 Email preview saved to: ${previewPath}`);
     return previewPath;
   }
 
-  async sendPasswordReset(to, resetToken) {
+  async sendClassInvitation(to, token, classInfo) {
     try {
+      const inviteUrl = `${process.env.FRONTEND_URL}/accept-invitation?token=${token}`;
+      const html = `
+        <p>You've been invited to join the class <strong>${classInfo.name}</strong>.</p>
+        <p>Click the link below to accept the invitation:</p>
+        <a href="${inviteUrl}">Join Class</a>
+        <p>This link will expire in 7 days.</p>
+      `;
+
       await this.transporter.sendMail({
         from: `"VocaBoost" <${process.env.FROM_EMAIL}>`,
         to,
-        subject: 'VocaBoost - Reset Password',
-        html: `<a href="${process.env.FRONTEND_URL}/reset-password?token=${resetToken}"> Reset Password </a>`,
-        text: `Reset password at: ${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`,
+        subject: `Invitation to join class "${classInfo.name}"`,
+        html,
+        text: `Join class here: ${inviteUrl}`,
       });
     } catch (error) {
+      logger.error(`Failed to send invitation to ${to}:`, error);
       throw error;
     }
   }

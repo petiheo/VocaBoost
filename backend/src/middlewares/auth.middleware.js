@@ -1,49 +1,71 @@
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET;
+const { verifyToken } = require('../helpers/jwt.helper');
+const userModel = require('../models/user.model');
+const logger = require('../utils/logger');
 
-const authMiddleware = {
-  verifyToken: (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-
-    if (!authHeader) {
-      return res.status(403).json({
-        success: false,
-        error: 'Forbidden: A token is required for authentication.',
-      });
-    }
-
-    // The header format is "Bearer <token>"
-    const token = authHeader.split(' ')[1];
-
-    if (!token) {
-      return res.status(403).json({
-        success: false,
-        error: 'Forbidden: Token not found or malformed header.',
-      });
-    }
-
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET);
-
-      // Attach the decoded user payload to the request object
-      // so subsequent handlers can access it (e.g., req.user.userId)
-      req.user = decoded;
-    } catch (err) {
-      if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({
-          success: false,
-          error: 'Unauthorized: Token has expired.',
-        });
-      }
+const authMiddleware = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        error: 'Unauthorized: Invalid token.',
+        message: 'No token provided',
       });
     }
 
-    // If token is valid, proceed to the next middleware/controller
-    return next();
-  },
+    const token = authHeader.substring(7);
+    const decoded = verifyToken(token);
+
+    const user = await userModel.findById(decoded.userId);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    if (user.account_status !== 'active') {
+      return res.status(403).json({
+        success: false,
+        message: `Account ${user.account_status}. Please contact support.`,
+      });
+    }
+
+    if (user.email_verified === false) {
+      return res.status(403).json({
+        success: false,
+        message: 'Email verification required',
+      });
+    }
+
+    // Attach user info to request
+    req.user = {
+      userId: decoded.userId,
+      email: decoded.email,
+      role: user.role, // Use current role from DB, not from token
+    };
+
+    next();
+  } catch (error) {
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token',
+      });
+    }
+
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token expired',
+      });
+    }
+
+    logger.error('Auth middleware error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Authentication error',
+    });
+  }
 };
 
 module.exports = authMiddleware;
