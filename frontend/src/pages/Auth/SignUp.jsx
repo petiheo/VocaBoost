@@ -6,9 +6,10 @@ import { GoogleLogo } from "../../assets/icons/index";
 import authService from "../../services/Auth/authService";
 import { SignInSignUpBG } from "../../assets/Auth";
 import LoadingCursor from "../../components/cursor/LoadingCursor";
+import { handleSignupError, clearAuthErrors } from "../../utils/authErrorHandler";
 
 const handleGoogleSignUp = () => {
-    window.location.href = "http://localhost:3000/api/auth/google";
+    window.location.href = import.meta.env.VITE_GOOGLE_AUTH_URL || "http://localhost:3000/api/auth/google";
 };
 
 export default function SignUp() {
@@ -27,9 +28,15 @@ export default function SignUp() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
+    const clearForm = () => {
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+    };
+
     const handleSignUp = async (e) => {
         e.preventDefault();
-        setErrors({});
+        clearAuthErrors(setErrors);
 
         const newErrors = {};
 
@@ -43,11 +50,10 @@ export default function SignUp() {
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
-            setEmail("");
-            setPassword("");
-            setConfirmPassword("");
+            clearForm();
             return;
         }
+        
         setIsLoading(true);
         try {
             const res = await authService.register({ email, password });
@@ -58,11 +64,7 @@ export default function SignUp() {
                 } 
             });
         } catch (error) {
-            setErrors({email: "Your email is already registered."});
-            setEmail("");
-            setPassword("");
-            setConfirmPassword("");
-            console.error(error);
+            handleSignupError(error, setErrors, clearForm);
         } finally {
             setIsLoading(false);
         }

@@ -14,7 +14,6 @@ export default function CheckYourMail() {
     
     // Check if user came from sign-up or sign-in
     const isFromSignUp = location.state?.fromSignUp || false;
-    console.log('is from sign up:::', isFromSignUp);
     
     useEffect(() => {
         // Get email from location state or localStorage

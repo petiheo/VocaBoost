@@ -9,10 +9,11 @@ import { SignInSignUpBG } from "../../assets/Auth";
 import { useState } from "react";
 import LoadingCursor from "../../components/cursor/LoadingCursor";
 import { useAuth } from "../../services/Auth/authContext";
+import { handleLoginError, clearAuthErrors } from "../../utils/authErrorHandler";
 
 
 
-export default function Login() {
+export default function Signin() {
     // Xử lý việc navigate trang
     const navigate = useNavigate();
 
@@ -29,10 +30,15 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const clearForm = () => {
+        setEmail("");
+        setPassword("");
+    };
+
     // Xử lý việc đăng nhập 
     const handleLogin = async (e) => {
         e.preventDefault();
-        setErrors({});
+        clearAuthErrors(setErrors);
 
         setIsLoading(true);
         try {
@@ -55,12 +61,7 @@ export default function Login() {
                 });
             }
         } catch (error) {
-            setEmail("");
-            setPassword("");
-            
-            // Use backend error message if available, otherwise fallback
-            const errorMessage = error.response?.data?.message || "Incorrect email or password!";
-            setErrors({ login: errorMessage });
+            handleLoginError(error, setErrors, clearForm);
         } finally {
             setIsLoading(false);
         }
@@ -68,7 +69,7 @@ export default function Login() {
 
     // Đăng nhập bằng google
     const handleGoogleLogin = () => {
-        window.location.href = "http://localhost:3000/api/auth/google";
+        window.location.href = import.meta.env.VITE_GOOGLE_AUTH_URL || "http://localhost:3000/api/auth/google";
     };
 
     return (

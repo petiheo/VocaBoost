@@ -196,6 +196,20 @@ class AuthController {
       );
     }
   }
+
+  async validateToken(req, res) {
+    try {
+      return ResponseUtils.success(res, 'Validate token successfully', req.user);
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'validateToken',
+        'Internal server error',
+        500
+      );
+    }
+  }
 }
 
 module.exports = new AuthController();

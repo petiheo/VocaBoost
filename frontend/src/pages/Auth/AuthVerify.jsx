@@ -22,42 +22,52 @@ export default function AuthVerify() {
 
     const handleVerification = async () => {
       if (token) {
-        // Lưu token
-        localStorage.setItem("token", token);
-
-        // (Tùy chọn) Giải mã token để lấy thông tin user
         try {
-          // Gọi API verify từ authService
+          // Call API verify from authService
           const result = await authService.verifyEmail(token);
 
           if (!result.success) {
             throw new Error(result.message || "Email verification failed");
           }
 
-          // Decode để lấy thông tin user
-          try {
-            // Chưa kiểm tra phần decode
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            setUser({
-              id: payload.userId,
-              email: payload.email,
-              role: payload.role
-            })
-
-            localStorage.setItem("user", JSON.stringify({
-              id: payload.userId,
-              email: payload.email,
-              role: payload.role
-            }));
-            console.log(payload.id, payload.email, payload.role);
-          } catch {
-            console.log("Không decode được token");
+          // After successful email verification, the backend should provide a session token
+          if (result.data && result.data.token) {
+            // Store the new session token provided by the backend
+            localStorage.setItem("token", result.data.token);
+            
+            // Store user data if provided
+            if (result.data.user) {
+              const userData = result.data.user;
+              setUser(userData);
+              localStorage.setItem("user", JSON.stringify(userData));
+            }
+            
+            // Navigate to select user type
+            navigate("/select-user-type");
+          } else {
+            // If no session token is provided, try to validate the verification token
+            localStorage.setItem("token", token);
+            
+            try {
+              const validation = await authService.validateToken();
+              
+              if (validation && validation.success) {
+                const userData = validation.data.user;
+                setUser(userData);
+                localStorage.setItem("user", JSON.stringify(userData));
+                navigate("/select-user-type");
+              } else {
+                throw new Error("Token validation failed");
+              }
+            } catch (error) {
+              console.error("Token validation failed:", error);
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              navigate("/signin");
+            }
           }
-
-          // Chuyển sang homepage/dashboard
-          navigate("/select-user-type");
         } catch (error) {
-          console.log(error.message);
+          console.error("Email verification failed:", error);
           navigate("/signin");
         }
       }
