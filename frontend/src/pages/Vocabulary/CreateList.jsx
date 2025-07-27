@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Header, SideBar, Footer} from "../../components/index.jsx";
-import { UploadImage, UploadedImage} from "../../assets/Vocabulary";
+import { UploadImage } from "../../assets/Vocabulary";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import Select from "react-select";
 

@@ -8,7 +8,7 @@ const rateLimiter = require('../middlewares/rateLimiter.middleware');
 const vocabularyValidator = require('../validators/vocabulary.validator');
 const vocabularyController = require('../controllers/vocabulary.controller');
 
-vocabularyRouter.use(authMiddleware.verifyToken);
+vocabularyRouter.use(authMiddleware);
 
 vocabularyRouter.post(
   '/lists',
@@ -17,17 +17,11 @@ vocabularyRouter.post(
   vocabularyController.createList
 );
 
-vocabularyRouter.get(
-  '/my-lists',
-  vocabularyController.getUserLists
-);
+vocabularyRouter.get('/my-lists', vocabularyController.getUserLists);
 
 vocabularyRouter.get('/search', vocabularyController.searchPublicLists);
 
-vocabularyRouter.get(
-  '/lists/:listId',
-  vocabularyController.getListById
-);
+vocabularyRouter.get('/lists/:listId', vocabularyController.getListById);
 
 vocabularyRouter.put(
   '/lists/:listId',
@@ -35,10 +29,7 @@ vocabularyRouter.put(
   vocabularyController.updateList
 );
 
-vocabularyRouter.delete(
-  '/lists/:listId',
-  vocabularyController.deleteList
-);
+vocabularyRouter.delete('/lists/:listId', vocabularyController.deleteList);
 
 vocabularyRouter.post(
   '/lists/:listId/words',
@@ -52,10 +43,7 @@ vocabularyRouter.post(
   vocabularyController.createWordsBulk
 );
 
-vocabularyRouter.get(
-  '/lists/:listId/words',
-  vocabularyController.getWordsByListId
-);
+vocabularyRouter.get('/lists/:listId/words', vocabularyController.getWordsByListId);
 
 vocabularyRouter.put(
   '/words/:wordId',
@@ -63,10 +51,7 @@ vocabularyRouter.put(
   vocabularyController.updateWord
 );
 
-vocabularyRouter.delete(
-  '/words/:wordId',
-  vocabularyController.deleteWord
-);
+vocabularyRouter.delete('/words/:wordId', vocabularyController.deleteWord);
 
 vocabularyRouter.post(
   '/words/:wordId/examples',
@@ -79,10 +64,7 @@ vocabularyRouter.get(
   vocabularyController.getExamplesByWordId
 );
 
-vocabularyRouter.delete(
-  '/examples/:exampleId',
-  vocabularyController.deleteExample
-);
+vocabularyRouter.delete('/examples/:exampleId', vocabularyController.deleteExample);
 
 vocabularyRouter.post(
   '/words/:wordId/synonyms',
@@ -100,14 +82,11 @@ vocabularyRouter.delete(
   vocabularyController.deleteSynonym
 );
 
-vocabularyRouter.get(
-  '/tags', 
-  vocabularyController.getAllTags
-);
+vocabularyRouter.get('/tags', vocabularyController.getAllTags);
 
 vocabularyRouter.post(
   '/upload-image',
-  uploadMiddleware.single('image'),
+  uploadMiddleware.singleFile('image'),
   vocabularyController.uploadImageForWord
 );
 

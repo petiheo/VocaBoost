@@ -2,7 +2,6 @@ export { default as UploadImage } from './uploadImage.svg';
 export { default as DropdownIcon } from './dropDown.svg';
 export { default as EditIcon } from './EditIcon.svg';
 export { default as PlusIcon } from './plus.svg';
-export { default as UploadedImage } from './uploadedImage.svg';
 export { default as MoreIcon } from './more.svg';
 export { default as ShareIcon } from './share.svg';
 export { default as RightMoreIcon } from './rightMore.svg';

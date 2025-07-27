@@ -1,8 +1,8 @@
 const authService = require('../services/auth.service');
-const { verifyToken } = require('../helpers/jwt.helper');
+const { generateToken } = require('../helpers/jwt.helper');
 const passport = require('passport');
 const { ResponseUtils, ErrorHandler } = require('../utils');
-
+const logger = require('../utils/logger');
 class AuthController {
   async register(req, res) {
     try {
