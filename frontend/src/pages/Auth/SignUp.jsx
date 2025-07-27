@@ -4,7 +4,8 @@ import AccountPageInput from "../../components/AccountPageInput"
 import MainPageLogo from "../../assets/Logo.svg";
 import { GoogleLogo } from "../../assets/icons/index";
 import authService from "../../services/Auth/authService";
-
+import { SignInSignUpBG } from "../../assets/Auth";
+import LoadingCursor from "../../components/cursor/LoadingCursor";
 
 const handleGoogleSignUp = () => {
     window.location.href = "http://localhost:3000/api/auth/google";
@@ -12,19 +13,28 @@ const handleGoogleSignUp = () => {
 
 export default function SignUp() {
 
+    // Xử lý lỗi
     const [errors, setErrors] = useState({});
+
+    // Xử lý việc điều hướng trang
     const navigate = useNavigate();
+
+    // Xử lý cursor xoay khi bấm nút đăng nhập 
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Xử lý xoá hết input khi đăng nhập sai 
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
 
     const handleSignUp = async (e) => {
         e.preventDefault();
-        const email = e.target.email.value;
-        const password = e.target.password.value;
-        const confirmPassword = e.target.confirmPassword.value;
+        setErrors({});
 
         const newErrors = {};
 
-        if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
-            newErrors.password = "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters!";
+        if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
+            newErrors.password = "Password must at least 8 characters, contain uppercase, lowercase and number";
         }
 
         if (password !== confirmPassword) {
@@ -33,21 +43,35 @@ export default function SignUp() {
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
+            setEmail("");
+            setPassword("");
+            setConfirmPassword("");
             return;
         }
-
+        setIsLoading(true);
         try {
             const res = await authService.register({ email, password });
-            navigate("/checkYourMail");
+            navigate("/checkYourMail", { 
+                state: { 
+                    fromSignUp: true, 
+                    email: email 
+                } 
+            });
         } catch (error) {
-            setErrors({ server: error.response?.data?.error || "Registration error." });
+            setErrors({email: "Your email is already registered."});
+            setEmail("");
+            setPassword("");
+            setConfirmPassword("");
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
 
     return (
         <div className="grid-container">
+            <LoadingCursor loading={isLoading} />
             <div className="left-grid">
                 <Link to="/" className="signup-logo">
                     <img src={MainPageLogo} alt="logo-page" />
@@ -56,7 +80,7 @@ export default function SignUp() {
                 <div className="signup-container">
 
                     <div className="signup-signup-container">
-                        <Link to="/signin" className="signup-signup-button">Sign in</Link>
+                        <Link to="/signin" className="signup-signin-button">Sign in</Link>
                         <Link to="" className="signup-signup-button">Sign up</Link>
                     </div>
 
@@ -68,7 +92,14 @@ export default function SignUp() {
 
                     <form className="signup-form" onSubmit={handleSignUp}>
                         <AccountPageInput
-                            label="Email:" name="email" type="text" placeholder="Enter your email" required
+                            label="Email:" 
+                            name="email" 
+                            type="text" 
+                            placeholder="Enter your email" 
+                            required
+                            error = {errors.email}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
 
                         <AccountPageInput
@@ -78,6 +109,8 @@ export default function SignUp() {
                             placeholder="Enter password"
                             required
                             error={errors.password}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
 
                         <AccountPageInput
@@ -87,9 +120,15 @@ export default function SignUp() {
                             placeholder="Repeat password"
                             required
                             error={errors.confirmPassword}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                         />
 
-                        <AccountPageInput type="submit" value="Sign up" />
+                        <AccountPageInput 
+                            type="submit" 
+                            value={isLoading ? "Registering..." : "Sign up"}
+                            disabled={isLoading}
+                        />
                     </form>
 
 
@@ -101,7 +140,7 @@ export default function SignUp() {
             </div>
 
             <div className="right-grid">
-
+                <img src={SignInSignUpBG} alt="sign-in-sign-up-background" />
             </div>
         </div>
     );

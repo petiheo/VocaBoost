@@ -5,7 +5,7 @@ $text-color: black;
 
 .header {
     margin: 20px 0;
-
+    background-color: #FFFCF7;
     display: grid;
     grid-template-columns: 10% 70% 20%;
     font-family: $font-family;
@@ -39,13 +39,14 @@ $text-color: black;
     }
 
     &__user {
-        grid-column: 2 /4;
+        grid-column: 3 /4;
+        display: flex;
+        gap: 20%;
+        align-items: center;
         .homepage__topbar {
             display: flex;
             justify-content: flex-end;
-            margin-bottom: 16px;
-
-            grid-column-start: 3;
+            align-items: center;
         }
     }
 

@@ -11,7 +11,10 @@ const Input = (props) => {
 
     return (
         <div className="input">
-            {props.label && <label htmlFor={props.id || props.name}>{props.label}</label>}
+            {props.label && <label htmlFor={props.id || props.name}>
+                {props.label} 
+                {props.labelIcon && <img src={props.labelIcon} alt="required" style={{marginLeft: "2px", verticalAlign: "middle"}}/>}
+            </label>}
             <div className="input__container">
                 <input
                     ref={inputRef}
@@ -21,7 +24,8 @@ const Input = (props) => {
                     value={props.value}
                     onChange={props.onChange}
                     pattern={props.pattern}
-                    required
+                    required={props.required}
+                    disabled={props.disabled}
                     className={`input__${props.type || ''}`}
                 />
             </div>
