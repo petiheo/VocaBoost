@@ -1,10 +1,11 @@
-@use 'AccountPageInput';
-@use 'Footer';
-@use 'Header';
-@use 'Navbar';
-@use 'SearchBar';
-@use 'Sidebar';
-@forward 'Dropdown' as dropdown-*;
-@forward 'ClassroomTitle';
-@forward 'TeacherClassroomMenuTab';
-@forward 'VocabularyListCard'
+@use "AccountPageInput";
+@use "Footer";
+@use "Header";
+@use "Navbar";
+@use "SearchBar";
+@use "SideBar";
+@use "LearnerSubMenu";
+@forward "Dropdown" as dropdown-*;
+@forward "ClassroomTitle";
+@forward "TeacherClassroomMenuTab";
+@forward "VocabularyListCard";
