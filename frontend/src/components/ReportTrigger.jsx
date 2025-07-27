@@ -2,21 +2,29 @@ import { useState } from 'react';
 import Report from './Report';
 import { ReportIcon } from '../assets/icons/index'; 
 
-const ReportTrigger = () => {
+const ReportTrigger = ({wordId}) => {
   const [show, setShow] = useState(false);
 
-  const handleSubmit = async (message) => {
+  const handleSubmit = async(reason) => {
     try {
-      await fetch('/api/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
+      const res = await fetch('/api/user/report', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({wordId, reason})
       });
-      alert('Report sent successfully!');
-    } catch (error) {
-      alert('Failed to send report.');
+    
+      const data = await res.json();
+
+      if (data.success) {
+          alert('Report submitted successfully');
+        }
+        else {
+          alert(data.error || 'Failed to submit report');
+      }
+    } catch(error) {
+      alert('Failed to send report')
     }
-  };
+  }
 
   return (
     <>
