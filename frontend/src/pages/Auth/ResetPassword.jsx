@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../../services/Auth/authService";
-import AccountPageInput from "../../components/AccountPageInput"
+import AccountPageInput from "../../components/AccountPageInput";
+import LoadingCursor from "../../components/cursor/LoadingCursor";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -61,6 +62,7 @@ export default function ResetPassword() {
 
   return (
     <div className="reset">
+      <LoadingCursor loading={isLoading} />
       <form className="reset__form" onSubmit={handleReset}>
         <h2>Reset your password</h2>
 

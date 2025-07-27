@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Logo from "../../components/Logo";
@@ -6,6 +6,8 @@ import { UploadPattern } from "../../assets/icons";
 import AccountPageInput from "../../components/AccountPageInput";
 import { RedAsterisk } from "../../assets/Auth";
 import teacherService from "../../services/Teacher/teacherService";
+import LoadingCursor from "../../components/cursor/LoadingCursor";
+import authService from "../../services/Auth/authService";
 
 export default function TeacherVerification() {
   const navigate = useNavigate();
@@ -26,6 +28,38 @@ export default function TeacherVerification() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Authentication check
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      const token = authService.getToken();
+      if (!token) {
+        setError("Please login first to submit teacher verification.");
+        setTimeout(() => {
+          navigate("/signin");
+        }, 2000);
+        return;
+      }
+
+      // Validate token
+      try {
+        const validation = await authService.validateToken();
+        if (!validation || !validation.success) {
+          setError("Your session has expired. Please login again.");
+          setTimeout(() => {
+            navigate("/signin");
+          }, 2000);
+        }
+      } catch (error) {
+        setError("Authentication failed. Please login again.");
+        setTimeout(() => {
+          navigate("/signin");
+        }, 2000);
+      }
+    };
+
+    checkAuthentication();
+  }, [navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -58,8 +92,6 @@ export default function TeacherVerification() {
     try {
       // Check if user is authenticated
       const token = localStorage.getItem("token");
-      console.log("Token exists:", !!token);
-
       if (!token) {
         throw new Error("Please login first to submit teacher verification");
       }
@@ -87,15 +119,6 @@ export default function TeacherVerification() {
       submitData.append("additionalNotes", formData.additionalNotes);
       submitData.append("credentials", selectedFile);
 
-      console.log("Submitting data:", {
-        fullName: formData.fullName,
-        institution: formData.institution,
-        schoolEmail: formData.schoolEmail,
-        additionalNotes: formData.additionalNotes,
-        fileSize: selectedFile.size,
-        fileType: selectedFile.type,
-      });
-
       const result = await teacherService.submitVerification(submitData);
 
       if (result.success) {
@@ -108,9 +131,6 @@ export default function TeacherVerification() {
         throw new Error(result.message || "Submission failed");
       }
     } catch (error) {
-      console.error("Teacher verification error:", error);
-      console.error("Error response:", error.response);
-
       let errorMessage = "Failed to submit verification request";
 
       if (error.response?.data?.message) {
@@ -130,6 +150,7 @@ export default function TeacherVerification() {
   };
   return (
     <div className="teacher-verification">
+      <LoadingCursor loading={isLoading} />
       <div className="teacher-verification__header">
         <Logo />
       </div>

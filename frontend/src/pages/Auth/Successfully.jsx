@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { SignUpElement, SuccessfullyBackground } from "../../assets/icons/index"
-export default function CheckYourMail() {
+export default function Successfully() {
     return (
         <div className="successfully-container"
             style={{

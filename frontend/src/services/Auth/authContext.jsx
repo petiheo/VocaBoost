@@ -17,6 +17,8 @@ export const AuthProvider = ({ children }) => {
                 try {
                     // Check if user's email is verified
                     const accountStatus = await authService.getAccountStatus(currentUser.email);
+                    console.log('account status:::', accountStatus);
+                    
                     if (accountStatus?.data?.emailVerified) {
                         setUser(currentUser);
                     } else {

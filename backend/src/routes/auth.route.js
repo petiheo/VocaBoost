@@ -5,6 +5,7 @@ const passport = require('passport');
 const rateLimiter = require('../middlewares/rateLimiter.middleware');
 const authValidators = require('../validators/auth.validator');
 const authController = require('../controllers/auth.controller');
+const authMiddleware = require('../middlewares/auth.middleware');
 
 // Registration & Login & Logout
 authRouter.post(
@@ -64,5 +65,7 @@ authRouter.post(
   authValidators.email,
   authController.getAccountStatus
 );
+
+authRouter.get('/validate-token', authMiddleware, authController.validateToken);
 
 module.exports = authRouter;

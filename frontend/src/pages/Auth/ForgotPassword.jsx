@@ -1,6 +1,7 @@
 import { useState } from "react";
 import authService from "../../services/Auth/authService";
 import AccountPageInput from "../../components/AccountPageInput";
+import LoadingCursor from "../../components/cursor/LoadingCursor";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -28,17 +29,19 @@ export default function ForgotPassword() {
 
   return (
     <div className="forgot">
+      <LoadingCursor loading={isLoading} />
       <form className="forgot__form" onSubmit={handleSend}>
         <h2>Forgot your password?</h2>
 
-        <label htmlFor="email">Enter your email:</label>
-        <input
-        id="email"
-        type="email"
-        placeholder="example@email.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
+        <AccountPageInput
+          label="Enter your email:"
+          name="email"
+          type="email"
+          placeholder="example@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          error={error}
         />
 
         {/* Success Message */}
@@ -47,20 +50,12 @@ export default function ForgotPassword() {
             {success}
           </div>
         )}
-
-        {/* Error Message */}
-        {error && (
-          <div className="forgot__error">
-            {error}
-          </div>
-        )}
         
-        <button 
-          type="submit"
+        <AccountPageInput 
+          type="submit" 
+          value={isLoading ? "Submitting..." : "Submit"}
           disabled={isLoading}
-        >
-          {isLoading ? "Submitting..." : "Submit"}
-        </button>
+        />
       </form>
     </div>
   );
