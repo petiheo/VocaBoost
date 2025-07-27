@@ -40,10 +40,8 @@ export default function AuthSuccess() {
             throw new Error("Token validation failed");
           }
         } catch (error) {
-          console.log('Lỗi:::', error);
-          
-          // localStorage.removeItem("token");
-          // localStorage.removeItem("user");
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
           navigate("/signin");
         }
       } else {

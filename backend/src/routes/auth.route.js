@@ -22,7 +22,7 @@ authRouter.post(
   authController.login
 );
 
-authRouter.post('/logout', rateLimiter, authController.logout);
+authRouter.post('/logout', authController.logout);
 
 // OAuth Routes
 authRouter.get(
