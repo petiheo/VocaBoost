@@ -92,7 +92,7 @@ class VocabularyModel {
     return data;
   }
 
-  static async searchInList(listId, options) {
+  async searchInList(listId, options) {
     const { q, sortBy, from, to } = options;
 
     let query = supabase
