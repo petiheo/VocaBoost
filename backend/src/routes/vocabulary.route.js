@@ -43,7 +43,12 @@ vocabularyRouter.post(
   vocabularyController.createWordsBulk
 );
 
-vocabularyRouter.get('/lists/:listId/words', vocabularyController.getWordsByListId);
+vocabularyRouter.get('/lists/:listId/words', vocabularyController.getWordsByListId);ord
+
+vocabularyRouter.get(
+  '/lists/:listId/words/search',
+  vocabularyController.searchWordsInList
+);
 
 vocabularyRouter.put(
   '/words/:wordId',

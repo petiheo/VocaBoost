@@ -270,6 +270,44 @@ class VocabularyController {
     }
   }
 
+  async searchWordsInList(req, res) {
+    try {
+      const { listId } = req.params;
+      const { q, sortBy, page, limit } = req.query;
+      const userId = req.user.userId;
+
+      if (!q) {
+        return res.status(400).json({
+          success: false,
+          errors: [{ field: 'q', message: "A search query 'q' is required." }],
+        });
+      }
+
+      const result = await vocabularyService.searchWordsInList(listId, userId, {
+        q,
+        sortBy,
+        page,
+        limit,
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: { words: result.words },
+        pagination: result.pagination,
+      });
+    } catch (error) {
+      if (error.isForbidden) {
+        return res.status(403).json({
+          success: false,
+          error: 'Forbidden: You do not have permission to view this list.',
+        });
+      }
+      
+      console.error('Search words error:', error);
+      return res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+  }
+
   // =================================================================
   //  EXAMPLES
   // =================================================================

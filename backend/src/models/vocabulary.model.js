@@ -81,6 +81,41 @@ class VocabularyModel {
       return await supabase.from('vocabulary').delete().eq('id', wordId);
   }
 
+  static async findById(id) {
+    const { data, error } = await supabase
+      .from('vocabulary')
+      .select()
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async searchInList(listId, options) {
+    const { q, sortBy, from, to } = options;
+
+    let query = supabase
+      .from('vocabulary')
+      .select('id, term, definition, phonetics, image_url, created_at', {
+        count: 'exact',
+      })
+      .eq('list_id', listId)
+      .or(`term.ilike.%${q}%,definition.ilike.%${q}%`);
+
+    if (sortBy) {
+      const [field, direction] = sortBy.split(':');
+      if (['term', 'created_at'].includes(field)) {
+        query = query.order(field, { ascending: direction === 'asc' });
+      }
+    } else {
+      // Default sort as defined in the API contract
+      query = query.order('created_at', { ascending: true });
+    }
+
+    return await query.range(from, to);
+  }
+
   // =================================================================
   //  EXAMPLE MODELS
   // =================================================================

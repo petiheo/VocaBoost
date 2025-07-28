@@ -135,6 +135,36 @@ class VocabularyService {
     return { words, pagination: this._formatPagination(page, limit, count) };
   }
 
+  async searchWordsInList(listId, userId, options) {
+    const { page = 1, limit = 20, sortBy, q } = options;
+
+    await this.findListById(listId, userId);
+
+    if (sortBy && sortBy.split(':').length !== 2) {
+      throw new ValidationError([
+        {
+          field: 'sortBy',
+          message: "Invalid sort format. Use 'field:direction' (e.g., term:asc).",
+        },
+      ]);
+    }
+
+    const { from, to } = this._getPagination(page, limit);
+    const { data: words, error, count } = await vocabularyModel.searchInList(listId, {
+      q,
+      sortBy,
+      from,
+      to,
+    });
+
+    if (error) throw error;
+
+    return {
+      words,
+      pagination: this._formatPagination(page, limit, count),
+    };
+  }
+
   // =================================================================
   //  EXAMPLES
   // =================================================================
