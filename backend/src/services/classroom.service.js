@@ -225,7 +225,7 @@ class ClassroomService {
       expires_at: expiresAt,
     });
 
-    await emailService.sendClassInvitation(email, token, classroom);
+    await emailService.sendClassInvitation(email, token, classroom, teacher.display_name);
   }
 
   _verifyInvitationToken(token) {
