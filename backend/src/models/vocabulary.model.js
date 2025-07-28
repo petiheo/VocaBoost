@@ -1,4 +1,4 @@
-const supabase = require('../config/database');
+const { supabase } = require('../config/supabase.config');
 
 class VocabularyModel {
   // =================================================================
@@ -13,7 +13,7 @@ class VocabularyModel {
   }
 
   async findUserLists(userId, options) {
-    const { q, privacy, sortBy, page, limit, from, to } = options;
+    const { q, privacy, sortBy, from, to } = options;
     let query = supabase
       .from('vocab_lists')
       .select(
@@ -87,18 +87,10 @@ class VocabularyModel {
     return await supabase.from('vocabulary').insert(wordData).select().single();
   }
 
-  async createWordsBulk(wordsToInsert) {
-    return await supabase.from('vocabulary').insert(wordsToInsert);
-  }
-
   async createWordsBulkAndReturn(wordsToInsert) {
     return await supabase.from('vocabulary').insert(wordsToInsert).select();
   }
-
-  async createExamplesBulk(examplesToInsert) {
-    return await supabase.from('vocabulary_examples').insert(examplesToInsert);
-  }
-
+  
   async findWordWithListInfo(wordId) {
     return await supabase
       .from('vocabulary')
@@ -110,45 +102,17 @@ class VocabularyModel {
   async findWordsByListId(listId, from, to) {
     return await supabase
       .from('vocabulary')
-      .select('*, vocabulary_examples(*)', { count: 'exact' })
+      .select('*, vocabulary_examples(*), word_synonyms(synonym)', { count: 'exact' })
       .eq('list_id', listId)
       .order('created_at', { ascending: true })
       .range(from, to);
   }
 
-  async updateWord(wordId, updateData) {
-    return await supabase
-      .from('vocabulary')
-      .update(updateData)
-      .eq('id', wordId)
-      .select('id, term, definition, image_url, updated_at')
-      .single();
-  }
-
-  async deleteWord(wordId) {
-    return await supabase.from('vocabulary').delete().eq('id', wordId);
-  }
-
-  async findById(id) {
-    // MODIFIED: Added a LEFT JOIN to include the example
-    const { data, error } = await supabase
-      .from('vocabulary')
-      .select('*, vocabulary_examples(*)')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (error) throw error;
-    return data;
-  }
-
   async searchInList(listId, options) {
     const { q, sortBy, from, to } = options;
-
     let query = supabase
       .from('vocabulary')
-      .select('id, term, definition, phonetics, image_url, created_at', {
-        count: 'exact',
-      })
+      .select('*, vocabulary_examples(*), word_synonyms(synonym)', { count: 'exact' })
       .eq('list_id', listId)
       .or(`term.ilike.%${q}%,definition.ilike.%${q}%`);
 
@@ -158,36 +122,60 @@ class VocabularyModel {
         query = query.order(field, { ascending: direction === 'asc' });
       }
     } else {
-      // Default sort as defined in the API contract
       query = query.order('created_at', { ascending: true });
     }
-
     return await query.range(from, to);
+  }
+
+  async updateWord(wordId, updateData) {
+    return await supabase
+      .from('vocabulary')
+      .update(updateData)
+      .eq('id', wordId)
+      .select()
+      .single();
+  }
+
+  async deleteWord(wordId) {
+    return await supabase.from('vocabulary').delete().eq('id', wordId);
+  }
+
+  async findById(id) {
+    const { data, error } = await supabase
+      .from('vocabulary')
+      .select('*, vocabulary_examples(*), word_synonyms(synonym)')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) throw error;
+    // Format synonyms into a simple array
+    if (data && data.word_synonyms) {
+        data.synonyms = data.word_synonyms.map(s => s.synonym);
+        delete data.word_synonyms;
+    }
+    return { data, error };
   }
 
   // =================================================================
   //  EXAMPLE MODELS
   // =================================================================
+  async createExamplesBulk(examplesToInsert) {
+    return await supabase.from('vocabulary_examples').insert(examplesToInsert);
+  }
+
   async upsertExample(wordId, exampleData) {
-    // Upsert handles both INSERT and UPDATE in one command.
-    // If a row with vocabulary_id exists, it updates it. If not, it inserts.
     return await supabase
       .from('vocabulary_examples')
       .upsert({
         vocabulary_id: wordId,
         example_sentence: exampleData.exampleSentence,
-        translation: exampleData.translation,
-        // You can add ai_generated fields here if needed
       })
       .select()
       .single();
   }
 
   async deleteExample(wordId) {
-    return await supabase
-      .from('vocabulary_examples')
-      .delete()
-      .eq('vocabulary_id', wordId);
+    return await supabase.from('vocabulary_examples').delete().eq('vocabulary_id', wordId);
   }
 
   // =================================================================
@@ -201,11 +189,8 @@ class VocabularyModel {
       .ignore();
   }
 
-  async deleteSynonym(wordId, synonym) {
-    return await supabase
-      .from('word_synonyms')
-      .delete()
-      .match({ word_id: wordId, synonym: synonym });
+  async deleteSynonymsByWordId(wordId) {
+    return await supabase.from('word_synonyms').delete().eq('word_id', wordId);
   }
 
   // =================================================================

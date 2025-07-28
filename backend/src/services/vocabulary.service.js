@@ -1,10 +1,19 @@
 const vocabularyModel = require('../models/vocabulary.model');
 
 class ForbiddenError extends Error {
-  /* ... */
+  constructor(message = 'User does not have permission for this action.') {
+    super(message);
+    this.name = 'ForbiddenError';
+    this.isForbidden = true;
+  }
 }
 class ValidationError extends Error {
-  /* ... */
+  constructor(errors) {
+    super('Validation failed.');
+    this.name = 'ValidationError';
+    this.isValidationError = true;
+    this.errors = errors;
+  }
 }
 
 class VocabularyService {
@@ -126,101 +135,97 @@ class VocabularyService {
   async createWord(listId, wordData, userId) {
     await this._verifyListOwnership(listId, userId);
 
-    const { term, definition, phonetics, image_url, exampleSentence, translation } =
-      wordData;
+    const { term, definition, translation, phonetics, image_url, exampleSentence, synonyms } = wordData;
 
+    // 1. Create the core word
     const { data: newWord, error } = await vocabularyModel.createWord({
-      list_id: listId,
-      term,
-      definition,
-      phonetics,
-      image_url,
-      created_by: userId,
+      list_id: listId, term, definition, translation, phonetics, image_url, created_by: userId,
     });
     if (error) throw error;
 
+    // 2. Add the optional example
     if (exampleSentence) {
-      await vocabularyModel.upsertExample(newWord.id, {
-        exampleSentence,
-        translation,
-      });
+      await vocabularyModel.upsertExample(newWord.id, { exampleSentence });
+    }
+
+    // 3. Add the optional synonyms
+    if (synonyms && synonyms.length > 0) {
+        const synonymsToInsert = synonyms.map(s => ({ word_id: newWord.id, synonym: s.trim() }));
+        await vocabularyModel.createSynonyms(synonymsToInsert);
     }
 
     await vocabularyModel.updateWordCount(listId);
-    return newWord;
+    
+    // Return the full, newly created word object
+    const { data: finalWord, error: fetchError } = await vocabularyModel.findById(newWord.id);
+    if (fetchError) throw fetchError;
+    return finalWord;
   }
 
   async createWordsBulk(listId, words, userId) {
     await this._verifyListOwnership(listId, userId);
 
-    const { wordsToInsert, errors } = this._prepareBulkWords(listId, words, userId);
+    const { wordsToInsert, examplesToInsert, synonymsToInsert, errors } =
+      this._prepareBulkWords(listId, words, userId);
 
     if (wordsToInsert.length === 0) {
       return { createdCount: 0, failedCount: errors.length, errors };
     }
 
+    // 1. Bulk insert words and get their new IDs
     const { data: newWords, error: insertError } =
       await vocabularyModel.createWordsBulkAndReturn(wordsToInsert);
     if (insertError) throw insertError;
 
-    const examplesToInsert = [];
-    words.forEach((originalWord, index) => {
-      const newWord = newWords.find(
-        (nw) => nw.term === originalWord.term && nw.list_id === listId
-      );
+    // 2. Map examples and synonyms to the new word IDs
+    const finalExamples = this._mapSubItemsToNewWords(words, newWords, 'example');
+    const finalSynonyms = this._mapSubItemsToNewWords(words, newWords, 'synonym');
 
-      if (originalWord.exampleSentence && newWord) {
-        examplesToInsert.push({
-          vocabulary_id: newWord.id,
-          example_sentence: originalWord.exampleSentence,
-          translation: originalWord.translation,
-        });
-      }
-    });
-
-    if (examplesToInsert.length > 0) {
-      const { error: exampleError } =
-        await vocabularyModel.createExamplesBulk(examplesToInsert);
-      if (exampleError) {
-        console.error('Bulk example creation failed:', exampleError);
-      }
+    // 3. Bulk insert examples and synonyms
+    if (finalExamples.length > 0) {
+        await vocabularyModel.createExamplesBulk(finalExamples).catch(err => console.error('Bulk example creation failed:', err));
+    }
+    if (finalSynonyms.length > 0) {
+        await vocabularyModel.createSynonyms(finalSynonyms).catch(err => console.error('Bulk synonym creation failed:', err));
     }
 
     await vocabularyModel.updateWordCount(listId);
-
     return { createdCount: newWords.length, failedCount: errors.length, errors };
   }
 
   async updateWord(wordId, userId, updateData) {
     await this._verifyWordPermission(wordId, userId);
 
-    const { term, definition, phonetics, image_url, exampleSentence, translation } =
-      updateData;
+    const { term, definition, translation, phonetics, image_url, exampleSentence, synonyms } = updateData;
 
-    const wordFieldsToUpdate = { term, definition, phonetics, image_url };
-
+    // 1. Update core word fields
+    const wordFieldsToUpdate = { term, definition, translation, phonetics, image_url };
     const cleanedWordUpdates = Object.fromEntries(
       Object.entries(wordFieldsToUpdate).filter(([_, v]) => v !== undefined)
     );
-
     if (Object.keys(cleanedWordUpdates).length > 0) {
-      const { error } = await vocabularyModel.updateWord(wordId, cleanedWordUpdates);
-      if (error) throw error;
+      await vocabularyModel.updateWord(wordId, cleanedWordUpdates);
     }
 
+    // 2. Update the example (if provided)
     if (exampleSentence !== undefined) {
       if (exampleSentence) {
-        await vocabularyModel.upsertExample(wordId, {
-          exampleSentence,
-          translation,
-        });
+        await vocabularyModel.upsertExample(wordId, { exampleSentence });
       } else {
         await vocabularyModel.deleteExample(wordId);
       }
     }
 
-    const { data: finalWord, error: fetchError } =
-      await vocabularyModel.findById(wordId);
+    // 3. Overwrite synonyms (if provided)
+    if (synonyms !== undefined) {
+        await vocabularyModel.deleteSynonymsByWordId(wordId); // Clear existing
+        if (synonyms.length > 0) {
+            const synonymsToInsert = synonyms.map(s => ({ word_id: wordId, synonym: s.trim() }));
+            await vocabularyModel.createSynonyms(synonymsToInsert);
+        }
+    }
+
+    const { data: finalWord, error: fetchError } = await vocabularyModel.findById(wordId);
     if (fetchError) throw fetchError;
     return finalWord;
   }
@@ -233,52 +238,25 @@ class VocabularyService {
   }
 
   async findWordsByListId(listId, userId, { page = 1, limit = 25 }) {
-    await this.findListById(listId, userId); // Use existing method for permission check
+    await this.findListById(listId, userId);
     const { from, to } = this._getPagination(page, limit);
-    const {
-      data: words,
-      error,
-      count,
-    } = await vocabularyModel.findWordsByListId(listId, from, to);
-
+    const { data: words, error, count } = await vocabularyModel.findWordsByListId(listId, from, to);
     if (error) throw error;
     return { words, pagination: this._formatPagination(page, limit, count) };
   }
 
   async searchWordsInList(listId, userId, options) {
     const { page = 1, limit = 20, sortBy, q } = options;
-
     await this.findListById(listId, userId);
-
     if (sortBy && sortBy.split(':').length !== 2) {
-      throw new ValidationError([
-        {
-          field: 'sortBy',
-          message: "Invalid sort format. Use 'field:direction' (e.g., term:asc).",
-        },
-      ]);
+      throw new ValidationError([{ field: 'sortBy', message: "Invalid sort format." }]);
     }
-
     const { from, to } = this._getPagination(page, limit);
-    const {
-      data: words,
-      error,
-      count,
-    } = await vocabularyModel.searchInList(listId, {
-      q,
-      sortBy,
-      from,
-      to,
-    });
-
+    const { data: words, error, count } = await vocabularyModel.searchInList(listId, { q, sortBy, from, to });
     if (error) throw error;
-
-    return {
-      words,
-      pagination: this._formatPagination(page, limit, count),
-    };
+    return { words, pagination: this._formatPagination(page, limit, count) };
   }
-
+  
   // =================================================================
   //  SYNONYMS
   // =================================================================
@@ -370,6 +348,7 @@ class VocabularyService {
           list_id: listId,
           term: word.term,
           definition: word.definition,
+          translation: word.translation,
           phonetics: word.phonetics,
           image_url: word.image_url,
           created_by: userId,
@@ -383,6 +362,28 @@ class VocabularyService {
       }
     });
     return { wordsToInsert, errors };
+  }
+
+  _mapSubItemsToNewWords(originalWords, newWords, itemType) {
+    const itemsToInsert = [];
+    originalWords.forEach((originalWord) => {
+        const newWord = newWords.find(nw => nw.term === originalWord.term);
+        if (!newWord) return;
+
+        if (itemType === 'example' && originalWord.exampleSentence) {
+            itemsToInsert.push({
+                vocabulary_id: newWord.id,
+                example_sentence: originalWord.exampleSentence,
+                translation: originalWord.translation,
+            });
+        }
+        if (itemType === 'synonym' && originalWord.synonyms) {
+            originalWord.synonyms.forEach(synonym => {
+                itemsToInsert.push({ word_id: newWord.id, synonym: synonym.trim() });
+            });
+        }
+    });
+    return itemsToInsert;
   }
 
   _getPagination(page, size) {

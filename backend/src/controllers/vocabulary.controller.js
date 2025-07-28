@@ -350,67 +350,6 @@ class VocabularyController {
   }
 
   // =================================================================
-  //  SYNONYMS
-  // =================================================================
-
-  async addSynonyms(req, res) {
-    try {
-      const { wordId } = req.params;
-      const { synonyms } = req.body;
-      const userId = req.user.userId;
-
-      const result = await vocabularyService.addSynonyms(wordId, synonyms, userId);
-
-      return res.status(201).json({
-        success: true,
-        message: 'Synonyms added successfully.',
-        data: result,
-      });
-    } catch (error) {
-      if (error.isForbidden) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            error: 'Forbidden: You do not have permission to perform this action.',
-          });
-      }
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
-    }
-  }
-
-  async deleteSynonym(req, res) {
-    try {
-      const { wordId, synonym } = req.params;
-      const userId = req.user.userId;
-
-      await vocabularyService.deleteSynonym(
-        wordId,
-        decodeURIComponent(synonym),
-        userId
-      );
-
-      return res
-        .status(200)
-        .json({ success: true, message: 'Synonym deleted successfully.' });
-    } catch (error) {
-      if (error.isForbidden) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            error: 'Forbidden: You do not have permission to perform this action.',
-          });
-      }
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
-    }
-  }
-
-  // =================================================================
   //  TAGS & UPLOADS
   // =================================================================
 
@@ -443,7 +382,9 @@ class VocabularyController {
       const { wordId } = req.body;
 
       if (wordId) {
-        await vocabularyService.updateWord(wordId, userId, { image_url: imageUrl });
+        await vocabularyService.updateWord(wordId, userId, {
+          image_url: imageUrl,
+        });
       }
 
       return res.status(201).json({
