@@ -66,7 +66,6 @@ const vocabularyValidator = {
   createWordsBulk: [
     param('listId').isUUID().withMessage('URL parameter listId must be a valid UUID.'),
     body('words').isArray({ min: 1 }).withMessage('Words must be a non-empty array.'),
-    // Validate each object within the 'words' array
     body('words.*.term').notEmpty().withMessage('Each word must have a term.'),
     body('words.*.definition').notEmpty().withMessage('Each word must have a definition.'),
     body('words.*.translation').optional().isString(),

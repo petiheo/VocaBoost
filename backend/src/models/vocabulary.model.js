@@ -92,39 +92,173 @@ class VocabularyModel {
   }
   
   async findWordWithListInfo(wordId) {
-    return await supabase
+    // ==========================================================
+    // ===== NEW, MORE ROBUST VERSION ===========================
+    // ==========================================================
+    const { data, error } = await supabase
       .from('vocabulary')
-      .select('list_id, vocab_lists(creator_id, privacy_setting)')
+      .select(`
+        list_id,
+        vocab_lists (
+          creator_id,
+          privacy_setting
+        )
+      `)
       .eq('id', wordId)
-      .single();
+      .single(); // .single() will error if no row is found, which is good for permission checks
+
+    if (error) {
+        // If the word doesn't exist, Supabase returns an error. We handle this gracefully.
+        if (error.code === 'PGRST116') { // PostgREST code for "exact one row not found"
+            return { data: null, error: null };
+        }
+        return { data: null, error };
+    }
+    
+    // Ensure the nested vocab_lists object is not null before returning
+    if (!data.vocab_lists) {
+        // This is a data integrity issue (a word exists without a list),
+        // but we handle it safely by treating the word as inaccessible.
+        console.error(`Data integrity issue: Word ${wordId} has no associated list.`);
+        return { data: null, error: new Error('Word has no associated list.') };
+    }
+
+    return { data, error: null };
   }
 
   async findWordsByListId(listId, from, to) {
-    return await supabase
-      .from('vocabulary')
-      .select('*, vocabulary_examples(*), word_synonyms(synonym)', { count: 'exact' })
-      .eq('list_id', listId)
-      .order('created_at', { ascending: true })
-      .range(from, to);
+    // ==========================================================
+    // ===== NEW, MULTI-STEP QUERY LOGIC ========================
+    // ==========================================================
+    try {
+      // Step 1: Fetch the paginated list of basic word info.
+      const { data: words, error: wordsError, count } = await supabase
+        .from('vocabulary')
+        .select('*', { count: 'exact' })
+        .eq('list_id', listId)
+        .order('created_at', { ascending: true })
+        .range(from, to);
+
+      if (wordsError) throw wordsError;
+      if (!words || words.length === 0) {
+        return { data: [], error: null, count: 0 };
+      }
+
+      // Step 2: Get all the IDs of the words we just fetched.
+      const wordIds = words.map(word => word.id);
+
+      // Step 3: Fetch all examples for those specific words in a single query.
+      const { data: examples, error: examplesError } = await supabase
+        .from('vocabulary_examples')
+        .select('*')
+        .in('vocabulary_id', wordIds);
+      
+      if (examplesError) throw examplesError;
+
+      // Step 4: Fetch all synonyms for those specific words in a single query.
+      const { data: synonyms, error: synonymsError } = await supabase
+        .from('word_synonyms')
+        .select('word_id, synonym')
+        .in('word_id', wordIds);
+      
+      if (synonymsError) throw synonymsError;
+
+      // Step 5: Map the examples and synonyms to their parent words for efficient lookup.
+      const examplesMap = new Map(examples.map(ex => [ex.vocabulary_id, ex]));
+      const synonymsMap = new Map();
+      synonyms.forEach(s => {
+        if (!synonymsMap.has(s.word_id)) {
+          synonymsMap.set(s.word_id, []);
+        }
+        synonymsMap.get(s.word_id).push(s.synonym);
+      });
+
+      // Step 6: Assemble the final, complete word objects.
+      const enrichedWords = words.map(word => ({
+        ...word,
+        vocabulary_examples: examplesMap.get(word.id) || null,
+        synonyms: synonymsMap.get(word.id) || [],
+      }));
+
+      return { data: enrichedWords, error: null, count };
+
+    } catch (error) {
+      console.error(`Error in findWordsByListId for list ${listId}:`, error);
+      return { data: null, error, count: 0 };
+    }
   }
 
   async searchInList(listId, options) {
+    // ==========================================================
+    // ===== NEW, MULTI-STEP QUERY LOGIC ========================
+    // ==========================================================
     const { q, sortBy, from, to } = options;
-    let query = supabase
-      .from('vocabulary')
-      .select('*, vocabulary_examples(*), word_synonyms(synonym)', { count: 'exact' })
-      .eq('list_id', listId)
-      .or(`term.ilike.%${q}%,definition.ilike.%${q}%`);
-
-    if (sortBy) {
-      const [field, direction] = sortBy.split(':');
-      if (['term', 'created_at'].includes(field)) {
-        query = query.order(field, { ascending: direction === 'asc' });
+    try {
+      // Step 1: Fetch the paginated list of words that match the search query.
+      let query = supabase
+        .from('vocabulary')
+        .select('*', { count: 'exact' })
+        .eq('list_id', listId)
+        .or(`term.ilike.%${q}%,definition.ilike.%${q}%`);
+      
+      if (sortBy) {
+        const [field, direction] = sortBy.split(':');
+        if (['term', 'created_at'].includes(field)) {
+          query = query.order(field, { ascending: direction === 'asc' });
+        }
+      } else {
+        query = query.order('created_at', { ascending: true });
       }
-    } else {
-      query = query.order('created_at', { ascending: true });
+
+      const { data: words, error: wordsError, count } = await query.range(from, to);
+
+      if (wordsError) throw wordsError;
+      if (!words || words.length === 0) {
+        return { data: [], error: null, count: 0 };
+      }
+
+      // Step 2: Get all the IDs of the words we just fetched.
+      const wordIds = words.map(word => word.id);
+
+      // Step 3: Fetch all examples for those specific words in a single query.
+      const { data: examples, error: examplesError } = await supabase
+        .from('vocabulary_examples')
+        .select('*')
+        .in('vocabulary_id', wordIds);
+      
+      if (examplesError) throw examplesError;
+
+      // Step 4: Fetch all synonyms for those specific words in a single query.
+      const { data: synonyms, error: synonymsError } = await supabase
+        .from('word_synonyms')
+        .select('word_id, synonym')
+        .in('word_id', wordIds);
+      
+      if (synonymsError) throw synonymsError;
+
+      // Step 5: Map the examples and synonyms to their parent words for efficient lookup.
+      const examplesMap = new Map(examples.map(ex => [ex.vocabulary_id, ex]));
+      const synonymsMap = new Map();
+      synonyms.forEach(s => {
+        if (!synonymsMap.has(s.word_id)) {
+          synonymsMap.set(s.word_id, []);
+        }
+        synonymsMap.get(s.word_id).push(s.synonym);
+      });
+
+      // Step 6: Assemble the final, complete word objects.
+      const enrichedWords = words.map(word => ({
+        ...word,
+        vocabulary_examples: examplesMap.get(word.id) || null,
+        synonyms: synonymsMap.get(word.id) || [],
+      }));
+
+      return { data: enrichedWords, error: null, count };
+
+    } catch (error) {
+      console.error(`Error in searchInList for list ${listId} with query "${q}":`, error);
+      return { data: null, error, count: 0 };
     }
-    return await query.range(from, to);
   }
 
   async updateWord(wordId, updateData) {
@@ -141,19 +275,51 @@ class VocabularyModel {
   }
 
   async findById(id) {
-    const { data, error } = await supabase
-      .from('vocabulary')
-      .select('*, vocabulary_examples(*), word_synonyms(synonym)')
-      .eq('id', id)
-      .maybeSingle();
+    // ==========================================================
+    // ===== NEW, MULTI-STEP QUERY LOGIC ========================
+    // ==========================================================
+    try {
+      // Step 1: Fetch the basic word information from the 'vocabulary' table.
+      const { data: wordData, error: wordError } = await supabase
+        .from('vocabulary')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
 
-    if (error) throw error;
-    // Format synonyms into a simple array
-    if (data && data.word_synonyms) {
-        data.synonyms = data.word_synonyms.map(s => s.synonym);
-        delete data.word_synonyms;
+      if (wordError) throw wordError;
+      if (!wordData) return { data: null, error: null }; // Word not found
+
+      // Step 2: Fetch the associated example sentence from its own table.
+      const { data: exampleData, error: exampleError } = await supabase
+        .from('vocabulary_examples')
+        .select('*')
+        .eq('vocabulary_id', id)
+        .maybeSingle();
+      
+      if (exampleError) throw exampleError;
+
+      // Step 3: Fetch all associated synonyms from their own table.
+      const { data: synonymsData, error: synonymsError } = await supabase
+        .from('word_synonyms')
+        .select('synonym')
+        .eq('word_id', id);
+
+      if (synonymsError) throw synonymsError;
+
+      // Step 4: Assemble the final, complete word object.
+      const finalWordObject = {
+        ...wordData,
+        vocabulary_examples: exampleData, // This will be the example object or null
+        synonyms: synonymsData ? synonymsData.map(s => s.synonym) : [], // Format into a simple array
+      };
+
+      return { data: finalWordObject, error: null };
+
+    } catch (error) {
+      // Catch any database error from the three steps and return it.
+      console.error(`Error in findById for word ${id}:`, error);
+      return { data: null, error };
     }
-    return { data, error };
   }
 
   // =================================================================
@@ -184,9 +350,7 @@ class VocabularyModel {
   async createSynonyms(synonymsToInsert) {
     return await supabase
       .from('word_synonyms')
-      .insert(synonymsToInsert)
-      .onConflict('word_id', 'synonym')
-      .ignore();
+      .upsert(synonymsToInsert);
   }
 
   async deleteSynonymsByWordId(wordId) {

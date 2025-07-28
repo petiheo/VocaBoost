@@ -149,9 +149,12 @@ class VocabularyService {
     }
 
     // 3. Add the optional synonyms
-    if (synonyms && synonyms.length > 0) {
+    if (synonyms && Array.isArray(synonyms) && synonyms.length > 0) {
         const synonymsToInsert = synonyms.map(s => ({ word_id: newWord.id, synonym: s.trim() }));
-        await vocabularyModel.createSynonyms(synonymsToInsert);
+        // Using .catch() here makes this step non-blocking. If synonyms fail, the word is still created.
+        await vocabularyModel.createSynonyms(synonymsToInsert).catch(err => {
+            console.error(`Failed to add synonyms for new word ${newWord.id}:`, err);
+        });
     }
 
     await vocabularyModel.updateWordCount(listId);
@@ -165,23 +168,19 @@ class VocabularyService {
   async createWordsBulk(listId, words, userId) {
     await this._verifyListOwnership(listId, userId);
 
-    const { wordsToInsert, examplesToInsert, synonymsToInsert, errors } =
-      this._prepareBulkWords(listId, words, userId);
+    const { wordsToInsert, errors } = this._prepareBulkWords(listId, words, userId);
 
     if (wordsToInsert.length === 0) {
       return { createdCount: 0, failedCount: errors.length, errors };
     }
 
-    // 1. Bulk insert words and get their new IDs
     const { data: newWords, error: insertError } =
       await vocabularyModel.createWordsBulkAndReturn(wordsToInsert);
     if (insertError) throw insertError;
 
-    // 2. Map examples and synonyms to the new word IDs
     const finalExamples = this._mapSubItemsToNewWords(words, newWords, 'example');
     const finalSynonyms = this._mapSubItemsToNewWords(words, newWords, 'synonym');
 
-    // 3. Bulk insert examples and synonyms
     if (finalExamples.length > 0) {
         await vocabularyModel.createExamplesBulk(finalExamples).catch(err => console.error('Bulk example creation failed:', err));
     }
