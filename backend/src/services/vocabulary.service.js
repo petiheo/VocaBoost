@@ -244,6 +244,15 @@ class VocabularyService {
     return { words, pagination: this._formatPagination(page, limit, count) };
   }
 
+  async findWordById(wordId, userId) {
+    await this._verifyWordPermission(wordId, userId, 'read');
+
+    const { data: word, error } = await vocabularyModel.findById(wordId);
+    if (error) throw error;
+
+    return word;
+  }
+
   async searchWordsInList(listId, userId, options) {
     const { page = 1, limit = 20, sortBy, q } = options;
     await this.findListById(listId, userId);

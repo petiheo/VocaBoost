@@ -309,6 +309,37 @@ class VocabularyController {
     }
   }
 
+  async getWordById(req, res) {
+    try {
+      const { wordId } = req.params;
+      const userId = req.user.userId;
+
+      const word = await vocabularyService.findWordById(wordId, userId);
+
+      if (!word) {
+        return res
+          .status(404)
+          .json({ success: false, error: 'Word not found.' });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: { word },
+      });
+    } catch (error) {
+      if (error.isForbidden) {
+        return res.status(403).json({
+          success: false,
+          error: 'Forbidden: You do not have permission to view this word.',
+        });
+      }
+      console.error(`Error fetching word ${req.params.wordId}:`, error);
+      return res
+        .status(500)
+        .json({ success: false, error: 'Internal server error' });
+    }
+  }
+
   async searchWordsInList(req, res) {
     try {
       const { listId } = req.params;
