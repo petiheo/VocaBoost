@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-const Input = (props) => {
+const AccountPageInput = (props) => {
     const inputRef = useRef(null); // tranh render lai khi thay doi props type 
 
     useEffect(() => {
@@ -38,4 +38,4 @@ const Input = (props) => {
     );
 };
 
-export default Input;
+export default AccountPageInput;

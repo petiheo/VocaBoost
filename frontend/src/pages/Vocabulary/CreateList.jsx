@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Header, SideBar, Footer} from "../../components/index.jsx";
+import { Header, SideBar, Footer, AccountPageInput} from "../../components/index.jsx";
 import { UploadImage } from "../../assets/Vocabulary";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import Select from "react-select";
@@ -247,7 +247,8 @@ export default function CreateList() {
                                 <hr className="create-list__word-box--divider" />
                                 <div className="create-list__word-box--row">
                                     <div className="create-list__word-box--field">
-                                        <input
+                                        <AccountPageInput
+                                            name={`term-${index}`}
                                             type="text"
                                             placeholder=""
                                             value={word.term || ""}
@@ -257,7 +258,8 @@ export default function CreateList() {
                                     </div>
 
                                     <div className="create-list__word-box--field">
-                                        <input
+                                        <AccountPageInput
+                                            name={`definition-${index}`}
                                             type="text"
                                             placeholder=""
                                             value={word.definition || ""}
@@ -267,7 +269,8 @@ export default function CreateList() {
                                     </div>
 
                                     <div className="create-list__word-box--field">
-                                        <input
+                                        <AccountPageInput
+                                            name={`phonetics-${index}`}
                                             type="text"
                                             placeholder=""
                                             value={word.phonetics || ""}
@@ -276,7 +279,7 @@ export default function CreateList() {
                                         <small className="input-note">Phonetics</small>
                                     </div>
 
-                                <label className="create-list__upload-btn">
+                                {/* <label className="create-list__upload-btn">
                                 {word.image ? (
                                 <img src={UploadedImage} alt="uploaded icon" className="preview-img" />
                                 ) : (
@@ -289,11 +292,36 @@ export default function CreateList() {
                                     hidden
                                     onChange={(e) => handleImageUpload(e.target.files[0], index)}
                                 />
-                                </label>
+                                </label> */}
                                 </div>
                                 <div className="create-list__word-box--row">
                                     <div className="create-list__word-box--field">
-                                        <input
+                                        <AccountPageInput
+                                            name={`synonym-${index}`}
+                                            type="text"
+                                            placeholder=""
+                                            value={word.synonym}
+                                            onChange={(e) => handleWordChange(index, "synonym", e.target.value)}
+                                        />
+                                        <small className="input-note">Synonym</small>
+                                    </div>
+
+                                    <div className="create-list__word-box--field">
+                                        <AccountPageInput
+                                            name={`translation-${index}`}
+                                            type="text"
+                                            placeholder=""
+                                            value={word.translation}
+                                            onChange={(e) => handleWordChange(index, "translation", e.target.value)}
+                                        />
+                                        <small className="input-note">Translation</small>
+                                    </div>
+                                </div>
+
+                                <div className="create-list__word-box--row">
+                                    <div className="create-list__word-box--field">
+                                        <AccountPageInput
+                                            name={`example-${index}`}
                                             type="text"
                                             placeholder=""
                                             value={word.example}
@@ -303,6 +331,7 @@ export default function CreateList() {
                                     </div>
                                     <button type="button" className="create-list__ai-btn">AI</button>
                                 </div>
+
                             </div>
                         ))}
                     </div>
