@@ -35,12 +35,17 @@ const vocabularyValidator = {
       .withMessage('Tags must be an array of strings.')
       .custom(async (tags) => {
         if (tags.length === 0) return true;
-        const { data, error, count } = await supabase.from('tags').select('name', { count: 'exact' }).in('name', tags);
+        const { data, error, count } = await supabase
+          .from('tags')
+          .select('name', { count: 'exact' })
+          .in('name', tags);
         if (error) throw new Error('Server error during tag validation.');
         if (count !== tags.length) {
           const foundNames = data.map((t) => t.name);
           const invalidTags = tags.filter((name) => !foundNames.includes(name));
-          throw new Error(`One or more tags are invalid. The tag '${invalidTags[0]}' does not exist.`);
+          throw new Error(
+            `One or more tags are invalid. The tag '${invalidTags[0]}' does not exist.`
+          );
         }
         return true;
       }),
@@ -48,7 +53,9 @@ const vocabularyValidator = {
   ],
 
   updateList: [
-    param('listId').isUUID().withMessage('URL parameter listId must be a valid UUID.'),
+    param('listId')
+      .isUUID()
+      .withMessage('URL parameter listId must be a valid UUID.'),
     body('title')
       .optional()
       .trim()
@@ -59,50 +66,91 @@ const vocabularyValidator = {
 
   // --- WORD VALIDATORS ---
   createWord: [
-    param('listId').isUUID().withMessage('URL parameter listId must be a valid UUID.'),
+    param('listId')
+      .isUUID()
+      .withMessage('URL parameter listId must be a valid UUID.'),
     body('term').trim().notEmpty().withMessage('Term is required.'),
     body('definition').trim().notEmpty().withMessage('Definition is required.'),
-    body('image_url').optional().isURL().withMessage('Image URL must be a valid URL format.'),
-    handleValidationErrors,
-  ],
-
-  createWordsBulk: [
-    param('listId').isUUID().withMessage('URL parameter listId must be a valid UUID.'),
-    body('words').isArray({ min: 1 }).withMessage('Words must be a non-empty array.'),
-    body('words.*.term').notEmpty().withMessage('Each word must have a term.'),
-    body('words.*.definition').notEmpty().withMessage('Each word must have a definition.'),
+    body('image_url')
+      .optional()
+      .isURL()
+      .withMessage('Image URL must be a valid URL format.'),
+    body('exampleSentence')
+      .optional()
+      .trim()
+      .isLength({ min: 2, max: 255 })
+      .withMessage('Example sentence must be between 2 and 255 characters.'),
+    body('translation').optional().trim(),
     handleValidationErrors,
   ],
 
   updateWord: [
-    param('wordId').isUUID().withMessage('URL parameter wordId must be a valid UUID.'),
+    param('wordId')
+      .isUUID()
+      .withMessage('URL parameter wordId must be a valid UUID.'),
     body('term').optional().trim().notEmpty().withMessage('Term cannot be empty.'),
-    body('definition').optional().trim().notEmpty().withMessage('Definition cannot be empty.'),
-    body('image_url').optional().isURL().withMessage('Image URL must be a valid URL format.'),
+    body('definition')
+      .optional()
+      .trim()
+      .notEmpty()
+      .withMessage('Definition cannot be empty.'),
+    body('image_url')
+      .optional()
+      .isURL()
+      .withMessage('Image URL must be a valid URL format.'),
+    body('exampleSentence')
+      .optional()
+      .trim()
+      .isLength({ min: 10, max: 255 })
+      .withMessage('Example sentence must be between 10 and 255 characters.'),
+    body('translation').optional().trim(),
+    handleValidationErrors,
+  ],
+
+  updateWord: [
+    param('wordId')
+      .isUUID()
+      .withMessage('URL parameter wordId must be a valid UUID.'),
+    body('term').optional().trim().notEmpty().withMessage('Term cannot be empty.'),
+    body('definition')
+      .optional()
+      .trim()
+      .notEmpty()
+      .withMessage('Definition cannot be empty.'),
+    body('image_url')
+      .optional()
+      .isURL()
+      .withMessage('Image URL must be a valid URL format.'),
     handleValidationErrors,
   ],
 
   addExample: [
-    param('wordId').isUUID().withMessage('URL parameter wordId must be a valid UUID.'),
+    param('wordId')
+      .isUUID()
+      .withMessage('URL parameter wordId must be a valid UUID.'),
     body('exampleSentence')
       .trim()
       .isLength({ min: 10, max: 255 })
-      .withMessage('Example sentence is required and must be between 2 and 255 characters.'),
-    body('translation')
-      .optional()
-      .trim(),
+      .withMessage(
+        'Example sentence is required and must be between 2 and 255 characters.'
+      ),
+    body('translation').optional().trim(),
     handleValidationErrors,
   ],
 
   addSynonyms: [
-    param('wordId').isUUID().withMessage('URL parameter wordId must be a valid UUID.'),
+    param('wordId')
+      .isUUID()
+      .withMessage('URL parameter wordId must be a valid UUID.'),
     body('synonyms')
       .isArray({ min: 1 })
       .withMessage('Synonyms must be a non-empty array.'),
     // This checks that every item in the array is a non-empty string
     body('synonyms.*')
-      .isString().withMessage('All items in the synonyms array must be strings.')
-      .notEmpty().withMessage('Synonyms cannot be empty strings.'),
+      .isString()
+      .withMessage('All items in the synonyms array must be strings.')
+      .notEmpty()
+      .withMessage('Synonyms cannot be empty strings.'),
     handleValidationErrors,
   ],
 };

@@ -28,7 +28,7 @@ passport.use(
 
         let user = await userModel.findByEmail(email);
         let isNewUser = false;
-        
+
         if (user) {
           // Existing user - update Google info if missing
           if (!user.google_id)

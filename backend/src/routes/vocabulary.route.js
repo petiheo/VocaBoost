@@ -43,7 +43,7 @@ vocabularyRouter.post(
   vocabularyController.createWordsBulk
 );
 
-vocabularyRouter.get('/lists/:listId/words', vocabularyController.getWordsByListId);ord
+vocabularyRouter.get('/lists/:listId/words', vocabularyController.getWordsByListId);
 
 vocabularyRouter.get(
   '/lists/:listId/words/search',
@@ -59,27 +59,9 @@ vocabularyRouter.put(
 vocabularyRouter.delete('/words/:wordId', vocabularyController.deleteWord);
 
 vocabularyRouter.post(
-  '/words/:wordId/examples',
-  ...vocabularyValidator.addExample,
-  vocabularyController.addExample
-);
-
-vocabularyRouter.get(
-  '/words/:wordId/examples',
-  vocabularyController.getExamplesByWordId
-);
-
-vocabularyRouter.delete('/examples/:exampleId', vocabularyController.deleteExample);
-
-vocabularyRouter.post(
   '/words/:wordId/synonyms',
   ...vocabularyValidator.addSynonyms,
   vocabularyController.addSynonyms
-);
-
-vocabularyRouter.get(
-  '/words/:wordId/synonyms',
-  vocabularyController.getSynonymsByWordId
 );
 
 vocabularyRouter.delete(
