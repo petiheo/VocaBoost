@@ -1,6 +1,4 @@
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
-import Sidebar from '../../components/SideBar';
+import {Header, SideBar, Footer} from '../../components';
 import DropdownMenu from '../../components/DropdownMenu';
 
 const HomePage = () => {
@@ -9,10 +7,7 @@ const HomePage = () => {
       <Header />
 
       <div className="homepage__body">
-        <div className="homepage_sidebar">
-          <Sidebar />
-        </div>
-
+        <SideBar />
         <main className="homepage__main">
           <section className="homepage__content">
             <h1>Welcome to VocaBoost</h1>

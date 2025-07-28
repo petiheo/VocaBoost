@@ -1,22 +1,17 @@
 .homepage__wrapper {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-}
+  min-height: 100vh;
 
-.homepage__body {
-  flex: 1;
-}
+  &__body {
+    display: flex;
+    flex: 1;
+  }
 
-.sidebar {
-  width: 240px;
-  background-color: #f8f9fa;
-}
+  &__main {
+    margin: auto;
+    flex: 1;
+    background-color: #FFFCF7;
 
-.homepage__main {
-  margin: auto;
-  background-color: #FFFCF7;
-  display: flex;
-  flex-direction: column;
+  }
 }
-
