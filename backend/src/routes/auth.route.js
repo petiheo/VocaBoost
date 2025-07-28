@@ -61,7 +61,6 @@ authRouter.post(
 
 authRouter.post(
   '/get-account-status',
-  rateLimiter,
   authValidators.email,
   authController.getAccountStatus
 );
