@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Header, SideBar, Footer } from "../../components/index.jsx";
+import { Header, SideBar, Footer, AccountPageInput } from "../../components/index.jsx";
 import { UploadImage } from "../../assets/Vocabulary";
 // import CreatableSelect from "react-select/creatable";
 import Select from "react-select";
@@ -36,14 +36,19 @@ export default function EditList() {
             const list = await vocabularyService.getListById(listId);
             const words = await vocabularyService.getWordsByListId(listId);
 
-            const mappedWords = words.map(w => ({
+            const mappedWords = await Promise.all(
+            words.map(async (w) => {
+                const examples = await vocabularyService.getExamplesByWordId(w.id);
+                return {
                 id: w.id,
                 term: w.term,
                 definition: w.definition,
                 phonetics: w.phonetics || "",
                 image: w.image_url || "",
-                example: "", // cần lấy từ API nếu có example riêng
-            }));
+                example: examples?.[0]?.example_sentence || "",
+                };
+            })
+            );
 
             setTitle(list.title);
             setDescription(list.description);
@@ -63,7 +68,7 @@ export default function EditList() {
     }, [listId]);
 
     const handleUpdateList = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
 
     try {
         if (!title.trim() || !description.trim()) {
@@ -105,20 +110,17 @@ export default function EditList() {
         };
 
         if (word.id) {
-            await vocabularyService.updateWord(word.id, wordPayload);
-            if (word.example?.trim()) {
-            await vocabularyService.addExample(word.id, word.example);
-            }
-        } else { // nếu không có ID thì coi như là thêm mới
-            const newWord = await vocabularyService.addWord({
-            listId,
-            ...wordPayload,
-            });
+        await vocabularyService.updateWord(word.id, wordPayload);
 
-            if (word.example?.trim()) {
-            await vocabularyService.addExample(newWord.id, word.example);
-            }
+        if (word.example?.trim().length >= 10) {
+            // Nếu có example mới → thêm
+            await vocabularyService.addExample(word.id, word.example);
+        } else if (word.exampleId) {
+            // Nếu user xoá example (input trống) → xoá khỏi DB
+            await vocabularyService.deleteExample(word.exampleId);
         }
+        }
+
         }
 
         alert("List updated successfully!");
@@ -255,8 +257,9 @@ export default function EditList() {
 
                             <div className="edit-list__word-box--row">
                                 <div className="edit-list__word-box--field">
-                                <input
+                                <AccountPageInput
                                     type="text"
+                                    name={`term-${index}`}
                                     value={word.term || ""}
                                     onChange={(e) => handleWordChange(index, "term", e.target.value)}
                                 />
@@ -264,8 +267,9 @@ export default function EditList() {
                                 </div>
 
                                 <div className="edit-list__word-box--field">
-                                <input
+                                <AccountPageInput
                                     type="text"
+                                    name={`definition-${index}`}
                                     value={word.definition || ""}
                                     onChange={(e) => handleWordChange(index, "definition", e.target.value)}
                                 />
@@ -273,15 +277,16 @@ export default function EditList() {
                                 </div>
 
                                 <div className="edit-list__word-box--field">
-                                <input
+                                <AccountPageInput
                                     type="text"
+                                    name={`phonetics-${index}`}
                                     value={word.phonetics || ""}
                                     onChange={(e) => handleWordChange(index, "phonetics", e.target.value)}
                                 />
                                 <small className="input-note">Phonetics</small>
                                 </div>
 
-                                <label className="edit-list__upload-btn">
+                                {/* <label className="edit-list__upload-btn">
                                 <img
                                     src={word.image || UploadImage}
                                     alt="Uploaded"
@@ -293,20 +298,48 @@ export default function EditList() {
                                     hidden
                                     onChange={(e) => handleImageUpload(e.target.files[0], index)}
                                 />
-                                </label>
+                                </label> */}
                             </div>
 
-                            <div className="edit-list__word-box--row">
-                                <div className="edit-list__word-box--field">
-                                <input
-                                    type="text"
-                                    value={word.example}
-                                    onChange={(e) => handleWordChange(index, "example", e.target.value)}
-                                />
-                                <small className="input-note">An example in context</small>
+                                <div className="create-list__word-box--row">
+                                    <div className="create-list__word-box--field">
+                                        <AccountPageInput
+                                            name={`synonym-${index}`}
+                                            type="text"
+                                            placeholder=""
+                                            value={word.synonym}
+                                            onChange={(e) => handleWordChange(index, "synonym", e.target.value)}
+                                        />
+                                        <small className="input-note">Synonym</small>
+                                    </div>
+
+                                    <div className="create-list__word-box--field">
+                                        <AccountPageInput
+                                            name={`translation-${index}`}
+                                            type="text"
+                                            placeholder=""
+                                            value={word.translation}
+                                            onChange={(e) => handleWordChange(index, "translation", e.target.value)}
+                                        />
+                                        <small className="input-note">Translation</small>
+                                    </div>
                                 </div>
-                                <button type="button" className="edit-list__ai-btn">AI</button>
-                            </div>
+
+                                <div className="create-list__word-box--row">
+                                    <div className="create-list__word-box--field">
+                                        <AccountPageInput
+                                            name={`example-${index}`}
+                                            type="text"
+                                            placeholder=""
+                                            value={word.example}
+                                            onChange={(e) => handleWordChange(index, "example", e.target.value)}
+                                        />
+                                        <small className="input-note">An example in context</small>
+                                    </div>
+                                    <button type="button" className="create-list__ai-btn">AI</button>
+                                </div>
+
+
                         </div>
                           ))}
                     </div>

@@ -55,7 +55,7 @@ class ClassroomModel {
       .select(
         `
         *,
-        assignments!inner(id)
+        assignments(id)
       `
       )
       .eq('teacher_id', teacherId)
