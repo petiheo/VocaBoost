@@ -317,9 +317,7 @@ class VocabularyController {
       const word = await vocabularyService.findWordById(wordId, userId);
 
       if (!word) {
-        return res
-          .status(404)
-          .json({ success: false, error: 'Word not found.' });
+        return res.status(404).json({ success: false, error: 'Word not found.' });
       }
 
       return res.status(200).json({
@@ -425,12 +423,10 @@ class VocabularyController {
       });
     } catch (error) {
       console.error(error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          error: 'Internal server error during file upload.',
-        });
+      return res.status(500).json({
+        success: false,
+        error: 'Internal server error during file upload.',
+      });
     }
   }
 }

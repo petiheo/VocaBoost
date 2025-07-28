@@ -90,37 +90,40 @@ class VocabularyModel {
   async createWordsBulkAndReturn(wordsToInsert) {
     return await supabase.from('vocabulary').insert(wordsToInsert).select();
   }
-  
+
   async findWordWithListInfo(wordId) {
     // ==========================================================
     // ===== NEW, MORE ROBUST VERSION ===========================
     // ==========================================================
     const { data, error } = await supabase
       .from('vocabulary')
-      .select(`
+      .select(
+        `
         list_id,
         vocab_lists (
           creator_id,
           privacy_setting
         )
-      `)
+      `
+      )
       .eq('id', wordId)
       .single(); // .single() will error if no row is found, which is good for permission checks
 
     if (error) {
-        // If the word doesn't exist, Supabase returns an error. We handle this gracefully.
-        if (error.code === 'PGRST116') { // PostgREST code for "exact one row not found"
-            return { data: null, error: null };
-        }
-        return { data: null, error };
+      // If the word doesn't exist, Supabase returns an error. We handle this gracefully.
+      if (error.code === 'PGRST116') {
+        // PostgREST code for "exact one row not found"
+        return { data: null, error: null };
+      }
+      return { data: null, error };
     }
-    
+
     // Ensure the nested vocab_lists object is not null before returning
     if (!data.vocab_lists) {
-        // This is a data integrity issue (a word exists without a list),
-        // but we handle it safely by treating the word as inaccessible.
-        console.error(`Data integrity issue: Word ${wordId} has no associated list.`);
-        return { data: null, error: new Error('Word has no associated list.') };
+      // This is a data integrity issue (a word exists without a list),
+      // but we handle it safely by treating the word as inaccessible.
+      console.error(`Data integrity issue: Word ${wordId} has no associated list.`);
+      return { data: null, error: new Error('Word has no associated list.') };
     }
 
     return { data, error: null };
@@ -132,7 +135,11 @@ class VocabularyModel {
     // ==========================================================
     try {
       // Step 1: Fetch the paginated list of basic word info.
-      const { data: words, error: wordsError, count } = await supabase
+      const {
+        data: words,
+        error: wordsError,
+        count,
+      } = await supabase
         .from('vocabulary')
         .select('*', { count: 'exact' })
         .eq('list_id', listId)
@@ -145,14 +152,14 @@ class VocabularyModel {
       }
 
       // Step 2: Get all the IDs of the words we just fetched.
-      const wordIds = words.map(word => word.id);
+      const wordIds = words.map((word) => word.id);
 
       // Step 3: Fetch all examples for those specific words in a single query.
       const { data: examples, error: examplesError } = await supabase
         .from('vocabulary_examples')
         .select('*')
         .in('vocabulary_id', wordIds);
-      
+
       if (examplesError) throw examplesError;
 
       // Step 4: Fetch all synonyms for those specific words in a single query.
@@ -160,13 +167,13 @@ class VocabularyModel {
         .from('word_synonyms')
         .select('word_id, synonym')
         .in('word_id', wordIds);
-      
+
       if (synonymsError) throw synonymsError;
 
       // Step 5: Map the examples and synonyms to their parent words for efficient lookup.
-      const examplesMap = new Map(examples.map(ex => [ex.vocabulary_id, ex]));
+      const examplesMap = new Map(examples.map((ex) => [ex.vocabulary_id, ex]));
       const synonymsMap = new Map();
-      synonyms.forEach(s => {
+      synonyms.forEach((s) => {
         if (!synonymsMap.has(s.word_id)) {
           synonymsMap.set(s.word_id, []);
         }
@@ -174,14 +181,13 @@ class VocabularyModel {
       });
 
       // Step 6: Assemble the final, complete word objects.
-      const enrichedWords = words.map(word => ({
+      const enrichedWords = words.map((word) => ({
         ...word,
         vocabulary_examples: examplesMap.get(word.id) || null,
         synonyms: synonymsMap.get(word.id) || [],
       }));
 
       return { data: enrichedWords, error: null, count };
-
     } catch (error) {
       console.error(`Error in findWordsByListId for list ${listId}:`, error);
       return { data: null, error, count: 0 };
@@ -200,7 +206,7 @@ class VocabularyModel {
         .select('*', { count: 'exact' })
         .eq('list_id', listId)
         .or(`term.ilike.%${q}%,definition.ilike.%${q}%`);
-      
+
       if (sortBy) {
         const [field, direction] = sortBy.split(':');
         if (['term', 'created_at'].includes(field)) {
@@ -218,14 +224,14 @@ class VocabularyModel {
       }
 
       // Step 2: Get all the IDs of the words we just fetched.
-      const wordIds = words.map(word => word.id);
+      const wordIds = words.map((word) => word.id);
 
       // Step 3: Fetch all examples for those specific words in a single query.
       const { data: examples, error: examplesError } = await supabase
         .from('vocabulary_examples')
         .select('*')
         .in('vocabulary_id', wordIds);
-      
+
       if (examplesError) throw examplesError;
 
       // Step 4: Fetch all synonyms for those specific words in a single query.
@@ -233,13 +239,13 @@ class VocabularyModel {
         .from('word_synonyms')
         .select('word_id, synonym')
         .in('word_id', wordIds);
-      
+
       if (synonymsError) throw synonymsError;
 
       // Step 5: Map the examples and synonyms to their parent words for efficient lookup.
-      const examplesMap = new Map(examples.map(ex => [ex.vocabulary_id, ex]));
+      const examplesMap = new Map(examples.map((ex) => [ex.vocabulary_id, ex]));
       const synonymsMap = new Map();
-      synonyms.forEach(s => {
+      synonyms.forEach((s) => {
         if (!synonymsMap.has(s.word_id)) {
           synonymsMap.set(s.word_id, []);
         }
@@ -247,16 +253,18 @@ class VocabularyModel {
       });
 
       // Step 6: Assemble the final, complete word objects.
-      const enrichedWords = words.map(word => ({
+      const enrichedWords = words.map((word) => ({
         ...word,
         vocabulary_examples: examplesMap.get(word.id) || null,
         synonyms: synonymsMap.get(word.id) || [],
       }));
 
       return { data: enrichedWords, error: null, count };
-
     } catch (error) {
-      console.error(`Error in searchInList for list ${listId} with query "${q}":`, error);
+      console.error(
+        `Error in searchInList for list ${listId} with query "${q}":`,
+        error
+      );
       return { data: null, error, count: 0 };
     }
   }
@@ -295,7 +303,7 @@ class VocabularyModel {
         .select('*')
         .eq('vocabulary_id', id)
         .maybeSingle();
-      
+
       if (exampleError) throw exampleError;
 
       // Step 3: Fetch all associated synonyms from their own table.
@@ -310,11 +318,10 @@ class VocabularyModel {
       const finalWordObject = {
         ...wordData,
         vocabulary_examples: exampleData, // This will be the example object or null
-        synonyms: synonymsData ? synonymsData.map(s => s.synonym) : [], // Format into a simple array
+        synonyms: synonymsData ? synonymsData.map((s) => s.synonym) : [], // Format into a simple array
       };
 
       return { data: finalWordObject, error: null };
-
     } catch (error) {
       // Catch any database error from the three steps and return it.
       console.error(`Error in findById for word ${id}:`, error);
@@ -341,16 +348,17 @@ class VocabularyModel {
   }
 
   async deleteExample(wordId) {
-    return await supabase.from('vocabulary_examples').delete().eq('vocabulary_id', wordId);
+    return await supabase
+      .from('vocabulary_examples')
+      .delete()
+      .eq('vocabulary_id', wordId);
   }
 
   // =================================================================
   //  SYNONYM MODELS
   // =================================================================
   async createSynonyms(synonymsToInsert) {
-    return await supabase
-      .from('word_synonyms')
-      .upsert(synonymsToInsert);
+    return await supabase.from('word_synonyms').upsert(synonymsToInsert);
   }
 
   async deleteSynonymsByWordId(wordId) {

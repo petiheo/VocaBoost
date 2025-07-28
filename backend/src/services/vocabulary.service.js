@@ -135,11 +135,25 @@ class VocabularyService {
   async createWord(listId, wordData, userId) {
     await this._verifyListOwnership(listId, userId);
 
-    const { term, definition, translation, phonetics, image_url, exampleSentence, synonyms } = wordData;
+    const {
+      term,
+      definition,
+      translation,
+      phonetics,
+      image_url,
+      exampleSentence,
+      synonyms,
+    } = wordData;
 
     // 1. Create the core word
     const { data: newWord, error } = await vocabularyModel.createWord({
-      list_id: listId, term, definition, translation, phonetics, image_url, created_by: userId,
+      list_id: listId,
+      term,
+      definition,
+      translation,
+      phonetics,
+      image_url,
+      created_by: userId,
     });
     if (error) throw error;
 
@@ -150,17 +164,22 @@ class VocabularyService {
 
     // 3. Add the optional synonyms
     if (synonyms && Array.isArray(synonyms) && synonyms.length > 0) {
-        const synonymsToInsert = synonyms.map(s => ({ word_id: newWord.id, synonym: s.trim() }));
-        // Using .catch() here makes this step non-blocking. If synonyms fail, the word is still created.
-        await vocabularyModel.createSynonyms(synonymsToInsert).catch(err => {
-            console.error(`Failed to add synonyms for new word ${newWord.id}:`, err);
-        });
+      const synonymsToInsert = synonyms.map((s) => ({
+        word_id: newWord.id,
+        synonym: s.trim(),
+      }));
+      // Using .catch() here makes this step non-blocking. If synonyms fail, the word is still created.
+      await vocabularyModel.createSynonyms(synonymsToInsert).catch((err) => {
+        console.error(`Failed to add synonyms for new word ${newWord.id}:`, err);
+      });
     }
 
     await vocabularyModel.updateWordCount(listId);
-    
+
     // Return the full, newly created word object
-    const { data: finalWord, error: fetchError } = await vocabularyModel.findById(newWord.id);
+    const { data: finalWord, error: fetchError } = await vocabularyModel.findById(
+      newWord.id
+    );
     if (fetchError) throw fetchError;
     return finalWord;
   }
@@ -182,10 +201,14 @@ class VocabularyService {
     const finalSynonyms = this._mapSubItemsToNewWords(words, newWords, 'synonym');
 
     if (finalExamples.length > 0) {
-        await vocabularyModel.createExamplesBulk(finalExamples).catch(err => console.error('Bulk example creation failed:', err));
+      await vocabularyModel
+        .createExamplesBulk(finalExamples)
+        .catch((err) => console.error('Bulk example creation failed:', err));
     }
     if (finalSynonyms.length > 0) {
-        await vocabularyModel.createSynonyms(finalSynonyms).catch(err => console.error('Bulk synonym creation failed:', err));
+      await vocabularyModel
+        .createSynonyms(finalSynonyms)
+        .catch((err) => console.error('Bulk synonym creation failed:', err));
     }
 
     await vocabularyModel.updateWordCount(listId);
@@ -195,10 +218,24 @@ class VocabularyService {
   async updateWord(wordId, userId, updateData) {
     await this._verifyWordPermission(wordId, userId);
 
-    const { term, definition, translation, phonetics, image_url, exampleSentence, synonyms } = updateData;
+    const {
+      term,
+      definition,
+      translation,
+      phonetics,
+      image_url,
+      exampleSentence,
+      synonyms,
+    } = updateData;
 
     // 1. Update core word fields
-    const wordFieldsToUpdate = { term, definition, translation, phonetics, image_url };
+    const wordFieldsToUpdate = {
+      term,
+      definition,
+      translation,
+      phonetics,
+      image_url,
+    };
     const cleanedWordUpdates = Object.fromEntries(
       Object.entries(wordFieldsToUpdate).filter(([_, v]) => v !== undefined)
     );
@@ -217,14 +254,18 @@ class VocabularyService {
 
     // 3. Overwrite synonyms (if provided)
     if (synonyms !== undefined) {
-        await vocabularyModel.deleteSynonymsByWordId(wordId); // Clear existing
-        if (synonyms.length > 0) {
-            const synonymsToInsert = synonyms.map(s => ({ word_id: wordId, synonym: s.trim() }));
-            await vocabularyModel.createSynonyms(synonymsToInsert);
-        }
+      await vocabularyModel.deleteSynonymsByWordId(wordId); // Clear existing
+      if (synonyms.length > 0) {
+        const synonymsToInsert = synonyms.map((s) => ({
+          word_id: wordId,
+          synonym: s.trim(),
+        }));
+        await vocabularyModel.createSynonyms(synonymsToInsert);
+      }
     }
 
-    const { data: finalWord, error: fetchError } = await vocabularyModel.findById(wordId);
+    const { data: finalWord, error: fetchError } =
+      await vocabularyModel.findById(wordId);
     if (fetchError) throw fetchError;
     return finalWord;
   }
@@ -239,7 +280,11 @@ class VocabularyService {
   async findWordsByListId(listId, userId, { page = 1, limit = 25 }) {
     await this.findListById(listId, userId);
     const { from, to } = this._getPagination(page, limit);
-    const { data: words, error, count } = await vocabularyModel.findWordsByListId(listId, from, to);
+    const {
+      data: words,
+      error,
+      count,
+    } = await vocabularyModel.findWordsByListId(listId, from, to);
     if (error) throw error;
     return { words, pagination: this._formatPagination(page, limit, count) };
   }
@@ -257,14 +302,20 @@ class VocabularyService {
     const { page = 1, limit = 20, sortBy, q } = options;
     await this.findListById(listId, userId);
     if (sortBy && sortBy.split(':').length !== 2) {
-      throw new ValidationError([{ field: 'sortBy', message: "Invalid sort format." }]);
+      throw new ValidationError([
+        { field: 'sortBy', message: 'Invalid sort format.' },
+      ]);
     }
     const { from, to } = this._getPagination(page, limit);
-    const { data: words, error, count } = await vocabularyModel.searchInList(listId, { q, sortBy, from, to });
+    const {
+      data: words,
+      error,
+      count,
+    } = await vocabularyModel.searchInList(listId, { q, sortBy, from, to });
     if (error) throw error;
     return { words, pagination: this._formatPagination(page, limit, count) };
   }
-  
+
   // =================================================================
   //  SYNONYMS
   // =================================================================
@@ -375,21 +426,21 @@ class VocabularyService {
   _mapSubItemsToNewWords(originalWords, newWords, itemType) {
     const itemsToInsert = [];
     originalWords.forEach((originalWord) => {
-        const newWord = newWords.find(nw => nw.term === originalWord.term);
-        if (!newWord) return;
+      const newWord = newWords.find((nw) => nw.term === originalWord.term);
+      if (!newWord) return;
 
-        if (itemType === 'example' && originalWord.exampleSentence) {
-            itemsToInsert.push({
-                vocabulary_id: newWord.id,
-                example_sentence: originalWord.exampleSentence,
-                translation: originalWord.translation,
-            });
-        }
-        if (itemType === 'synonym' && originalWord.synonyms) {
-            originalWord.synonyms.forEach(synonym => {
-                itemsToInsert.push({ word_id: newWord.id, synonym: synonym.trim() });
-            });
-        }
+      if (itemType === 'example' && originalWord.exampleSentence) {
+        itemsToInsert.push({
+          vocabulary_id: newWord.id,
+          example_sentence: originalWord.exampleSentence,
+          translation: originalWord.translation,
+        });
+      }
+      if (itemType === 'synonym' && originalWord.synonyms) {
+        originalWord.synonyms.forEach((synonym) => {
+          itemsToInsert.push({ word_id: newWord.id, synonym: synonym.trim() });
+        });
+      }
     });
     return itemsToInsert;
   }
