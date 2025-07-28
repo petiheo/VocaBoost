@@ -308,6 +308,19 @@ export default function CreateList() {
 
                                     <div className="create-list__word-box--field">
                                         <AccountPageInput
+                                            name={`translation-${index}`}
+                                            type="text"
+                                            placeholder=""
+                                            value={word.translation}
+                                            onChange={(e) => handleWordChange(index, "translation", e.target.value)}
+                                        />
+                                        <small className="input-note">Translation</small>
+                                    </div>
+                                </div>
+
+                                <div className="create-list__word-box--row">
+                                    <div className="create-list__word-box--field">
+                                        <AccountPageInput
                                             name={`example-${index}`}
                                             type="text"
                                             placeholder=""

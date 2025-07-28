@@ -286,7 +286,7 @@ export default function EditList() {
                                 <small className="input-note">Phonetics</small>
                                 </div>
 
-                                <label className="edit-list__upload-btn">
+                                {/* <label className="edit-list__upload-btn">
                                 <img
                                     src={word.image || UploadImage}
                                     alt="Uploaded"
@@ -298,21 +298,48 @@ export default function EditList() {
                                     hidden
                                     onChange={(e) => handleImageUpload(e.target.files[0], index)}
                                 />
-                                </label>
+                                </label> */}
                             </div>
 
-                            <div className="edit-list__word-box--row">
-                                <div className="edit-list__word-box--field">
-                                <AccountPageInput
-                                    type="text"
-                                    name={`example-${index}`}
-                                    value={word.example}
-                                    onChange={(e) => handleWordChange(index, "example", e.target.value)}
-                                />
-                                <small className="input-note">An example in context</small>
+                                <div className="create-list__word-box--row">
+                                    <div className="create-list__word-box--field">
+                                        <AccountPageInput
+                                            name={`synonym-${index}`}
+                                            type="text"
+                                            placeholder=""
+                                            value={word.synonym}
+                                            onChange={(e) => handleWordChange(index, "synonym", e.target.value)}
+                                        />
+                                        <small className="input-note">Synonym</small>
+                                    </div>
+
+                                    <div className="create-list__word-box--field">
+                                        <AccountPageInput
+                                            name={`translation-${index}`}
+                                            type="text"
+                                            placeholder=""
+                                            value={word.translation}
+                                            onChange={(e) => handleWordChange(index, "translation", e.target.value)}
+                                        />
+                                        <small className="input-note">Translation</small>
+                                    </div>
                                 </div>
-                                <button type="button" className="edit-list__ai-btn">AI</button>
-                            </div>
+
+                                <div className="create-list__word-box--row">
+                                    <div className="create-list__word-box--field">
+                                        <AccountPageInput
+                                            name={`example-${index}`}
+                                            type="text"
+                                            placeholder=""
+                                            value={word.example}
+                                            onChange={(e) => handleWordChange(index, "example", e.target.value)}
+                                        />
+                                        <small className="input-note">An example in context</small>
+                                    </div>
+                                    <button type="button" className="create-list__ai-btn">AI</button>
+                                </div>
+
+
                         </div>
                           ))}
                     </div>
