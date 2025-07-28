@@ -97,6 +97,15 @@ const vocabularyService = {
   return res.data.data.example;
 },
 
+  getExamplesByWordId: async (wordId) => {
+    const res = await api.get(`/vocabulary/words/${wordId}/examples`);
+    return res.data.data.examples;
+  },
+
+  deleteExample: async (exampleId) => {
+    const res = await api.delete(`/vocabulary/examples/${exampleId}`);
+    return res.data;
+  },
 };
 
 export default vocabularyService;

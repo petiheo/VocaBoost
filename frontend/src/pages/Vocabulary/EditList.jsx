@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Header, SideBar, Footer } from "../../components/index.jsx";
+import { Header, SideBar, Footer, AccountPageInput } from "../../components/index.jsx";
 import { UploadImage } from "../../assets/Vocabulary";
 // import CreatableSelect from "react-select/creatable";
 import Select from "react-select";
@@ -36,14 +36,19 @@ export default function EditList() {
             const list = await vocabularyService.getListById(listId);
             const words = await vocabularyService.getWordsByListId(listId);
 
-            const mappedWords = words.map(w => ({
+            const mappedWords = await Promise.all(
+            words.map(async (w) => {
+                const examples = await vocabularyService.getExamplesByWordId(w.id);
+                return {
                 id: w.id,
                 term: w.term,
                 definition: w.definition,
                 phonetics: w.phonetics || "",
                 image: w.image_url || "",
-                example: "", // cần lấy từ API nếu có example riêng
-            }));
+                example: examples?.[0]?.example_sentence || "",
+                };
+            })
+            );
 
             setTitle(list.title);
             setDescription(list.description);
@@ -63,7 +68,7 @@ export default function EditList() {
     }, [listId]);
 
     const handleUpdateList = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
 
     try {
         if (!title.trim() || !description.trim()) {
@@ -105,20 +110,17 @@ export default function EditList() {
         };
 
         if (word.id) {
-            await vocabularyService.updateWord(word.id, wordPayload);
-            if (word.example?.trim()) {
-            await vocabularyService.addExample(word.id, word.example);
-            }
-        } else { // nếu không có ID thì coi như là thêm mới
-            const newWord = await vocabularyService.addWord({
-            listId,
-            ...wordPayload,
-            });
+        await vocabularyService.updateWord(word.id, wordPayload);
 
-            if (word.example?.trim()) {
-            await vocabularyService.addExample(newWord.id, word.example);
-            }
+        if (word.example?.trim().length >= 10) {
+            // Nếu có example mới → thêm
+            await vocabularyService.addExample(word.id, word.example);
+        } else if (word.exampleId) {
+            // Nếu user xoá example (input trống) → xoá khỏi DB
+            await vocabularyService.deleteExample(word.exampleId);
         }
+        }
+
         }
 
         alert("List updated successfully!");
@@ -255,8 +257,9 @@ export default function EditList() {
 
                             <div className="edit-list__word-box--row">
                                 <div className="edit-list__word-box--field">
-                                <input
+                                <AccountPageInput
                                     type="text"
+                                    name={`term-${index}`}
                                     value={word.term || ""}
                                     onChange={(e) => handleWordChange(index, "term", e.target.value)}
                                 />
@@ -264,8 +267,9 @@ export default function EditList() {
                                 </div>
 
                                 <div className="edit-list__word-box--field">
-                                <input
+                                <AccountPageInput
                                     type="text"
+                                    name={`definition-${index}`}
                                     value={word.definition || ""}
                                     onChange={(e) => handleWordChange(index, "definition", e.target.value)}
                                 />
@@ -273,8 +277,9 @@ export default function EditList() {
                                 </div>
 
                                 <div className="edit-list__word-box--field">
-                                <input
+                                <AccountPageInput
                                     type="text"
+                                    name={`phonetics-${index}`}
                                     value={word.phonetics || ""}
                                     onChange={(e) => handleWordChange(index, "phonetics", e.target.value)}
                                 />
@@ -298,8 +303,9 @@ export default function EditList() {
 
                             <div className="edit-list__word-box--row">
                                 <div className="edit-list__word-box--field">
-                                <input
+                                <AccountPageInput
                                     type="text"
+                                    name={`example-${index}`}
                                     value={word.example}
                                     onChange={(e) => handleWordChange(index, "example", e.target.value)}
                                 />
