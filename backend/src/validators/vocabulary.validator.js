@@ -19,8 +19,8 @@ const vocabularyValidator = {
   createList: [
     body('title')
       .trim()
-      .isLength({ min: 3, max: 100 })
-      .withMessage('Title is required and must be between 3 and 100 characters.'),
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Title is required and must be between 2 and 100 characters.'),
     body('description')
       .optional()
       .trim()
@@ -87,7 +87,7 @@ const vocabularyValidator = {
     body('exampleSentence')
       .trim()
       .isLength({ min: 10, max: 255 })
-      .withMessage('Example sentence is required and must be between 10 and 255 characters.'),
+      .withMessage('Example sentence is required and must be between 2 and 255 characters.'),
     body('translation')
       .optional()
       .trim(),
