@@ -133,6 +133,26 @@ class ReviewModel {
       if (error) throw error;
       return data;
   }
+
+  async findProgressByWordId(userId, wordId) {
+    const { data, error } = await supabase
+      .from('user_word_progress')
+      .select(`
+        next_review_date,
+        interval_days,
+        ease_factor,
+        repetitions,
+        correct_count,
+        incorrect_count,
+        last_reviewed_at
+      `)
+      .eq('user_id', userId)
+      .eq('word_id', wordId)
+      .maybeSingle(); // Use maybeSingle to return null instead of erroring if not found
+
+    if (error) throw error;
+    return data;
+  }
 }
 
 module.exports = new ReviewModel();

@@ -1,4 +1,5 @@
 const vocabularyModel = require('../models/vocabulary.model');
+const reviewModel = require('../models/review.model');
 
 class ForbiddenError extends Error {
   constructor(message = 'User does not have permission for this action.') {
@@ -295,7 +296,12 @@ class VocabularyService {
     const { data: word, error } = await vocabularyModel.findById(wordId);
     if (error) throw error;
 
-    return word;
+    const userProgress = await reviewModel.findProgressByWordId(userId, wordId);
+
+    return {
+      ...word,
+      userProgress: userProgress, 
+    };
   }
 
   async searchWordsInList(listId, userId, options) {
