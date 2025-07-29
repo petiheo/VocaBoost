@@ -47,14 +47,19 @@ class ReviewService {
     const activeSession = await reviewModel.findActiveSession(userId);
     if (!activeSession) return null;
 
-    const { data: allWords, error: wordsError } = await vocabularyModel.findWordsByListId([activeSession.vocab_list_id], 0, 9999);
+    if (!activeSession.word_ids || activeSession.word_ids.length === 0) {
+      console.warn(`Active session ${activeSession.id} found without word_ids. Ignoring.`);
+      return null;
+    }
+    
+    const { data: sessionWords, error: wordsError } = await vocabularyModel.findWordsByIds(activeSession.word_ids);
     if (wordsError) throw wordsError;
 
     const { data: completedResults, error: resultsError } = await reviewModel.getSessionSummaryStats(activeSession.id);
     if (resultsError) throw resultsError;
 
     const completedWordIds = new Set((completedResults || []).map(r => r.word_id));
-    const remainingWords = (allWords || []).filter(word => !completedWordIds.has(word.id));
+    const remainingWords = (sessionWords || []).filter(word => !completedWordIds.has(word.id));
     
     return {
         sessionId: activeSession.id,
@@ -71,18 +76,23 @@ class ReviewService {
       throw new Error('User already has an active session. Please end or resume it first.');
     }
     
-    const { data: allWords } = await vocabularyModel.findWordsByListId(listId, 0, 9999);
-    if (!allWords || allWords.length === 0) {
-      throw new Error('This list is empty or does not exist.');
-    }
+    const dueWords = await reviewModel.findDueWordsByListId(userId, listId, 20);
 
-    const { data: session } = await reviewModel.createSession(userId, listId, sessionType, allWords.length);
+    if (!dueWords || dueWords.length === 0) {
+      throw new Error('No words are currently due for review in this list.');
+    }
+    
+    const dueWordIds = dueWords.map(word => word.id);
+
+    const sessionResponse = await reviewModel.createSession(userId, listId, sessionType, dueWordIds);
+    if (sessionResponse.error) throw sessionResponse.error;
+    const session = sessionResponse.data;
 
     return {
         sessionId: session.id,
         sessionType: sessionType,
-        totalWords: allWords.length,
-        words: shuffleArray(allWords)
+        totalWords: dueWords.length,
+        words: shuffleArray(dueWords)
     };
   }
 
@@ -146,21 +156,18 @@ class ReviewService {
   _calculateSm2(progress, isCorrect) {
     let { repetitions, ease_factor, interval_days } = progress;
     
-    // --- CORRECT ANSWER ---
     if (isCorrect) {
       repetitions += 1;
-      
       if (repetitions === 1) {
         interval_days = 1;
       } else if (repetitions === 2) {
         interval_days = 6;
       } else {
-        interval_days = Math.round(interval_days * ease_factor);
+        interval_days = Math.round(progress.interval_days * ease_factor); 
       }
-    } else { // --- INCORRECT ANSWER ---
+    } else {
       repetitions = 0;
       interval_days = 1;
-      
       ease_factor = Math.max(1.3, ease_factor - 0.2);
     }
     

@@ -194,6 +194,69 @@ class VocabularyModel {
     }
   }
 
+  async findWordsByIds(wordIds) {
+    try {
+      // Step 1: Fetch the full details for the provided word IDs.
+      const { data: words, error: wordsError } = await supabase
+        .from('vocabulary')
+        .select('*')
+        .in('id', wordIds);
+
+      if (wordsError) throw wordsError;
+      if (!words || words.length === 0) {
+        return { data: [], error: null };
+      }
+
+      // The wordIds are already known, so we can proceed directly.
+      
+      // Step 2: Fetch all examples for those specific words.
+      const { data: examples, error: examplesError } = await supabase
+        .from('vocabulary_examples')
+        .select('vocabulary_id, example_sentence')
+        .in('vocabulary_id', wordIds);
+
+      if (examplesError) throw examplesError;
+
+      // Step 3: Fetch all synonyms for those specific words.
+      const { data: synonyms, error: synonymsError } = await supabase
+        .from('word_synonyms')
+        .select('word_id, synonym')
+        .in('word_id', wordIds);
+
+      if (synonymsError) throw synonymsError;
+
+      // Step 4: Map the examples and synonyms to their parent words.
+      const examplesByWordId = new Map();
+      (examples || []).forEach(ex => {
+        if (!examplesByWordId.has(ex.vocabulary_id)) {
+          examplesByWordId.set(ex.vocabulary_id, []);
+        }
+        examplesByWordId.get(ex.vocabulary_id).push(ex);
+      });
+
+      const synonymsByWordId = new Map();
+      (synonyms || []).forEach(s => {
+        if (!synonymsByWordId.has(s.word_id)) {
+          synonymsByWordId.set(s.word_id, []);
+        }
+        synonymsByWordId.get(s.word_id).push(s.synonym);
+      });
+
+      // Step 5: Assemble the final, enriched word objects.
+      const enrichedWords = words.map(word => ({
+        ...word,
+        examples: examplesByWordId.get(word.id) || [],
+        synonyms: synonymsByWordId.get(word.id) || [],
+      }));
+
+      return { data: enrichedWords, error: null };
+
+    } catch (error) {
+      console.error(`Error in findWordsByIds:`, error);
+      return { data: null, error };
+    }
+  }
+
   async searchInList(listId, options) {
     // ==========================================================
     // ===== NEW, MULTI-STEP QUERY LOGIC ========================
@@ -283,9 +346,6 @@ class VocabularyModel {
   }
 
   async findById(id) {
-    // ==========================================================
-    // ===== NEW, MULTI-STEP QUERY LOGIC ========================
-    // ==========================================================
     try {
       // Step 1: Fetch the basic word information from the 'vocabulary' table.
       const { data: wordData, error: wordError } = await supabase
