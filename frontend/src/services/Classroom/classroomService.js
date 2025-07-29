@@ -121,13 +121,13 @@ const classroomService = {
         return res.data;
     },
 
-    //19. Get To review Assignments (Learner) (chua link)
+    //19. Get To review Assignments (Learner) (chưa test)
     getToReviewAssignments: async (classroomId) => {
         const res = await api.get(`/classroom/${classroomId}/assignments/to-review`);
         return res.data;
     },
 
-    //20. Get Reviewed Assignments (Learner) (chua link)
+    //20. Get Reviewed Assignments (Learner) (chưa test)
     getReviewedAssignments: async (classroomId) => {
         const res = await api.get(`/classroom/${classroomId}/assignments/reviewed`);
         return res.data;
@@ -151,12 +151,17 @@ const classroomService = {
         return res.data;
     },
 
-    //24. Leave classroom (Learner) (chua link)
+    //24. Leave classroom (Learner) (chưa hoàn thiện)
     leaveClassroom: async (classroomId) => {
         const res = await api.post(`/classroom/${classroomId}/leave`);
         return res.data;
-    }
+    },
 
+    //25. Get Overdue Assignments (Learner) (chưa test)
+    getOverdueAssignments: async (classroomId) => {
+        const res = await api.get(`/classroom/${classroomId}/assignment/overdue`);
+        return res.data;
+    },
 };
 
 export default classroomService;
