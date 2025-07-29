@@ -6,9 +6,18 @@ import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 
 
 export default function StudentListPage() {
+    // Xử lý lưu trữ dữ liệu learner
     const [learners, setLearners] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
+
+    // Dùng để navigate trang
     const navigate = useNavigate();
+
+    // Xử lý thanh search bar 
+    const [searchQuery, setSearchQuery] = useState("");
+
+    // Xử lý Learner list hiện theo search bar
+    const filterLearners = learners.filter((learners) => 
+    learners?.email.toLowerCase().includes(searchQuery.toLowerCase()));
 
     // Truy xuất dữ liệu lớp học được lưu khi users chọn classroom ở trang MyClassroom. 
     const [classroomId, setClassroomId] = useState(() => {
@@ -60,7 +69,7 @@ export default function StudentListPage() {
                     <Link to="../add-students" className="btn btn--dark"> + Add Student</Link>
 
                     <div className="pending-request__search-block">
-                        <SearchBar />
+                        <SearchBar value={searchQuery} onChange={setSearchQuery} placeHolder={"Enter learner email you want to find"}/>
                         <div className="search-block--dropdown-menu">
                             <ClassroomDropdownMenu students={learners.length} />
                         </div>
@@ -69,7 +78,7 @@ export default function StudentListPage() {
 
                 <div className="student-list">
                     <SeeMoreSection
-                        items={learners}
+                        items={filterLearners}
                         renderItem={(item) => (
                             <div className="student-row" key={item.learner_id}>
                                 <span>{item.email}</span>
