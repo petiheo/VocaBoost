@@ -1,0 +1,25 @@
+.toast-notification {
+  padding: 1rem 1.5rem;
+  border-radius: 0.2rem;
+  font-weight: bold;
+  color: white;
+  z-index: 9999;
+  opacity: 1;
+  animation: fadein 2s ease forwards;
+
+}
+
+.toast--success {
+  color: #E0FFE1;
+  background-color: #3BC042; // xanh lá
+}
+
+.toast--error {
+  color: #FFE2E2;
+  background-color: #C03B3B; // đỏ
+}
+
+@keyframes fadein {
+  from { opacity: 1; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Header, SideBar, Footer, AccountPageInput} from "../../components/index.jsx";
-import { UploadImage } from "../../assets/Vocabulary";
+import { Header, SideBar, Footer, AccountPageInput, ToastNotification} from "../../components/index.jsx";
+// import { UploadImage } from "../../assets/Vocabulary";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import Select from "react-select";
 
 export default function CreateList() {
     const [privacy, setPrivacy] = useState("private");
     const navigate = useNavigate();
+    const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
     const [words, setWords] = useState([
         { term: "", definition: "", example: "", image: null, tag: "" },
@@ -103,13 +104,15 @@ export default function CreateList() {
         }
 
         // Điều hướng hoặc thông báo sau khi tạo thành công
-        alert("List created successfully!");
+        setToast({ show: true, message: "List created successfully!", type: "success" });
         
-        navigate("/vocabulary");
+        setTimeout(() => {
+            navigate("/vocabulary");
+        }, 2000); // Điều hướng sau 2 giây
 
         } catch (err) {
         console.error("Error creating list:", err);
-        alert("Failed to create list.");
+        setToast({ show: true, message: "Failed to create list. Please try again.", type: "error" });
         }
     };
 
@@ -124,27 +127,27 @@ export default function CreateList() {
         setWords([...words, { term: "", definition: "", phonetics: "", example: "", image: null }]);
     };
 
-    const handleImageUpload = async (file, index) => {
-    try {
-        const formData = new FormData();
-        formData.append("image", file);
+    // const handleImageUpload = async (file, index) => {
+    // try {
+    //     const formData = new FormData();
+    //     formData.append("image", file);
 
-        const res = await vocabularyService.uploadImage(formData);
+    //     const res = await vocabularyService.uploadImage(formData);
 
-        if (res?.url) {
-        const updated = [...words];
-        updated[index].image = res.url;
-        setWords(updated);
+    //     if (res?.url) {
+    //     const updated = [...words];
+    //     updated[index].image = res.url;
+    //     setWords(updated);
 
-        alert("✅ Image uploaded successfully!");
-        } else {
-        alert("❌ Upload failed: No URL returned.");
-        }
-    } catch (err) {
-        console.error("Image upload failed", err);
-        alert("❌ Image upload failed.");
-    }
-    };
+    //     alert(" Image uploaded successfully!");
+    //     } else {
+    //     alert(" Upload failed: No URL returned.");
+    //     }
+    // } catch (err) {
+    //     console.error("Image upload failed", err);
+    //     alert(" Image upload failed.");
+    // }
+    // };
 
 
     return (
@@ -337,7 +340,11 @@ export default function CreateList() {
                     </div>
 
                     <div className="create-list__add-button-wrapper">
-                        <button type="button" className="create-list__add-button" onClick={handleAddWord}>
+                        <button type="button" className="create-list__add-button"  onClick={() => 
+                            {
+                                setToast({ show: true, message: "Word added successfully!", type: "success" })
+                                handleAddWord();
+                            }}>
                             Add word
                         </button>
                     </div>
@@ -352,6 +359,14 @@ export default function CreateList() {
 
                 </form>
             </div>
+
+            {toast.show && (
+            <ToastNotification
+                message={toast.message}
+                type={toast.type}
+                onClose={() => setToast({ ...toast, show: false })}
+            />
+            )}
 
             <Footer />
         </div>

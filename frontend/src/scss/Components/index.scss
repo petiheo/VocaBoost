@@ -5,6 +5,8 @@
 @use "SearchBar";
 @use "SideBar";
 @use "LearnerSubMenu";
+@use "ToastNotification";
+@use "ConfirmModal";
 @forward "Dropdown" as dropdown-*;
 @forward "ClassroomTitle";
 @forward "TeacherClassroomMenuTab";
