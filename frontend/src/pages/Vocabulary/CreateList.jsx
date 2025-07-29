@@ -4,21 +4,22 @@ import { Header, SideBar, Footer, AccountPageInput} from "../../components/index
 // import { UploadImage } from "../../assets/Vocabulary";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import Select from "react-select";
+import { useConfirm } from "../../components/ConfirmProvider.jsx"; 
 import { useToast } from "../../components/ToastProvider.jsx";
 
 export default function CreateList() {
     const [privacy, setPrivacy] = useState("private");
     const navigate = useNavigate();
+    const confirm = useConfirm();
     const toast = useToast();
 
     const [words, setWords] = useState([
-        { term: "", definition: "", example: "", image: null, tag: "" },
-        { term: "", definition: "", example: "", image: null, tag: "" },
-        { term: "", definition: "", example: "", image: null, tag: "" },
+        { term: "", definition: "", exampleSentence: "", image: null, tag: "", phonetics: "", synonyms: "", translation: "" },
+        { term: "", definition: "", exampleSentence: "", image: null, tag: "", phonetics: "", synonyms: "", translation: "" },
+        { term: "", definition: "", exampleSentence: "", image: null, tag: "", phonetics: "", synonyms: "", translation: "" },
     ]);
 
     const { listId } = useParams();
-
 
     const [availableTags, setAvailableTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]); // array of strings  // selected tags
@@ -33,11 +34,48 @@ export default function CreateList() {
     }, []);
 
     
+    function normalizeSynonyms(input) {
+    if (!input) return [];
+
+    if (typeof input === "string") {
+        return input
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s !== "");
+    }
+
+    return [];
+    }
+
+    function validateSynonymsInput(input) {
+        if (!input) return true; // nếu không có từ đồng nghĩa thì không cần kiểm tra
+
+        // Không được kết thúc bằng ký tự đặc biệt
+        if (/[^a-zA-Z0-9)]$/.test(input.trim())) {
+            toast("Synonyms không được kết thúc bằng ký tự đặc biệt.", "error");
+            return false;
+        }
+
+        // Không được chứa 2 dấu `,,` liền nhau (=> tạo chuỗi rỗng)
+        if (input.includes(",,")) {
+            toast("Synonyms phải được phân cách đúng bằng dấu ',' và không có khoảng trống thừa.", "error");
+            return false;
+        }
+        return true;
+    }
+
+    
     const handleDeleteWord = async (index) => {
-        const confirmed = window.confirm("Are you sure you want to delete this word?");
-        if (!confirmed) return;
+        confirm("Are you sure you want to delete this word?").then((confirmed) => {
+            if (!confirmed) return;
 
         setWords(prev => prev.filter((_, i) => i !== index)); // cập nhật UI
+        setSelectedWordIds(prev => {
+            const newSelected = new Set(prev);
+            newSelected.delete(words[index].id);
+            return newSelected;
+        });
+    });
     };
 
 
@@ -52,9 +90,32 @@ export default function CreateList() {
         privacy_setting: privacy,
         tags: selectedTags,
         };
-
+        
         try {
-        console.log("Sending to backend:", data);
+        const hasInvalid = words.some(word => !word.term?.trim() || !word.definition?.trim());
+        if (hasInvalid) {
+            toast("Each word must have both term and definition.", "error");
+            return;
+        }
+
+        if (words.some(word => word.exampleSentence.length < 2 || word.exampleSentence.length > 500)) {
+            toast("Example sentence must be between 2 and 500 characters.", "error");
+            return;
+        }
+
+        for (let i = 0; i < words.length; i++) {
+            const word = words[i];
+
+            if (!word.term?.trim() || !word.definition?.trim()) {
+                toast(`Word ${i + 1} must have both term and definition.`, "error");
+                return;
+            }
+
+            if (!validateSynonymsInput(word.synonyms || "")) {
+                toast(`Word ${i + 1} has invalid synonyms. Must be comma-separated and not end with a special character.`, "error");
+                return;
+            }
+        }
 
         let actualListId = listId;
         let createdList;
@@ -76,35 +137,33 @@ export default function CreateList() {
         if (validWords.length > 0) {
             // Bước 1: Thêm từ hàng loạt
             const wordPayload = {
-            listId: listId,
+            listId: actualListId,
             words: validWords.map(w => ({
                 term: w.term,
                 definition: w.definition,
                 phonetics: w.phonetics || "",
-                image_url: w.image || "",
+                // image_url: w.image || "",
+                synonyms: normalizeSynonyms(w.synonyms),
+                translation: w.translation || "",
+                exampleSentence: w.exampleSentence || "",
             })),
             };
 
-            await vocabularyService.addWordsBulk(wordPayload);
+            await vocabularyService.createWordsBulk(wordPayload);
 
             // Bước 2: Lấy lại danh sách từ từ backend để có ID
             const insertedWords = await vocabularyService.getWordsByListId(createdList.id);
 
-            // Bước 3: Thêm ví dụ nếu có
-            const exampleRequests = validWords.map((wordInput) => {
-            const match = insertedWords.find(
-                w => w.term === wordInput.term && w.definition === wordInput.definition
-            );
-            if (match && wordInput.example && wordInput.example.trim().length >= 10) {
-                return vocabularyService.addExample(match.id, wordInput.example);
-            }
-            return null;
-            });
+            // Cập nhật lại từ với ID mới
+            const updatedWords = validWords.map((w, i) => ({
+                ...w,
+                id: insertedWords[i]?.id || null, // nếu không có ID thì để null
+            }));
 
-            await Promise.all(exampleRequests.filter(Boolean));
+            setWords(updatedWords);
+
         }
 
-        // Điều hướng hoặc thông báo sau khi tạo thành công
         toast( "List created successfully!", "success");
 
         setTimeout(() => {
@@ -125,7 +184,7 @@ export default function CreateList() {
     };
 
     const handleAddWord = () => {
-        setWords([...words, { term: "", definition: "", phonetics: "", example: "", image: null }]);
+        setWords([...words, { term: "", definition: "", phonetics: "", exampleSentence: "", image: null, synonyms: "", translation: "" }]);
     };
 
     // const handleImageUpload = async (file, index) => {
@@ -162,7 +221,7 @@ export default function CreateList() {
                     <textarea
                         className="create-list__form--title"
                         name="list-title"
-                        placeholder="Enter a title – For example ‘Intro to SE - chapter 5’"
+                        placeholder="Enter a title – For exampleSentence ‘Intro to SE - chapter 5’"
                         required
                     />
 
@@ -206,11 +265,13 @@ export default function CreateList() {
                                 type="button"
                                 className="create-list__delete-selected"
                                 onClick={() => {
-                                const confirmed = window.confirm("Delete selected words?");
-                                if (!confirmed) return;
-                                setWords(words.filter((_, i) => !selectedWordIds.has(i)));
-                                setSelectedWordIds(new Set());
-                                }}  
+                                    confirm("Delete selected words?").then((confirmed) => {
+                                        if (!confirmed) return;
+
+                                        setWords(words.filter((_, i) => !selectedWordIds.has(i)));
+                                        setSelectedWordIds(new Set());
+                                    });
+                                }}
                             >
                                 Delete selected
                             </button>
@@ -258,7 +319,7 @@ export default function CreateList() {
                                             value={word.term || ""}
                                             onChange={(e) => handleWordChange(index, "term", e.target.value)}
                                         />
-                                        <small className="input-note">Terminology</small>
+                                        <small className="input-title">Terminology</small>
                                     </div>
 
                                     <div className="create-list__word-box--field">
@@ -269,7 +330,7 @@ export default function CreateList() {
                                             value={word.definition || ""}
                                             onChange={(e) => handleWordChange(index, "definition", e.target.value)}
                                         />
-                                        <small className="input-note">Definition</small>
+                                        <small className="input-title">Definition</small>
                                     </div>
 
                                     <div className="create-list__word-box--field">
@@ -280,7 +341,7 @@ export default function CreateList() {
                                             value={word.phonetics || ""}
                                             onChange={(e) => handleWordChange(index, "phonetics", e.target.value)}
                                         />
-                                        <small className="input-note">Phonetics</small>
+                                        <small className="input-title">Phonetics</small>
                                     </div>
 
                                 {/* <label className="create-list__upload-btn">
@@ -301,13 +362,13 @@ export default function CreateList() {
                                 <div className="create-list__word-box--row">
                                     <div className="create-list__word-box--field">
                                         <AccountPageInput
-                                            name={`synonym-${index}`}
+                                            name={`synonyms-${index}`}
                                             type="text"
                                             placeholder=""
-                                            value={word.synonym}
-                                            onChange={(e) => handleWordChange(index, "synonym", e.target.value)}
+                                            value={word.synonyms}
+                                            onChange={(e) => handleWordChange(index, "synonyms", e.target.value)}
                                         />
-                                        <small className="input-note">Synonym</small>
+                                        <small className="input-title">Synonyms</small>
                                     </div>
 
                                     <div className="create-list__word-box--field">
@@ -318,20 +379,20 @@ export default function CreateList() {
                                             value={word.translation}
                                             onChange={(e) => handleWordChange(index, "translation", e.target.value)}
                                         />
-                                        <small className="input-note">Translation</small>
+                                        <small className="input-title">Translation</small>
                                     </div>
                                 </div>
 
                                 <div className="create-list__word-box--row">
                                     <div className="create-list__word-box--field">
                                         <AccountPageInput
-                                            name={`example-${index}`}
+                                            name={`exampleSentence-${index}`}
                                             type="text"
                                             placeholder=""
-                                            value={word.example}
-                                            onChange={(e) => handleWordChange(index, "example", e.target.value)}
+                                            value={word.exampleSentence}
+                                            onChange={(e) => handleWordChange(index, "exampleSentence", e.target.value)}
                                         />
-                                        <small className="input-note">An example in context</small>
+                                        <small className="input-title">An example in context</small>
                                     </div>
                                     <button type="button" className="create-list__ai-btn">AI</button>
                                 </div>
@@ -343,7 +404,7 @@ export default function CreateList() {
                     <div className="create-list__add-button-wrapper">
                         <button type="button" className="create-list__add-button"  onClick={() => 
                             {
-                                setToast({ show: true, message: "Word added successfully!", type: "success" })
+                                console.log("Word added successfully!");
                                 handleAddWord();
                             }}>
                             Add word

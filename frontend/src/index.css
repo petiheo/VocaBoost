@@ -2535,7 +2535,7 @@ h2 {
 
 @keyframes fadein {
   from {
-    opacity: 0.7;
+    opacity: 0.8;
     transform: translateY(10px);
   }
   to {
@@ -3012,6 +3012,13 @@ h2 {
   font-size: 1rem;
 }
 .create-list__word-box--row .input-note {
+  font-size: 0.8rem;
+  color: #C03B3B;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  margin-left: 0.1rem;
+}
+.create-list__word-box--row .input-title {
   font-size: 1rem;
   font-weight: bold;
   color: #756746;
@@ -3405,12 +3412,6 @@ h2 {
 .edit-list__content {
   display: flex;
   flex-direction: row;
-}
-.edit-list__toast {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 1000;
 }
 .edit-list__form {
   padding: 3rem;
