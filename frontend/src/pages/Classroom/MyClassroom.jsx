@@ -106,7 +106,7 @@ export default function MyClassroomPage() {
               renderItem={(item, index) => (
                 <div className="classroom-card" key={item.id}
                   onClick={() => {
-                    localStorage.setItem("selectedClassroom", JSON.stringify(classrooms)) // luu thông tin của classroom được chọn
+                    localStorage.setItem("selectedClassroom", JSON.stringify(item)) // luu thông tin của classroom được chọn
                     navigate(`/classroom/approve-join-classroom-request`); // Điều hướng
                   }}
                   style={{ cursor: "pointer" }}

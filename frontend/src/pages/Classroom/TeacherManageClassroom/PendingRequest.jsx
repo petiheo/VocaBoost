@@ -6,6 +6,7 @@ import {
     SearchBar, ClassroomDropdownMenu
 } from "../../../components/index";
 import classroomService from "../../../services/Classroom/classroomService";
+import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 
 // const initialStudents = Array(7).fill("Jane Smith");
 
@@ -55,18 +56,22 @@ export default function PendingRequestPage() {
                 </div>
 
                 {/* Student list */}
+
                 <div className="pending-request__student-list">
-                    {filteredRequest.map((r) => (
-                        <div className="pending-request__student-row" key={r.learner_id}>
-                            <span>{r.email}</span>
+                    <SeeMoreSection 
+                        items={request}
+                        renderItem={(item) => (
+                            <div className="pending-request__student-row" key={item.learner_id}>
+                            <span>{item.email}</span>
                             <button
                                 className="btn btn--light"
-                                onClick={() => handleCancel(learner_id)}
+                                onClick={() => handleCancel(item.learner_id)}
                             >
                                 Cancel
                             </button>
                         </div>
-                    ))}
+                        )}
+                    /> 
                 </div>
 
                 <div className="pending-request__see-more">

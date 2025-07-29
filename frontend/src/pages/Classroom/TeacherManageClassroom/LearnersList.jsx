@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ClassroomTitle, TeacherClassroomMenuTab, SearchBar, ClassroomDropdownMenu } from "../../../components/index"
 import classroomService from "../../../services/Classroom/classroomService";
+import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 
 
 export default function StudentListPage() {
@@ -34,10 +35,10 @@ export default function StudentListPage() {
         fetchLearnersList();
     }, [classroomId]);
 
-    const handleRemove = async(id) => {
+    const handleRemove = async (id) => {
         try {
             const res = await classroomService.removeALearner({ classroomId, learnerId: id });
-            if (res.success){
+            if (res.success) {
                 console.log("Remove thanh cong");
                 setLearners(learners.filter((l) => l.learner_id !== id));
             }
@@ -66,20 +67,18 @@ export default function StudentListPage() {
                     </div>
                 </div>
 
-                {/* Student list */}
                 <div className="student-list">
-                    {learners.map((l) => (
-                        <div className="student-row" key={l.learner_id}>
-                            <span>{l.email}</span>
-                            <button className="btn light" onClick={() => handleRemove(l.learner_id)}>
-                                Remove
-                            </button>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="see-more">
-                    <button className="btn see-more-btn">See more ▼</button>
+                    <SeeMoreSection
+                        items={learners}
+                        renderItem={(item) => (
+                            <div className="student-row" key={item.learner_id}>
+                                <span>{item.email}</span>
+                                <button className="btn light" onClick={() => handleRemove(item.learner_id)}>
+                                    Remove
+                                </button>
+                            </div>
+                        )}
+                    />
                 </div>
             </div>
         </div>
