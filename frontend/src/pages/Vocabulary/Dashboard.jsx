@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Footer, Header, SideBar, LearnerSubMenu } from "../../components/index.jsx";
 import { DropdownIcon, MoreIcon, PlusIcon } from "../../assets/Vocabulary/index.jsx";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
+import { useConfirm } from "../../components/ConfirmProvider.jsx";
 
 export default function Dashboard() {
     const [lists, setLists] = useState([]);
@@ -16,6 +17,7 @@ export default function Dashboard() {
     const [availableTags, setAvailableTags] = useState([]);
 
     const navigate = useNavigate();
+    const confirm = useConfirm();
 
     const handleCreateNewList = async () => {
         try {
@@ -212,7 +214,7 @@ export default function Dashboard() {
                                             <div
                                                 className="more-option delete"
                                                 onClick={async () => {
-                                                const confirmed = window.confirm("Are you sure you want to delete this list?");
+                                                const confirmed =  await confirm("Are you sure you want to delete this list?");
                                                 if (!confirmed) return;
 
                                                 try {
