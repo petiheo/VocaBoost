@@ -290,6 +290,7 @@ class VocabularyService {
     const listId = await this._verifyWordPermission(wordId, userId);
     const { error } = await vocabularyModel.deleteWord(wordId);
     if (error) throw error;
+    
     await vocabularyModel.updateWordCount(listId);
   }
 
