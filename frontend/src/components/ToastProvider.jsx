@@ -8,7 +8,7 @@ export const ToastProvider = ({ children }) => {
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast((t) => ({ ...t, show: false })), 3000);
+    setTimeout(() => setToast((t) => ({ ...t, show: false })), 800);
   };
 
   return (
