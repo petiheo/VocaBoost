@@ -7,13 +7,11 @@ if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 }
 
-const logFormat = winston.format.printf(
-  ({ timestamp, level, message, stack }) => {
-    return stack
-      ? `${timestamp} [${level}]: ${message} - ${stack}`
-      : `${timestamp} [${level}]: ${message}`;
-  }
-);
+const logFormat = winston.format.printf(({ timestamp, level, message, stack }) => {
+  return stack
+    ? `${timestamp} [${level}]: ${message} - ${stack}`
+    : `${timestamp} [${level}]: ${message}`;
+});
 
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'http',

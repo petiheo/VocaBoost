@@ -56,10 +56,7 @@ class EmailService {
       for (const file of partialFiles) {
         if (file.endsWith('.hbs')) {
           const name = path.basename(file, '.hbs');
-          const content = await fs.readFile(
-            path.join(partialsDir, file),
-            'utf8'
-          );
+          const content = await fs.readFile(path.join(partialsDir, file), 'utf8');
           handlebars.registerPartial(name, content);
         }
       }
@@ -76,10 +73,7 @@ class EmailService {
       for (const file of templateFiles) {
         if (file.endsWith('.hbs')) {
           const name = path.basename(file, '.hbs');
-          const content = await fs.readFile(
-            path.join(templatesPath, file),
-            'utf8'
-          );
+          const content = await fs.readFile(path.join(templatesPath, file), 'utf8');
           this.templates.set(name, handlebars.compile(content));
         }
       }
@@ -285,28 +279,25 @@ class EmailService {
     return previewPath;
   }
 
-  async sendClassInvitation(to, token, classInfo) {
-    try {
-      const inviteUrl = `${process.env.FRONTEND_URL}/accept-invitation?token=${token}`;
-      const html = `
-        <p>You've been invited to join the class <strong>${classInfo.name}</strong>.</p>
-        <p>Click the link below to accept the invitation:</p>
-        <a href="${inviteUrl}">Join Class</a>
-        <p>This link will expire in 7 days.</p>
-      `;
+  async sendClassInvitation(to, token, classInfo, teacherName) {
+  const joinUrl = `${process.env.FRONTEND_URL}/accept-invitation?token=${token}`;
 
-      await this.transporter.sendMail({
-        from: `"VocaBoost" <${process.env.FROM_EMAIL}>`,
-        to,
-        subject: `Invitation to join class "${classInfo.name}"`,
-        html,
-        text: `Join class here: ${inviteUrl}`,
-      });
-    } catch (error) {
-      console.error(`Failed to send invitation to ${to}:`, error);
-      throw error;
-    }
-  }
+  const html = this.renderTemplate('classroom-invitation', {
+    joinUrl,
+    className: classInfo.name,
+    classDescription: classInfo.description,
+    teacherName: teacherName || 'Your teacher',
+    subject: `Invitation to join classroom: ${classInfo.name}`,
+  });
+
+  return this.sendEmail({
+    to,
+    subject: `🎓 VocaBoost Invitation - Join "${classInfo.name}"`,
+    html,
+    text: `You've been invited to join the class "${classInfo.name}". Use this link: ${joinUrl}`,
+  });
+}
+
 }
 
 module.exports = new EmailService();

@@ -10,8 +10,9 @@ const open = require('open'); // npm install open (optional)
 const http = require('http');
 const url = require('url');
 
-// Email service
+// Email service and logger
 const emailService = require('../../src/services/email.service');
+const logger = require('../../src/utils/logger');
 
 // Test data for all templates
 const templateData = {
@@ -77,11 +78,11 @@ async function generatePreviews(templateName = null) {
 
   for (const template of templates) {
     try {
-      console.log(`📧 Generating preview for: ${template}`);
+      logger.info(`📧 Generating preview for: ${template}`);
 
       const data = templateData[template];
       if (!data) {
-        console.error(`❌ No test data found for template: ${template}`);
+        logger.error(`❌ No test data found for template: ${template}`);
         continue;
       }
 
@@ -97,9 +98,9 @@ async function generatePreviews(templateName = null) {
       await fs.writeFile(filepath, html);
       generatedFiles.push({ template, filepath, filename });
 
-      console.log(`✅ Generated: ${filename}`);
+      logger.info(`✅ Generated: ${filename}`);
     } catch (error) {
-      console.error(`❌ Error generating ${template}:`, error.message);
+      logger.error(`❌ Error generating ${template}:`, error.message);
     }
   }
 
@@ -208,8 +209,8 @@ async function startPreviewServer(previewDir, files) {
   });
 
   server.listen(PORT, () => {
-    console.log(`\n🚀 Preview server running at: http://localhost:${PORT}`);
-    console.log('Press Ctrl+C to stop the server\n');
+    logger.info(`\n🚀 Preview server running at: http://localhost:${PORT}`);
+    logger.info('Press Ctrl+C to stop the server\n');
   });
 
   return server;
@@ -218,7 +219,7 @@ async function startPreviewServer(previewDir, files) {
 async function main() {
   const templateName = process.argv[2];
 
-  console.log('🎨 VocaBoost Email Template Preview Generator\n');
+  logger.info('🎨 VocaBoost Email Template Preview Generator\n');
 
   try {
     // Wait for email service to initialize
@@ -227,11 +228,11 @@ async function main() {
     const { previewDir, generatedFiles } = await generatePreviews(templateName);
 
     if (generatedFiles.length === 0) {
-      console.error('No templates were generated.');
+      logger.error('No templates were generated.');
       process.exit(1);
     }
 
-    console.log(
+    logger.info(
       `\n✨ Generated ${generatedFiles.length} preview(s) in: ${previewDir}`
     );
 
@@ -248,14 +249,14 @@ async function main() {
 
     // Handle graceful shutdown
     process.on('SIGINT', () => {
-      console.log('\n\n👋 Shutting down preview server...');
+      logger.info('\n\n👋 Shutting down preview server...');
       server.close(() => {
-        console.log('Server closed.');
+        logger.info('Server closed.');
         process.exit(0);
       });
     });
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    logger.error('❌ Error:', error.message);
     process.exit(1);
   }
 }

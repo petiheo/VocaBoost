@@ -3,7 +3,6 @@ classroomRouter = express.Router();
 
 const classroomValidator = require('../validators/classroom.validator');
 const classroomController = require('../controllers/classroom.controller');
-const rateLimiter = require('../middlewares/rateLimiter.middleware');
 const {
   requireRole,
   hasClassroomAccess,
@@ -12,7 +11,6 @@ const {
 const authenticate = require('../middlewares/auth.middleware');
 
 classroomRouter.use(authenticate);
-classroomRouter.use(rateLimiter);
 
 // Tạo lớp học mới
 classroomRouter.post(
@@ -91,10 +89,7 @@ classroomRouter.post(
   classroomController.inviteLearner
 );
 
-classroomRouter.post(
-  '/accept-invitation',
-  classroomController.acceptInvitation
-);
+classroomRouter.post('/accept-invitation', classroomController.acceptInvitation);
 
 classroomRouter.delete(
   '/:classroomId/invitation',
@@ -111,9 +106,7 @@ classroomRouter.post(
   classroomController.createAssignment
 );
 
-classroomRouter.get('/my-joined', 
-  classroomController.getMyJoinedClassrooms
-);
+classroomRouter.get('/my-joined', classroomController.getMyJoinedClassrooms);
 
 classroomRouter.get(
   '/:classroomId/invitations',
@@ -164,7 +157,8 @@ classroomRouter.delete(
   classroomController.deleteAssignment
 );
 
-classroomRouter.post('/:classroomId/leave',
+classroomRouter.post(
+  '/:classroomId/leave',
   hasClassroomAccess,
   requireClassRole('learner'),
   classroomController.leaveClassroom
@@ -176,7 +170,5 @@ classroomRouter.get(
   requireClassRole('learner'),
   classroomController.getLearnerOverdueAssignments
 );
-
-
 
 module.exports = classroomRouter;

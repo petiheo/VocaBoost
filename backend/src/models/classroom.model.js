@@ -1,4 +1,4 @@
-const supabase = require('../config/database');
+const { supabase } = require('../config/supabase.config');
 const { v4: uuidv4 } = require('uuid');
 
 class ClassroomModel {
@@ -49,6 +49,27 @@ class ClassroomModel {
     return data;
   }
 
+  async findByTeacherIdWithAssignmentCounts(teacherId) {
+    const { data, error } = await supabase
+      .from('classrooms')
+      .select(
+        `
+        *,
+        assignments(id)
+      `
+      )
+      .eq('teacher_id', teacherId)
+      .neq('classroom_status', 'deleted');
+
+    if (error) throw error;
+
+    return data.map((classroom) => ({
+      ...classroom,
+      assignment_count: classroom.assignments ? classroom.assignments.length : 0,
+      assignments: undefined,
+    }));
+  }
+
   async getClassroomByCode(joinCode) {
     const { data, error } = await supabase
       .from('classrooms')
@@ -58,6 +79,17 @@ class ClassroomModel {
 
     if (error) throw error;
     return data;
+  }
+
+  async getClassroomCount(teacherId) {
+    const { count, error } = await supabase
+      .from('classrooms')
+      .select('*', { count: 'exact', head: true })
+      .eq('teacher_id', teacherId)
+      .neq('classroom_status', 'deleted');
+
+    if (error) throw error;
+    return count || 0;
   }
 
   async findMemberStatus(classroomId, userId) {
@@ -185,7 +217,7 @@ class ClassroomModel {
   }
 
   async searchLearnersByDisplayName(classroomId, status, keyword) {
-    const { data, error } = await supabase
+    let query = supabase
       .from('classroom_members')
       .select(
         `
@@ -201,14 +233,14 @@ class ClassroomModel {
       .eq('classroom_id', classroomId)
       .eq('join_status', status);
 
+    if (keyword) {
+      query = query.ilike('users.display_name', `%${keyword}%`);
+    }
+
+    const { data, error } = await query;
+
     if (error) throw error;
-
-    if (!keyword) return data;
-
-    const lower = keyword.toLowerCase();
-    return data.filter((item) =>
-      item.users?.display_name?.toLowerCase().includes(lower)
-    );
+    return data;
   }
 
   async upsertInvitation({ classroom_id, email, token, expires_at }) {
@@ -334,12 +366,86 @@ class ClassroomModel {
     }));
   }
 
+  async getJoinedClassroomsByLearnerWithAssignmentCounts(learnerId) {
+    const { data, error } = await supabase
+      .from('classroom_members')
+      .select(
+        `
+            classroom_id,
+            classrooms (
+                id,
+                teacher_id,
+                name,
+                description,
+                join_code,
+                learner_count,
+                classroom_status,
+                assignments(
+                  id,
+                  start_date,
+                  due_date
+                )
+            )
+            `
+      )
+      .eq('learner_id', learnerId)
+      .eq('join_status', 'joined');
+
+    if (error) throw error;
+
+    return data.map((entry) => {
+      const assignments = entry.classrooms.assignments || [];
+      const now = new Date();
+
+      const assignedCount = assignments.filter((assignment) => {
+        const startDate = new Date(assignment.start_date);
+        const dueDate = new Date(assignment.due_date);
+        return startDate <= now && now <= dueDate;
+      }).length;
+
+      return {
+        id: entry.classrooms.id,
+        teacher_id: entry.classrooms.teacher_id,
+        name: entry.classrooms.name,
+        description: entry.classrooms.description,
+        join_code: entry.classrooms.join_code,
+        learner_count: entry.classrooms.learner_count,
+        status: entry.classrooms.classroom_status,
+        assignment_count: assignedCount,
+      };
+    });
+  }
+
   async getInvitationsByClassroomId(classroomId) {
     const { data, error } = await supabase
       .from('classroom_invitations')
       .select('email')
       .eq('classroom_id', classroomId)
       .eq('status', 'pending_invite');
+    if (error) throw error;
+    return data;
+  }
+
+  async getLearnerAssignmentsByClassroomAndLearner(classroomId, learnerId) {
+    const { data, error } = await supabase
+      .from('learner_assignments')
+      .select('assignment_id')
+      .eq('learner_id', learnerId)
+      .in(
+        'assignment_id',
+        supabase.from('assignments').select('id').eq('classroom_id', classroomId)
+      );
+
+    if (error) throw error;
+    return data.map((row) => row.assignment_id);
+  }
+
+  async createLearnerAssignmentsBatch(assignments) {
+    const { data, error } = await supabase
+      .from('learner_assignments')
+      .insert(assignments)
+      .select();
+
     if (error) throw error;
     return data;
   }
@@ -390,9 +496,7 @@ class ClassroomModel {
 
     if (error) throw error;
 
-    return data.filter(
-      (item) => item.assignments?.classroom_id === classroomId
-    );
+    return data.filter((item) => item.assignments?.classroom_id === classroomId);
   }
 
   async hasLearnerAssignment(assignmentId, learnerId) {
@@ -467,7 +571,7 @@ class ClassroomModel {
     const { data, error } = await supabase
       .from('assignment_sublists')
       .select('*')
-      .eq('assignment_id', assignmentId)
+      .eq('assignment_id', assignmentId);
 
     if (error) throw error;
     return data;
@@ -552,10 +656,7 @@ class ClassroomModel {
   }
 
   async deleteVocabLists(listIds) {
-    const { error } = await supabase
-      .from('vocab_lists')
-      .delete()
-      .in('id', listIds);
+    const { error } = await supabase.from('vocab_lists').delete().in('id', listIds);
 
     if (error) throw error;
   }

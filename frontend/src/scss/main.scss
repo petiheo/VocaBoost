@@ -6,6 +6,7 @@
 @use './Review';
 @use './User';
 @use './Vocabulary';
+@use './ErrorBoundary';
 
 
 * {
@@ -14,5 +15,6 @@
 }
 
 body {
+  background: #FFFCF7;
   margin: 0 0;
 }
