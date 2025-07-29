@@ -3,6 +3,8 @@ import { Header, Footer, SideBar } from "../../components/index";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import classroomService from "../../services/Classroom/classroomService";
 import { useAuth } from "../../services/Auth/authContext";
+import SeeMoreSection from "../../components/Classroom/SeeMoreSection";
+
 
 const tabs = [
   { name: "My classroom", route: "/my-classroom" },
@@ -24,19 +26,19 @@ export default function MyClassroomPage() {
     const fetchClassroom = async () => {
       try {
         // Trường hợp là giáo viên
-        // if(user?.role === "teacher"){
+        if (user?.role === "teacher") {
           const res = await classroomService.myClassroom();
           if (res.success && Array.isArray(res.data)) {
             setClassrooms(res.data);
           }
-        // }
+        }
         // Trường hợp là học sinh
-        // else if(user?.role === "learner"){
-        //   const res = await classroomService.getMyJoined();
-        //   if (res.success && Array.isArray(res.data)) {
-        //     setClassrooms(res.data);
-        //   }
-        // }
+        else if (user?.role === "learner") {
+          const res = await classroomService.getMyJoined();
+          if (res.success && Array.isArray(res.data)) {
+            setClassrooms(res.data);
+          }
+        }
       } catch (error) {
         console.error("Lỗi khi lấy danh sách lớp học:", error);
       };
@@ -77,7 +79,7 @@ export default function MyClassroomPage() {
           </div>
 
           {/* Classroom List */}
-          <div className="classroom-list">
+          {/* <div className="classroom-list">
             {classrooms.length === 0 ? (
               <p className="no-classroom-message">No classroom available.</p>
             ) : (classrooms.map((c, index) => (
@@ -95,11 +97,31 @@ export default function MyClassroomPage() {
                 </div>
               </div>
             )))}
-          </div>
+          </div> */}
 
           {/* See more */}
-          <div className="see-more">
-            <button className="btn see-more-btn">See more ▼</button>
+          <div className="classroom-list">
+            <SeeMoreSection
+              items={classrooms}
+              renderItem={(item, index) => (
+                <div className="classroom-card" key={item.id}
+                  onClick={() => {
+                    localStorage.setItem("selectedClassroom", JSON.stringify(classrooms)) // luu thông tin của classroom được chọn
+                    navigate(`/classroom/approve-join-classroom-request`); // Điều hướng
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  <div className="info">
+                    <span>{item.assignment_count} assignments | {item.learner_count} members</span>
+                    <h3>{item.name}</h3>
+                  </div>
+                </div>
+              )}
+              initialCount={2}
+              step={3}
+              wrapperClassName="word-list"
+              itemWrapperTag="div"
+            />
           </div>
         </div>
       </div>
