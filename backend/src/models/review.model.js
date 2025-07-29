@@ -142,10 +142,40 @@ class ReviewModel {
       `)
       .eq('user_id', userId)
       .eq('word_id', wordId)
-      .maybeSingle(); // Use maybeSingle to return null instead of erroring if not found
+      .maybeSingle(); 
 
     if (error) throw error;
     return data;
+  }
+
+  // =================================================================
+  //  USER WORD PROGRESS (NEW METHOD)
+  // =================================================================
+
+  async createDefaultWordProgress(userId, wordId) {
+    const { error } = await supabase.from('user_word_progress').insert({
+      user_id: userId,
+      word_id: wordId,
+      next_review_date: new Date().toISOString(),
+      interval_days: 0,
+      ease_factor: 2.5,
+      repetitions: 0,
+    });
+
+    if (error) {
+      if (error.code === '23505') { // PostgreSQL duplicate key error code
+        console.warn(`Default progress for word ${wordId} already exists for user ${userId}. Ignoring.`);
+        return;
+      }
+      throw error;
+    }
+  }
+
+  async createDefaultWordProgressBulk(progressRecords) {
+    const { error } = await supabase
+      .from('user_word_progress')
+      .insert(progressRecords, { onConflict: 'user_id, word_id', ignore: true });
+    if (error) throw error;
   }
 }
 

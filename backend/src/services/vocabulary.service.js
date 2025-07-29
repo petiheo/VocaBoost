@@ -175,6 +175,9 @@ class VocabularyService {
       });
     }
 
+    // 4. create default user word progress 
+    await reviewModel.createDefaultWordProgress(userId, newWord.id)
+
     await vocabularyModel.updateWordCount(listId);
 
     // Return the full, newly created word object
@@ -210,6 +213,18 @@ class VocabularyService {
       await vocabularyModel
         .createSynonyms(finalSynonyms)
         .catch((err) => console.error('Bulk synonym creation failed:', err));
+    }
+
+    if (newWords && newWords.length > 0) {
+      const progressRecords = newWords.map(word => ({
+        user_id: userId,
+        word_id: word.id,
+        next_review_date: new Date().toISOString(),
+        interval_days: 0,
+        ease_factor: 2.5,
+        repetitions: 0,
+      }));
+      await reviewModel.createDefaultWordProgressBulk(progressRecords);
     }
 
     await vocabularyModel.updateWordCount(listId);
