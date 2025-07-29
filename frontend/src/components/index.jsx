@@ -11,6 +11,7 @@ export {default as VocabularyListCard} from "./Classroom/VocabularyListCard.jsx"
 export { default as ToastNotification } from "./ToastNotification.jsx";
 export { default as ConfirmModal } from "./ConfirmModal.jsx";
 export { useConfirm, ConfirmProvider } from "./ConfirmProvider.jsx";
+export { useToast, ToastProvider } from "./ToastProvider.jsx";
 
 // Classroom components
 export {default as ClassroomTitle} from "./Classroom/ClassroomTitle.jsx"
