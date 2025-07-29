@@ -9,6 +9,7 @@ import {
     // Manage classroom
     AddLearners, ApproveJoinClassroomRequest, ManageClassroomLayout, LearnersList, PendingRequest,
     AssignmentDetail,
+    Statistic,
 } from "../pages/Classroom"
 
 const classroomRoutes = [
@@ -66,6 +67,10 @@ const classroomRoutes = [
             {
                 path: "assignment-detail",
                 element: <AssignmentDetail />
+            },
+            {
+                path: "statistics",
+                element: <Statistic/>
             },
         ]
     },
