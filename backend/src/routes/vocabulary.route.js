@@ -10,6 +10,10 @@ const vocabularyController = require('../controllers/vocabulary.controller');
 
 vocabularyRouter.use(authMiddleware);
 
+// =================================================================
+//  LIST ROUTES
+// =================================================================
+
 vocabularyRouter.post(
   '/lists',
   rateLimiter,
@@ -31,6 +35,10 @@ vocabularyRouter.put(
 
 vocabularyRouter.delete('/lists/:listId', vocabularyController.deleteList);
 
+// =================================================================
+//  WORD ROUTES
+// =================================================================
+
 vocabularyRouter.post(
   '/lists/:listId/words',
   ...vocabularyValidator.createWord,
@@ -45,6 +53,13 @@ vocabularyRouter.post(
 
 vocabularyRouter.get('/lists/:listId/words', vocabularyController.getWordsByListId);
 
+vocabularyRouter.get('/words/:wordId', vocabularyController.getWordById);
+
+vocabularyRouter.get(
+  '/lists/:listId/words/search',
+  vocabularyController.searchWordsInList
+);
+
 vocabularyRouter.put(
   '/words/:wordId',
   ...vocabularyValidator.updateWord,
@@ -53,34 +68,9 @@ vocabularyRouter.put(
 
 vocabularyRouter.delete('/words/:wordId', vocabularyController.deleteWord);
 
-vocabularyRouter.post(
-  '/words/:wordId/examples',
-  ...vocabularyValidator.addExample,
-  vocabularyController.addExample
-);
-
-vocabularyRouter.get(
-  '/words/:wordId/examples',
-  vocabularyController.getExamplesByWordId
-);
-
-vocabularyRouter.delete('/examples/:exampleId', vocabularyController.deleteExample);
-
-vocabularyRouter.post(
-  '/words/:wordId/synonyms',
-  ...vocabularyValidator.addSynonyms,
-  vocabularyController.addSynonyms
-);
-
-vocabularyRouter.get(
-  '/words/:wordId/synonyms',
-  vocabularyController.getSynonymsByWordId
-);
-
-vocabularyRouter.delete(
-  '/words/:wordId/synonyms/:synonym',
-  vocabularyController.deleteSynonym
-);
+// =================================================================
+//  TAGS & UPLOADS
+// =================================================================
 
 vocabularyRouter.get('/tags', vocabularyController.getAllTags);
 
