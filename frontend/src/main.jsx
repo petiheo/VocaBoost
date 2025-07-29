@@ -6,7 +6,6 @@ import ErrorBoundary from "./components/ErrorBoundary.jsx";
 
 import authRoutes from "./routes/AuthRoutes";
 import vocabularyRoutes from "./routes/VocabularyRoutes.jsx";
-// import classroomRoutes from "./routes/ClassroomRoutes.jsx";
 import classroomRoutes from "./routes/ClassroomRoutes.jsx";
 
 

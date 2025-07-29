@@ -34,7 +34,7 @@ export default function PendingRequestPage() {
         fetchPendingRequest();
     }, [])
     // Xử lý nút Cancel (chưa hoàn thiện)
-    const handleCancel = (learner_id) => {
+    const handleCancel = async (id) => {
         setRequest(request.filter((_, i) => i !== learner_id));
     };
 

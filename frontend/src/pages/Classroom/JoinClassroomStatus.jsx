@@ -1,10 +1,18 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function JoinClassroomStatus({ status, code, errorMsg }) {
+    // Xử lý background của tường trạng thái 
     const [animation, setAnimation] = useState("");
 
+    // Xử lý trạng thái 
     const safeStatus = status ?? "default";
+
+    // Xử lý code của classroom
     const safeCode = code ?? "No code provided";
+
+    // Xử lý điều hướng trang
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (status === "success") setAnimation("confetti");
@@ -18,11 +26,11 @@ export default function JoinClassroomStatus({ status, code, errorMsg }) {
             case "success":
                 return "Join classroom successfully!";
             case "pending":
-                return "Join request sent!";
+                return "Your request has sent successfully!";
             case "full":
-                return "Classroom is full";
+                return "Error - The classroom is full";
             case "error":
-                return "Join failed";
+                return "Error - Join failed";
             default:
                 return "Join classroom";
         }
@@ -49,7 +57,7 @@ export default function JoinClassroomStatus({ status, code, errorMsg }) {
                 <h2 className="join-classroom__header">{getTitle(safeStatus)}</h2>
                 <p className="join-classroom__message">{getMessage(safeStatus)}</p>
                 <div className="join-classroom__code">{safeCode}</div>
-                <button className="join-classroom__button">
+                <button className="join-classroom__button" onClick={() => (navigate("/my-classroom"))}>
                     {status === "default" ? "Join" : "→"}
                 </button>
             </div>

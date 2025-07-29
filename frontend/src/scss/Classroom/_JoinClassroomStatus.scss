@@ -7,24 +7,29 @@
   align-items: center;
 
   &.confetti {
-    background-image: url("../../assets/Classroom/JoinClassroom/cofetti.svg");
+    background-image: url("./assets/Classroom/join_classroom_successfully.svg");
     background-size: cover;
   }
 
   &.error-bg {
     background-color: #F6CFCF;
-    background-image: url("../../assets/Classroom/JoinClassroom/error.svg");
-    background-repeat: cover;
+    background-image: url("./assets/Classroom/join_classroom_error.svg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+
   }
 
   &__card {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
     background: #fff;
     border-radius: 16px;
     padding: 2rem;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     text-align: center;
     width: 100%;
     max-width: 400px;
@@ -34,7 +39,7 @@
   &__header {
     font-family: $font-lalezar;
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: normal;
     margin-bottom: 1rem;
   }
 
@@ -53,6 +58,14 @@
     border-radius: 8px;
     display: inline-block;
     margin-bottom: 1.5rem;
+
+    display: -webkit-box;
+    line-clamp: 1;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60%; 
   }
 
   &__button {
@@ -67,6 +80,11 @@
 
     &:hover {
       background-color: #1e1811;
+    }
+
+    &:active {
+      background-color: #D6D6D6;
+      border-radius: 10px;
     }
   }
 }
