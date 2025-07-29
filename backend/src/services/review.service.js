@@ -47,11 +47,14 @@ class ReviewService {
     const activeSession = await reviewModel.findActiveSession(userId);
     if (!activeSession) return null;
 
-    const { data: allWords } = await vocabularyModel.findWordsByListId(activeSession.vocab_list_id, 0, 9999);
-    const { data: completedResults } = await reviewModel.getSessionSummaryStats(activeSession.id);
-    const completedWordIds = new Set(completedResults.map(r => r.word_id));
-    
-    const remainingWords = allWords.filter(word => !completedWordIds.has(word.id));
+    const { data: allWords, error: wordsError } = await vocabularyModel.findWordsByListId([activeSession.vocab_list_id], 0, 9999);
+    if (wordsError) throw wordsError;
+
+    const { data: completedResults, error: resultsError } = await reviewModel.getSessionSummaryStats(activeSession.id);
+    if (resultsError) throw resultsError;
+
+    const completedWordIds = new Set((completedResults || []).map(r => r.word_id));
+    const remainingWords = (allWords || []).filter(word => !completedWordIds.has(word.id));
     
     return {
         sessionId: activeSession.id,
@@ -88,8 +91,10 @@ class ReviewService {
     if (!session) throw new ForbiddenError('Session not found or you do not have permission to access it.');
     if (session.status === 'completed') throw new Error('Session is already completed.');
 
-    const results = await reviewModel.getSessionSummaryStats(sessionId);
-    const correctAnswers = results.filter(r => r.result === 'correct').length;
+    const { data: results, error } = await reviewModel.getSessionSummaryStats(sessionId);
+    if (error) throw error; 
+
+    const correctAnswers = (results || []).filter(r => r.result === 'correct').length;
     const totalWords = session.total_words;
 
     await reviewModel.updateSessionStatus(sessionId, 'completed', new Date().toISOString());

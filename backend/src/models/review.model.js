@@ -33,7 +33,7 @@ class ReviewModel {
   async findActiveSession(userId) {
     const { data, error } = await supabase
       .from('revision_sessions')
-      .select('id, session_type, total_words')
+      .select('id, session_type, total_words, vocab_list_id') 
       .eq('user_id', userId)
       .in('status', ['in_progress', 'interrupted'])
       .maybeSingle();
@@ -122,13 +122,10 @@ class ReviewModel {
   }
   
   async getSessionSummaryStats(sessionId) {
-      const { data, error } = await supabase
-        .from('session_word_results')
-        .select('result')
-        .eq('session_id', sessionId);
-
-      if (error) throw error;
-      return data;
+    return await supabase
+      .from('session_word_results')
+      .select('result, word_id') 
+      .eq('session_id', sessionId);
   }
 
   async findProgressByWordId(userId, wordId) {
