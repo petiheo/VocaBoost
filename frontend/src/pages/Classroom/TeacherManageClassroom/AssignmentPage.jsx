@@ -3,7 +3,7 @@ import { ClassroomTitle, TeacherClassroomMenuTab } from "../../../components";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import classroomService from "../../../services/Classroom/classroomService";
-import {format} from 'date-fns';
+import { format } from 'date-fns';
 
 
 export default function AssignmentPage() {
@@ -36,7 +36,7 @@ export default function AssignmentPage() {
             } catch (error) {
                 console.log("Loi khong fetch duoc assignments");
                 navigate("/fail");
-            }finally{
+            } finally {
                 setIsLoading(false);
             }
         }
