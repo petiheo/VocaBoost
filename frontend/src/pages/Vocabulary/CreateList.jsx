@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Header, SideBar, Footer, AccountPageInput, ToastNotification} from "../../components/index.jsx";
+import { Header, SideBar, Footer, AccountPageInput} from "../../components/index.jsx";
 // import { UploadImage } from "../../assets/Vocabulary";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import Select from "react-select";
+import { useToast } from "../../components/ToastProvider.jsx";
 
 export default function CreateList() {
     const [privacy, setPrivacy] = useState("private");
     const navigate = useNavigate();
-    const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+    const toast = useToast();
 
     const [words, setWords] = useState([
         { term: "", definition: "", example: "", image: null, tag: "" },
@@ -104,15 +105,15 @@ export default function CreateList() {
         }
 
         // Điều hướng hoặc thông báo sau khi tạo thành công
-        setToast({ show: true, message: "List created successfully!", type: "success" });
-        
+        toast( "List created successfully!", "success");
+
         setTimeout(() => {
             navigate("/vocabulary");
         }, 2000); // Điều hướng sau 2 giây
 
         } catch (err) {
         console.error("Error creating list:", err);
-        setToast({ show: true, message: "Failed to create list. Please try again.", type: "error" });
+        toast("Failed to create list. Please try again.", "error");
         }
     };
 
@@ -359,15 +360,6 @@ export default function CreateList() {
 
                 </form>
             </div>
-
-            {toast.show && (
-            <ToastNotification
-                message={toast.message}
-                type={toast.type}
-                onClose={() => setToast({ ...toast, show: false })}
-            />
-            )}
-
             <Footer />
         </div>
     );

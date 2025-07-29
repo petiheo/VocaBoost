@@ -1,11 +1,16 @@
 .toast-notification {
+  font-family: 'Inria Sans', sans-serif;
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: 80vh;
   padding: 1rem 1.5rem;
   border-radius: 0.2rem;
   font-weight: bold;
   color: white;
   z-index: 9999;
   opacity: 1;
-  animation: fadein 2s ease forwards;
+  animation: fadein 1s ease forwards;
 
 }
 
