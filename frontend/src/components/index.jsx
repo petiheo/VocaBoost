@@ -8,6 +8,7 @@ export { default as SearchBar } from "./SearchBar.jsx";
 export { default as SideBar } from "./SideBar.jsx";
 export { default as LearnerSubMenu } from "./LearnerSubMenu.jsx";
 export {default as VocabularyListCard} from "./Classroom/VocabularyListCard.jsx";
+export { default as ToastNotification } from "./ToastNotification.jsx";
 
 // Classroom components
 export {default as ClassroomTitle} from "./Classroom/ClassroomTitle.jsx"
