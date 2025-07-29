@@ -43,7 +43,7 @@ class ReviewModel {
   }
 
   async createSession(userId, listId, sessionType, totalWords) {
-    const { data, error } = await supabase
+    return await supabase
       .from('revision_sessions')
       .insert({
         user_id: userId,
@@ -54,9 +54,6 @@ class ReviewModel {
       })
       .select('id')
       .single();
-    
-    if (error) throw error;
-    return data;
   }
 
   async getSessionByIdAndUser(sessionId, userId) {
