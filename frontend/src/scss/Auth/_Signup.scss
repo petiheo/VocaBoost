@@ -2,17 +2,7 @@
 $text-color: #352D24;
 
 
-.grid-container{
-    display: grid;
-    grid-template-columns: 60% 40%;
-    height: 100vh;
-    .right-grid{
-        background-color: #352D24;
-        grid-column-start: 2;
-        grid-column-end: 3;
-    }
-}
-.signup{
+.signup {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -20,7 +10,7 @@ $text-color: #352D24;
     background-color: #F5F5F5;
 
 
-    &-logo{
+    &-logo {
         position: relative;
         left: calc((260 / 1440) * 100vw);
         top: calc((77 / 1440) * 100vh);
@@ -28,21 +18,32 @@ $text-color: #352D24;
         height: calc((65 / 1440) * 100vh);
     }
 
-    &-signup-button{
+    &-signin-button {
+        padding: 0 20px;
         text-decoration: none;
         color: $text-color;
         font-family: $font-lalezar;
         font-size: calc((30 / 1440) * 100vw);
+
+        &:active {
+            background-color: #D6D6D6;
+            border-radius: 10px;
+        }
     }
 
-    &-signup-button{
-        text-decoration: none;
+    &-signup-button {
+        padding: 0 20px;
         color: $text-color;
         font-family: $font-lalezar;
         font-size: calc((30 / 1440) * 100vw);
+
+        &:active {
+            background-color: #D6D6D6;
+            border-radius: 10px;
+        }
     }
-    
-    &-google{
+
+    &-google {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -52,15 +53,15 @@ $text-color: #352D24;
         color: $text-color;
         font-family: $font-lalezar;
 
-        border: 2px solid #A0A0A0 ;
+        border: 2px solid #A0A0A0;
         border-radius: 40px;
         padding: 10px;
 
-        margin: 5% 0;
-        
+        margin: 10px 0;
+
     }
 
-    &-container{
+    &-container {
         position: relative;
         left: calc((66 / 1440) * 100vw);
         top: calc((174 / 1440) * 100vh);
@@ -72,32 +73,31 @@ $text-color: #352D24;
         gap: 30px;
     }
 
-    &-signup-container{
+    &-signup-container {
         display: flex;
         justify-content: center;
-        gap: 50%; 
-
+        gap: 50%;
     }
 
     &-form {
         display: flex;
         flex-direction: column;
-        gap: 20px; 
+        gap: 20px;
     }
 
-    &-or{
+    &-or {
         color: $text-color;
         font-family: $font-lalezar;
         font-size: 30px;
     }
 
-    &-back-button-container{
+    &-back-button-container {
         display: flex;
         justify-content: center;
         align-items: center;
         width: 100%;
 
-        .signup-back-button{
+        .signup-back-button {
             display: flex;
             justify-content: center;
 
@@ -106,12 +106,12 @@ $text-color: #352D24;
             color: $text-color;
             font-family: $font-inriasans;
             background-color: #F3EDDF;
-    
+
             border: none;
             border-radius: 17px;
             padding: 10px;
 
-            margin-top: 1rem;         
+            margin-top: 1rem;
 
         }
     }

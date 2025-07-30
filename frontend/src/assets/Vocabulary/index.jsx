@@ -1,0 +1,11 @@
+export { default as UploadImage } from './uploadImage.svg';
+export { default as DropdownIcon } from './dropDown.svg';
+export { default as EditIcon } from './EditIcon.svg';
+export { default as PlusIcon } from './plus.svg';
+export { default as MoreIcon } from './more.svg';
+export { default as ShareIcon } from './share.svg';
+export { default as RightMoreIcon } from './rightMore.svg';
+export { default as TotalWordIcon } from './totalWord.svg';
+export { default as CategoryIcon } from './category.svg';
+export { default as TimeIcon } from './time.svg';
+export { default as LearnerIcon } from './learner.svg';

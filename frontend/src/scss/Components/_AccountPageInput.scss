@@ -2,6 +2,14 @@
 
 $text-color: #352D24;
 
+.input-error {
+    text-align: left;
+    color: red;
+    font-size: 0.9rem;
+    font-family: $font-lalezar;
+    margin-top: 4px;
+}
+
 .input {
 
     color: $text-color;
@@ -14,14 +22,8 @@ $text-color: #352D24;
         justify-content: center;
         align-items: center;
     }
-    
-    .input-error {
-        text-align: left;
-        color: red;
-        font-size: 0.9rem;
-        margin-top: 4px;
-    }
-    
+
+
     &__submit {
         background-color: #3492EA;
         border: none;
@@ -30,14 +32,28 @@ $text-color: #352D24;
         width: 50%;
         padding: calc((15 / 1440) * 100vh);
 
-
         font-family: $font-lalezar;
         font-size: calc((20 / 1440) * 100vw);
         color: white;
+        
+        transition: all 0.3s ease;
+        
+        &:hover:not(:disabled) {
+            background-color: #2980d6;
+            cursor: pointer;
+        }
+        
+        &:disabled {
+            background-color: #9ca3af;
+            color: #d1d5db;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
     }
 
     &__text,
-    &__password {
+    &__password,
+    &__email {
         align-items: flex-start;
 
         background-color: #D6D6D6;

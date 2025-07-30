@@ -8,10 +8,7 @@ const supabase = createClient(
 
 const testConnection = async () => {
   try {
-    const { data, error } = await supabase
-      .from('users')
-      .select('count')
-      .limit(1);
+    const { data, error } = await supabase.from('users').select('count').limit(1);
 
     if (error) throw error;
     logger.info('Connect to Supabase successfully');

@@ -18,7 +18,7 @@ import {
 
 const authRoutes = [
     { path: "/", element: <MainPage /> },
-    { path: "auth/success", element: <AuthSuccess /> },
+    { path: "/auth/success", element: <AuthSuccess /> },
     { path: "/verify-email", element: <AuthVerify /> },
     { path: "checkYourMail", element: <CheckYourMail /> },
     { path: "createlist", element: <CreateList /> },

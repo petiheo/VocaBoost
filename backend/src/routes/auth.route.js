@@ -3,25 +3,26 @@ const authRouter = express.Router();
 const passport = require('passport');
 
 const rateLimiter = require('../middlewares/rateLimiter.middleware');
-const { authValidators } = require('../validators/auth.validator');
+const authValidators = require('../validators/auth.validator');
 const authController = require('../controllers/auth.controller');
+const authMiddleware = require('../middlewares/auth.middleware');
 
 // Registration & Login & Logout
 authRouter.post(
   '/register',
-  rateLimiter,
+  // rateLimiter,
   authValidators.register,
   authController.register
 );
 
 authRouter.post(
   '/login',
-  rateLimiter,
+  // rateLimiter,
   authValidators.login,
   authController.login
 );
 
-authRouter.post('/logout', rateLimiter, authController.logout);
+authRouter.post('/logout', authController.logout);
 
 // OAuth Routes
 authRouter.get(
@@ -60,9 +61,10 @@ authRouter.post(
 
 authRouter.post(
   '/get-account-status',
-  rateLimiter,
   authValidators.email,
   authController.getAccountStatus
 );
+
+authRouter.get('/validate-token', authMiddleware, authController.validateToken);
 
 module.exports = authRouter;

@@ -1,6 +1,17 @@
 const supabase = require('../config/database');
 
 class UserModel {
+  async findById(id) {
+    const { data, error } = await supabase
+      .from('users')
+      .select()
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
   async findByEmail(email) {
     const { data, error } = await supabase
       .from('users')
@@ -69,11 +80,11 @@ class UserModel {
     return data;
   }
 
-  async updateAvartar(id, avatar) {
+  async updateAvatar(id, avatarUrl) {
     const { data, error } = await supabase
       .from('users')
       .update({
-        avatar_url: avatar,
+        avatar_url: avatarUrl,
         updated_at: new Date().toISOString(),
       })
       .eq('id', id)
@@ -120,13 +131,91 @@ class UserModel {
   }
 
   async verifyEmail(id) {
-    return await supabase
+    const { data, error } = await supabase
       .from('users')
       .update({
         email_verified: true,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', id);
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async hasReportedWord(reporterId, wordId) {
+    const { data, error } = await supabase
+      .from('reports')
+      .select()
+      .eq('reporter_id', reporterId)
+      .eq('word_id', wordId)
+      .eq('status', 'open')
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async createReport(reporterId, wordId, reason) {
+    const { data, error } = await supabase
+      .from('reports')
+      .insert({
+        reporter_id: reporterId,
+        word_id: wordId,
+        reason: reason,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async updateDailyGoal(userId, dailyGoal) {
+    const { data, error } = await supabase
+      .from('user_settings')
+      .update({
+        daily_goal: dailyGoal,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async updateUserStatus(userId, newStatus) {
+    const { data, error } = await supabase
+      .from('users')
+      .update({
+        account_status: newStatus,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async updateUserRole(userId, newRole) {
+    const { data, error } = await supabase
+      .from('users')
+      .update({
+        role: newRole,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   }
 }
 

@@ -56,10 +56,7 @@ class EmailService {
       for (const file of partialFiles) {
         if (file.endsWith('.hbs')) {
           const name = path.basename(file, '.hbs');
-          const content = await fs.readFile(
-            path.join(partialsDir, file),
-            'utf8'
-          );
+          const content = await fs.readFile(path.join(partialsDir, file), 'utf8');
           handlebars.registerPartial(name, content);
         }
       }
@@ -76,10 +73,7 @@ class EmailService {
       for (const file of templateFiles) {
         if (file.endsWith('.hbs')) {
           const name = path.basename(file, '.hbs');
-          const content = await fs.readFile(
-            path.join(templatesPath, file),
-            'utf8'
-          );
+          const content = await fs.readFile(path.join(templatesPath, file), 'utf8');
           this.templates.set(name, handlebars.compile(content));
         }
       }
@@ -284,6 +278,26 @@ class EmailService {
     logger.info(`📧 Email preview saved to: ${previewPath}`);
     return previewPath;
   }
+
+  async sendClassInvitation(to, token, classInfo, teacherName) {
+  const joinUrl = `${process.env.FRONTEND_URL}/accept-invitation?token=${token}`;
+
+  const html = this.renderTemplate('classroom-invitation', {
+    joinUrl,
+    className: classInfo.name,
+    classDescription: classInfo.description,
+    teacherName: teacherName || 'Your teacher',
+    subject: `Invitation to join classroom: ${classInfo.name}`,
+  });
+
+  return this.sendEmail({
+    to,
+    subject: `🎓 VocaBoost Invitation - Join "${classInfo.name}"`,
+    html,
+    text: `You've been invited to join the class "${classInfo.name}". Use this link: ${joinUrl}`,
+  });
+}
+
 }
 
 module.exports = new EmailService();

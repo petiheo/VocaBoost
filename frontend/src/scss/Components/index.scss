@@ -6,3 +6,16 @@
 @forward 'Dropdown' as dropdown-*;
 @use 'Report';
 @use 'ReportTrigger';
+@use "AccountPageInput";
+@use "Footer";
+@use "Header";
+@use "Navbar";
+@use "SearchBar";
+@use "SideBar";
+@use "LearnerSubMenu";
+@use "ToastNotification";
+@use "ConfirmModal";
+@forward "Dropdown" as dropdown-*;
+@forward "ClassroomTitle";
+@forward "TeacherClassroomMenuTab";
+@forward "VocabularyListCard";

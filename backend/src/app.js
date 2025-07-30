@@ -5,6 +5,7 @@ const logger = require('./utils/logger');
 const securityMiddleware = require('./middlewares/security.middleware');
 
 const router = require('./routes/index.route');
+const cors = require('cors');
 
 require('./config/passport');
 
@@ -68,8 +69,8 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   logger.error(err.stack);
   return res.status(500).json({
-    status: 'failed',
-    message: 'Đã xảy ra lỗi!',
+    success: false,
+    message: 'Internal server error',
   });
 });
 

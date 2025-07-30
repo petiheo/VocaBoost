@@ -1,161 +1,81 @@
 const authService = require('../services/auth.service');
-const {
-  generateToken,
-  generateEmailVerificationToken,
-  generateResetToken,
-  verifyToken,
-} = require('../helpers/jwt.helper');
-const emailService = require('../services/email.service');
+const { generateToken } = require('../helpers/jwt.helper');
 const passport = require('passport');
+const { ResponseUtils, ErrorHandler } = require('../utils');
 const logger = require('../utils/logger');
-
 class AuthController {
-  // TODO: Render HTML bằng Pug, chuyển logic chính sang service
   async register(req, res) {
     try {
       const { email, password, role = 'learner' } = req.body;
+      const result = await authService.registerUser(email, password, role);
 
-      const isExistEmail = await authService.findUserByEmail(email);
-      if (isExistEmail) {
-        return res.status(409).json({
-          success: false,
-          message: 'Email already registered',
-        });
-      }
-
-      const userData = await authService.insertIntoUsers(email, password, role);
-      const verificationToken = generateEmailVerificationToken(userData.id);
-      await authService.insertIntoAuthTokens(
-        verificationToken,
-        userData.id,
-        `email_verification`,
-        '24h'
+      return ResponseUtils.success(
+        res,
+        'Registration successful. Please check your email for verification.',
+        result,
+        201
       );
-      await emailService.sendEmailVerification(email, verificationToken);
-
-      const accessToken = generateToken({
-        userId: userData.id,
-        email,
-        role,
-      });
-
-      return res.status(201).json({
-        success: true,
-        message:
-          'Registration successful. Please check your email for verification.',
-        data: {
-          user: {
-            id: userData.id,
-            email,
-            role,
-            status: userData.account_status,
-          },
-          token: accessToken,
-        },
-      });
     } catch (error) {
-      logger.error('Register error: ', error);
-      return res.status(400).json({
-        success: false,
-        message: 'Registration failed',
-      });
+      if (error.message === 'Email already registered') {
+        return ResponseUtils.conflict(res, error.message);
+      }
+      return ErrorHandler.handleError(res, error, 'register', 'Registration failed');
     }
   }
 
-  // TODO: Chuyển logic chính sang service, thêm login attemp (optional), update last login
   async login(req, res) {
     try {
       const { email, password } = req.body;
+      const result = await authService.loginUser(email, password);
 
-      const userData = await authService.findUserByEmail(email);
-      if (!userData) {
-        return res.status(401).json({
-          success: false,
-          error: 'Invalid email or password',
-        });
-      }
-
-      const isValidPassword = await authService.validatePassword(
-        password,
-        userData.password_hash
-      );
-      if (!isValidPassword) {
-        return res.status(401).json({
-          success: false,
-          error: 'Invalid email or password',
-        });
-      }
-
-      if (userData.account_status === 'inactive') {
-        return res.status(403).json({
-          success: false,
-          error: 'Account has been deactivated',
-        });
-      }
-
-      if (userData.account_status === 'suspended') {
-        return res.status(403).json({
-          success: false,
-          error: 'Account has been suspended',
-        });
-      }
-
-      const accessToken = generateToken({
-        userId: userData.id,
-        email,
-        role: userData.role,
-      });
-
-      return res.status(200).json({
-        success: true,
-        message: 'Login successful',
-        data: {
-          user: {
-            id: userData.id,
-            email,
-            role: userData.role,
-            avataUrl: userData.avatar_url,
-          },
-          token: accessToken,
-        },
-      });
+      return ResponseUtils.success(res, 'Login successful', result);
     } catch (error) {
-      logger.error('Login error: ', error);
-      return res.status(400).json({
-        success: false,
-        message: 'Login failed',
-      });
+      if (error.message === 'Invalid email or password') {
+        return ResponseUtils.unauthorized(res, error.message);
+      }
+      if (
+        error.message ===
+        'This account was created with Google. Please sign in with Google instead.'
+      ) {
+        return ResponseUtils.error(res, error.message, 400);
+      }
+      if (
+        error.message === 'Account has been deactivated' ||
+        error.message === 'Account has been suspended'
+      ) {
+        return ResponseUtils.forbidden(res, error.message);
+      }
+      return ErrorHandler.handleError(res, error, 'login', 'Login failed');
     }
   }
 
   async googleCallback(req, res, next) {
-    passport.authenticate(
-      'google',
-      { session: false },
-      async (err, user, info) => {
-        const frontendUrl = process.env.FRONTEND_URL;
-        try {
-          if (err) {
-            logger.error('Google OAuth Error:', err);
-            return res.redirect(`${frontendUrl}/login?error=oauth_failed`);
-          }
-
-          if (!user) {
-            return res.redirect(`${frontendUrl}/login?error=access_denied`);
-          }
-
-          const accessToken = generateToken({
-            userId: user.id,
-            email: user.email,
-            role: user.role,
-          });
-          res.redirect(`${frontendUrl}/auth/success?token=${accessToken}`);
-        } catch (error) {
-          logger.error('Google callback processing error:', error);
-          res.redirect(`${frontendUrl}/login?error=processing_failed`);
+    passport.authenticate('google', { session: false }, async (err, user, info) => {
+      const frontendUrl = process.env.FRONTEND_URL;
+      try {
+        if (err) {
+          logger.error('Google OAuth Error:', err);
+          return res.redirect(`${frontendUrl}/login?error=oauth_failed`);
         }
+
+        if (!user) {
+          return res.redirect(`${frontendUrl}/login?error=access_denied`);
+        }
+
+        const accessToken = generateToken({
+          userId: user.id,
+          email: user.email,
+          role: user.role,
+        });
+
+        // Pass isNewUser as separate URL parameter
+        const redirectUrl = `${frontendUrl}/auth/success?token=${accessToken}&isNewUser=${user.isNewUser}`;
+        res.redirect(redirectUrl);
+      } catch (error) {
+        logger.error('Google callback processing error:', error);
+        res.redirect(`${frontendUrl}/login?error=processing_failed`);
       }
-    )(req, res, next);
+    })(req, res, next);
   }
 
   // TODO: frontend sẽ xử lý xóa JWT, sau này có thể triển khai thêm blacklist token
@@ -178,161 +98,116 @@ class AuthController {
   async forgotPassword(req, res) {
     try {
       const { email } = req.body;
+      await authService.sendPasswordReset(email);
 
-      const userData = await authService.findUserByEmail(email);
-      if (!userData) {
-        return res.status(200).json({
-          success: true,
-          message:
-            'If the email exists, password reset instructions have been sent',
-        });
-      }
-
-      const resetToken = generateResetToken(userData.id);
-      await authService.insertIntoAuthTokens(
-        resetToken,
-        userData.id,
-        'password_reset',
-        '15m'
+      return ResponseUtils.success(
+        res,
+        "If your email is registered, you'll receive a password reset link shortly."
       );
-      await emailService.sendPasswordReset(email, resetToken);
-
-      return res.status(200).json({
-        success: true,
-        message:
-          'If the email exists, password reset instructions have been sent',
-      });
     } catch (error) {
-      logger.error('Forgot password error: ', error);
-      return res.status(400).json({
-        success: false,
-        message: 'Forgot password failed',
-      });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'forgotPassword',
+        'Forgot password failed'
+      );
     }
   }
 
   async resetPassword(req, res) {
     try {
       const { token, newPassword } = req.body;
-      const decoded = verifyToken(token);
+      await authService.resetPassword(token, newPassword);
 
-      if (
-        decoded.type !== 'password_reset' ||
-        (await authService.isUsedToken(token))
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid or expired token',
-        });
-      }
-
-      await authService.updateUsedAt(token);
-      await authService.updatePassword(decoded.userId, newPassword);
-      return res.status(200).json({
-        success: true,
-        message:
-          'Password has been reset successfully. Please login with your new password.',
-      });
+      return ResponseUtils.success(
+        res,
+        'Password has been reset successfully. Please login with your new password.'
+      );
     } catch (error) {
-      logger.error('Reset password error: ', error);
-      return res.status(400).json({
-        success: false,
-        message: 'Reset password failed',
-      });
+      if (error.message === 'Invalid or expired token') {
+        return ResponseUtils.error(res, error.message, 400);
+      }
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'resetPassword',
+        'Reset password failed'
+      );
     }
   }
 
   async verifyEmail(req, res) {
     try {
       const token = req.params.token;
-      const decoded = verifyToken(token);
+      const result = await authService.verifyEmailToken(token);
 
-      if (
-        decoded.type !== 'email_verification' ||
-        (await authService.isUsedToken(token))
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid or expired token',
-        });
-      }
-
-      await authService.updateUsedAt(token);
-      await authService.verifyEmail(decoded.userId);
-      return res.status(200).json({
-        success: true,
-        message: 'Email verified successfully.',
-      });
+      return ResponseUtils.success(res, 'Email verified successfully.', result);
     } catch (error) {
-      logger.error('Verify email error: ', error);
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid or expired verification token',
-      });
+      if (error.message === 'Invalid or expired verification token') {
+        return ResponseUtils.error(res, error.message, 400);
+      }
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'verifyEmail',
+        'Invalid or expired verification token'
+      );
     }
   }
 
   async resendVerification(req, res) {
     try {
       const { email } = req.body;
-      const userData = await authService.findUserByEmail(email);
+      await authService.resendVerification(email);
 
-      if (!userData || userData.email_verified) {
-        return res.status(404).json({
-          success: false,
-          message: 'Email not found or already verified',
-        });
-      }
-
-      const token = generateEmailVerificationToken(userData.id);
-      await authService.insertIntoAuthTokens(
-        token,
-        userData.id,
-        `email_verification`,
-        '24h'
+      return ResponseUtils.success(
+        res,
+        'Verification email resent successfully. Please check your inbox'
       );
-
-      await emailService.sendEmailVerification(email, token);
-      return res.status(200).json({
-        success: true,
-        message:
-          'Verification email resent successfully. Please check your inbox',
-      });
     } catch (error) {
-      logger.error('Resend verification error: ', error);
-      return res.status(404).json({
-        success: false,
-        message: 'Email not found or already verified',
-      });
+      if (error.message === 'Email not found or already verified') {
+        return ResponseUtils.error(res, error.message, 400);
+      }
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'resendVerification',
+        'Email not found or already verified'
+      );
     }
   }
 
   async getAccountStatus(req, res) {
     try {
       const { email } = req.body;
-      const userData = await authService.findUserByEmail(email);
+      const result = await authService.getAccountStatus(email);
 
-      if (!userData) {
-        return res.status(404).json({
-          success: false,
-          message: 'Email not found',
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        data: {
-          email: email,
-          emailVerified: userData.email_verified,
-          accountStatus: userData.account_status,
-        },
-      });
+      return ResponseUtils.success(res, 'Account status retrieved', result);
     } catch (error) {
-      console.error('Get account status error: ', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Internal server error',
-      });
+      if (error.message === 'Email not found') {
+        return ResponseUtils.notFound(res, error.message);
+      }
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getAccountStatus',
+        'Internal server error',
+        500
+      );
+    }
+  }
+
+  async validateToken(req, res) {
+    try {
+      return ResponseUtils.success(res, 'Validate token successfully', req.user);
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'validateToken',
+        'Internal server error',
+        500
+      );
     }
   }
 }
