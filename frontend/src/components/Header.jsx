@@ -5,7 +5,7 @@ import DropdownMenu from "./DropdownMenu.jsx";
 import { useAuth } from "../services/Auth/authContext.jsx";
 import { Bell, Plus } from "../assets/Auth/index.jsx";
 
-const Header = () => {
+const Header = ({ searchQuery, onSearchChange }) => {
     const { user, loading } = useAuth();
     if (loading) return null;
     return (
@@ -23,7 +23,10 @@ const Header = () => {
 
             {/* Search Bar */}
             <div className="header__search-bar">
-                <SearchBar />
+                <SearchBar 
+                    searchQuery={searchQuery}
+                    onSearchChange={onSearchChange}
+                />
             </div>
 
             {user ? (
