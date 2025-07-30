@@ -208,7 +208,7 @@ class VocabularyModel {
       }
 
       // The wordIds are already known, so we can proceed directly.
-      
+
       // Step 2: Fetch all examples for those specific words.
       const { data: examples, error: examplesError } = await supabase
         .from('vocabulary_examples')
@@ -227,7 +227,7 @@ class VocabularyModel {
 
       // Step 4: Map the examples and synonyms to their parent words.
       const examplesByWordId = new Map();
-      (examples || []).forEach(ex => {
+      (examples || []).forEach((ex) => {
         if (!examplesByWordId.has(ex.vocabulary_id)) {
           examplesByWordId.set(ex.vocabulary_id, []);
         }
@@ -235,7 +235,7 @@ class VocabularyModel {
       });
 
       const synonymsByWordId = new Map();
-      (synonyms || []).forEach(s => {
+      (synonyms || []).forEach((s) => {
         if (!synonymsByWordId.has(s.word_id)) {
           synonymsByWordId.set(s.word_id, []);
         }
@@ -243,14 +243,13 @@ class VocabularyModel {
       });
 
       // Step 5: Assemble the final, enriched word objects.
-      const enrichedWords = words.map(word => ({
+      const enrichedWords = words.map((word) => ({
         ...word,
         examples: examplesByWordId.get(word.id) || [],
         synonyms: synonymsByWordId.get(word.id) || [],
       }));
 
       return { data: enrichedWords, error: null };
-
     } catch (error) {
       console.error(`Error in findWordsByIds:`, error);
       return { data: null, error };

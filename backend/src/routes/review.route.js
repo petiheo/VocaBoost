@@ -9,24 +9,15 @@ const reviewController = require('../controllers/review.controller');
 
 reviewRouter.use(authMiddleware);
 
-reviewRouter.get(
-  '/lists/due',
-  reviewController.getListsWithDueWords
-);
+reviewRouter.get('/lists/due', reviewController.getListsWithDueWords);
 
-reviewRouter.get(
-  '/due',
-  reviewController.getDueWords
-);
+reviewRouter.get('/due', reviewController.getDueWords);
 
-reviewRouter.get(
-  '/sessions/status',
-  reviewController.getActiveSessionStatus
-);
+reviewRouter.get('/sessions/status', reviewController.getActiveSessionStatus);
 
 reviewRouter.post(
   '/sessions/start',
-  rateLimiter, 
+  rateLimiter,
   ...reviewValidator.startSession,
   reviewController.startSession
 );
@@ -44,4 +35,3 @@ reviewRouter.post(
 );
 
 module.exports = reviewRouter;
-

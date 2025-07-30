@@ -9,14 +9,16 @@ const reviewValidator = {
       .withMessage('listId is required.')
       .isUUID()
       .withMessage('listId must be a valid UUID.'),
-    
+
     body('sessionType')
       .trim()
       .notEmpty()
       .withMessage('sessionType is required.')
       .isIn(['flashcard', 'fill_blank', 'word_association'])
-      .withMessage('sessionType must be one of: flashcard, fill_blank, word_association.'),
-      
+      .withMessage(
+        'sessionType must be one of: flashcard, fill_blank, word_association.'
+      ),
+
     handleValidationErrors,
   ],
 
@@ -38,7 +40,7 @@ const reviewValidator = {
       .withMessage('result is required.')
       .isIn(['correct', 'incorrect'])
       .withMessage("Result must be either 'correct' or 'incorrect'."),
-      
+
     body('responseTimeMs')
       .optional()
       .isInt({ min: 0 })

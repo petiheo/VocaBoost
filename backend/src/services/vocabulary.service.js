@@ -175,8 +175,8 @@ class VocabularyService {
       });
     }
 
-    // 4. create default user word progress 
-    await reviewModel.createDefaultWordProgress(userId, newWord.id)
+    // 4. create default user word progress
+    await reviewModel.createDefaultWordProgress(userId, newWord.id);
 
     await vocabularyModel.updateWordCount(listId);
 
@@ -216,7 +216,7 @@ class VocabularyService {
     }
 
     if (newWords && newWords.length > 0) {
-      const progressRecords = newWords.map(word => ({
+      const progressRecords = newWords.map((word) => ({
         user_id: userId,
         word_id: word.id,
         next_review_date: new Date().toISOString(),
@@ -290,7 +290,7 @@ class VocabularyService {
     const listId = await this._verifyWordPermission(wordId, userId);
     const { error } = await vocabularyModel.deleteWord(wordId);
     if (error) throw error;
-    
+
     await vocabularyModel.updateWordCount(listId);
   }
 
@@ -316,7 +316,7 @@ class VocabularyService {
 
     return {
       ...word,
-      userProgress: userProgress, 
+      userProgress: userProgress,
     };
   }
 
