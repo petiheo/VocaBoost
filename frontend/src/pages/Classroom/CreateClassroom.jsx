@@ -2,14 +2,25 @@ import { useState } from "react";
 import { Header, SideBar, Footer } from "../../components/index.jsx";
 import classroomService from "../../services/Classroom/classroomService.js";
 import { useNavigate } from "react-router-dom";
+import LoadingCursor from "../../components/cursor/LoadingCursor";
 
 export default function CreateClassroom() {
+
+    // Xử lý trạng thái của classroom khi khởi tạo classroom
     const [privacy, setPrivacy] = useState("private");
+
+    // Xử lý thông báo trang
     const [errors, setErrors] = useState({});
+
+    //Xử lý điều hướng 
     const navigate = useNavigate();
+
+    // Xử lý cursor xoay khi bấm nút đăng nhập 
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleCreateClassroom = async (e) => {
         e.preventDefault();
+
         const classroomName = e.target["classroom-name"].value;
         const description = e.target["description"].value;
         const limit = parseInt(e.target["limit"].value);
@@ -22,6 +33,7 @@ export default function CreateClassroom() {
         };
 
         // Handle API submission or further logic here...
+        setIsLoading(true);
         try {
             const res = await classroomService.createClassroom(data);
             navigate("/my-classroom");
@@ -29,11 +41,14 @@ export default function CreateClassroom() {
         } catch (error) {
             setErrors({ server: error.response?.data?.error || "Classroom error." });
             console.error(errors);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
         <div className="create-classroom">
+            <LoadingCursor loading={isLoading} />
             {/* header  */}
             <Header />
             <div className="create-classroom__content">
@@ -104,7 +119,8 @@ export default function CreateClassroom() {
                     <input
                         className="create-classroom__form--submit"
                         type="submit"
-                        value="Create Classroom"
+                        value={isLoading ? "Creating..." : "Create Classroom"}
+                        disabled={isLoading}
                     />
                 </form>
             </div>
