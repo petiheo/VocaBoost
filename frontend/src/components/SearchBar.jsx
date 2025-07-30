@@ -1,6 +1,6 @@
 import { SearchBarPattern } from "../assets/icons/index"
 
-const SearchBar = () => {
+const SearchBar = ({ searchQuery, onSearchChange }) => {
   return (
     <div className="searchbar-container">
       <img src={SearchBarPattern} alt="searchbar-pattern" width="16px"/>
@@ -8,6 +8,8 @@ const SearchBar = () => {
         type="text"
         className="searchbar-input"
         placeholder="Search"
+        value={searchQuery}
+        onChange={onSearchChange}
       />
     </div>
   );

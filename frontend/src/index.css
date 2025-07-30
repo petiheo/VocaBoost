@@ -515,7 +515,52 @@
 .homepage__wrapper__main {
   margin: auto;
   flex: 1;
-  background-color: #FFFCF7;
+}
+
+.homepage__main {
+  padding: 2rem;
+}
+
+.homepage__content {
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.search-results-section {
+  width: 100%;
+}
+.search-results-section h2 {
+  font-family: "Inria Sans", sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #2D2D2D;
+  margin-bottom: 2rem;
+}
+.search-results-section .search-status-message {
+  width: 100%;
+  padding: 3rem 1rem;
+  text-align: center;
+  font-size: 1.1rem;
+  font-family: "Inria Sans", sans-serif;
+  border-radius: 10px;
+  background-color: #f8f8f8;
+}
+.search-results-section .search-status-message.loading {
+  color: #555;
+}
+.search-results-section .search-status-message.error {
+  background-color: #fff0f0;
+  color: #d8000c;
+  font-weight: 500;
+}
+.search-results-section .search-status-message.empty {
+  color: #666;
+}
+
+.search-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
 }
 
 .top-pattern {
@@ -2877,23 +2922,24 @@ h2 {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   min-height: 220px;
   max-width: 300px;
-  gap: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .vocab-card .vocab-title {
+  font-family: "Lalezar", sans-serif;
   font-size: 1.2rem;
   font-weight: 700;
   color: #2b2b2b;
   margin: 0;
+  margin-bottom: 0.5rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .vocab-card .vocab-desc {
+  font-family: "Inria Sans", sans-serif;
   font-size: 0.9rem;
   color: #444;
   margin: 0;
@@ -2909,6 +2955,8 @@ h2 {
   font-size: 10px;
   color: #2932B1;
   font-weight: bold;
+  margin-top: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 .vocab-card .vocab-result {
   font-family: "Inter", sans-serif;
@@ -2920,7 +2968,9 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1.5rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  font-family: "Inria Sans", sans-serif;
 }
 .vocab-card .vocab-footer .user-block {
   display: flex;
@@ -2951,7 +3001,7 @@ h2 {
   background-color: #d6e5ff;
   color: #1b4da3;
   padding: 2px 6px;
-  border-radius: 5px;
+  border-radius: 7px;
   margin-top: 2px;
   width: fit-content;
 }
@@ -2963,6 +3013,104 @@ h2 {
   border: none;
   border-radius: 20px;
   cursor: pointer;
+}
+
+.carousel-vocab-section {
+  width: 100%;
+  margin-bottom: 4.5rem;
+}
+.carousel-vocab-section .section-header {
+  margin-bottom: 1.5rem;
+}
+.carousel-vocab-section .section-header h2 {
+  font-family: "Lalezar", sans-serif;
+  font-size: 2.5rem;
+  color: #2D2D2D;
+  margin: 0 0 1rem 0;
+}
+.carousel-vocab-section .carousel-body {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.carousel-vocab-section .nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #2D2D2D;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s;
+}
+.carousel-vocab-section .nav-arrow:hover {
+  background-color: #f5f5f5;
+}
+.carousel-vocab-section .nav-arrow img {
+  width: 32px;
+  height: 32px;
+}
+.carousel-vocab-section .nav-arrow.prev {
+  left: -24px;
+}
+.carousel-vocab-section .nav-arrow.next {
+  right: -24px;
+}
+
+.review-tabs {
+  display: flex;
+  gap: 1rem;
+}
+.review-tabs .tab-button {
+  font-family: "Inria Sans", sans-serif;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: transparent;
+  color: #555;
+  cursor: pointer;
+  border-radius: 20px;
+  transition: background-color 0.2s, color 0.2s;
+}
+.review-tabs .tab-button.active, .review-tabs .tab-button:hover {
+  background-color: #EFEFEF;
+  color: #2D2D2D;
+}
+
+.carousel-viewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel-slider {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.carousel-item {
+  flex-shrink: 0;
+  flex-grow: 0;
+  width: 25%;
+  padding: 0 14px;
+}
+
+.no-data-message {
+  width: 100%;
+  text-align: center;
+  padding: 4rem 0;
+  font-family: "Inria Sans", sans-serif;
+  color: #888;
+  font-style: italic;
+  font-size: 1.1rem;
 }
 
 .create-list {
