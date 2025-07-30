@@ -20,6 +20,13 @@
   width: 80%;
   margin: auto;
 
+  h1 {
+    font-family: $font-lalezar;
+    font-weight: lighter;
+    font-size: 50px;
+    margin: 0;
+  }
+
 
   .my-classroom-header {
     display: flex;
@@ -46,7 +53,6 @@
 
   .tab {
     display: flex;
-    margin-top: 1.5rem;
 
     .tab {
       margin-right: 1rem;
@@ -76,7 +82,10 @@
       border-radius: 10px;
       cursor: pointer;
 
+      font-family: $font-inter;
       text-decoration: none;
+
+      box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.15);
 
       &.light {
         background-color: #F1EDE4;
@@ -145,4 +154,19 @@
       margin: 0;
     }
   }
+}
+
+.empty-list {
+  font-family: $font-inriasans;
+  font-size: 20px;
+
+  background-color: #FFFAEF;
+  height: 30vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 20px;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.08);
 }

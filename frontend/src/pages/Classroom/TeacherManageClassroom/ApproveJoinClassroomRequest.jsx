@@ -117,24 +117,33 @@ export default function ApproveJoinClassroomRequest() {
                     </div>
                 </div>
 
-                <div className="student-list">
-                    <SeeMoreSection
-                        items={requests}
-                        renderItem={(item) => (
-                            <div className="student-row" key={item.learner_id}>
-                                <span>{item.email}</span>
-                                <div className="buttons">
-                                    <button className="btn approve"
-                                        onClick={() => handleApproveJoinRequest(item.learner_id)}
-                                    >Approve</button>
-                                    <button className="btn decline"
-                                        onClick={() => handleRejectJoinRequest(item.learner_id)}
-                                    >Decline</button>
-                                </div>
-                            </div>
-                        )}
-                    />
-                </div>
+                {requests.length === 0 ? (
+                    <>
+                        <div className="empty-list">"No request available"</div>
+                    </>
+                ) : (
+                    <>
+                        <div className="student-list">
+                            <SeeMoreSection
+                                items={requests}
+                                renderItem={(item) => (
+                                    <div className="student-row" key={item.learner_id}>
+                                        <span>{item.email}</span>
+                                        <div className="buttons">
+                                            <button className="btn approve"
+                                                onClick={() => handleApproveJoinRequest(item.learner_id)}
+                                            >Approve</button>
+                                            <button className="btn decline"
+                                                onClick={() => handleRejectJoinRequest(item.learner_id)}
+                                            >Decline</button>
+                                        </div>
+                                    </div>
+                                )}
+                            />
+                        </div>
+                    </>
+                )}
+
             </div>
         </div>
     );

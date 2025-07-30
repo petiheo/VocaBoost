@@ -57,7 +57,7 @@ export default function MyClassroomPage() {
             setClassrooms([]);
           }
         }
-        else{
+        else {
           setClassrooms([]);
         }
       } catch (error) {
@@ -76,6 +76,8 @@ export default function MyClassroomPage() {
           <SideBar />
         </div>
         <div className="my-classroom-page">
+
+          <h1>My Classroom</h1>
 
           {user.role === "teacher" && (
             <div className="sub-menu-tabs">
@@ -103,29 +105,37 @@ export default function MyClassroomPage() {
           </div>
 
           {/* See more */}
-          <div className="classroom-list">
-            <SeeMoreSection
-              items={classrooms}
-              renderItem={(item, index) => (
-                <div className="classroom-card" key={item.id}
-                  onClick={() => {
-                    localStorage.setItem("selectedClassroom", JSON.stringify(item)) // luu thông tin của classroom được chọn
-                    navigate(`/classroom/approve-join-classroom-request`); // Điều hướng
-                  }}
-                  style={{ cursor: "pointer" }}
-                >
-                  <div className="info">
-                    <span>{item.assignment_count} assignments | {item.learner_count} members</span>
-                    <h3>{item.name}</h3>
-                  </div>
-                </div>
-              )}
-              initialCount={2}
-              step={3}
-              wrapperClassName="word-list"
-              itemWrapperTag="div"
-            />
-          </div>
+          {classrooms.length === 0 ? (
+            <>
+              <div className="empty-list">"No classrom available"</div>
+            </>
+          ) : (
+            <>
+              <div className="classroom-list">
+                <SeeMoreSection
+                  items={classrooms}
+                  renderItem={(item, index) => (
+                    <div className="classroom-card" key={item.id}
+                      onClick={() => {
+                        localStorage.setItem("selectedClassroom", JSON.stringify(item)) // luu thông tin của classroom được chọn
+                        navigate(`/classroom/learners-list`); // Điều hướng
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <div className="info">
+                        <span>{item.assignment_count} assignments | {item.learner_count} members</span>
+                        <h3>{item.name}</h3>
+                      </div>
+                    </div>
+                  )}
+                  initialCount={2}
+                  step={3}
+                  wrapperClassName="word-list"
+                  itemWrapperTag="div"
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
       <Footer />

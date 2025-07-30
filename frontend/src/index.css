@@ -2116,6 +2116,12 @@ h2 {
   width: 80%;
   margin: auto;
 }
+.my-classroom-page h1 {
+  font-family: "Lalezar", sans-serif;
+  font-weight: lighter;
+  font-size: 50px;
+  margin: 0;
+}
 .my-classroom-page .my-classroom-header {
   display: flex;
   justify-content: space-between;
@@ -2137,7 +2143,6 @@ h2 {
 }
 .my-classroom-page .tab {
   display: flex;
-  margin-top: 1.5rem;
 }
 .my-classroom-page .tab .tab {
   margin-right: 1rem;
@@ -2162,7 +2167,9 @@ h2 {
   border: none;
   border-radius: 10px;
   cursor: pointer;
+  font-family: "Inter", sans-serif;
   text-decoration: none;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.15);
 }
 .my-classroom-page .actions .btn.light {
   background-color: #F1EDE4;
@@ -2214,6 +2221,18 @@ h2 {
 }
 .my-classroom-page .footer .contact p {
   margin: 0;
+}
+
+.empty-list {
+  font-family: "Inria Sans", sans-serif;
+  font-size: 20px;
+  background-color: #FFFAEF;
+  height: 30vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.08);
 }
 
 .manage-classroom-learner {
@@ -2520,8 +2539,9 @@ h2 {
   display: flex;
   align-items: center;
   background-color: #f1f1f1;
-  border-radius: 12px;
   padding: 10px 16px;
+  border-radius: 9999px;
+  font-family: "Inria Sans", sans-serif;
   width: 100%;
   min-width: 200px;
   max-width: 80%;
@@ -2533,7 +2553,7 @@ h2 {
   background: transparent;
   outline: none;
   font-size: 16px;
-  color: #333;
+  color: #989898;
   width: 100%;
 }
 
@@ -2883,6 +2903,7 @@ h2 {
   border-bottom: 2px solid #ddd;
   padding-bottom: 4px;
   font-family: "Lalezar", sans-serif;
+  font-weight: lighter;
   margin-top: 2em;
 }
 .sub-menu-tabs .tab-list .tab {

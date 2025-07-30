@@ -75,7 +75,11 @@ export default function AssignmentPage() {
                                     <p className="due">Due: {assignment?.due_date ? format(new Date(assignment.due_date), 'd/M/yyyy') : 'N/A'}</p>
                                 </div>
                             ))
-                        ) : (<p>No assignment available</p>)}
+                        ) : (
+                            <>
+                                <div className="empty-list">"No assignment available"</div>
+                            </>
+                        )}
                     </div>
 
                     {/* See more */}

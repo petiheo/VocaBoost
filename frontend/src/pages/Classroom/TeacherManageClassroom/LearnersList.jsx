@@ -16,8 +16,8 @@ export default function StudentListPage() {
     const [searchQuery, setSearchQuery] = useState("");
 
     // Xử lý Learner list hiện theo search bar
-    const filterLearners = learners.filter((learners) => 
-    learners?.email.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filterLearners = learners.filter((learners) =>
+        learners?.email.toLowerCase().includes(searchQuery.toLowerCase()));
 
     // Truy xuất dữ liệu lớp học được lưu khi users chọn classroom ở trang MyClassroom. 
     const [classroomId, setClassroomId] = useState(() => {
@@ -69,26 +69,37 @@ export default function StudentListPage() {
                     <Link to="../add-students" className="btn btn--dark"> + Add Student</Link>
 
                     <div className="pending-request__search-block">
-                        <SearchBar value={searchQuery} onChange={setSearchQuery} placeHolder={"Enter learner email you want to find"}/>
+                        <SearchBar value={searchQuery} onChange={setSearchQuery} placeHolder={"Enter learner email you want to find"} />
                         <div className="search-block--dropdown-menu">
                             <ClassroomDropdownMenu students={learners.length} />
                         </div>
                     </div>
                 </div>
 
-                <div className="student-list">
-                    <SeeMoreSection
-                        items={filterLearners}
-                        renderItem={(item) => (
-                            <div className="student-row" key={item.learner_id}>
-                                <span>{item.email}</span>
-                                <button className="btn light" onClick={() => handleRemove(item.learner_id)}>
-                                    Remove
-                                </button>
-                            </div>
-                        )}
-                    />
-                </div>
+                {learners.length === 0 ? (
+                    <>
+                        <div className="empty-list">"No learner available"</div>
+                    </>
+                ) : (
+                    <>
+                        <div className="student-list">
+                            <SeeMoreSection
+                                items={filterLearners}
+                                renderItem={(item) => (
+                                    <div className="student-row" key={item.learner_id}>
+                                        <span>{item.email}</span>
+                                        <button className="btn light" onClick={() => handleRemove(item.learner_id)}>
+                                            Remove
+                                        </button>
+                                    </div>
+                                )}
+                            />
+                        </div>
+
+                    </>
+                )}
+
+
             </div>
         </div>
     );
