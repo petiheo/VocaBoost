@@ -58,6 +58,9 @@ import SuccessfullyBackground from "../icons/Successfully/successfully-backgroun
 // Teacher Verification
 import UploadPattern from "../icons/TeacherVerification/UploadPattern.svg"
 
+// Report Icon
+import ReportIcon from "../icons/Report/report.svg";
+
 
 
 export {
@@ -92,4 +95,7 @@ export {
 
     // Teacher Verification 
     UploadPattern,
+    
+    // Report Icon
+    ReportIcon
 }

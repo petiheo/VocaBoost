@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Footer, Header, SideBar, LearnerSubMenu } from "../../components/index.jsx";
+import { Footer, Header, SideBar, LearnerSubMenu, ReportTrigger } from "../../components/index.jsx";
 import { DropdownIcon, MoreIcon, PlusIcon } from "../../assets/Vocabulary/index.jsx";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { useConfirm } from "../../components/ConfirmProvider.jsx";
@@ -112,6 +112,7 @@ export default function Dashboard() {
         <div className="dashboard">
             <Header />
             <LearnerSubMenu />
+            <ReportTrigger />
             <div className="dashboard__content">
                 <SideBar />
 
