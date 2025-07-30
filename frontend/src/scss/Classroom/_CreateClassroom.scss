@@ -31,7 +31,15 @@
 
         font-family: $font-inriasans;
 
+        .classroom-name{
+            width: 100%;
+            .input-error{
+                margin-left: 1rem;
+            }
+        }
+
         &--classroom-name {
+            width: 100%;
             padding: 1rem;
             border: none;
             border-radius: 10px;

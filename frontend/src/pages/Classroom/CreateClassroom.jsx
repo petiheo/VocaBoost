@@ -24,13 +24,24 @@ export default function CreateClassroom() {
         const classroomName = e.target["classroom-name"].value;
         const description = e.target["description"].value;
         const limit = parseInt(e.target["limit"].value);
-
         const data = {
             name: classroomName,
             description,
             privacy,
             limit
         };
+        const newErrors = {};
+
+        if (classroomName === "") {
+            newErrors.classroomName = "The classroom name is empty";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            console.log("Oke");
+            setErrors(newErrors);
+            return;
+        }
+
 
         // Handle API submission or further logic here...
         setIsLoading(true);
@@ -56,14 +67,15 @@ export default function CreateClassroom() {
                 <SideBar />
                 <form className="create-classroom__form" onSubmit={handleCreateClassroom}>
                     <h1 className="create-classroom__header">Create new classroom</h1>
-                    <input
-                        className="create-classroom__form--classroom-name"
-                        name="classroom-name"
-                        type="text"
-                        placeholder="Enter classroom name"
-                        required
-                    />
-
+                    <div className="classroom-name">
+                        <input
+                            className="create-classroom__form--classroom-name"
+                            name="classroom-name"
+                            type="text"
+                            placeholder="Enter classroom name"
+                        />
+                        {errors.classroomName && <div className="input-error">{errors.classroomName}</div>}
+                    </div>
                     <input
                         className="create-classroom__form--description"
                         name="description"
