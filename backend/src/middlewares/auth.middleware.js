@@ -1,15 +1,13 @@
 const { verifyToken } = require('../helpers/jwt.helper');
 const userModel = require('../models/user.model');
 const logger = require('../utils/logger');
+const { ResponseUtils, ErrorHandler } = require('../utils');
 
 const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        message: 'No token provided',
-      });
+      return ResponseUtils.unauthorized(res, 'No token provided');
     }
 
     const token = authHeader.substring(7);
@@ -17,24 +15,15 @@ const authMiddleware = async (req, res, next) => {
 
     const user = await userModel.findById(decoded.userId);
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'User not found',
-      });
+      return ResponseUtils.unauthorized(res, 'User not found');
     }
 
     if (user.account_status !== 'active') {
-      return res.status(403).json({
-        success: false,
-        message: `Account ${user.account_status}. Please contact support.`,
-      });
+      return ResponseUtils.forbidden(res, `Account ${user.account_status}. Please contact support.`);
     }
 
     if (user.email_verified === false) {
-      return res.status(403).json({
-        success: false,
-        message: 'Email verification required',
-      });
+      return ResponseUtils.forbidden(res, 'Email verification required');
     }
 
     // Attach user info to request
@@ -47,24 +36,14 @@ const authMiddleware = async (req, res, next) => {
     next();
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid token',
-      });
+      return ResponseUtils.unauthorized(res, 'Invalid token');
     }
 
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Token expired',
-      });
+      return ResponseUtils.unauthorized(res, 'Token expired');
     }
 
-    logger.error('Auth middleware error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Authentication error',
-    });
+    return ErrorHandler.handleError(res, error, 'authMiddleware', 'Authentication error', 500);
   }
 };
 

@@ -1,6 +1,7 @@
 // src/models/review.model.js
 
 const { supabase } = require('../config/supabase.config');
+const logger = require('../utils/logger');
 
 class ReviewModel {
   // =================================================================
@@ -96,7 +97,7 @@ class ReviewModel {
 
       return enrichedWords;
     } catch (error) {
-      console.error(
+      logger.error(
         `Error in findDueWordsByListId for user ${userId} and list ${listId}:`,
         error
       );
@@ -246,7 +247,7 @@ class ReviewModel {
     if (error) {
       if (error.code === '23505') {
         // PostgreSQL duplicate key error code
-        console.warn(
+        logger.warn(
           `Default progress for word ${wordId} already exists for user ${userId}. Ignoring.`
         );
         return;

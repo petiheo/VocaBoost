@@ -1,4 +1,5 @@
 const { supabase } = require('../config/supabase.config');
+const logger = require('../utils/logger');
 
 class VocabularyModel {
   // =================================================================
@@ -122,7 +123,7 @@ class VocabularyModel {
     if (!data.vocab_lists) {
       // This is a data integrity issue (a word exists without a list),
       // but we handle it safely by treating the word as inaccessible.
-      console.error(`Data integrity issue: Word ${wordId} has no associated list.`);
+      logger.error(`Data integrity issue: Word ${wordId} has no associated list.`);
       return { data: null, error: new Error('Word has no associated list.') };
     }
 
@@ -189,7 +190,7 @@ class VocabularyModel {
 
       return { data: enrichedWords, error: null, count };
     } catch (error) {
-      console.error(`Error in findWordsByListId for list ${listId}:`, error);
+      logger.error(`Error in findWordsByListId for list ${listId}:`, error);
       return { data: null, error, count: 0 };
     }
   }
@@ -251,7 +252,7 @@ class VocabularyModel {
 
       return { data: enrichedWords, error: null };
     } catch (error) {
-      console.error(`Error in findWordsByIds:`, error);
+      logger.error(`Error in findWordsByIds:`, error);
       return { data: null, error };
     }
   }
@@ -323,7 +324,7 @@ class VocabularyModel {
 
       return { data: enrichedWords, error: null, count };
     } catch (error) {
-      console.error(
+      logger.error(
         `Error in searchInList for list ${listId} with query "${q}":`,
         error
       );
@@ -383,7 +384,7 @@ class VocabularyModel {
       return { data: finalWordObject, error: null };
     } catch (error) {
       // Catch any database error from the three steps and return it.
-      console.error(`Error in findById for word ${id}:`, error);
+      logger.error(`Error in findById for word ${id}:`, error);
       return { data: null, error };
     }
   }

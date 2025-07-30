@@ -2,6 +2,7 @@ const reviewModel = require('../models/review.model');
 const vocabularyModel = require('../models/vocabulary.model');
 const { ForbiddenError, ValidationError } = require('../utils/errorHandler');
 const { shuffleArray } = require('../utils/common');
+const logger = require('../utils/logger');
 
 class ReviewService {
   // =================================================================
@@ -55,7 +56,7 @@ class ReviewService {
     if (!activeSession) return null;
 
     if (!activeSession.word_ids || activeSession.word_ids.length === 0) {
-      console.warn(
+      logger.warn(
         `Active session ${activeSession.id} found without word_ids. Ignoring.`
       );
       return null;

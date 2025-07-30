@@ -1,5 +1,6 @@
 const vocabularyModel = require('../models/vocabulary.model');
 const reviewModel = require('../models/review.model');
+const logger = require('../utils/logger');
 
 class ForbiddenError extends Error {
   constructor(message = 'User does not have permission for this action.') {
@@ -171,7 +172,7 @@ class VocabularyService {
       }));
       // Using .catch() here makes this step non-blocking. If synonyms fail, the word is still created.
       await vocabularyModel.createSynonyms(synonymsToInsert).catch((err) => {
-        console.error(`Failed to add synonyms for new word ${newWord.id}:`, err);
+        logger.error(`Failed to add synonyms for new word ${newWord.id}:`, err);
       });
     }
 
@@ -207,12 +208,12 @@ class VocabularyService {
     if (finalExamples.length > 0) {
       await vocabularyModel
         .createExamplesBulk(finalExamples)
-        .catch((err) => console.error('Bulk example creation failed:', err));
+        .catch((err) => logger.error('Bulk example creation failed:', err));
     }
     if (finalSynonyms.length > 0) {
       await vocabularyModel
         .createSynonyms(finalSynonyms)
-        .catch((err) => console.error('Bulk synonym creation failed:', err));
+        .catch((err) => logger.error('Bulk synonym creation failed:', err));
     }
 
     if (newWords && newWords.length > 0) {

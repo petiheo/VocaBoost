@@ -1,5 +1,6 @@
 const teacherService = require('../services/teacher.service');
 const logger = require('../utils/logger');
+const { ResponseUtils, ErrorHandler } = require('../utils');
 
 class TeacherController {
   async submitVerification(req, res) {
@@ -10,11 +11,11 @@ class TeacherController {
 
       const canSubmit = await teacherService.canSubmitRequest(userId);
       if (!canSubmit) {
-        return res.status(400).json({
-          success: false,
-          message:
-            'Submit verification failed, please check your existing request status.',
-        });
+        return ResponseUtils.error(
+          res,
+          'Submit verification failed, please check your existing request status.',
+          400
+        );
       }
 
       const teacherRequest = await teacherService.submitRequest(
@@ -28,22 +29,24 @@ class TeacherController {
         file
       );
 
-      return res.status(201).json({
-        success: true,
-        message:
-          'Your teacher verification request has been submitted successfully.',
-        data: {
+      return ResponseUtils.success(
+        res,
+        'Your teacher verification request has been submitted successfully.',
+        {
           requestId: teacherRequest.id,
           status: teacherRequest.status,
           submittedAt: teacherRequest.created_at,
         },
-      });
+        201
+      );
     } catch (error) {
-      logger.error('Submit verification error:', error);
-      return res.status(400).json({
-        success: false,
-        message: error.message || 'Submit verification request failed',
-      });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'Teacher.submitVerification',
+        'Submit verification request failed',
+        400
+      );
     }
   }
 
@@ -52,16 +55,15 @@ class TeacherController {
       const userId = req.user.userId;
       const result = await teacherService.getVerificationStatus(userId);
 
-      return res.status(200).json({
-        success: true,
-        data: result,
-      });
+      return ResponseUtils.success(res, '', result, 200);
     } catch (error) {
-      logger.error('Get verification status error:', error);
-      return res.status(400).json({
-        success: false,
-        message: 'Failed to get verification status',
-      });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'Teacher.getVerificationStatus',
+        'Failed to get verification status',
+        400
+      );
     }
   }
 }
