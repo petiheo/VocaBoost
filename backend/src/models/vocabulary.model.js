@@ -17,7 +17,7 @@ class VocabularyModel {
     let query = supabase
       .from('vocab_lists')
       .select(
-        'id, title, privacy_setting, word_count, updated_at, tags(name), creator:users(id, display_name, role)',
+        'id, title, description, privacy_setting, word_count, updated_at, tags(name), creator:users(id, display_name, role)',
         { count: 'exact' }
       )
       .eq('creator_id', userId);

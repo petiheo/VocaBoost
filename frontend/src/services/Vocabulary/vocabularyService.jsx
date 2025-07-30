@@ -45,14 +45,14 @@ const vocabularyService = {
   },
 
   // 8. Thêm 1 từ
-  addWord: async (data) => {
+  createWord: async (data) => {
     if (!data.listId || !data.term || !data.definition) return;
     const res = await api.post(`/vocabulary/lists/${data.listId}/words`, data); //  theo API
     return res.data.data.word;
   },
 
   // 9. Thêm nhiều từ
-  addWordsBulk: async (data) => {
+  createWordsBulk: async (data) => {
     if (!data.listId || !data.words || !Array.isArray(data.words)) return;
     const res = await api.post(`/vocabulary/lists/${data.listId}/words-bulk`, data); //  đúng format bulk
     return res.data.data;
@@ -79,33 +79,14 @@ const vocabularyService = {
   },
 
   // 13. Upload hình ảnh
-  uploadImage: async (formData) => {
+  uploadImageForWord: async (formData) => {
     const res = await api.post("/vocabulary/upload-image", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
     return res.data;
-  },
-
-  // 14. Thêm ví dụ cho từ
-  addExample: async (wordId, exampleSentence, translation = "") => {
-  const res = await api.post(`/vocabulary/words/${wordId}/examples`, {
-    exampleSentence,
-    translation
-  });
-  return res.data.data.example;
-},
-
-  getExamplesByWordId: async (wordId) => {
-    const res = await api.get(`/vocabulary/words/${wordId}/examples`);
-    return res.data.data.examples;
-  },
-
-  deleteExample: async (exampleId) => {
-    const res = await api.delete(`/vocabulary/examples/${exampleId}`);
-    return res.data;
-  },
+  }
 };
 
 export default vocabularyService;

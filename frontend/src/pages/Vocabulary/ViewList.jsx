@@ -4,6 +4,8 @@ import { Header, SideBar, Footer } from "../../components";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { UploadImage, MoreIcon, ShareIcon, DropdownIcon } from "../../assets/Vocabulary";
 import { SearchBarPattern } from "../../assets/icons/index"
+import { useConfirm } from "../../components/ConfirmProvider.jsx";
+import { useToast } from "../../components/ToastProvider.jsx";
 
 
 export default function ViewList() {
@@ -14,11 +16,14 @@ export default function ViewList() {
   const [showMoreBox, setShowMoreBox] = useState(false);
   const { listId } = useParams();
 
+  const confirm = useConfirm();
+  const toast = useToast();
+
 
   const handleCopy = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
-      alert("Copied to clipboard");
+      toast("Copied to clipboard", "success");
     } catch (err) {
       console.error("Copy failed", err);
     }
@@ -82,15 +87,17 @@ export default function ViewList() {
                               <div
                                 className="more-option delete"
                                 onClick={async () => {
-                                  const confirmed = window.confirm("Are you sure you want to delete this list?");
-                                  if (!confirmed) return;
-                                  try {
-                                    await vocabularyService.deleteList(listInfo.id);
-                                    window.location.href = "/dashboard";
-                                  } catch (err) {
-                                    console.error("Failed to delete:", err);
-                                    alert("Failed to delete list.");
-                                  }
+                                  confirm("Are you sure you want to delete this list?").then(confirmed => {
+                                    if (!confirmed) return;
+                                    try {
+                                      vocabularyService.deleteList(listInfo.id);
+                                      window.location.href = "/dashboard";
+                                    } catch (err) {
+                                      console.error("Failed to delete:", err);
+                                      toast("Failed to delete list.", "error");
+                                    }
+                                  });
+                                
                                 }}
                               >
                                 Delete List
@@ -114,12 +121,6 @@ export default function ViewList() {
                                 onClick={() => handleCopy(`https://localhost:5173/vocabulary/view/${listInfo.id}`)}
                                 >
                                 https://localhost:5173/vocabulary/view/{listInfo.id}
-                                </div>
-                                <div
-                                className="share-option"
-                                onClick={() => handleCopy(listInfo.id)}
-                                >
-                                {listInfo.id}
                                 </div>
                             </div>
                             )}
