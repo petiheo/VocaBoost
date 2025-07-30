@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Footer, Header, SideBar, LearnerSubMenu } from "../../components/index.jsx";
+import { Footer, Header, SideBar, LearnerSubMenu, ReportTrigger } from "../../components/index.jsx";
 import { DropdownIcon, MoreIcon, PlusIcon } from "../../assets/Vocabulary/index.jsx";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
+import { useConfirm } from "../../components/ConfirmProvider.jsx";
+import { useToast } from "../../components/ToastProvider.jsx";
 
 export default function Dashboard() {
     const [lists, setLists] = useState([]);
@@ -16,6 +18,8 @@ export default function Dashboard() {
     const [availableTags, setAvailableTags] = useState([]);
 
     const navigate = useNavigate();
+    const confirm = useConfirm();
+    const toast = useToast();
 
     const handleCreateNewList = async () => {
         try {
@@ -32,12 +36,12 @@ export default function Dashboard() {
             if (listId) {
                 navigate(`/vocabulary/create/${listId}`); //  Navigate với ID
             } else {
-                alert("Failed to create new list.");
+                toast("Failed to create new list.", "error");
                 console.log("Response:", res);
             }
         } catch (error) {
             console.error("Error creating list:", error);
-            alert("Something went wrong. Please try again.");
+            toast("Something went wrong. Please try again.", "error");
         }
     };
 
@@ -108,6 +112,7 @@ export default function Dashboard() {
         <div className="dashboard">
             <Header />
             <LearnerSubMenu />
+            <ReportTrigger />
             <div className="dashboard__content">
                 <SideBar />
 
@@ -212,7 +217,7 @@ export default function Dashboard() {
                                             <div
                                                 className="more-option delete"
                                                 onClick={async () => {
-                                                const confirmed = window.confirm("Are you sure you want to delete this list?");
+                                                const confirmed =  await confirm("Are you sure you want to delete this list?");
                                                 if (!confirmed) return;
 
                                                 try {
@@ -222,7 +227,7 @@ export default function Dashboard() {
                                                     setActiveListId(null);
                                                 } catch (err) {
                                                     console.error("Delete failed:", err);
-                                                    alert("Failed to delete list.");
+                                                    toast("Failed to delete list.", "error");
                                                 }
                                                 }}
                                             >

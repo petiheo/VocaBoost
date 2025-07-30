@@ -5,10 +5,14 @@ import { UploadImage } from "../../assets/Vocabulary";
 // import CreatableSelect from "react-select/creatable";
 import Select from "react-select";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
+import { useConfirm } from "../../components/ConfirmProvider.jsx";
+import { useToast } from "../../components/ToastProvider.jsx";
 
 export default function EditList() {
     const { listId } = useParams();
     const navigate = useNavigate();
+    const confirm = useConfirm();
+    const toast = useToast();
 
     const [privacy, setPrivacy] = useState("private");
     const [availableTags, setAvailableTags] = useState([]);
@@ -21,11 +25,58 @@ export default function EditList() {
     const [selectedWordIds, setSelectedWordIds] = useState(new Set());
 
     const handleDeleteWord = async (index) => {
-        const confirmed = window.confirm("Are you sure you want to delete this word?");
-        if (!confirmed) return;
+        confirm("Are you sure you want to delete this word?").then((confirmed) => {
+            if (!confirmed) return;
 
         setWords(prev => prev.filter((_, i) => i !== index)); // cập nhật UI
+        setSelectedWordIds(prev => {
+            const newSelected = new Set(prev);
+            newSelected.delete(words[index].id);
+            return newSelected;
+        });
+        });
     };
+
+    function normalizeSynonyms(input) {
+    if (!input) return [];
+
+    if (typeof input === "string") {
+        return input
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s !== "");
+    }
+
+    return [];
+    }
+    
+    function validateSynonymsInput(input) {
+        if (typeof input !== "string" || input.trim() === "") {
+            // Nếu null/undefined/rỗng => hợp lệ, không cần validate
+            return true;
+        }
+
+        // Không được kết thúc bằng ký tự đặc biệt
+        if (/[^a-zA-Z0-9)]$/.test(input.trim())) {
+            toast("Synonyms không được kết thúc bằng ký tự đặc biệt.", "error");
+            return false;
+        }
+
+        // Không được chứa 2 dấu `,,` liền nhau (=> tạo chuỗi rỗng)
+        if (input.includes(",,")) {
+            toast("Synonyms phải được phân cách đúng bằng dấu ',' và không có khoảng trống thừa.", "error");
+            return false;
+        }
+
+        // Nếu có chuỗi rỗng sau khi split thì cũng lỗi
+        const parts = input.split(",").map(s => s.trim());
+        if (parts.some(p => p === "")) {
+            toast("Synonyms không được chứa mục trống.", "error");
+            return false;
+        }
+
+        return true;
+    }
 
 
     useEffect(() => {
@@ -38,14 +89,15 @@ export default function EditList() {
 
             const mappedWords = await Promise.all(
             words.map(async (w) => {
-                const examples = await vocabularyService.getExamplesByWordId(w.id);
                 return {
                 id: w.id,
                 term: w.term,
                 definition: w.definition,
                 phonetics: w.phonetics || "",
                 image: w.image_url || "",
-                example: examples?.[0]?.example_sentence || "",
+                exampleSentence: w.vocabulary_examples?.example_sentence || "",
+                translation: w.translation || "",
+                synonyms: w.synonyms || [],
                 };
             })
             );
@@ -72,14 +124,28 @@ export default function EditList() {
 
     try {
         if (!title.trim() || !description.trim()) {
-        alert("Title and description are required.");
-        return;
+            toast("Title and description are required.", "error");
+            return;
         }
 
         const hasInvalid = words.some(word => !word.term?.trim() || !word.definition?.trim());
         if (hasInvalid) {
-        alert("Each word must have both term and definition.");
-        return;
+            toast("Each word must have both term and definition.", "error");
+            return;
+        }
+
+        for (let i = 0; i < words.length; i++) {
+            const word = words[i];
+
+            if (!word.term?.trim() || !word.definition?.trim()) {
+                toast(`Word ${i + 1} must have both term and definition.`, "error");
+                return;
+            }
+
+            if (!validateSynonymsInput(word.synonyms)) {
+                toast(`Word ${i + 1} has invalid synonyms. Must be comma-separated and not end with a special character.`, "error");
+                return;
+            }
         }
 
         const updatePayload = {
@@ -106,33 +172,31 @@ export default function EditList() {
             term: word.term,
             definition: word.definition,
             phonetics: word.phonetics || "",
+            exampleSentence: word.exampleSentence || "",
+            translation: word.translation || "",
+            synonyms: normalizeSynonyms(word.synonyms),
             ...(word.image ? { image_url: word.image } : {}),
         };
 
         if (word.id) {
-        await vocabularyService.updateWord(word.id, wordPayload);
-
-        if (word.example?.trim().length >= 10) {
-            // Nếu có example mới → thêm
-            await vocabularyService.addExample(word.id, word.example);
-        } else if (word.exampleId) {
-            // Nếu user xoá example (input trống) → xoá khỏi DB
-            await vocabularyService.deleteExample(word.exampleId);
+            console.log("Updating word:", word.id, wordPayload);
+            await vocabularyService.updateWord(word.id, wordPayload);
+        }
+        else {
+            wordPayload.listId = listId; // cần listId khi tạo từ mới
+            await vocabularyService.createWord(wordPayload);
         }
         }
 
-        }
-
-        alert("List updated successfully!");
-        navigate("/vocabulary");
+        toast("List updated successfully!", "success");
+        setTimeout(() => navigate("/vocabulary"), 2000);
 
     } catch (err) {
         console.error("Error updating list:", err.response?.data || err.message);
-        alert("Failed to update list.");
+        toast("Failed to update list.", "error");
     }
     };
   
-
 
     const handleWordChange = (index, field, value) => {
         const updated = [...words];
@@ -141,7 +205,7 @@ export default function EditList() {
     };
 
     const handleAddWord = () => {
-        setWords([...words, { term: "", definition: "", phonetics: "", example: "", image: null }]);
+        setWords([...words, { term: "", definition: "", phonetics: "", exampleSentence: "", image: null, translation: "", synonyms: [] }]);
     };
 
     const handleImageUpload = async (file, index) => {
@@ -212,11 +276,13 @@ export default function EditList() {
                                 type="button"
                                 className="edit-list__delete-selected"
                                 onClick={() => {
-                                const confirmed = window.confirm("Delete selected words?");
-                                if (!confirmed) return;
-                                setWords(words.filter((word) => !selectedWordIds.has(word.id)));
-                                setSelectedWordIds(new Set());
-                                }}  
+                                confirm("Delete selected words?").then((confirmed) => {
+                                    if (!confirmed) return;
+
+                                        setWords(words.filter((word) => !selectedWordIds.has(word.id)));
+                                        setSelectedWordIds(new Set());
+                                    });
+                                }}
                             >
                                 Delete selected
                             </button>
@@ -263,7 +329,7 @@ export default function EditList() {
                                     value={word.term || ""}
                                     onChange={(e) => handleWordChange(index, "term", e.target.value)}
                                 />
-                                <small className="input-note">Terminology</small>
+                                <small className="input-title">Terminology</small>
                                 </div>
 
                                 <div className="edit-list__word-box--field">
@@ -273,7 +339,7 @@ export default function EditList() {
                                     value={word.definition || ""}
                                     onChange={(e) => handleWordChange(index, "definition", e.target.value)}
                                 />
-                                <small className="input-note">Definition</small>
+                                <small className="input-title">Definition</small>
                                 </div>
 
                                 <div className="edit-list__word-box--field">
@@ -283,7 +349,7 @@ export default function EditList() {
                                     value={word.phonetics || ""}
                                     onChange={(e) => handleWordChange(index, "phonetics", e.target.value)}
                                 />
-                                <small className="input-note">Phonetics</small>
+                                <small className="input-title">Phonetics</small>
                                 </div>
 
                                 {/* <label className="edit-list__upload-btn">
@@ -304,13 +370,13 @@ export default function EditList() {
                                 <div className="create-list__word-box--row">
                                     <div className="create-list__word-box--field">
                                         <AccountPageInput
-                                            name={`synonym-${index}`}
+                                            name={`synonyms-${index}`}
                                             type="text"
                                             placeholder=""
-                                            value={word.synonym}
-                                            onChange={(e) => handleWordChange(index, "synonym", e.target.value)}
+                                            value={word.synonyms}
+                                            onChange={(e) => handleWordChange(index, "synonyms", e.target.value)}
                                         />
-                                        <small className="input-note">Synonym</small>
+                                        <small className="input-title">Synonyms</small>
                                     </div>
 
                                     <div className="create-list__word-box--field">
@@ -321,20 +387,20 @@ export default function EditList() {
                                             value={word.translation}
                                             onChange={(e) => handleWordChange(index, "translation", e.target.value)}
                                         />
-                                        <small className="input-note">Translation</small>
+                                        <small className="input-title">Translation</small>
                                     </div>
                                 </div>
 
                                 <div className="create-list__word-box--row">
                                     <div className="create-list__word-box--field">
                                         <AccountPageInput
-                                            name={`example-${index}`}
+                                            name={`exampleSentence-${index}`}
                                             type="text"
                                             placeholder=""
-                                            value={word.example}
-                                            onChange={(e) => handleWordChange(index, "example", e.target.value)}
+                                            value={word.exampleSentence}
+                                            onChange={(e) => handleWordChange(index, "exampleSentence", e.target.value)}
                                         />
-                                        <small className="input-note">An example in context</small>
+                                        <small className="input-title">An example in context</small>
                                     </div>
                                     <button type="button" className="create-list__ai-btn">AI</button>
                                 </div>
@@ -357,7 +423,8 @@ export default function EditList() {
                             className="edit-list__form--cancel"
                             onClick={() => {
                                     if (!originalList) return;
-                                    const confirmed = window.confirm("Discard all changes?");
+
+                                    confirm("Discard all changes?").then((confirmed) => {
                                     if (!confirmed) return;
 
                                     setTitle(originalList.title);
@@ -366,6 +433,8 @@ export default function EditList() {
                                     setSelectedTags(originalList.tags);
                                     setWords(originalWords);
                                     navigate("/vocabulary");
+
+                                    });
                                 }}
                         />
                         <input

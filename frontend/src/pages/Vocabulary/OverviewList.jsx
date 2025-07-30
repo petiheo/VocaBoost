@@ -4,6 +4,7 @@ import { Header, SideBar, Footer } from "../../components";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { RightMoreIcon, TotalWordIcon, CategoryIcon, TimeIcon, LearnerIcon } from "../../assets/Vocabulary";
 import { jwtDecode } from "jwt-decode"; // Thư viện để giải mã JWT
+import { useToast } from "../../components/ToastProvider.jsx";
 
 
 export default function OverviewList() {
@@ -11,6 +12,7 @@ export default function OverviewList() {
   console.log("List ID from params:", listId); // Kiểm tra trong console
   const [listInfo, setListInfo] = useState(null);
   const [words, setWords] = useState([]);
+  const toast = useToast(); 
 
   const currentUserId = localStorage.getItem("userId"); // hoặc lấy từ context
   const [isOwner, setIsOwner] = useState(false);
@@ -58,10 +60,10 @@ export default function OverviewList() {
         privacy_setting: "private",
         // có thể clone từ list gốc nếu bạn có cơ chế "copy list"
       });
-      alert("Added to your lists.");
+      toast("Added to your lists.", "success");
     } catch (error) {
       console.error("Failed to add to list", error);
-      alert("Failed to add.");
+      toast("Failed to add.", "error");
     }
   };
 

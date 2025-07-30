@@ -1,0 +1,89 @@
+.report {
+    font-family: 'Inria Sans', serif;
+    &-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    &-modal {
+        width: 60%;
+        max-width: 550px;
+        background-color: #faf3e0;
+        border-radius: 20px;
+        padding: 40px;
+        position: relative;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+
+    &-title {
+        font-family: 'Lalezar', serif;
+        font-size: 28px;
+        font-weight: normal;
+        color: #2d1d0b;
+        margin-bottom: 10px;
+    }
+
+    &-instruction {
+        font-size: 16px;
+        color: #2d1d0b;
+        margin-bottom: 20px;
+    }
+
+    &-textarea {
+        width: 100%;
+        min-height: 12rem;
+        background-color: #fdf0cc;
+        border: 1px solid #b4a790;
+        border-radius: 20px;
+        padding: 20px;
+        font-size: 16px;
+        font-family: 'Inria Sans', serif;
+        resize: none;
+        color: #2d1d0b;
+        outline: none;
+
+        &::placeholder {
+            color: #b4a790;
+        }
+    }
+}
+
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #2d1d0b;
+}
+
+.submit-button {
+  font-family: 'Inria Sans', serif;
+  font-size: 1rem;
+  font-weight: bold;
+
+  width: 40%;
+  margin-top: 3rem;
+  background-color: #2d1d0b;
+  color: #fff6e5;
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: opacity 0.3s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
