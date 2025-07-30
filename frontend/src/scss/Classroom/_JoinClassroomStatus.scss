@@ -27,12 +27,12 @@
     justify-content: center;
 
     background: #fff;
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    text-align: center;
+    padding: 2.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
+    text-align: center;
     border: 1px solid #ddd;
   }
 
@@ -40,24 +40,28 @@
     font-family: $font-lalezar;
     font-size: 1.5rem;
     font-weight: normal;
-    margin-bottom: 1rem;
+    color: #2c231b;
+    margin-bottom: 0.5rem;
   }
 
   &__message {
     font-family: $font-inriasans;
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: #2A1E17;
+    margin-bottom: 1rem;
   }
 
   &__code {
     font-family: $font-inriasans;
-    font-weight: 600;
     font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c231b;
     background: #eee;
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
-    display: inline-block;
-    margin-bottom: 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    width: 60%;
+    margin-bottom: 1.25rem;
 
     display: -webkit-box;
     line-clamp: 1;
@@ -65,17 +69,16 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 60%; 
   }
 
   &__button {
     font-family: $font-inriasans;
     background-color: #2b2112;
     color: #fff;
-    padding: 0.75rem 2rem;
+    padding: 0.65rem 2rem;
     border: none;
-    border-radius: 10px;
-    font-size: 1rem;
+    border-radius: 9999px;
+    font-size: 0.95rem;
     cursor: pointer;
 
     &:hover {

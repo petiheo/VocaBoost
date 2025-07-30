@@ -26,7 +26,7 @@
         h2.join-classroom__title {
             font-family: $font-lalezar;
             font-size: 1.5rem;
-            font-weight: 700;
+            font-weight: normal;
             color: #2c231b;
             margin-bottom: 0.5rem;
         }
@@ -40,16 +40,17 @@
         }
 
         .join-classroom__code-input {
+            font-family: $font-inriasans;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c231b;
             background-color: #f2f2f2;
             border: none;
             border-radius: 0.5rem;
             padding: 0.75rem 1rem;
             width: 60%;
-            font-size: 1rem;
-            font-weight: 600;
             text-align: center;
             margin-bottom: 1.25rem;
-            color: #2c231b;
 
             &:focus {
                 outline: none;
