@@ -1,16 +1,32 @@
-@use '../Fonts' as *; 
+@use '../Fonts' as *;
 
-.my-classroom-container{
+.my-classroom {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100vh;
+}
+
+.my-classroom-container {
   margin: 2em 0;
   display: flex;
 
   font-family: $font-inter;
+  font-weight: bold;
+  color: #352D24;
 }
 
 .my-classroom-page {
   font-family: $font-inriasans;
   width: 80%;
   margin: auto;
+
+  h1 {
+    font-family: $font-lalezar;
+    font-weight: lighter;
+    font-size: 50px;
+    margin: 0;
+  }
+
 
   .my-classroom-header {
     display: flex;
@@ -37,7 +53,6 @@
 
   .tab {
     display: flex;
-    margin-top: 1.5rem;
 
     .tab {
       margin-right: 1rem;
@@ -45,6 +60,7 @@
       background-color: #f3eacc;
       border: none;
       border-radius: 6px;
+
       cursor: pointer;
 
       &.active {
@@ -66,16 +82,19 @@
       border-radius: 10px;
       cursor: pointer;
 
+      font-family: $font-inter;
       text-decoration: none;
+
+      box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.15);
 
       &.light {
         background-color: #F1EDE4;
-  
+
       }
 
       &.dark {
         background-color: #222;
-        color: #fff;
+        color: #FFF3DF;
       }
     }
 
@@ -135,4 +154,19 @@
       margin: 0;
     }
   }
+}
+
+.empty-list {
+  font-family: $font-inriasans;
+  font-size: 20px;
+
+  background-color: #FFFAEF;
+  height: 30vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 20px;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.08);
 }

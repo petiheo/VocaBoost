@@ -2,26 +2,49 @@ import { useState } from "react";
 import { Header, SideBar, Footer } from "../../components/index.jsx";
 import classroomService from "../../services/Classroom/classroomService.js";
 import { useNavigate } from "react-router-dom";
+import LoadingCursor from "../../components/cursor/LoadingCursor";
 
 export default function CreateClassroom() {
+
+    // Xử lý trạng thái của classroom khi khởi tạo classroom
     const [privacy, setPrivacy] = useState("private");
+
+    // Xử lý thông báo trang
     const [errors, setErrors] = useState({});
+
+    //Xử lý điều hướng 
     const navigate = useNavigate();
+
+    // Xử lý cursor xoay khi bấm nút đăng nhập 
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleCreateClassroom = async (e) => {
         e.preventDefault();
+
         const classroomName = e.target["classroom-name"].value;
         const description = e.target["description"].value;
         const limit = parseInt(e.target["limit"].value);
-
         const data = {
             name: classroomName,
             description,
             privacy,
             limit
         };
+        const newErrors = {};
+
+        if (classroomName === "") {
+            newErrors.classroomName = "The classroom name is empty";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            console.log("Oke");
+            setErrors(newErrors);
+            return;
+        }
+
 
         // Handle API submission or further logic here...
+        setIsLoading(true);
         try {
             const res = await classroomService.createClassroom(data);
             navigate("/my-classroom");
@@ -29,11 +52,14 @@ export default function CreateClassroom() {
         } catch (error) {
             setErrors({ server: error.response?.data?.error || "Classroom error." });
             console.error(errors);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
         <div className="create-classroom">
+            <LoadingCursor loading={isLoading} />
             {/* header  */}
             <Header />
             <div className="create-classroom__content">
@@ -41,14 +67,15 @@ export default function CreateClassroom() {
                 <SideBar />
                 <form className="create-classroom__form" onSubmit={handleCreateClassroom}>
                     <h1 className="create-classroom__header">Create new classroom</h1>
-                    <input
-                        className="create-classroom__form--classroom-name"
-                        name="classroom-name"
-                        type="text"
-                        placeholder="Enter classroom name"
-                        required
-                    />
-
+                    <div className="classroom-name">
+                        <input
+                            className="create-classroom__form--classroom-name"
+                            name="classroom-name"
+                            type="text"
+                            placeholder="Enter classroom name"
+                        />
+                        {errors.classroomName && <div className="input-error">{errors.classroomName}</div>}
+                    </div>
                     <input
                         className="create-classroom__form--description"
                         name="description"
@@ -104,7 +131,8 @@ export default function CreateClassroom() {
                     <input
                         className="create-classroom__form--submit"
                         type="submit"
-                        value="Create Classroom"
+                        value={isLoading ? "Creating..." : "Create Classroom"}
+                        disabled={isLoading}
                     />
                 </form>
             </div>

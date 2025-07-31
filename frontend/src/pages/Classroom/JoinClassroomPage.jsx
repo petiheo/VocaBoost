@@ -5,7 +5,6 @@ import classroomService from "../../services/Classroom/classroomService"
 export default function JoinClassroomPage() {
     const [inputCode, setInputCode] = useState("");
     const [status, setStatus] = useState("default");
-    const [submittedCode, setSubmittedCode] = useState("");
     const [errors, setErrors] = useState({});
 
     const handleJoin = async (e) => {
@@ -42,7 +41,7 @@ export default function JoinClassroomPage() {
     };
 
     if (status != "default") {
-        return <JoinClassroomStatus status={status} code={submittedCode} errorMsg={errors.server} />
+        return <JoinClassroomStatus status={status} code={inputCode} errorMsg={errors.server} />
     }
 
     return (

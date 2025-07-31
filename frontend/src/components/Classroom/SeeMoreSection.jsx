@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SeeMore } from "../../assets/Classroom";
 
 const SeeMoreSection = ({ items = [], renderItem, initialCount, step, wrapperClassName = "", itemWrapperTag: Tag = "div" }) => {
     const [visibleCount, setVisibleCount] = useState(initialCount);
@@ -17,7 +18,9 @@ const SeeMoreSection = ({ items = [], renderItem, initialCount, step, wrapperCla
 
             {hasMore && (
                 <div className="see-more">
-                    <button onClick={handleSeeMore}>See more ▼</button>
+                    <button onClick={handleSeeMore}>See more 
+                        <img src={SeeMore} alt="see-more"/>
+                    </button>
                 </div>
             )}
         </div>

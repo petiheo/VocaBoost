@@ -66,7 +66,7 @@ export default function AssignmentDetail() {
     try {
       const res = await classroomService.deleteAssignment(classroomId, assignment?.id)
       if (res.success) {
-        console.log("Xoá lớp assignment thành công");
+        console.log("Xoá assignment thành công");
         localStorage.removeItem("selectedAssignment");
         setTimeout(() => {
           navigate("/classroom/assignment-page");

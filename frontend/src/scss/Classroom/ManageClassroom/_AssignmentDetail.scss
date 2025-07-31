@@ -81,18 +81,29 @@
         }
       }
       
-      .see-more {
-        text-align: center;
-        margin-top: 1.5rem;
-
-        button {
-          background: #f0f0f0;
-          border: none;
-          padding: 0.6rem 1.2rem;
-          border-radius: 6px;
-          cursor: pointer;
-        }
-      }
     }
+  }
+}
+.see-more {
+  margin-top: 1.5rem;
+  
+  display: flex;
+  justify-self: center;
+  align-self: center;
+  
+  button {
+    font-family: $font-inriasans;
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    background: #FBF4E7;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+
+    cursor: pointer;
   }
 }

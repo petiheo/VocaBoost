@@ -1,19 +1,21 @@
 .learners-layout {
-    grid-template-rows: 10% 80% 10%;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
     background: #FFFCF7;
 
     &__body {
+        min-height: 100%;
         margin: 2em 0;
+
         display: flex;
         gap: 2em;
-
     }
 
     &__content {
         background: #FFFCF7;
-        width: 70%;
+        min-width: 70%;
         margin: 0 auto;
         gap: 2em;
-
     }
 }
