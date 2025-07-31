@@ -72,8 +72,8 @@ const vocabularyValidator = {
     body('exampleSentence')
       .optional({ checkFalsy: true })
       .trim()
-      .isLength({ min: 2, max: 255 })
-      .withMessage('Example sentence must be between 2 and 255 characters.'),
+      .isLength({ min: 0, max: 255 })
+      .withMessage('Example sentence must be between 0 and 255 characters.'),
     body('synonyms')
       .optional()
       .isArray()
