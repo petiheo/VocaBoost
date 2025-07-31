@@ -280,24 +280,23 @@ class EmailService {
   }
 
   async sendClassInvitation(to, token, classInfo, teacherName) {
-  const joinUrl = `${process.env.FRONTEND_URL}/accept-invitation?token=${token}`;
+    const joinUrl = `${process.env.FRONTEND_URL}/accept-invitation?token=${token}`;
 
-  const html = this.renderTemplate('classroom-invitation', {
-    joinUrl,
-    className: classInfo.name,
-    classDescription: classInfo.description,
-    teacherName: teacherName || 'Your teacher',
-    subject: `Invitation to join classroom: ${classInfo.name}`,
-  });
+    const html = this.renderTemplate('classroom-invitation', {
+      joinUrl,
+      className: classInfo.name,
+      classDescription: classInfo.description,
+      teacherName: teacherName || 'Your teacher',
+      subject: `Invitation to join classroom: ${classInfo.name}`,
+    });
 
-  return this.sendEmail({
-    to,
-    subject: `🎓 VocaBoost Invitation - Join "${classInfo.name}"`,
-    html,
-    text: `You've been invited to join the class "${classInfo.name}". Use this link: ${joinUrl}`,
-  });
-}
-
+    return this.sendEmail({
+      to,
+      subject: `🎓 VocaBoost Invitation - Join "${classInfo.name}"`,
+      html,
+      text: `You've been invited to join the class "${classInfo.name}". Use this link: ${joinUrl}`,
+    });
+  }
 }
 
 module.exports = new EmailService();

@@ -24,4 +24,6 @@ userRouter.post(
   userController.reportContent
 );
 
+userRouter.get('/profile/statistics', rateLimiter, userController.getUserStatistics);
+
 module.exports = userRouter;
