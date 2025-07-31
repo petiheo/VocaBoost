@@ -1,6 +1,7 @@
 const userModel = require('../models/user.model');
 const logger = require('../utils/logger');
 const userProfileModel = require('../models/userProfile.model');
+const statisticsModel = require('../models/statistics.model');
 const classroomModel = require('../models/classroom.model');
 const teacherService = require('./teacher.service');
 const storageService = require('./storage.service');
@@ -100,6 +101,63 @@ class UserService {
       status: report.status,
       message: 'Word reported successfully. Our team will review it.',
     };
+  }
+
+  async getUserStatistics(userId) {
+    try {
+      // 1. Fetch data for the four summary cards
+      const { data: summaryData, error: summaryError } =
+        await statisticsModel.getSummaryStats(userId);
+      if (summaryError) throw summaryError;
+
+      // 2. Fetch data for the "Progress Over Time" chart
+      const { data: progressData, error: progressError } =
+        await statisticsModel.getProgressOverTime(userId);
+      if (progressError) throw progressError;
+
+      // 3. Fetch data for the "Completion Rate by List" chart
+      const { data: completionData, error: completionError } =
+        await statisticsModel.getCompletionRateByRecentList(userId, 5); // Get top 5 lists
+      if (completionError) throw completionError;
+
+      // 4. Fetch data for the "Study Consistency" calendar
+      const { data: consistencyData, error: consistencyError } =
+        await statisticsModel.getStudyConsistency(userId, 90); // Get consistency for the last 90 days
+      if (consistencyError) throw consistencyError;
+
+      return {
+        summary: {
+          wordsLearned: summaryData?.total_vocabulary || 0,
+          currentStreak: summaryData?.current_streak || 0,
+          longestStreak: summaryData?.longest_streak || 0,
+
+          avgDailyStudyMinutes:
+            Math.round(
+              summaryData?.total_study_time / (summaryData?.total_study_days || 1)
+            ) || 0,
+
+          retentionRate:
+            summaryData?.total_reviews > 0
+              ? parseFloat(
+                  (
+                    (summaryData.correct_reviews / summaryData.total_reviews) *
+                    100
+                  ).toFixed(2)
+                )
+              : 0,
+        },
+        progressOverTime: progressData || [],
+        completionRateByList: completionData || [],
+        studyConsistency: (consistencyData || []).map((d) => d.study_date), // Extract just the date string
+      };
+    } catch (error) {
+      logger.error(
+        `[getLearningStatistics] Error fetching stats for user ${userId}:`,
+        error
+      );
+
+      throw new Error('Failed to retrieve learning statistics.');
+    }
   }
 }
 

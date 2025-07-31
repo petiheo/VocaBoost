@@ -79,6 +79,23 @@ class UserController {
       );
     }
   }
+
+  async getUserStatistics(req, res) {
+    try {
+      const userId = req.user.userId;
+      const profile = await userService.getUserStatistics(userId);
+
+      return ResponseUtils.success(res, 'Profile retrieved successfully', profile);
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        `getProfile - User ${req.user?.userId}`,
+        'Get profile failed',
+        500
+      );
+    }
+  }
 }
 
 module.exports = new UserController();
