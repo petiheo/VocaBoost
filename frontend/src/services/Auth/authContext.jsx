@@ -24,11 +24,13 @@ export const AuthProvider = ({ children }) => {
                     } else {
                         // Clear session for unverified users
                         await authService.logout();
+                        sessionStorage.setItem("logoutReason", "unverified");
                         setUser(null);
                     }
                 } catch (error) {
                     // If there's an error checking status, clear the session
                     await authService.logout();
+                    sessionStorage.setItem("logoutReason", "verification_error");
                     setUser(null);
                 }
             }
@@ -41,6 +43,8 @@ export const AuthProvider = ({ children }) => {
     const logout = async () => {
         try {
             await authService.logout();
+            // Store reason for manual logout
+            sessionStorage.setItem("logoutReason", "manual");
         } catch (e) {
             console.warn("Logout error, but will continue:", e);
         }

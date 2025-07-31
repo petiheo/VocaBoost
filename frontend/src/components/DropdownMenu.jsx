@@ -33,7 +33,7 @@ const DropdownMenu = () => {
         try {
             await authService.logout();
             contextLogout();
-            navigate("/mainpage");
+            navigate("/");
         } catch (error) {
             console.error("Logout failed:", error);
         }
@@ -54,7 +54,7 @@ const DropdownMenu = () => {
 
             {isOpen && (
                 <div className="dropdown__content">
-                    <Link to="/homepage" className="dropdown__item">
+                    <Link to="/profile" className="dropdown__item">
                         My Profile
                         <img src={DropDownMenuPattern1} alt="drop-down-menu-pattern1" className="drop-down-menu-pattern1" />
                     </Link>

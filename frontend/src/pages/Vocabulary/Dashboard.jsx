@@ -49,7 +49,8 @@ export default function Dashboard() {
         async function fetchLists() {
             try {
                 const res = await vocabularyService.getMyLists();
-                setLists(res.map(list => ({
+                const listsData = res.lists || []; 
+                setLists(listsData.map(list => ({
                     id: list.id,
                     title: list.title,
                     description: list.description,

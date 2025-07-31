@@ -30,7 +30,7 @@ api.interceptors.request.use(
 
       // Check if token is expired before making request (except for auth endpoints)
       if (!isAuthEndpoint && authService && authService.isTokenExpired()) {
-        authService.clearSession();
+        authService.clearSession(true, "expired");
         return Promise.reject(new Error("Token expired"));
       }
       config.headers.Authorization = `Bearer ${token}`;
@@ -50,9 +50,10 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Use authService to handle session cleanup
       if (authService) {
-        authService.clearSession();
+        authService.clearSession(true, "unauthorized");
       } else {
         // Fallback if authService not loaded yet
+        sessionStorage.setItem("logoutReason", "unauthorized");
         localStorage.removeItem("token");
         localStorage.removeItem("user");
 

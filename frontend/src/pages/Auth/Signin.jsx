@@ -6,10 +6,11 @@ import { GoogleLogo } from "../../assets/icons/index";
 import { useNavigate } from 'react-router-dom' // Import useNavigate for navigation
 import authService from "../../services/Auth/authService";
 import { SignInSignUpBG } from "../../assets/Auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LoadingCursor from "../../components/cursor/LoadingCursor";
 import { useAuth } from "../../services/Auth/authContext";
 import { handleLoginError, clearAuthErrors } from "../../utils/authErrorHandler";
+import { useToast } from "../../components/ToastProvider";
 
 
 
@@ -29,6 +30,43 @@ export default function Signin() {
     // Xử lý xoá hết input khi đăng nhập sai 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    // Toast notification
+    const showToast = useToast();
+
+    // Check for logout notifications on component mount
+    useEffect(() => {
+        const logoutReason = sessionStorage.getItem("logoutReason");
+        if (logoutReason) {
+            let message = "";
+            switch (logoutReason) {
+                case "manual":
+                    message = "You have been successfully logged out.";
+                    showToast(message, "success");
+                    break;
+                case "expired":
+                    message = "Your session has expired. Please log in again.";
+                    showToast(message, "error");
+                    break;
+                case "unauthorized":
+                    message = "Your session is invalid. Please log in again.";
+                    showToast(message, "error");
+                    break;
+                case "unverified":
+                    message = "Please verify your email address before logging in.";
+                    showToast(message, "error");
+                    break;
+                case "verification_error":
+                    message = "Unable to verify account status. Please try again.";
+                    showToast(message, "error");
+                    break;
+                default:
+                    break;
+            }
+            // Clear the logout reason after showing notification
+            sessionStorage.removeItem("logoutReason");
+        }
+    }, [showToast]);
 
     const clearForm = () => {
         setEmail("");

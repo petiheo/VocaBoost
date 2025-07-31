@@ -1,0 +1,317 @@
+@use "../Fonts" as *;
+
+.profile {
+  background: #fffcf7;
+
+  &__container {
+    display: flex;
+    font-family: $font-inter;
+    margin-bottom: 2em;
+  }
+
+  &__content {
+    width: 80%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+  }
+}
+
+h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+// Avatar section styling
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  .profile-avatar {
+    .avatar-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #e9ecef;
+    }
+
+    .avatar-placeholder {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: #c0c4cc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 600;
+      color: #ffffff;
+      border: 4px solid #e9ecef;
+    }
+  }
+
+  .avatar-upload {
+    .upload-button {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background-color: #ffc107;
+      color: #000;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: none;
+
+      &:hover {
+        background-color: #ffb300;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// Form group styling (following AssignExercise pattern)
+.form-group {
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #2c3e50;
+  }
+
+  input {
+    width: 100%;
+    background-color: #f8f3e8;
+    padding: 12px;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: $font-inter;
+
+    &:focus {
+      outline: none;
+      border-color: #ffc107;
+      box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.1);
+    }
+
+    &:disabled,
+    &.readonly {
+      background-color: #f1f3f4;
+      color: #6c757d;
+      cursor: not-allowed;
+      border-color: #d1d3d4;
+    }
+  }
+
+  &__daily-goal {
+    input {
+      max-width: 200px;
+    }
+
+    .field-description {
+      display: block;
+      margin-top: 4px;
+      font-size: 12px;
+      color: #6c757d;
+      font-style: italic;
+    }
+  }
+}
+
+// Teacher verification section
+.teacher-verification {
+  height: auto;
+
+  .verification-label-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    label {
+      margin-bottom: 0 !important;
+      min-width: 160px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+  }
+
+  .verification-status {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.375rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: capitalize;
+      width: fit-content;
+
+      &.approved {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      &.pending {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+
+      &.rejected {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+    }
+
+    .verification-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 1rem 1.25rem;
+      background-color: #fff8e1;
+      border: 2px solid #ffc107;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #856404;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: $font-inter;
+
+      &:hover {
+        background-color: #ffc107;
+        color: #ffffff;
+        transform: translateY(-1px);
+      }
+
+      .arrow {
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+// Button styling (following AssignExercise pattern)
+.edit-btn,
+.save-btn {
+  width: 30%;
+  margin: auto;
+  background: #1e1e1e;
+  color: #fff;
+  border: none;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  font-family: $font-inter;
+
+  &:hover:not(:disabled) {
+    background: #333;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.cancel-btn {
+  width: 30%;
+  margin: auto;
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  font-family: $font-inter;
+
+  &:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+  }
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .profile {
+    &__container {
+      flex-direction: column;
+    }
+
+    &__content {
+      width: 95%;
+      gap: 1.5em;
+    }
+  }
+
+  .avatar-section {
+    .profile-avatar {
+      .avatar-image,
+      .avatar-placeholder {
+        width: 100px;
+        height: 100px;
+        font-size: 2.5rem;
+      }
+    }
+  }
+
+  .button-group {
+    flex-direction: column;
+
+    .cancel-btn,
+    .save-btn,
+    .edit-btn {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .profile {
+    &__content {
+      width: 100%;
+      padding: 1rem;
+    }
+  }
+
+  .form-group {
+    input {
+      padding: 10px;
+      font-size: 13px;
+    }
+  }
+}

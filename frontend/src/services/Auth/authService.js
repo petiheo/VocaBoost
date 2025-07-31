@@ -99,9 +99,14 @@ const authService = {
   },
 
   // Enhanced session management
-  clearSession: () => {
+  clearSession: (showNotification = false, reason = 'logout') => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
+    // Store logout reason in sessionStorage for notification
+    if (showNotification) {
+      sessionStorage.setItem("logoutReason", reason);
+    }
 
     // Only redirect if not already on auth pages
     const currentPath = window.location.pathname;
