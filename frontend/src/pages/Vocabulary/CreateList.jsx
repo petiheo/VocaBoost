@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Header, SideBar, Footer, AccountPageInput} from "../../components/index.jsx";
+import { Header, SideBar, Footer } from "../../components/index.jsx";
+import CreateListInput from "../../components/CreateListInput.jsx";
+import WordInput from "../../components/WordInput.jsx";
 // import { UploadImage } from "../../assets/Vocabulary";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import Select from "react-select";
 import { useConfirm } from "../../components/ConfirmProvider.jsx"; 
 import { useToast } from "../../components/ToastProvider.jsx";
+import { validateCreateListForm } from "../../utils/createListValidation.js";
 
 export default function CreateList() {
     const [privacy, setPrivacy] = useState("private");
@@ -13,11 +16,17 @@ export default function CreateList() {
     const confirm = useConfirm();
     const toast = useToast();
 
+    // Form data state
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
     const [words, setWords] = useState([
         { term: "", definition: "", exampleSentence: "", image: null, tag: "", phonetics: "", synonyms: "", translation: "" },
         { term: "", definition: "", exampleSentence: "", image: null, tag: "", phonetics: "", synonyms: "", translation: "" },
         { term: "", definition: "", exampleSentence: "", image: null, tag: "", phonetics: "", synonyms: "", translation: "" },
     ]);
+
+    // Validation state
+    const [validationErrors, setValidationErrors] = useState({});
 
     const { listId } = useParams();
 
@@ -33,35 +42,17 @@ export default function CreateList() {
     fetchTags();
     }, []);
 
-    
     function normalizeSynonyms(input) {
-    if (!input) return [];
+        if (!input) return [];
 
-    if (typeof input === "string") {
-        return input
-            .split(",")
-            .map((s) => s.trim())
-            .filter((s) => s !== "");
-    }
-
-    return [];
-    }
-
-    function validateSynonymsInput(input) {
-        if (!input) return true; // nếu không có từ đồng nghĩa thì không cần kiểm tra
-
-        // Không được kết thúc bằng ký tự đặc biệt
-        if (/[^a-zA-Z0-9)]$/.test(input.trim())) {
-            toast("Synonyms không được kết thúc bằng ký tự đặc biệt.", "error");
-            return false;
+        if (typeof input === "string") {
+            return input
+                .split(",")
+                .map((s) => s.trim())
+                .filter((s) => s !== "");
         }
 
-        // Không được chứa 2 dấu `,,` liền nhau (=> tạo chuỗi rỗng)
-        if (input.includes(",,")) {
-            toast("Synonyms phải được phân cách đúng bằng dấu ',' và không có khoảng trống thừa.", "error");
-            return false;
-        }
-        return true;
+        return [];
     }
 
     
@@ -81,44 +72,26 @@ export default function CreateList() {
 
     const handleCreateList = async (e) => {
         e.preventDefault();
-        const title = e.target["list-title"].value;
-        const description = e.target["description"].value;
+
+        // Validate the entire form
+        const validation = validateCreateListForm(title, description, words);
+        setValidationErrors(validation.errors);
+
+        if (!validation.isValid) {
+            toast("Please fix the validation errors before submitting.", "error");
+            return;
+        }
 
         const data = {
-        title,
-        description,
-        privacy_setting: privacy,
-        tags: selectedTags,
+            title,
+            description,
+            privacy_setting: privacy,
+            tags: selectedTags,
         };
         
         try {
-        const hasInvalid = words.some(word => !word.term?.trim() || !word.definition?.trim());
-        if (hasInvalid) {
-            toast("Each word must have both term and definition.", "error");
-            return;
-        }
-
-        if (words.some(word => word.exampleSentence.length < 2 || word.exampleSentence.length > 500)) {
-            toast("Example sentence must be between 2 and 500 characters.", "error");
-            return;
-        }
-
-        for (let i = 0; i < words.length; i++) {
-            const word = words[i];
-
-            if (!word.term?.trim() || !word.definition?.trim()) {
-                toast(`Word ${i + 1} must have both term and definition.`, "error");
-                return;
-            }
-
-            if (!validateSynonymsInput(word.synonyms || "")) {
-                toast(`Word ${i + 1} has invalid synonyms. Must be comma-separated and not end with a special character.`, "error");
-                return;
-            }
-        }
-
-        let actualListId = listId;
-        let createdList;
+            let actualListId = listId;
+            let createdList;
 
         if (!actualListId) {
             const res = await vocabularyService.createList(data);
@@ -181,6 +154,42 @@ export default function CreateList() {
         const updated = [...words];
         updated[index][field] = value;
         setWords(updated);
+
+        // Clear validation errors for this specific field when user starts typing
+        if (validationErrors.words?.[index]?.[field]) {
+            setValidationErrors(prev => ({
+                ...prev,
+                words: {
+                    ...prev.words,
+                    [index]: {
+                        ...prev.words[index],
+                        [field]: undefined
+                    }
+                }
+            }));
+        }
+    };
+
+    const handleTitleChange = (e) => {
+        setTitle(e.target.value);
+        // Clear title validation errors when user starts typing
+        if (validationErrors.title) {
+            setValidationErrors(prev => ({
+                ...prev,
+                title: undefined
+            }));
+        }
+    };
+
+    const handleDescriptionChange = (e) => {
+        setDescription(e.target.value);
+        // Clear description validation errors when user starts typing
+        if (validationErrors.description) {
+            setValidationErrors(prev => ({
+                ...prev,
+                description: undefined
+            }));
+        }
     };
 
     const handleAddWord = () => {
@@ -218,18 +227,28 @@ export default function CreateList() {
                 <form className="create-list__form" onSubmit={handleCreateList}>
                     <h1 className="create-list__header">Create new list</h1>
 
-                    <textarea
-                        className="create-list__form--title"
+                    <CreateListInput
+                        label="Title"
                         name="list-title"
-                        placeholder="Enter a title – For exampleSentence ‘Intro to SE - chapter 5’"
-                        required
+                        as="textarea"
+                        value={title}
+                        onChange={handleTitleChange}
+                        placeholder="Enter a title – For example 'Intro to SE - chapter 5'"
+                        required={true}
+                        errors={validationErrors.title}
+                        className="create-list__form--title"
                     />
 
-                    <textarea
-                        className="create-list__form--description"
+                    <CreateListInput
+                        label="Description"
                         name="description"
+                        as="textarea"
+                        value={description}
+                        onChange={handleDescriptionChange}
                         placeholder="Description:..."
-                        required
+                        required={true}
+                        errors={validationErrors.description}
+                        className="create-list__form--description"
                     />
 
                     <div className="create-list__privacy-section">
@@ -312,36 +331,42 @@ export default function CreateList() {
                                 <hr className="create-list__word-box--divider" />
                                 <div className="create-list__word-box--row">
                                     <div className="create-list__word-box--field">
-                                        <AccountPageInput
+                                        <WordInput
+                                            label="Term"
                                             name={`term-${index}`}
                                             type="text"
-                                            placeholder=""
+                                            placeholder="Enter the term"
                                             value={word.term || ""}
                                             onChange={(e) => handleWordChange(index, "term", e.target.value)}
+                                            required={true}
+                                            errors={validationErrors.words?.[index]?.term}
                                         />
-                                        <small className="input-title">Terminology</small>
                                     </div>
 
                                     <div className="create-list__word-box--field">
-                                        <AccountPageInput
+                                        <WordInput
+                                            label="Definition"
                                             name={`definition-${index}`}
                                             type="text"
-                                            placeholder=""
+                                            placeholder="Enter the definition"
                                             value={word.definition || ""}
                                             onChange={(e) => handleWordChange(index, "definition", e.target.value)}
+                                            required={true}
+                                            errors={validationErrors.words?.[index]?.definition}
                                         />
-                                        <small className="input-title">Definition</small>
                                     </div>
 
                                     <div className="create-list__word-box--field">
-                                        <AccountPageInput
+                                        <WordInput
+                                            label="Phonetics"
                                             name={`phonetics-${index}`}
                                             type="text"
-                                            placeholder=""
+                                            placeholder="Enter phonetics (optional)"
                                             value={word.phonetics || ""}
                                             onChange={(e) => handleWordChange(index, "phonetics", e.target.value)}
+                                            required={false}
+                                            errors={validationErrors.words?.[index]?.phonetics}
                                         />
-                                        <small className="input-title">Phonetics</small>
                                     </div>
 
                                 {/* <label className="create-list__upload-btn">
@@ -361,38 +386,44 @@ export default function CreateList() {
                                 </div>
                                 <div className="create-list__word-box--row">
                                     <div className="create-list__word-box--field">
-                                        <AccountPageInput
+                                        <WordInput
+                                            label="Synonyms"
                                             name={`synonyms-${index}`}
                                             type="text"
-                                            placeholder=""
-                                            value={word.synonyms}
+                                            placeholder="Enter synonyms separated by commas (optional)"
+                                            value={word.synonyms || ""}
                                             onChange={(e) => handleWordChange(index, "synonyms", e.target.value)}
+                                            required={false}
+                                            errors={validationErrors.words?.[index]?.synonyms}
                                         />
-                                        <small className="input-title">Synonyms</small>
                                     </div>
 
                                     <div className="create-list__word-box--field">
-                                        <AccountPageInput
+                                        <WordInput
+                                            label="Translation"
                                             name={`translation-${index}`}
                                             type="text"
-                                            placeholder=""
-                                            value={word.translation}
+                                            placeholder="Enter translation (optional)"
+                                            value={word.translation || ""}
                                             onChange={(e) => handleWordChange(index, "translation", e.target.value)}
+                                            required={false}
+                                            errors={validationErrors.words?.[index]?.translation}
                                         />
-                                        <small className="input-title">Translation</small>
                                     </div>
                                 </div>
 
                                 <div className="create-list__word-box--row">
                                     <div className="create-list__word-box--field">
-                                        <AccountPageInput
+                                        <WordInput
+                                            label="Example sentence"
                                             name={`exampleSentence-${index}`}
                                             type="text"
-                                            placeholder=""
-                                            value={word.exampleSentence}
+                                            placeholder="Enter an example sentence (optional)"
+                                            value={word.exampleSentence || ""}
                                             onChange={(e) => handleWordChange(index, "exampleSentence", e.target.value)}
+                                            required={false}
+                                            errors={validationErrors.words?.[index]?.exampleSentence}
                                         />
-                                        <small className="input-title">An example in context</small>
                                     </div>
                                     <button type="button" className="create-list__ai-btn">AI</button>
                                 </div>

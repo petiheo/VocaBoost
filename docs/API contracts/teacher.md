@@ -48,7 +48,7 @@ Content-Type: multipart/form-data
 - Allowed types: JPEG, PNG, PDF, DOC, DOCX
 - Field name must be: `credentials`
 
-**Success Response (201):**
+**Success Response (201 - New Request):**
 
 ```json
 {
@@ -57,17 +57,24 @@ Content-Type: multipart/form-data
   "data": {
     "requestId": "uuid",
     "status": "pending",
-    "submittedAt": "2025-07-20T10:00:00Z"
+    "submittedAt": "2025-07-20T10:00:00Z",
+    "isUpdate": false
   }
 }
 ```
 
-**Error Response (400):**
+**Success Response (200 - Updated Request):**
 
 ```json
 {
-  "success": false,
-  "error": "Submit verification failed, please check your existing request status."
+  "success": true,
+  "message": "Your teacher verification request has been updated successfully.",
+  "data": {
+    "requestId": "uuid",
+    "status": "pending",
+    "submittedAt": "2025-07-20T10:00:00Z",
+    "isUpdate": true
+  }
 }
 ```
 
@@ -180,7 +187,14 @@ The system automatically sends email notifications:
 
 ## Error Handling
 
-- Duplicate pending requests are prevented
 - File upload errors are handled gracefully
 - Invalid file types are rejected before upload
 - Expired tokens return appropriate error messages
+
+## Behavior Changes
+
+**New Logic for Existing Requests:**
+- If a teacher has already submitted a verification request, submitting again will **update** the existing request rather than returning an error
+- The existing request status will be reset to 'pending' and any rejection reason will be cleared
+- The institution and credentials file will be updated with the new information
+- This allows teachers to easily correct or update their verification requests

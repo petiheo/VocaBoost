@@ -33,7 +33,7 @@ const userService = {
     return res.data;
   },
 
-  // Report content - matches API: POST /api/user/report
+  // Report content
   reportContent: async (reportData) => {
     const res = await api.post("/user/report", reportData);
     return res.data;

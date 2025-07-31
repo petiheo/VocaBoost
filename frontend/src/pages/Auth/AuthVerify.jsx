@@ -42,6 +42,10 @@ export default function AuthVerify() {
               localStorage.setItem("user", JSON.stringify(userData));
             }
             
+            // Clear pending email verification flags
+            sessionStorage.removeItem("pendingEmailVerification");
+            sessionStorage.removeItem("userEmail");
+            
             // Navigate to select user type
             navigate("/select-user-type");
           } else {
@@ -55,6 +59,11 @@ export default function AuthVerify() {
                 const userData = validation.data.user;
                 setUser(userData);
                 localStorage.setItem("user", JSON.stringify(userData));
+                
+                // Clear pending email verification flags
+                sessionStorage.removeItem("pendingEmailVerification");
+                sessionStorage.removeItem("userEmail");
+                
                 navigate("/select-user-type");
               } else {
                 throw new Error("Token validation failed");

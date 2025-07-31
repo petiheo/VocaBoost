@@ -9,16 +9,7 @@ class TeacherController {
       const { fullName, institution, schoolEmail, additionalNotes } = req.body;
       const file = req.file;
 
-      const canSubmit = await teacherService.canSubmitRequest(userId);
-      if (!canSubmit) {
-        return ResponseUtils.error(
-          res,
-          'Submit verification failed, please check your existing request status.',
-          400
-        );
-      }
-
-      const teacherRequest = await teacherService.submitRequest(
+      const result = await teacherService.submitRequest(
         userId,
         {
           fullName,
@@ -29,15 +20,20 @@ class TeacherController {
         file
       );
 
+      const message = result.isUpdate 
+        ? 'Your teacher verification request has been updated successfully.'
+        : 'Your teacher verification request has been submitted successfully.';
+
       return ResponseUtils.success(
         res,
-        'Your teacher verification request has been submitted successfully.',
+        message,
         {
-          requestId: teacherRequest.id,
-          status: teacherRequest.status,
-          submittedAt: teacherRequest.created_at,
+          requestId: result.teacherRequest.id,
+          status: result.teacherRequest.status,
+          submittedAt: result.teacherRequest.created_at,
+          isUpdate: result.isUpdate,
         },
-        201
+        result.isUpdate ? 200 : 201
       );
     } catch (error) {
       return ErrorHandler.handleError(

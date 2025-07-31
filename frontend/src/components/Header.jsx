@@ -4,9 +4,14 @@ import SearchBar from "./SearchBar.jsx";
 import DropdownMenu from "./DropdownMenu.jsx";
 import { useAuth } from "../services/Auth/authContext.jsx";
 import { Bell, Plus } from "../assets/Auth/index.jsx";
+import { useEmailVerificationRedirect } from "../hooks/useEmailVerificationRedirect.js";
 
 const Header = ({ searchQuery, onSearchChange }) => {
     const { user, loading } = useAuth();
+    
+    // Handle email verification redirect for authenticated users
+    useEmailVerificationRedirect();
+    
     if (loading) return null;
     return (
         <nav className="header">

@@ -18,19 +18,17 @@ const authMiddleware = async (req, res, next) => {
       return ResponseUtils.unauthorized(res, 'User not found');
     }
 
-    if (user.account_status !== 'active') {
+    // Block only specific problematic statuses, allow others like 'pending_verification'
+    if (user.account_status === 'inactive' || user.account_status === 'suspended' || user.account_status === 'banned') {
       return ResponseUtils.forbidden(res, `Account ${user.account_status}. Please contact support.`);
     }
 
-    if (user.email_verified === false) {
-      return ResponseUtils.forbidden(res, 'Email verification required');
-    }
-
-    // Attach user info to request
+    // Attach user info to request (including email verification status)
     req.user = {
       userId: decoded.userId,
       email: decoded.email,
       role: user.role, // Use current role from DB, not from token
+      emailVerified: user.email_verified, // Include verification status for individual endpoints to check
     };
 
     next();

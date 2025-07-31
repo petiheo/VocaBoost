@@ -4,19 +4,6 @@ const teacherRequestModel = require('../models/teacherRequest.model');
 const logger = require('../utils/logger');
 
 class TeacherService {
-  async canSubmitRequest(userId) {
-    const oldRequest = await teacherRequestModel.findByUserId(userId);
-    if (!oldRequest) return true;
-
-    if (oldRequest.status === 'rejected') {
-      // Nếu đã trôi qua đủ thời gian thì cho submit lại (vd: 24h)
-      const isValidTimePass =
-        (Date.now() - new Date(oldRequest.created_at)) / (1000 * 60 * 60 * 24);
-      return isValidTimePass >= 1;
-    }
-
-    return oldRequest.status !== 'pending' && oldRequest.status !== 'approved';
-  }
 
   async submitRequest(userId, data, file) {
     try {
@@ -25,17 +12,40 @@ class TeacherService {
         userId
       );
 
-      const teacherRequest = await teacherRequestModel.create({
-        userId,
-        institution: data.institution,
-        credentialsUrl: uploadResult.url,
-        additionalNotes: data.additionalNotes,
-      });
+      // Check if there's an existing request
+      const existingRequest = await teacherRequestModel.findByUserId(userId);
+      let teacherRequest;
+      let isUpdate = false;
 
+      if (existingRequest) {
+        // Update existing request
+        teacherRequest = await teacherRequestModel.update(existingRequest.id, {
+          institution: data.institution,
+          credentialsUrl: uploadResult.url,
+          additionalNotes: data.additionalNotes,
+        });
+        isUpdate = true;
+        logger.info(`Updated existing teacher verification request for user ${userId}`);
+      } else {
+        // Create new request
+        teacherRequest = await teacherRequestModel.create({
+          userId,
+          institution: data.institution,
+          credentialsUrl: uploadResult.url,
+          additionalNotes: data.additionalNotes,
+        });
+        logger.info(`Created new teacher verification request for user ${userId}`);
+      }
+
+      // Update user information (always do this regardless of create/update)
       if (data.fullName) await userModel.updateDisplayName(userId, data.fullName);
       await userModel.updateUserStatus(userId, 'pending_verification');
       await userModel.updateUserRole(userId, 'teacher');
-      return teacherRequest;
+
+      return {
+        teacherRequest,
+        isUpdate,
+      };
     } catch (error) {
       logger.error('Submit verification failed: ', error);
       throw error;
