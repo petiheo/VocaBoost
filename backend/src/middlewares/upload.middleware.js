@@ -1,44 +1,31 @@
 const { uploadInstances } = require('../config/multer.config');
 const { STORAGE_ERRORS } = require('../config/storage.config');
+const ResponseUtils = require('../utils/response');
+const ErrorHandler = require('../utils/errorHandler');
 
 const handleMulterError = (err, req, res, next) => {
   if (err) {
     // Multer-specific errors
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({
-        success: false,
-        message: STORAGE_ERRORS.FILE_TOO_LARGE,
-      });
+      return ResponseUtils.error(res, STORAGE_ERRORS.FILE_TOO_LARGE, 400);
     }
 
     if (err.code === 'LIMIT_FILE_COUNT') {
-      return res.status(400).json({
-        success: false,
-        message: 'Too many files uploaded',
-      });
+      return ResponseUtils.error(res, 'Too many files uploaded', 400);
     }
 
     if (err.code === 'LIMIT_UNEXPECTED_FILE') {
-      return res.status(400).json({
-        success: false,
-        message: `Unexpected field name. Expected: ${err.field}`,
-      });
+      return ResponseUtils.error(res, `Unexpected field name. Expected: ${err.field}`, 400);
     }
 
     // Custom file type errors
     if (err.message && err.message.includes(STORAGE_ERRORS.INVALID_FILE_TYPE)) {
-      return res.status(400).json({
-        success: false,
-        message: err.message,
-      });
+      return ResponseUtils.error(res, err.message, 400);
     }
 
     // Generic multer error
     if (err.name === 'MulterError') {
-      return res.status(400).json({
-        success: false,
-        message: `Upload error: ${err.message}`,
-      });
+      return ResponseUtils.error(res, `Upload error: ${err.message}`, 400);
     }
   }
 

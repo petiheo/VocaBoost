@@ -92,3 +92,7 @@ public/
 
 # Supabase
 .branches
+
+# Auto-generated CSS files
+frontend/src/index.css
+frontend/src/index.css.map

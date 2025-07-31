@@ -7,19 +7,19 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   min-height: 220px;
   max-width: 300px;
-  gap: 10px;
 
   overflow: hidden;
   text-overflow: ellipsis;
 
   .vocab-title {
+    font-family: $font-lalezar;
     font-size: 1.2rem;
     font-weight: 700;
     color: #2b2b2b;
     margin: 0;
+    margin-bottom: 0.5rem;
 
     white-space: nowrap; // giữ nội dung trên 1 dòng duy nhất
     overflow: hidden;
@@ -27,6 +27,7 @@
   }
 
   .vocab-desc {
+    font-family: $font-inriasans;
     font-size: 0.9rem;
     color: #444;
     margin: 0;
@@ -45,6 +46,8 @@
     font-size: 10px;
     color: #2932B1;
     font-weight: bold;
+    margin-top: 0.5rem;
+    margin-bottom: 0.3rem;
   }
 
   .vocab-result {
@@ -58,8 +61,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 1.5rem;
-
+    margin-top: auto; // THAY BẰNG DÒNG NÀY để đẩy footer xuống đáy
+    padding-top: 1rem; // Thêm padding để đảm bảo có khoảng trống phía trên footer
+    font-family: $font-inriasans;
+    
     .user-block {
       display: flex;
       align-items: center;
@@ -93,7 +98,7 @@
           background-color: #d6e5ff;
           color: #1b4da3;
           padding: 2px 6px;
-          border-radius: 5px;
+          border-radius: 7px;
           margin-top: 2px;
           width: fit-content;
         }

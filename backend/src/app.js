@@ -3,11 +3,13 @@ const passport = require('passport');
 const app = express();
 const logger = require('./utils/logger');
 const securityMiddleware = require('./middlewares/security.middleware');
+const ResponseUtils = require('./utils/response');
+const ErrorHandler = require('./utils/errorHandler');
 
 const router = require('./routes/index.route');
 const cors = require('cors');
 
-require('./config/passport');
+require('./config/passport.config');
 
 app.use(express.json());
 
@@ -35,21 +37,22 @@ app.use('/api', router);
 
 app.use('/health', async (req, res) => {
   try {
-    const db = require('./config/database');
-    await db.from('users').select('count').limit(1);
+    const { supabase } = require('./config/supabase.config');
+    await supabase.from('users').select('count').limit(1);
 
-    return res.status(200).json({
-      success: true,
+    return ResponseUtils.success(res, 'Service is healthy', {
       status: 'healthy',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
     });
   } catch (error) {
-    res.status(503).json({
-      success: false,
-      status: 'unhealthy',
-      error: error.message,
-    });
+    return ErrorHandler.handleError(
+      res,
+      error,
+      'Health Check',
+      'Service is unhealthy',
+      503
+    );
   }
 });
 
@@ -59,19 +62,13 @@ app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Endpoint not found',
-  });
+  return ResponseUtils.notFound(res, 'Endpoint not found');
 });
 
 // 500 handler
 app.use((err, req, res, next) => {
   logger.error(err.stack);
-  return res.status(500).json({
-    success: false,
-    message: 'Internal server error',
-  });
+  return ResponseUtils.serverError(res, 'Internal server error', err);
 });
 
 module.exports = app;

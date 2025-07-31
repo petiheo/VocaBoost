@@ -1,7 +1,7 @@
 const classroomService = require('../services/classroom.service');
 const { validationResult } = require('express-validator');
 const logger = require('../utils/logger');
-const ErrorHandler = require('../utils/errorHandler');
+const { ResponseUtils, ErrorHandler } = require('../utils');
 
 class ClassroomController {
   async createClassroom(req, res) {
@@ -17,20 +17,14 @@ class ClassroomController {
         capacity_limit,
       });
 
-      return res.status(201).json({
-        success: true,
-        message: 'Classroom created successfully',
-        data: newClassroom,
-      });
+      return ResponseUtils.success(res, 'Classroom created successfully', newClassroom, 201);
     } catch (error) {
-      logger.error(
-        `[createClassroom] Error creating classroom for teacher ${req.user?.userId}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'createClassroom',
+        'Failed to create classroom'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Internal server error',
-      });
     }
   }
 
@@ -40,19 +34,14 @@ class ClassroomController {
 
       const classrooms = await classroomService.getClassroomsByTeacherId(userId);
 
-      return res.status(200).json({
-        success: true,
-        data: classrooms,
-      });
+      return ResponseUtils.success(res, 'Classrooms retrieved successfully', classrooms);
     } catch (error) {
-      logger.error(
-        `[getMyClassrooms] Error fetching classrooms for teacher ${req.user?.userId}:`,
-        error
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getMyClassrooms',
+        'Failed to get classrooms'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to get classroom.',
-      });
     }
   }
 
@@ -62,28 +51,24 @@ class ClassroomController {
       const user = req.user;
 
       if (!joinCode) {
-        return res
-          .status(400)
-          .json({ success: false, message: 'Join code is required.' });
+        return ResponseUtils.validationError(res, 'Join code is required.');
       }
 
       const result = await classroomService.handleJoinRequestByCode(joinCode, user);
 
-      return res.status(200).json({
-        success: true,
-        message: result.autoApproved
+      return ResponseUtils.success(
+        res,
+        result.autoApproved
           ? 'You have joined the classroom.'
-          : 'Join request submitted. Please wait for approval.',
-      });
-    } catch (error) {
-      logger.error(
-        `[requestJoinByCode] Error handling join request for user ${req.user?.userId} with code ${req.body?.joinCode}:`,
-        error
+          : 'Join request submitted. Please wait for approval.'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to requests to join classroom.',
-      });
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'requestJoinByCode',
+        'Failed to request to join classroom'
+      );
     }
   }
 
@@ -94,19 +79,14 @@ class ClassroomController {
       const pendingRequests =
         await classroomService.getPendingJoinRequests(classroomId);
 
-      return res.status(200).json({
-        success: true,
-        data: pendingRequests,
-      });
+      return ResponseUtils.success(res, 'Pending requests retrieved successfully', pendingRequests);
     } catch (error) {
-      logger.error(
-        `[getPendingJoinRequests] Error getting join requests for classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getPendingJoinRequests',
+        'Failed to fetch join requests'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to fetch join requests.',
-      });
     }
   }
 
@@ -116,27 +96,19 @@ class ClassroomController {
       const { learnerId } = req.body;
 
       if (!learnerId) {
-        return res.status(400).json({
-          success: false,
-          message: 'Missing learnerId in request body.',
-        });
+        return ResponseUtils.validationError(res, 'Missing learnerId in request body.');
       }
 
       await classroomService.approveJoinRequest(classroomId, learnerId);
 
-      return res.status(200).json({
-        success: true,
-        message: 'Join request approved.',
-      });
+      return ResponseUtils.success(res, 'Join request approved.');
     } catch (error) {
-      logger.error(
-        `[approveJoinRequest] Error approving join request for learner ${req.body?.learnerId} in classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'approveJoinRequest',
+        'Failed to approve join request'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to approve join request.',
-      });
     }
   }
 
@@ -146,27 +118,19 @@ class ClassroomController {
       const { learnerId } = req.body;
 
       if (!learnerId) {
-        return res.status(400).json({
-          success: false,
-          message: 'Missing learnerId in request body.',
-        });
+        return ResponseUtils.validationError(res, 'Missing learnerId in request body.');
       }
 
       await classroomService.rejectJoinRequest(classroomId, learnerId);
 
-      return res.status(200).json({
-        success: true,
-        message: 'Join request rejected.',
-      });
+      return ResponseUtils.success(res, 'Join request rejected.');
     } catch (error) {
-      logger.error(
-        `[rejectJoinRequest] Error rejecting join request for learner ${req.body?.learnerId} in classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'rejectJoinRequest',
+        'Failed to reject join request'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to reject join request.',
-      });
     }
   }
 
@@ -176,19 +140,14 @@ class ClassroomController {
 
       const result = await classroomService.approveAllJoinRequests(classroomId);
 
-      return res.status(200).json({
-        success: true,
-        message: `Approved ${result} learners.`,
-      });
+      return ResponseUtils.success(res, `Approved ${result} learners.`);
     } catch (error) {
-      logger.error(
-        `[approveAllJoinRequests] Error approving all requests for classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'approveAllJoinRequests',
+        'Failed to approve join requests'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to approve join requests.',
-      });
     }
   }
 
@@ -198,19 +157,14 @@ class ClassroomController {
 
       const learners = await classroomService.getJoinedLearners(classroomId);
 
-      return res.status(200).json({
-        success: true,
-        data: learners,
-      });
+      return ResponseUtils.success(res, 'Learners retrieved successfully', learners);
     } catch (error) {
-      logger.error(
-        `[getJoinedLearners] Error fetching learner list for classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getJoinedLearners',
+        'Failed to fetch learner list'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to fetch learner list.',
-      });
     }
   }
 
@@ -220,27 +174,19 @@ class ClassroomController {
       const { learnerId } = req.body;
 
       if (!learnerId) {
-        return res.status(400).json({
-          success: false,
-          message: 'Missing learnerId in request body.',
-        });
+        return ResponseUtils.validationError(res, 'Missing learnerId in request body.');
       }
 
       await classroomService.removeLearner(classroomId, learnerId);
 
-      return res.status(200).json({
-        success: true,
-        message: 'Learner has been removed from the classroom.',
-      });
+      return ResponseUtils.success(res, 'Learner has been removed from the classroom.');
     } catch (error) {
-      logger.error(
-        `[removeLearner] Error removing learner ${req.body?.learnerId} from classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'removeLearner',
+        'Failed to remove learner'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to remove learner.',
-      });
     }
   }
 
@@ -250,19 +196,14 @@ class ClassroomController {
 
       await classroomService.deleteClassroom(classroom);
 
-      return res.status(200).json({
-        success: true,
-        message: 'Classroom has been deleted.',
-      });
+      return ResponseUtils.success(res, 'Classroom has been deleted.');
     } catch (error) {
-      logger.error(
-        `[deleteClassroom] Error deleting classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'deleteClassroom',
+        'Failed to delete classroom'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to delete classroom.',
-      });
     }
   }
 
@@ -277,19 +218,14 @@ class ClassroomController {
         q
       );
 
-      return res.status(200).json({
-        success: true,
-        data: results,
-      });
+      return ResponseUtils.success(res, 'Search results retrieved successfully', results);
     } catch (error) {
-      logger.error(
-        `[searchLearnersByDisplayName] Error searching learners in classroom ${req.classroom?.id} with query "${req.query?.q}":`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'searchLearnersByDisplayName',
+        'Failed to search learners'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to search learners.',
-      });
     }
   }
 
@@ -299,27 +235,19 @@ class ClassroomController {
       const { email } = req.body;
 
       if (!email) {
-        return res.status(400).json({
-          success: false,
-          message: 'Missing email of learner.',
-        });
+        return ResponseUtils.validationError(res, 'Missing email of learner.');
       }
 
       const result = await classroomService.inviteLearner(classroomId, email);
 
-      return res.status(200).json({
-        success: true,
-        message: 'Invitation has been sent.',
-      });
+      return ResponseUtils.success(res, 'Invitation has been sent.');
     } catch (error) {
-      logger.error(
-        `[inviteLearner] Error inviting learner with email ${req.body?.email} to classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'inviteLearner',
+        'Failed to send invitation'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to sent invitation.',
-      });
     }
   }
 
@@ -329,28 +257,19 @@ class ClassroomController {
       const user = req.user;
 
       if (!token) {
-        return res.status(400).json({
-          success: false,
-          message: 'Missing invitation token.',
-        });
+        return ResponseUtils.validationError(res, 'Missing invitation token.');
       }
 
       const result = await classroomService.acceptInvitation(token, user);
 
-      return res.status(200).json({
-        success: true,
-        message: 'You have successfully joined the classroom.',
-        data: result,
-      });
+      return ResponseUtils.success(res, 'You have successfully joined the classroom.', result);
     } catch (error) {
-      logger.error(
-        `[acceptInvitation] Error accepting invitation for user ${req.user?.userId}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'acceptInvitation',
+        'Failed to accept invitation'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to accept invitation.',
-      });
     }
   }
 
@@ -360,27 +279,19 @@ class ClassroomController {
       const { email } = req.body;
 
       if (!email) {
-        return res.status(400).json({
-          success: false,
-          message: 'Missing email in request body.',
-        });
+        return ResponseUtils.validationError(res, 'Missing email in request body.');
       }
 
       await classroomService.cancelInvitation(classroomId, email);
 
-      return res.status(200).json({
-        success: true,
-        message: 'Invitation has been cancelled.',
-      });
+      return ResponseUtils.success(res, 'Invitation has been cancelled.');
     } catch (error) {
-      logger.error(
-        `[cancelInvitation] Error canceling invitation for email ${req.body?.email} in classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'cancelInvitation',
+        'Failed to cancel invitation'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to cancel invitation.',
-      });
     }
   }
 
@@ -413,11 +324,7 @@ class ClassroomController {
       const assignmentData = this._extractAssignmentData(req);
       const assignment = await classroomService.createAssignment(assignmentData);
 
-      return res.status(201).json({
-        success: true,
-        message: 'Assignment created successfully.',
-        data: assignment,
-      });
+      return ResponseUtils.success(res, 'Assignment created successfully.', assignment, 201);
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -433,19 +340,14 @@ class ClassroomController {
       const learnerId = req.user.userId;
       const result = await classroomService.getJoinedClassroomsByLearner(learnerId);
 
-      return res.status(200).json({
-        success: true,
-        data: result,
-      });
+      return ResponseUtils.success(res, 'Joined classrooms retrieved successfully', result);
     } catch (error) {
-      logger.error(
-        `[getMyJoinedClassrooms] Error getting joined classrooms for learner ${req.user?.userId}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getMyJoinedClassrooms',
+        'Failed to get joined classrooms'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to get joined classrooms.',
-      });
     }
   }
 
@@ -456,19 +358,14 @@ class ClassroomController {
       const invitations =
         await classroomService.getClassroomInvitations(classroomId);
 
-      return res.status(200).json({
-        success: true,
-        data: invitations,
-      });
+      return ResponseUtils.success(res, 'Invitations retrieved successfully', invitations);
     } catch (error) {
-      logger.error(
-        `[getClassroomInvitations] Error getting invitations for classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getClassroomInvitations',
+        'Failed to get invitations'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to get invitations.',
-      });
     }
   }
 
@@ -479,19 +376,14 @@ class ClassroomController {
       const assignments =
         await classroomService.getClassroomAssignments(classroomId);
 
-      return res.status(200).json({
-        success: true,
-        data: assignments,
-      });
+      return ResponseUtils.success(res, 'Assignments retrieved successfully', assignments);
     } catch (error) {
-      logger.error(
-        `[getClassroomAssignments] Error retrieving assignments for classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getClassroomAssignments',
+        'Failed to retrieve assignments'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to retrieve assignments',
-      });
     }
   }
 
@@ -505,19 +397,14 @@ class ClassroomController {
         learnerId
       );
 
-      return res.status(200).json({
-        success: true,
-        data: result,
-      });
+      return ResponseUtils.success(res, 'To-review assignments retrieved successfully', result);
     } catch (error) {
-      logger.error(
-        `[getLearnerToReviewAssignments] Error loading assignments for learner ${req.user?.userId} in classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getLearnerToReviewAssignments',
+        'Failed to load assignments'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to load assignments.',
-      });
     }
   }
 
@@ -531,19 +418,14 @@ class ClassroomController {
         learnerId
       );
 
-      return res.status(200).json({
-        success: true,
-        data: result,
-      });
+      return ResponseUtils.success(res, 'Reviewed assignments retrieved successfully', result);
     } catch (error) {
-      logger.error(
-        `[getLearnerReviewedAssignments] Error loading reviewed assignments for learner ${req.user?.userId} in classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getLearnerReviewedAssignments',
+        'Failed to load reviewed assignments'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to load reviewed assignments.',
-      });
     }
   }
 
@@ -557,20 +439,14 @@ class ClassroomController {
         learnerId
       );
 
-      return res.status(200).json({
-        success: true,
-        data: result,
-      });
+      return ResponseUtils.success(res, 'Overdue assignments retrieved successfully', result);
     } catch (error) {
-      logger.error(
-        `[getLearnerOverdueAssignments] Error loading overdue assignments for learner ${req.user?.userId} in classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getLearnerOverdueAssignments',
+        'Failed to load overdue assignments'
       );
-
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to load overdue assignments.',
-      });
     }
   }
 
@@ -584,19 +460,14 @@ class ClassroomController {
         assignmentId
       );
 
-      return res.status(200).json({
-        success: true,
-        data: result,
-      });
+      return ResponseUtils.success(res, 'Assignment details retrieved successfully', result);
     } catch (error) {
-      logger.error(
-        `[getAssignmentDetails] Error fetching details for assignment ${req.params?.assignmentId} in classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getAssignmentDetails',
+        'Failed to get assignment details'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to get assignment details.',
-      });
     }
   }
 
@@ -606,10 +477,7 @@ class ClassroomController {
       const { isAutoApprovalEnabled } = req.body;
 
       if (typeof isAutoApprovalEnabled !== 'boolean') {
-        return res.status(400).json({
-          success: false,
-          message: 'isAutoApprovalEnabled must be a boolean.',
-        });
+        return ResponseUtils.validationError(res, 'isAutoApprovalEnabled must be a boolean.');
       }
 
       const updatedClassroom = await classroomService.changeAutoApproveSetting(
@@ -617,23 +485,21 @@ class ClassroomController {
         isAutoApprovalEnabled
       );
 
-      return res.status(200).json({
-        success: true,
-        message: `Auto-approve setting has been ${isAutoApprovalEnabled ? 'enabled' : 'disabled'}.`,
-        data: {
+      return ResponseUtils.success(
+        res,
+        `Auto-approve setting has been ${isAutoApprovalEnabled ? 'enabled' : 'disabled'}.`,
+        {
           classroomId: updatedClassroom.id,
           isAutoApprovalEnabled: updatedClassroom.is_auto_approval_enabled,
-        },
-      });
-    } catch (error) {
-      logger.error(
-        `[changeAutoApproveSetting] Error updating auto-approve setting for classroom ${req.classroom?.id}:`,
-        err
+        }
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to update auto-approve setting.',
-      });
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'changeAutoApproveSetting',
+        'Failed to update auto-approve setting'
+      );
     }
   }
 
@@ -645,19 +511,14 @@ class ClassroomController {
 
       await classroomService.deleteAssignment(classroomId, assignmentId, userId);
 
-      return res.status(200).json({
-        success: true,
-        message: 'Assignment deleted successfully.',
-      });
+      return ResponseUtils.success(res, 'Assignment deleted successfully.');
     } catch (error) {
-      logger.error(
-        `[deleteAssignment] Error deleting assignment ${req.params?.assignmentId} in classroom ${req.classroom?.id} by user ${req.user?.userId}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'deleteAssignment',
+        'Failed to delete assignment'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to delete assignment.',
-      });
     }
   }
 
@@ -668,19 +529,14 @@ class ClassroomController {
 
       await classroomService.leaveClassroom(classroomId, learnerId);
 
-      return res.status(200).json({
-        success: true,
-        message: 'You have left the classroom.',
-      });
+      return ResponseUtils.success(res, 'You have left the classroom.');
     } catch (error) {
-      logger.error(
-        `[leaveClassroom] Error while learner ${req.user?.userId} trying to leave classroom ${req.classroom?.id}:`,
-        err
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'leaveClassroom',
+        'Failed to leave the classroom'
       );
-      return res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to leave the classroom.',
-      });
     }
   }
 }
