@@ -125,6 +125,8 @@ class ReviewModel {
     }
   }
 
+  
+
   // =================================================================
   //  SESSION MANAGEMENT
   // =================================================================
@@ -248,6 +250,28 @@ class ReviewModel {
 
     if (error) throw error;
     return data;
+  }
+
+  async findProgressByWordIds(userId, wordIds) {
+    if (!wordIds || wordIds.length === 0) {
+      return { data: [], error: null };
+    }
+    return await supabase
+      .from('user_word_progress')
+      .select(
+        `
+        word_id,
+        next_review_date,
+        interval_days,
+        ease_factor,
+        repetitions,
+        correct_count,
+        incorrect_count,
+        last_reviewed_at
+      `
+      )
+      .eq('user_id', userId)
+      .in('word_id', wordIds);
   }
 
   // =================================================================

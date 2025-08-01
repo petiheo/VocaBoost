@@ -63,6 +63,31 @@ class ReviewController {
     }
   }
 
+  async getDueWordsByList(req, res) {
+    try {
+      const userId = req.user.userId;
+      const { listId } = req.params;
+
+      const dueWords = await reviewService.getDueWordsByList(userId, listId);
+
+      return ResponseUtils.success(
+        res,
+        'Due words for the list retrieved successfully.',
+        { words: dueWords }
+      );
+    } catch (error) {
+      if (error.isForbidden) {
+        return ResponseUtils.forbidden(res, error.message);
+      }
+      return ErrorHandler.handleError(
+        res,
+        error,
+        `getDueWordsByList - User ${req.user?.userId}`,
+        'Failed to retrieve due words for the list.'
+      );
+    }
+  }
+
   // Corresponds to GET /sessions/status
   async getActiveSessionStatus(req, res) {
     try {

@@ -65,6 +65,32 @@ class ReviewService {
     return { dueByList: result, totalDue: rawData.length };
   }
 
+  async getDueWordsByList(userId, listId) {
+    const list = await vocabularyService.findListById(listId, userId);
+    if (!list) {
+      throw new Error('List not found.');
+    }
+
+    const dueWords = await reviewModel.findDueWordsByListId(userId, listId);
+    if (!dueWords || dueWords.length === 0) {
+        return [];
+    }
+
+    const dueWordIds = dueWords.map(word => word.id);
+    const { data: progressData, error: progressError } = 
+      await reviewModel.findProgressByWordIds(userId, dueWordIds);
+    if (progressError) throw progressError;
+
+    const progressMap = new Map((progressData || []).map(p => [p.word_id, p]));
+
+    const wordsWithProgress = dueWords.map(word => ({
+      ...word,
+      userProgress: progressMap.get(word.id) || null
+    }));
+    
+    return wordsWithProgress;
+  }
+
   // =================================================================
   // SESSION MANAGEMENT
   // =================================================================
@@ -73,22 +99,35 @@ class ReviewService {
     if (!activeSession) return null;
 
     if (!activeSession.word_ids || activeSession.word_ids.length === 0) {
-      logger.warn(
-        `Active session ${activeSession.id} found without word_ids. Ignoring.`
-      );
+      // ... (logging remains the same) ...
       return null;
     }
 
+    // Step 1: Fetch the words (no change here)
     const { data: sessionWords, error: wordsError } =
       await vocabularyModel.findWordsByIds(activeSession.word_ids);
     if (wordsError) throw wordsError;
+
+    // Step 2: Fetch progress for these words 
+    const { data: progressData, error: progressError } = 
+      await reviewModel.findProgressByWordIds(userId, activeSession.word_ids);
+    if (progressError) throw progressError;
+
+    const progressMap = new Map((progressData || []).map(p => [p.word_id, p]));
+
+    const wordsWithProgress = (sessionWords || []).map(word => ({
+      ...word,
+      userProgress: progressMap.get(word.id) || null
+    }));
 
     const { data: completedResults, error: resultsError } =
       await reviewModel.getSessionSummaryStats(activeSession.id);
     if (resultsError) throw resultsError;
 
     const completedWordIds = new Set((completedResults || []).map((r) => r.word_id));
-    const remainingWords = (sessionWords || []).filter(
+    
+    // Use the words with progress for the final filter
+    const remainingWords = wordsWithProgress.filter(
       (word) => !completedWordIds.has(word.id)
     );
 
@@ -114,7 +153,7 @@ class ReviewService {
     if (!dueWords || dueWords.length === 0) {
       throw new Error('No words are currently due for review in this list.');
     }
-
+    
     const dueWordIds = dueWords.map((word) => word.id);
 
     const sessionResponse = await reviewModel.createSession(
@@ -126,11 +165,22 @@ class ReviewService {
     if (sessionResponse.error) throw sessionResponse.error;
     const session = sessionResponse.data;
 
+    const { data: progressData, error: progressError } = 
+      await reviewModel.findProgressByWordIds(userId, dueWordIds);
+    if (progressError) throw progressError;
+
+    const progressMap = new Map((progressData || []).map(p => [p.word_id, p]));
+
+    const wordsWithProgress = dueWords.map(word => ({
+      ...word,
+      userProgress: progressMap.get(word.id) || null
+    }));
+
     return {
       sessionId: session.id,
       sessionType: sessionType,
       totalWords: dueWords.length,
-      words: shuffleArray(dueWords),
+      words: shuffleArray(wordsWithProgress),
     };
   }
 
