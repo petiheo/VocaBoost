@@ -23,6 +23,23 @@ class ReviewService {
     };
   }
 
+  async getUpcomingReviewLists(userId, { page = 1, limit = 5 }) {
+    const { from, to } = this._getPagination(page, limit);
+    
+    const rpcLimit = to - from + 1;
+    const rpcOffset = from;
+
+    const { data: lists, error: rpcError } = await reviewModel.findUpcomingReviewLists(userId, rpcLimit, rpcOffset);
+    if (rpcError) throw rpcError;
+    
+    const totalItems = await reviewModel.countListsWithScheduledWords(userId);
+
+    return {
+      lists: lists || [],
+      pagination: this._formatPagination(page, limit, totalItems)
+    };
+  }
+
   async getDueWords(userId) {
     const rawData = await reviewModel.findDueWordsGroupedByList(userId);
     const dueByList = rawData.reduce((acc, item) => {

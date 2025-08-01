@@ -24,6 +24,28 @@ class ReviewController {
     }
   }
 
+  async getUpcomingReviewLists(req, res) {
+    try {
+      const userId = req.user.userId;
+      const { page, limit } = req.query;
+
+      const result = await reviewService.getUpcomingReviewLists(userId, { page, limit });
+
+      return ResponseUtils.success(
+        res,
+        'Upcoming review lists retrieved successfully.',
+        result
+      );
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        `getUpcomingReviewLists - User ${req.user?.userId}`,
+        'Failed to retrieve upcoming review lists.'
+      );
+    }
+  }
+
   // Corresponds to GET /due
   async getDueWords(req, res) {
     try {

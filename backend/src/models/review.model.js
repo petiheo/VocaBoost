@@ -16,6 +16,26 @@ class ReviewModel {
     });
   }
 
+  async findUpcomingReviewLists(userId, limit, offset) {
+    return await supabase.rpc('get_upcoming_review_lists', {
+      p_user_id: userId,
+      p_limit: limit,
+      p_offset: offset,
+    });
+  }
+
+  async countListsWithScheduledWords(userId) {
+    const { data, error } = await supabase
+      .rpc('count_distinct_lists_for_user_progress', { p_user_id: userId });
+      
+    if (error) {
+      logger.error(`Error counting lists with scheduled words for user ${userId}:`, error);
+      throw error;
+    }
+
+    return data || 0;
+  }
+
   async findDueWordsGroupedByList(userId) {
     const { data, error } = await supabase
       .from('user_word_progress')
