@@ -1,4 +1,3 @@
-import { data } from "react-router-dom";
 import api from "../../lib/api";
 
 const classroomService = {
@@ -79,7 +78,8 @@ const classroomService = {
 
     //13. Accept invitation (Learner) (chua link)
     acceptInvitation: async (token) => {
-        const res = await api.post(`/classroom/accept-invitation`, token);
+        const res = await api.post(`/classroom/accept-invitation`, {token});
+        return res.data; 
     },
 
     //14. Cancel Invitation (Teacher)
@@ -159,7 +159,7 @@ const classroomService = {
 
     //25. Get Overdue Assignments (Learner) (chưa test)
     getOverdueAssignments: async (classroomId) => {
-        const res = await api.get(`/classroom/${classroomId}/assignment/overdue`);
+        const res = await api.get(`/classroom/${classroomId}/assignments/overdue`);
         return res.data;
     },
 };

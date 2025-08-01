@@ -10,6 +10,7 @@ import {
     AddLearners, ApproveJoinClassroomRequest, ManageClassroomLayout, LearnersList, PendingRequest,
     AssignmentDetail,
     Statistic,
+    JoiningVerify,
 } from "../pages/Classroom"
 
 const classroomRoutes = [
@@ -73,6 +74,11 @@ const classroomRoutes = [
                 element: <Statistic/>
             },
         ]
+    },
+
+    {
+        path: "/accept-invitation",
+        element: <JoiningVerify/>
     },
 ];
 export default classroomRoutes;

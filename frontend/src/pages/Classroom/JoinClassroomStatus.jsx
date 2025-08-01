@@ -56,7 +56,8 @@ export default function JoinClassroomStatus({ status, code, errorMsg }) {
             <div className="join-classroom__card">
                 <h2 className="join-classroom__header">{getTitle(safeStatus)}</h2>
                 <p className="join-classroom__message">{getMessage(safeStatus)}</p>
-                <div className="join-classroom__code">{safeCode}</div>
+                {safeCode && (<div className="join-classroom__code">{safeCode}</div>)}
+                
                 <button className="join-classroom__button" onClick={() => (navigate("/my-classroom"))}>
                     {status === "default" ? "Join" : "→"}
                 </button>

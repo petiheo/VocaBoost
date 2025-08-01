@@ -118,7 +118,10 @@ export default function MyClassroomPage() {
                     <div className="classroom-card" key={item.id}
                       onClick={() => {
                         localStorage.setItem("selectedClassroom", JSON.stringify(item)) // luu thông tin của classroom được chọn
-                        navigate(`/classroom/learners-list`); // Điều hướng
+                        // Điều hướng
+                        {user?.role === "teacher" ? (
+                          navigate(`/classroom/learners-list`)
+                        ):(navigate(`/view-classroom`))}
                       }}
                       style={{ cursor: "pointer" }}
                     >

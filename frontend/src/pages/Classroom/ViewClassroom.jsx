@@ -19,7 +19,6 @@ const dummyLists = Array(8).fill({
     result: "80%"
 });
 
-
 export default function ManageClassroomLearner() {
 
     const [activeTab, setActiveTab] = useState("To-review");
@@ -34,43 +33,43 @@ export default function ManageClassroomLearner() {
     })
 
     // Xử lý việc fetch dữ liệu lớp học cho learner
-    // const [isLoading, setIsLoading] = useState(false);
-    // const [assignments, setAssignments] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [assignments, setAssignments] = useState([]);
 
-    // useEffect(() => {
-    //     if (!classroomId || isLoading) {
-    //         return;
-    //     }
+    useEffect(() => {
+        if (!classroomId) {
+            return;
+        }
 
-    //     const fetchAssignments = async () => {
-    //         setIsLoading(true);
-    //         try {
-    //             let res;
-    //             switch (activeTab) {
-    //                 case "To-review":
-    //                     res = await classroomService.getToReviewAssignments(classroomId);
-    //                     break;
-    //                 case "Reviewed":
-    //                     res = await classroomService.getReviewedAssignments(classroomId);
-    //                     break;
-    //                 default:
-    //                     res = await classroomService.getOverdueAssignments(classroomId);
-    //             }
+        const fetchAssignments = async () => {
+            setIsLoading(true);
+            try {
+                let res;
+                switch (activeTab) {
+                    case "To-review":
+                        res = await classroomService.getToReviewAssignments(classroomId);
+                        break;
+                    case "Reviewed":
+                        res = await classroomService.getReviewedAssignments(classroomId);
+                        break;
+                    default:
+                        res = await classroomService.getOverdueAssignments(classroomId);
+                }
 
-    //             if (res.success && Array.isArray(res.data)) {
-    //                 setAssignments(res.data);
-    //                 console.log("Fetch assignments thành công");
-    //             }
-    //         } catch (error) {
-    //             console.error("Lỗi khi fetch assignments:", error);
-    //             navigate("/fail");
-    //         } finally {
-    //             setIsLoading(false);
-    //         }
-    //     };
-    //     fetchAssignments();
+                if (res.success && Array.isArray(res.data)) {
+                    setAssignments(res.data);
+                    console.log("Fetch assignments thành công");
+                }
+            } catch (error) {
+                console.error("Lỗi khi fetch assignments:", error);
+                navigate("/fail");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchAssignments();
 
-    // }, [activeTab, classroomId]);
+    }, [activeTab, classroomId, navigate]);
 
     return (
         <div className="manage-classroom-learner">
@@ -101,47 +100,45 @@ export default function ManageClassroomLearner() {
 
                     {/* Top Bar */}
                     <div className="list-topbar">
-                        <span>All lists: 12</span>
+                        <span>All lists: {assignments.length}</span>
                         <div className="filter">Filter by ▼</div>
                     </div>
 
 
                     {/* List Grid */}
-                    {activeTab === "To-review" ? (
-                        <div className="list-grid">
-                            {dummyLists.map((list, index) => (
-                                <VocabularyListCard
-                                    key={index}
-                                    {...list}
-                                />
-                            ))}
+                    {isLoading ? (
+                        <div className="loading-container">
+                            <p>Loading assignments...</p>
                         </div>
-                    ) : activeTab === "Reviewed" ? (
+                    ) : assignments.length > 0 ? (
                         <div className="list-grid">
-                            {dummyLists.map((list, index) => (
+                            {assignments.map((assignment, index) => (
                                 <VocabularyListCard
-                                    key={index}
-                                    {...list}
+                                    key={assignment.assignment_id || index}
+                                    title={assignment.title}
+                                    description={`Exercise method: ${assignment.exercise_method}`}
+                                    username={`Due: ${new Date(assignment.due_date).toLocaleDateString()}`}
+                                    role="Assignment"
+                                    reviewProgress={`${assignment.completed_sublist_index || 0}/${assignment.sublist_count || 0}`}
+                                    completionDate={new Date(assignment.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    result={assignment.learner_status || 'Pending'}
                                 />
                             ))}
                         </div>
                     ) : (
-                        <div className="list-grid">
-                            {dummyLists.map((list, index) => (
-                                <VocabularyListCard
-                                    key={index}
-                                    {...list}
-                                />
-                            ))}
+                        <div className="empty-state">
+                            <p>No assignments found for {activeTab.toLowerCase()}.</p>
                         </div>
                     )}
 
 
 
                     {/* See more */}
-                    <div className="see-more">
-                        <button className="btn see-more-btn">See more ▼</button>
-                    </div>
+                    {assignments.length > 0 && (
+                        <div className="see-more">
+                            <button className="btn see-more-btn">See more ▼</button>
+                        </div>
+                    )}
                 </div>
             </div>
             <Footer />

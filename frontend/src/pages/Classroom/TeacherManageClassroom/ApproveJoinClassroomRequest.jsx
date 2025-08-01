@@ -43,7 +43,7 @@ export default function ApproveJoinClassroomRequest() {
             const res = await classroomService.approveJoinRequest({ classroomId, learnerId: id });
             if (res.success) {
                 console.log("Approve thanh cong");
-                setLearners(requests.filter((r) => r.learner_id !== id));
+                setRequests(requests.filter((r) => r.learner_id !== id));
             }
         } catch (error) {
             console.error(error.message);

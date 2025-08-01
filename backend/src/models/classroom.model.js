@@ -427,17 +427,16 @@ class ClassroomModel {
   }
 
   async getLearnerAssignmentsByClassroomAndLearner(classroomId, learnerId) {
-    const { data, error } = await supabase
-      .from('learner_assignments')
-      .select('assignment_id')
-      .eq('learner_id', learnerId)
-      .in(
-        'assignment_id',
-        supabase.from('assignments').select('id').eq('classroom_id', classroomId)
-      );
+    const { data, error } = await supabase.rpc(
+      'get_learner_assignments_by_classroom',
+      {
+        p_classroom_id: classroomId,
+        p_learner_id: learnerId,
+      }
+    );
 
     if (error) throw error;
-    return data.map((row) => row.assignment_id);
+    return data ? data.map((row) => row.assignment_id) : [];
   }
 
   async createLearnerAssignmentsBatch(assignments) {
