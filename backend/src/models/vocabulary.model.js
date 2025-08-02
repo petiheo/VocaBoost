@@ -64,7 +64,11 @@ class VocabularyModel {
     return await supabase
       .from('user_list_history')
       .upsert(
-        { user_id: userId, list_id: listId, last_accessed_at: new Date().toISOString() },
+        {
+          user_id: userId,
+          list_id: listId,
+          last_accessed_at: new Date().toISOString(),
+        },
         { onConflict: 'user_id, list_id' }
       );
   }
@@ -72,7 +76,8 @@ class VocabularyModel {
   async findHistoryLists(userId, from, to) {
     return await supabase
       .from('user_list_history')
-      .select(`
+      .select(
+        `
         last_accessed_at,
         list:vocab_lists (
             listId:id,
@@ -81,26 +86,29 @@ class VocabularyModel {
             privacy_setting,
             creator:users (display_name)
         )
-      `, { count: 'exact' })
+      `,
+        { count: 'exact' }
+      )
       .eq('user_id', userId)
       .order('last_accessed_at', { ascending: false })
       .range(from, to)
       .then(({ data, error, count }) => {
-          if (data) {
-              const reshapedData = data.map(item => ({
-                  ...item.list,
-                  last_accessed_at: item.last_accessed_at
-              }));
-              return { data: reshapedData, error, count };
-          }
-          return { data, error, count };
+        if (data) {
+          const reshapedData = data.map((item) => ({
+            ...item.list,
+            last_accessed_at: item.last_accessed_at,
+          }));
+          return { data: reshapedData, error, count };
+        }
+        return { data, error, count };
       });
   }
 
   async findPopularLists(from, to) {
     return await supabase
       .from('vocab_lists')
-      .select(`
+      .select(
+        `
         listId:id,
         title,
         description,
@@ -108,20 +116,22 @@ class VocabularyModel {
         view_count,
         creator:users (display_name),
         tags (name)
-      `, { count: 'exact' })
+      `,
+        { count: 'exact' }
+      )
       .eq('privacy_setting', 'public')
       .eq('is_active', true)
       .order('view_count', { ascending: false })
       .range(from, to)
       .then(({ data, error, count }) => {
-          if (data) {
-              const reshapedData = data.map(item => ({
-                  ...item,
-                  tags: item.tags.map(t => t.name)
-              }));
-              return { data: reshapedData, error, count };
-          }
-          return { data, error, count };
+        if (data) {
+          const reshapedData = data.map((item) => ({
+            ...item,
+            tags: item.tags.map((t) => t.name),
+          }));
+          return { data: reshapedData, error, count };
+        }
+        return { data, error, count };
       });
   }
 
