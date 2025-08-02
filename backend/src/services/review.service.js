@@ -96,9 +96,20 @@ class ReviewService {
   }
 
   async getDueWordsByList(userId, listId) {
-    const list = await vocabularyService.findListById(listId, userId);
-    if (!list) {
+    const { data: listData, error: listError } = await vocabularyModel.findListById(listId);
+    if (listError) {
+      if (listError.code === 'PGRST116') { 
+        throw new Error('List not found.');
+      }
+      throw listError;
+    }
+  
+    if (!listData) {
       throw new Error('List not found.');
+    }
+  
+    if (userId !== listData.creator_id) {
+      throw new ForbiddenError('User does not have permission to access this list.');
     }
 
     const dueWords = await reviewModel.findDueWordsByListId(userId, listId);
