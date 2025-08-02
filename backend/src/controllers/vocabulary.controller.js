@@ -503,6 +503,62 @@ class VocabularyController {
       );
     }
   }
+
+  async generateExample(req, res) {
+    try {
+      const { wordId } = req.params;
+      const userId = req.user.userId;
+      const { context } = req.body;
+
+      const result = await vocabularyService.generateExample(
+        wordId,
+        userId,
+        context
+      );
+
+      return ResponseUtils.success(res, 'Example generated successfully.', {
+        example: result,
+      });
+    } catch (error) {
+      if (error.isForbidden) {
+        return ResponseUtils.forbidden(
+          res,
+          'Forbidden: You do not have permission to perform this action.'
+        );
+      }
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'generateExample',
+        'Internal server error',
+        500
+      );
+    }
+  }
+
+  async generateExampleForNewWord(req, res) {
+    try {
+      const { term, definition, context } = req.body;
+
+      const result = await vocabularyService.generateExampleForNewWord(
+        term,
+        definition,
+        context
+      );
+
+      return ResponseUtils.success(res, 'Example generated successfully.', {
+        example: result,
+      });
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'generateExampleForNewWord',
+        'Internal server error',
+        500
+      );
+    }
+  }
 }
 
 module.exports = new VocabularyController();
