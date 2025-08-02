@@ -8,7 +8,7 @@ class VocabularyModel {
   async findListById(listId) {
     return await supabase
       .from('vocab_lists')
-      .select('*, creator:users(id, display_name, role), tags(name)')
+      .select('*, creator:users(id, display_name, role, avatar_url), tags(name)') // change
       .eq('id', listId)
       .single();
   }
@@ -18,10 +18,10 @@ class VocabularyModel {
     let query = supabase
       .from('vocab_lists')
       .select(
-        'id, title, description, privacy_setting, word_count, updated_at, tags(name), creator:users(id, display_name, role)',
+        'id, title, description, privacy_setting, word_count, updated_at, tags(name), creator:users(id, display_name, role, avatar_url)',
         { count: 'exact' }
       )
-      .eq('creator_id', userId);
+      .eq('creator_id', userId); // change
 
     if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
     if (privacy) query = query.eq('privacy_setting', privacy);
@@ -40,13 +40,13 @@ class VocabularyModel {
     let query = supabase
       .from('vocab_lists')
       .select(
-        'id, title, description, word_count, updated_at, creator:users(id, display_name, role), tags(name)',
+        'id, title, description, word_count, updated_at, creator:users(id, display_name, role, avatar_url), tags(name)',
         { count: 'exact' }
       )
       .eq('privacy_setting', 'public')
       .eq('is_active', true);
 
-    if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
+    if (q) query = query.or(`title.ilike.%${q}%`);
     if (tags) {
       const tagArray = tags.split(',').map((t) => t.trim());
       query = query.in('tags.name', tagArray);
@@ -84,10 +84,10 @@ class VocabularyModel {
             title,
             wordCount:word_count,
             privacy_setting,
-            creator:users (display_name)
+            creator:users (id, display_name, role, avatar_url) 
         )
       `,
-        { count: 'exact' }
+        { count: 'exact' } // change
       )
       .eq('user_id', userId)
       .order('last_accessed_at', { ascending: false })
@@ -114,10 +114,10 @@ class VocabularyModel {
         description,
         wordCount:word_count,
         view_count,
-        creator:users (display_name),
+        creator:users (id, display_name, role, avatar_url),
         tags (name)
       `,
-        { count: 'exact' }
+        { count: 'exact' } // change
       )
       .eq('privacy_setting', 'public')
       .eq('is_active', true)
