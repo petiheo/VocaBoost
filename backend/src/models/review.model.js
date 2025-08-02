@@ -1,5 +1,3 @@
-// src/models/review.model.js
-
 const { supabase } = require('../config/supabase.config');
 const logger = require('../utils/logger');
 
@@ -54,49 +52,65 @@ class ReviewModel {
 
   async findDueWordsByListId(userId, listId, limit = null) {
     try {
-      // Step 1: Fetch the progress records for due words to get the word IDs.
-      let progressQuery = supabase
+      // Step 1: Get the IDs of all words in the specified list.
+      const { data: wordsInList, error: listWordsError } = await supabase
+        .from('vocabulary')
+        .select('id')
+        .eq('list_id', listId);
+      
+      if (listWordsError) throw listWordsError;
+      if (!wordsInList || wordsInList.length === 0) {
+        return []; // The list is empty.
+      }
+      
+      const wordIdsInList = wordsInList.map(w => w.id);
+
+      // Step 2: From those word IDs, find which ones are due for the user.
+      let dueProgressQuery = supabase
         .from('user_word_progress')
-        .select('word_id:vocabulary!inner(id, list_id)') // Inner join filters by listId
+        .select('word_id')
         .eq('user_id', userId)
-        .lte('next_review_date', new Date().toISOString())
-        .eq('vocabulary.list_id', listId);
+        .in('word_id', wordIdsInList) // Filter only for words in our target list
+        .lte('next_review_date', new Date().toISOString());
 
       if (limit !== null) {
-        progressQuery = progressQuery.limit(limit);
+        dueProgressQuery = dueProgressQuery.limit(limit);
       }
 
-      const { data: progressRecords, error: progressError } = await progressQuery;
+      const { data: dueProgressRecords, error: progressError } = await dueProgressQuery;
       if (progressError) throw progressError;
-      if (!progressRecords || progressRecords.length === 0) {
-        return []; // No words are due, return an empty array.
+
+      if (!dueProgressRecords || dueProgressRecords.length === 0) {
+        return []; // No words in this list are due for review.
       }
+      
+      // Step 3: get clean list of word IDs that are due.
+      const dueWordIds = dueProgressRecords.map(p => p.word_id);
 
-      // Step 2: Extract the unique IDs of the due words.
-      const dueWordIds = progressRecords.map((p) => p.word_id.id);
+      // --- The rest of the function proceeds exactly as before ---
 
-      // Step 3: Fetch the full details for only those due words.
+      // Step 4: Fetch the full details for only those due words.
       const { data: words, error: wordsError } = await supabase
         .from('vocabulary')
         .select('*')
         .in('id', dueWordIds);
       if (wordsError) throw wordsError;
 
-      // Step 4: Fetch all examples for those specific words in a single query.
+      // Step 5: Fetch all examples for those specific words.
       const { data: examples, error: examplesError } = await supabase
         .from('vocabulary_examples')
-        .select('*') // Select all fields to match the desired object structure
+        .select('*')
         .in('vocabulary_id', dueWordIds);
       if (examplesError) throw examplesError;
 
-      // Step 5: Fetch all synonyms for those specific words in a single query.
+      // Step 6: Fetch all synonyms for those specific words.
       const { data: synonyms, error: synonymsError } = await supabase
         .from('word_synonyms')
         .select('word_id, synonym')
         .in('word_id', dueWordIds);
       if (synonymsError) throw synonymsError;
 
-      // Step 6: Map the examples and synonyms to their parent words for efficient lookup.
+      // Step 7: Map the examples and synonyms to their parent words for efficient lookup.
       const examplesMap = new Map();
       (examples || []).forEach((ex) => {
         examplesMap.set(ex.vocabulary_id, ex);
@@ -110,6 +124,7 @@ class ReviewModel {
         synonymsMap.get(s.word_id).push(s.synonym);
       });
 
+      // Step 8: Assemble the final, complete word objects.
       const enrichedWords = words.map((word) => ({
         ...word,
         vocabulary_examples: examplesMap.get(word.id) || null,

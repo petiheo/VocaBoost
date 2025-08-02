@@ -100,11 +100,10 @@ class ReviewService {
     if (!activeSession) return null;
 
     if (!activeSession.word_ids || activeSession.word_ids.length === 0) {
-      // ... (logging remains the same) ...
       return null;
     }
 
-    // Step 1: Fetch the words (no change here)
+    // Step 1: Fetch the words 
     const { data: sessionWords, error: wordsError } =
       await vocabularyModel.findWordsByIds(activeSession.word_ids);
     if (wordsError) throw wordsError;
