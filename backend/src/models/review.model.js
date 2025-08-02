@@ -1,3 +1,5 @@
+// src/models/review.model.js
+
 const { supabase } = require('../config/supabase.config');
 const logger = require('../utils/logger');
 
@@ -7,153 +9,11 @@ class ReviewModel {
   // =================================================================
 
   async findListsWithDueWords(userId, from, to) {
-    // Step 1: Find all word_ids that are due for the user.
-    const { data: dueProgress, error: progressError } = await supabase
-      .from('user_word_progress')
-      .select('word_id')
-      .eq('user_id', userId)
-      .lte('next_review_date', new Date().toISOString());
-
-    if (progressError) throw progressError;
-    if (!dueProgress || dueProgress.length === 0) {
-      return { data: [], error: null, count: 0 };
-    }
-
-    const dueWordIds = dueProgress.map(p => p.word_id);
-
-    // Step 2: Get the unique list_ids for those due words.
-    const { data: listRecords, error: listError } = await supabase
-      .from('vocabulary')
-      .select('list_id')
-      .in('id', dueWordIds);
-
-    if (listError) throw listError;
-    if (!listRecords || listRecords.length === 0) {
-      return { data: [], error: null, count: 0 };
-    }
-    
-    const uniqueListIds = [...new Set(listRecords.map(r => r.list_id))];
-
-    // Step 3: Fetch the full details for those unique lists, with optional pagination.
-    let query = supabase
-      .from('vocab_lists')
-      .select('id, title, word_count, creator:users(id, display_name, role, avatar_url), tags(name)', { count: 'exact' })
-      .in('id', uniqueListIds)
-      .order('updated_at', { ascending: false });
-
-    if (from !== null && to !== null) {
-      query = query.range(from, to);
-    }
-    
-    return await query;
-  }
-
-  async findUpcomingReviewLists(userId, from, to) {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-
-    const sevenDaysFromNow = new Date(tomorrow);
-    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-
-    // Step 1: Find all progress records within the upcoming date range.
-    const { data: upcomingProgress, error: progressError } = await supabase
-      .from('user_word_progress')
-      .select('word_id, next_review_date')
-      .eq('user_id', userId)
-      .gte('next_review_date', tomorrow.toISOString())
-      .lt('next_review_date', sevenDaysFromNow.toISOString());
-      
-    if (progressError) throw progressError;
-    if (!upcomingProgress || upcomingProgress.length === 0) {
-        return { data: [], error: null };
-    }
-
-    const upcomingWordIds = upcomingProgress.map(p => p.word_id);
-    
-    // Step 2: Get the list_id and details for each of those upcoming words.
-    const { data: wordDetails, error: wordError } = await supabase
-      .from('vocabulary')
-      .select('list_id, vocab_lists(*, creator:users(id, display_name, role, avatar_url))')
-      .in('id', upcomingWordIds);
-      
-    if (wordError) throw wordError;
-
-    // Step 3: Process the data to find the soonest review for each unique list.
-    const listsMap = new Map();
-    upcomingProgress.forEach(progress => {
-      const wordDetail = wordDetails.find(w => w.id === progress.word_id);
-      if (wordDetail && wordDetail.vocab_lists) {
-        const listId = wordDetail.list_id;
-        if (!listsMap.has(listId) || new Date(progress.next_review_date) < new Date(listsMap.get(listId).next_review_date)) {
-          listsMap.set(listId, {
-            ...wordDetail.vocab_lists,
-            next_review_date: progress.next_review_date
-          });
-        }
-      }
+    return await supabase.rpc('get_lists_with_due_words', {
+      p_user_id: userId,
+      p_limit: to - from + 1,
+      p_offset: from,
     });
-
-    const uniqueLists = Array.from(listsMap.values());
-    uniqueLists.sort((a, b) => new Date(a.next_review_date) - new Date(b.next_review_date));
-
-    const paginatedData = (from !== null && to !== null) 
-      ? uniqueLists.slice(from, to + 1)
-      : uniqueLists; // If no pagination, return all results.
-
-    return { data: paginatedData, error: null, count: uniqueLists.length }; 
-  }
-
-  async countListsWithDueWords(userId) {
-    const { data: dueProgress, error: progressError } = await supabase
-      .from('user_word_progress')
-      .select('word_id')
-      .eq('user_id', userId)
-      .lte('next_review_date', new Date().toISOString());
-
-    if (progressError) throw progressError;
-    if (!dueProgress || dueProgress.length === 0) return 0;
-
-    const dueWordIds = dueProgress.map(p => p.word_id);
-
-    const { data: listRecords, error: listError } = await supabase
-      .from('vocabulary')
-      .select('list_id')
-      .in('id', dueWordIds);
-      
-    if (listError) throw listError;
-
-    return new Set(listRecords.map(r => r.list_id)).size;
-  }
-
-  async countListsWithScheduledWords(userId) {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-
-    const sevenDaysFromNow = new Date(tomorrow);
-    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-
-    const { data: upcomingProgress, error: progressError } = await supabase
-      .from('user_word_progress')
-      .select('word_id')
-      .eq('user_id', userId)
-      .gte('next_review_date', tomorrow.toISOString())
-      .lt('next_review_date', sevenDaysFromNow.toISOString());
-
-    if (progressError) throw progressError;
-    if (!upcomingProgress || upcomingProgress.length === 0) return 0;
-      
-    const upcomingWordIds = upcomingProgress.map(p => p.word_id);
-    
-    const { data: listRecords, error: listError } = await supabase
-      .from('vocabulary')
-      .select('list_id')
-      .in('id', upcomingWordIds);
-    
-    if (listError) throw listError;
-
-    return new Set(listRecords.map(r => r.list_id)).size;
   }
 
   async findDueWordsGroupedByList(userId) {
@@ -167,85 +27,72 @@ class ReviewModel {
     return data;
   }
 
-  async findDueWordsByListId(userId, listId, limit = null) {
+  async findDueWordsByListId(userId, listId, limit = 20) {
     try {
-      // Step 1: Get the IDs of all words in the specified list.
-      const { data: wordsInList, error: listWordsError } = await supabase
-        .from('vocabulary')
-        .select('id')
-        .eq('list_id', listId);
-      
-      if (listWordsError) throw listWordsError;
-      if (!wordsInList || wordsInList.length === 0) {
-        return []; // The list is empty.
-      }
-      
-      const wordIdsInList = wordsInList.map(w => w.id);
-
-      // Step 2: From those word IDs, find which ones are due for the user.
-      let dueProgressQuery = supabase
+      // Step 1: Fetch the basic progress records for due words in the specified list.
+      // This gets us the word IDs we need to work with.
+      const { data: progressRecords, error: progressError } = await supabase
         .from('user_word_progress')
-        .select('word_id')
+        .select('word_id:vocabulary!inner(id, list_id)') // Use an inner join to filter by listId
         .eq('user_id', userId)
-        .in('word_id', wordIdsInList) // Filter only for words in our target list
-        .lte('next_review_date', new Date().toISOString());
+        .lte('next_review_date', new Date().toISOString())
+        .eq('vocabulary.list_id', listId)
+        .limit(limit);
 
-      if (limit !== null) {
-        dueProgressQuery = dueProgressQuery.limit(limit);
-      }
-
-      const { data: dueProgressRecords, error: progressError } = await dueProgressQuery;
       if (progressError) throw progressError;
-
-      if (!dueProgressRecords || dueProgressRecords.length === 0) {
-        return []; // No words in this list are due for review.
+      if (!progressRecords || progressRecords.length === 0) {
+        return []; // No words are due, return an empty array
       }
-      
-      // Step 3: get clean list of word IDs that are due.
-      const dueWordIds = dueProgressRecords.map(p => p.word_id);
 
-      // --- The rest of the function proceeds exactly as before ---
+      // Step 2: Extract the unique IDs of the due words.
+      const dueWordIds = progressRecords.map((p) => p.word_id.id);
 
-      // Step 4: Fetch the full details for only those due words.
+      // Step 3: Fetch the full details for only those due words.
       const { data: words, error: wordsError } = await supabase
         .from('vocabulary')
         .select('*')
         .in('id', dueWordIds);
+
       if (wordsError) throw wordsError;
 
-      // Step 5: Fetch all examples for those specific words.
+      // Step 4: Fetch all examples for those specific words in a single query.
       const { data: examples, error: examplesError } = await supabase
         .from('vocabulary_examples')
-        .select('*')
+        .select('vocabulary_id, example_sentence')
         .in('vocabulary_id', dueWordIds);
+
       if (examplesError) throw examplesError;
 
-      // Step 6: Fetch all synonyms for those specific words.
+      // Step 5: Fetch all synonyms for those specific words in a single query.
       const { data: synonyms, error: synonymsError } = await supabase
         .from('word_synonyms')
         .select('word_id, synonym')
         .in('word_id', dueWordIds);
+
       if (synonymsError) throw synonymsError;
 
-      // Step 7: Map the examples and synonyms to their parent words for efficient lookup.
-      const examplesMap = new Map();
-      (examples || []).forEach((ex) => {
-        examplesMap.set(ex.vocabulary_id, ex);
-      });
-
-      const synonymsMap = new Map();
-      (synonyms || []).forEach((s) => {
-        if (!synonymsMap.has(s.word_id)) {
-          synonymsMap.set(s.word_id, []);
+      // Step 6: Map the examples and synonyms to their parent words for efficient lookup.
+      const examplesByWordId = new Map();
+      examples.forEach((ex) => {
+        if (!examplesByWordId.has(ex.vocabulary_id)) {
+          examplesByWordId.set(ex.vocabulary_id, []);
         }
-        synonymsMap.get(s.word_id).push(s.synonym);
+        examplesByWordId.get(ex.vocabulary_id).push(ex);
       });
 
-      // Step 8: Assemble the final, complete word objects.
+      const synonymsByWordId = new Map();
+      synonyms.forEach((s) => {
+        if (!synonymsByWordId.has(s.word_id)) {
+          synonymsByWordId.set(s.word_id, []);
+        }
+        synonymsByWordId.get(s.word_id).push(s.synonym);
+      });
+
+      // Step 7: Assemble the final, complete word objects.
       const enrichedWords = words.map((word) => ({
         ...word,
-        vocabulary_examples: examplesMap.get(word.id) || null,
-        synonyms: synonymsMap.get(word.id) || [],
+        examples: examplesByWordId.get(word.id) || [],
+        synonyms: synonymsByWordId.get(word.id) || [],
       }));
 
       return enrichedWords;
@@ -381,28 +228,6 @@ class ReviewModel {
 
     if (error) throw error;
     return data;
-  }
-
-  async findProgressByWordIds(userId, wordIds) {
-    if (!wordIds || wordIds.length === 0) {
-      return { data: [], error: null };
-    }
-    return await supabase
-      .from('user_word_progress')
-      .select(
-        `
-        word_id,
-        next_review_date,
-        interval_days,
-        ease_factor,
-        repetitions,
-        correct_count,
-        incorrect_count,
-        last_reviewed_at
-      `
-      )
-      .eq('user_id', userId)
-      .in('word_id', wordIds);
   }
 
   // =================================================================
