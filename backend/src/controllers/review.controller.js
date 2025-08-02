@@ -24,31 +24,6 @@ class ReviewController {
     }
   }
 
-  async getUpcomingReviewLists(req, res) {
-    try {
-      const userId = req.user.userId;
-      const { page, limit } = req.query;
-
-      const result = await reviewService.getUpcomingReviewLists(userId, {
-        page,
-        limit,
-      });
-
-      return ResponseUtils.success(
-        res,
-        'Upcoming review lists retrieved successfully.',
-        result
-      );
-    } catch (error) {
-      return ErrorHandler.handleError(
-        res,
-        error,
-        `getUpcomingReviewLists - User ${req.user?.userId}`,
-        'Failed to retrieve upcoming review lists.'
-      );
-    }
-  }
-
   // Corresponds to GET /due
   async getDueWords(req, res) {
     try {
@@ -62,31 +37,6 @@ class ReviewController {
         error,
         `getDueWords - User ${req.user?.userId}`,
         'Failed to retrieve due words.'
-      );
-    }
-  }
-
-  async getDueWordsByList(req, res) {
-    try {
-      const userId = req.user.userId;
-      const { listId } = req.params;
-
-      const dueWords = await reviewService.getDueWordsByList(userId, listId);
-
-      return ResponseUtils.success(
-        res,
-        'Due words for the list retrieved successfully.',
-        { words: dueWords }
-      );
-    } catch (error) {
-      if (error.isForbidden) {
-        return ResponseUtils.forbidden(res, error.message);
-      }
-      return ErrorHandler.handleError(
-        res,
-        error,
-        `getDueWordsByList - User ${req.user?.userId}`,
-        'Failed to retrieve due words for the list.'
       );
     }
   }
