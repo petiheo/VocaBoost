@@ -25,18 +25,19 @@ class ReviewService {
 
   async getUpcomingReviewLists(userId, { page = 1, limit = 5 }) {
     const { from, to } = this._getPagination(page, limit);
-    
+
     const rpcLimit = to - from + 1;
     const rpcOffset = from;
 
-    const { data: lists, error: rpcError } = await reviewModel.findUpcomingReviewLists(userId, rpcLimit, rpcOffset);
+    const { data: lists, error: rpcError } =
+      await reviewModel.findUpcomingReviewLists(userId, rpcLimit, rpcOffset);
     if (rpcError) throw rpcError;
-    
+
     const totalItems = await reviewModel.countListsWithScheduledWords(userId);
 
     return {
       lists: lists || [],
-      pagination: this._formatPagination(page, limit, totalItems)
+      pagination: this._formatPagination(page, limit, totalItems),
     };
   }
 
@@ -73,21 +74,21 @@ class ReviewService {
 
     const dueWords = await reviewModel.findDueWordsByListId(userId, listId);
     if (!dueWords || dueWords.length === 0) {
-        return [];
+      return [];
     }
 
-    const dueWordIds = dueWords.map(word => word.id);
-    const { data: progressData, error: progressError } = 
+    const dueWordIds = dueWords.map((word) => word.id);
+    const { data: progressData, error: progressError } =
       await reviewModel.findProgressByWordIds(userId, dueWordIds);
     if (progressError) throw progressError;
 
-    const progressMap = new Map((progressData || []).map(p => [p.word_id, p]));
+    const progressMap = new Map((progressData || []).map((p) => [p.word_id, p]));
 
-    const wordsWithProgress = dueWords.map(word => ({
+    const wordsWithProgress = dueWords.map((word) => ({
       ...word,
-      userProgress: progressMap.get(word.id) || null
+      userProgress: progressMap.get(word.id) || null,
     }));
-    
+
     return wordsWithProgress;
   }
 
@@ -108,16 +109,16 @@ class ReviewService {
       await vocabularyModel.findWordsByIds(activeSession.word_ids);
     if (wordsError) throw wordsError;
 
-    // Step 2: Fetch progress for these words 
-    const { data: progressData, error: progressError } = 
+    // Step 2: Fetch progress for these words
+    const { data: progressData, error: progressError } =
       await reviewModel.findProgressByWordIds(userId, activeSession.word_ids);
     if (progressError) throw progressError;
 
-    const progressMap = new Map((progressData || []).map(p => [p.word_id, p]));
+    const progressMap = new Map((progressData || []).map((p) => [p.word_id, p]));
 
-    const wordsWithProgress = (sessionWords || []).map(word => ({
+    const wordsWithProgress = (sessionWords || []).map((word) => ({
       ...word,
-      userProgress: progressMap.get(word.id) || null
+      userProgress: progressMap.get(word.id) || null,
     }));
 
     const { data: completedResults, error: resultsError } =
@@ -125,7 +126,7 @@ class ReviewService {
     if (resultsError) throw resultsError;
 
     const completedWordIds = new Set((completedResults || []).map((r) => r.word_id));
-    
+
     // Use the words with progress for the final filter
     const remainingWords = wordsWithProgress.filter(
       (word) => !completedWordIds.has(word.id)
@@ -153,7 +154,7 @@ class ReviewService {
     if (!dueWords || dueWords.length === 0) {
       throw new Error('No words are currently due for review in this list.');
     }
-    
+
     const dueWordIds = dueWords.map((word) => word.id);
 
     const sessionResponse = await reviewModel.createSession(
@@ -165,15 +166,15 @@ class ReviewService {
     if (sessionResponse.error) throw sessionResponse.error;
     const session = sessionResponse.data;
 
-    const { data: progressData, error: progressError } = 
+    const { data: progressData, error: progressError } =
       await reviewModel.findProgressByWordIds(userId, dueWordIds);
     if (progressError) throw progressError;
 
-    const progressMap = new Map((progressData || []).map(p => [p.word_id, p]));
+    const progressMap = new Map((progressData || []).map((p) => [p.word_id, p]));
 
-    const wordsWithProgress = dueWords.map(word => ({
+    const wordsWithProgress = dueWords.map((word) => ({
       ...word,
-      userProgress: progressMap.get(word.id) || null
+      userProgress: progressMap.get(word.id) || null,
     }));
 
     return {

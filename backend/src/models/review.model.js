@@ -25,11 +25,16 @@ class ReviewModel {
   }
 
   async countListsWithScheduledWords(userId) {
-    const { data, error } = await supabase
-      .rpc('count_distinct_lists_for_user_progress', { p_user_id: userId });
-      
+    const { data, error } = await supabase.rpc(
+      'count_distinct_lists_for_user_progress',
+      { p_user_id: userId }
+    );
+
     if (error) {
-      logger.error(`Error counting lists with scheduled words for user ${userId}:`, error);
+      logger.error(
+        `Error counting lists with scheduled words for user ${userId}:`,
+        error
+      );
       throw error;
     }
 
@@ -107,8 +112,8 @@ class ReviewModel {
 
       const enrichedWords = words.map((word) => ({
         ...word,
-        vocabulary_examples: examplesMap.get(word.id) || null, 
-        synonyms: synonymsMap.get(word.id) || [], 
+        vocabulary_examples: examplesMap.get(word.id) || null,
+        synonyms: synonymsMap.get(word.id) || [],
       }));
 
       return enrichedWords;

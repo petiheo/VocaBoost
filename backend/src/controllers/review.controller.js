@@ -29,7 +29,10 @@ class ReviewController {
       const userId = req.user.userId;
       const { page, limit } = req.query;
 
-      const result = await reviewService.getUpcomingReviewLists(userId, { page, limit });
+      const result = await reviewService.getUpcomingReviewLists(userId, {
+        page,
+        limit,
+      });
 
       return ResponseUtils.success(
         res,
