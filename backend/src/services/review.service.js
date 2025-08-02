@@ -8,18 +8,65 @@ class ReviewService {
   // =================================================================
   // GETTING DUE ITEMS
   // =================================================================
-  async getListsWithDueWords(userId, { page = 1, limit = 10 }) {
+  async getListsWithDueWords(userId, { page = null, limit = null }) {
     const { from, to } = this._getPagination(page, limit);
-    const { data, error } = await reviewModel.findListsWithDueWords(
-      userId,
-      from,
-      to
-    );
+    
+    const { data, error } = await reviewModel.findListsWithDueWords(userId, from, to);
     if (error) throw error;
-
+  
+    const totalItems = await reviewModel.countListsWithDueWords(userId);
+  
+    const formattedLists = (data || []).map(list => ({
+        id: list.id,
+        title: list.title,
+        wordCount: list.word_count,
+        creator: { 
+            id: list.creator.id,
+            display_name: list.creator.display_name,
+            role: list.creator.role,
+            avatar_url: list.creator.avatar_url
+        },
+        tags: list.tags.map(t => t.name) 
+    }));
+  
     return {
-      listsWithDueWords: data,
-      pagination: { currentPage: page, limit },
+      listsWithDueWords: formattedLists,
+      pagination: this._formatPagination(page, limit, totalItems),
+    };
+  }
+
+  async getUpcomingReviewLists(userId, { page = null, limit = null }) {
+    const { from, to } = this._getPagination(page, limit);
+  
+    const { data, error } = await reviewModel.findUpcomingReviewLists(userId, from, to);
+    if (error) throw error;
+  
+    const totalItems = await reviewModel.countListsWithScheduledWords(userId);
+  
+    const now = new Date();
+    const formattedLists = (data || []).map(list => {
+        const nextReviewDate = new Date(list.next_review_date);
+        const diffTime = nextReviewDate - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+        return {
+            listId: list.id,
+            title: list.title,
+            wordCount: list.word_count,
+            creator: {
+                id: list.creator.id,
+                display_name: list.creator.display_name,
+                role: list.creator.role,
+                avatar_url: list.creator.avatar_url
+            },
+            tags: (list.tags || []).map(t => t.name),
+            next_review_in_days: Math.max(1, diffDays),
+        };
+    });
+  
+    return {
+      lists: formattedLists,
+      pagination: this._formatPagination(page, limit, totalItems),
     };
   }
 
@@ -48,6 +95,43 @@ class ReviewService {
     return { dueByList: result, totalDue: rawData.length };
   }
 
+  async getDueWordsByList(userId, listId) {
+    const { data: listData, error: listError } = await vocabularyModel.findListById(listId);
+    if (listError) {
+      if (listError.code === 'PGRST116') { 
+        throw new Error('List not found.');
+      }
+      throw listError;
+    }
+  
+    if (!listData) {
+      throw new Error('List not found.');
+    }
+  
+    if (userId !== listData.creator_id) {
+      throw new ForbiddenError('User does not have permission to access this list.');
+    }
+
+    const dueWords = await reviewModel.findDueWordsByListId(userId, listId);
+    if (!dueWords || dueWords.length === 0) {
+      return [];
+    }
+
+    const dueWordIds = dueWords.map((word) => word.id);
+    const { data: progressData, error: progressError } =
+      await reviewModel.findProgressByWordIds(userId, dueWordIds);
+    if (progressError) throw progressError;
+
+    const progressMap = new Map((progressData || []).map((p) => [p.word_id, p]));
+
+    const wordsWithProgress = dueWords.map((word) => ({
+      ...word,
+      userProgress: progressMap.get(word.id) || null,
+    }));
+
+    return wordsWithProgress;
+  }
+
   // =================================================================
   // SESSION MANAGEMENT
   // =================================================================
@@ -56,22 +140,34 @@ class ReviewService {
     if (!activeSession) return null;
 
     if (!activeSession.word_ids || activeSession.word_ids.length === 0) {
-      logger.warn(
-        `Active session ${activeSession.id} found without word_ids. Ignoring.`
-      );
       return null;
     }
 
+    // Step 1: Fetch the words 
     const { data: sessionWords, error: wordsError } =
       await vocabularyModel.findWordsByIds(activeSession.word_ids);
     if (wordsError) throw wordsError;
+
+    // Step 2: Fetch progress for these words
+    const { data: progressData, error: progressError } =
+      await reviewModel.findProgressByWordIds(userId, activeSession.word_ids);
+    if (progressError) throw progressError;
+
+    const progressMap = new Map((progressData || []).map((p) => [p.word_id, p]));
+
+    const wordsWithProgress = (sessionWords || []).map((word) => ({
+      ...word,
+      userProgress: progressMap.get(word.id) || null,
+    }));
 
     const { data: completedResults, error: resultsError } =
       await reviewModel.getSessionSummaryStats(activeSession.id);
     if (resultsError) throw resultsError;
 
     const completedWordIds = new Set((completedResults || []).map((r) => r.word_id));
-    const remainingWords = (sessionWords || []).filter(
+
+    // Use the words with progress for the final filter
+    const remainingWords = wordsWithProgress.filter(
       (word) => !completedWordIds.has(word.id)
     );
 
@@ -109,11 +205,22 @@ class ReviewService {
     if (sessionResponse.error) throw sessionResponse.error;
     const session = sessionResponse.data;
 
+    const { data: progressData, error: progressError } =
+      await reviewModel.findProgressByWordIds(userId, dueWordIds);
+    if (progressError) throw progressError;
+
+    const progressMap = new Map((progressData || []).map((p) => [p.word_id, p]));
+
+    const wordsWithProgress = dueWords.map((word) => ({
+      ...word,
+      userProgress: progressMap.get(word.id) || null,
+    }));
+
     return {
       sessionId: session.id,
       sessionType: sessionType,
       totalWords: dueWords.length,
-      words: shuffleArray(dueWords),
+      words: shuffleArray(wordsWithProgress),
     };
   }
 
@@ -228,16 +335,29 @@ class ReviewService {
 
   // Helper for pagination
   _getPagination(page, size) {
-    const limit = size ? +size : 10;
-    const from = page ? (page - 1) * limit : 0;
-    const to = page ? from + size - 1 : size - 1;
-    return { from, to };
+    if (page == null || size == null) {
+      return { from: null, to: null, limit: null };
+    }
+
+    const limit = +size; 
+    const from = (page - 1) * limit;
+    const to = from + size - 1;
+    return { from, to, limit };
   }
 
   _formatPagination(page, limit, totalItems) {
+    if (page == null || limit == null) {
+      return { totalItems: totalItems || 0 };
+    }
+
     const currentPage = Number(page);
     const totalPages = Math.ceil(totalItems / limit);
-    return { currentPage, totalPages, totalItems, limit: Number(limit) };
+    return {
+      currentPage,
+      totalPages,
+      totalItems: totalItems || 0,
+      limit: Number(limit),
+    };
   }
 }
 

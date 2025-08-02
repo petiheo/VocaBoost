@@ -11,7 +11,11 @@ reviewRouter.use(authMiddleware);
 
 reviewRouter.get('/lists/due', reviewController.getListsWithDueWords);
 
+reviewRouter.get('/lists/upcoming', reviewController.getUpcomingReviewLists);
+
 reviewRouter.get('/due', reviewController.getDueWords);
+
+reviewRouter.get('/lists/:listId/due-words', reviewController.getDueWordsByList);
 
 reviewRouter.get('/sessions/status', reviewController.getActiveSessionStatus);
 

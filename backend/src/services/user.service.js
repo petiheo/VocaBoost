@@ -82,7 +82,7 @@ class UserService {
 
   async reportWord(reporterId, wordId, reason) {
     // Check if word exists
-    const wordModel = require('../models/word.model');
+    const wordModel = require('../models/vocabulary.model');
     const word = await wordModel.findById(wordId);
     if (!word) {
       throw new Error('Word not found.');
