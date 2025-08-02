@@ -23,6 +23,8 @@ vocabularyRouter.post(
 
 vocabularyRouter.get('/my-lists', vocabularyController.getUserLists);
 
+vocabularyRouter.get('/lists/history', vocabularyController.getHistoryLists);
+
 vocabularyRouter.get('/search', vocabularyController.searchPublicLists);
 
 vocabularyRouter.get('/lists/:listId', vocabularyController.getListById);

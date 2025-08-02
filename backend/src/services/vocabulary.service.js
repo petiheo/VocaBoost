@@ -80,18 +80,30 @@ class VocabularyService {
     const { data: list, error } = await vocabularyModel.findListById(listId);
     if (error || !list) return null;
 
-    if (
-      !skipPermissionCheck &&
-      list.privacy_setting === 'private' &&
-      list.creator_id !== userId
-    ) {
-      throw new ForbiddenError(
-        'You do not have permission to view this private list.'
-      );
+    if (!skipPermissionCheck && list.privacy_setting === 'private' && list.creator_id !== userId) {
+        throw new ForbiddenError('You do not have permission to view this private list.');
     }
 
-    list.tags = list.tags.map((t) => t.name);
+    if (!skipPermissionCheck) {
+        await vocabularyModel.upsertListHistory(userId, listId).catch(err => {
+            logger.error(`Failed to update history for user ${userId} and list ${listId}:`, err);
+        });
+    }
+    
+    list.tags = list.tags.map(t => t.name);
     return list;
+  }
+
+  async findHistoryLists(userId, { page = 1, limit = 10 }) {
+    const { from, to } = this._getPagination(page, limit);
+    
+    const { data, error, count } = await vocabularyModel.findHistoryLists(userId, from, to);
+    if (error) throw error;
+    
+    return {
+      lists: data || [],
+      pagination: this._formatPagination(page, limit, count)
+    };
   }
 
   async updateList(listId, userId, updateData) {
