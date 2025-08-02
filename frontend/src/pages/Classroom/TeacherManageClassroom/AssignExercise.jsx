@@ -25,7 +25,7 @@ function AssignExercise() {
     const [searchTerm, setSearchTerm] = useState('');
     const [showError, setShowError] = useState(false);
     const dropdownRef = useRef(null);
-    
+
     // Xử lý việc lấy data vocab của giáo viên 
     const [vocabList, setVocabList] = useState([]);
 
@@ -33,16 +33,14 @@ function AssignExercise() {
         const fetchVocabularyList = async () => {
             try {
                 const res = await vocabularyService.getMyLists();
-                if (res?.success && Array.isArray(res.data.lists)) {
-                    setVocabList(res.data.lists)
-                }
+                setVocabList(res.lists);
             } catch (error) {
                 console.error("Lỗi khi lấy danh sách lớp học:", error);
             }
         }
         fetchVocabularyList();
     }, [])
-    
+
     // Xử lý thanh chọn list từ vựng
     const filteredOptions = vocabList.filter(lists =>
         lists.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -50,7 +48,7 @@ function AssignExercise() {
 
     const handleSelect = (option) => {
         // setSelectedVocab(option);
-        setSelectedVocabId(option.id)
+        setSelectedVocabId(option.id);
         setSearchTerm(option.title);
         setDropdownOpen(false);
         setShowError(false);
@@ -58,7 +56,7 @@ function AssignExercise() {
 
 
     const handleBlur = () => {
-        if (!vocabList.some(lists => lists.toLowerCase() === searchTerm.toLowerCase())) {
+        if (!vocabList.some(lists => lists.title.toLowerCase() === searchTerm.toLowerCase())) {
             setShowError(true);
             setSelectedVocabId(null);
         } else {
@@ -78,7 +76,7 @@ function AssignExercise() {
 
     const handleCreateAssignment = async (e) => {
         e.preventDefault();
-        const vocabListId = selectedVocabId // chinh lai thanh id
+        const vocabListId = selectedVocabId;
         const title = searchTerm;
         const wordsPerReview = parseInt(e.target["words_per_review"].value);
         const formatDate = (dateStr) => new Date(`${dateStr}T10:00:00Z`).toISOString();
@@ -166,7 +164,7 @@ function AssignExercise() {
                                     setDropdownOpen(true);
                                 }}
                                 autoComplete="off"
-                                onFocus={() => setDropdownOpen(true)} 
+                                onFocus={() => setDropdownOpen(true)}
                                 onBlur={handleBlur}
                             />
                             {dropdownOpen && filteredOptions.length > 0 && (
