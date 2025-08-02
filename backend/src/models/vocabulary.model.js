@@ -8,7 +8,7 @@ class VocabularyModel {
   async findListById(listId) {
     return await supabase
       .from('vocab_lists')
-      .select('*, creator:users(id, display_name, role, avatar_url), tags(name)') // change
+      .select('*, creator:users(id, display_name, role, avatar_url), tags(name)') 
       .eq('id', listId)
       .single();
   }
@@ -21,7 +21,7 @@ class VocabularyModel {
         'id, title, description, privacy_setting, word_count, updated_at, tags(name), creator:users(id, display_name, role, avatar_url)',
         { count: 'exact' }
       )
-      .eq('creator_id', userId); // change
+      .eq('creator_id', userId); 
 
     if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
     if (privacy) query = query.eq('privacy_setting', privacy);
@@ -87,7 +87,7 @@ class VocabularyModel {
             creator:users (id, display_name, role, avatar_url) 
         )
       `,
-        { count: 'exact' } // change
+        { count: 'exact' } 
       )
       .eq('user_id', userId)
       .order('last_accessed_at', { ascending: false })
@@ -117,7 +117,7 @@ class VocabularyModel {
         creator:users (id, display_name, role, avatar_url),
         tags (name)
       `,
-        { count: 'exact' } // change
+        { count: 'exact' } 
       )
       .eq('privacy_setting', 'public')
       .eq('is_active', true)
