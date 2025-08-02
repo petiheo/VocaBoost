@@ -80,27 +80,35 @@ class VocabularyModel {
         `
         last_accessed_at,
         list:vocab_lists (
-            listId:id,
+            id,
             title,
-            wordCount:word_count,
+            description,
+            word_count,
             privacy_setting,
-            creator:users (id, display_name, role, avatar_url) 
+            created_at,
+            creator:users (id, display_name, role, avatar_url),
+            tags (name)
         )
       `,
-        { count: 'exact' } 
+        { count: 'exact' }
       )
       .eq('user_id', userId)
       .order('last_accessed_at', { ascending: false })
       .range(from, to)
       .then(({ data, error, count }) => {
+        if (error) return { data, error, count };
         if (data) {
-          const reshapedData = data.map((item) => ({
-            ...item.list,
-            last_accessed_at: item.last_accessed_at,
-          }));
+          const reshapedData = data.map((item) => {
+            if (!item.list) return null; 
+            return {
+              ...item.list,
+              tags: item.list.tags.map(t => t.name),
+              last_accessed_at: item.last_accessed_at,
+            }
+          }).filter(Boolean);
           return { data: reshapedData, error, count };
         }
-        return { data, error, count };
+        return { data: [], error, count };
       });
   }
 
@@ -109,21 +117,24 @@ class VocabularyModel {
       .from('vocab_lists')
       .select(
         `
-        listId:id,
+        id,
         title,
         description,
-        wordCount:word_count,
+        word_count,
+        privacy_setting,
+        created_at,
         view_count,
         creator:users (id, display_name, role, avatar_url),
         tags (name)
       `,
-        { count: 'exact' } 
+        { count: 'exact' }
       )
       .eq('privacy_setting', 'public')
       .eq('is_active', true)
       .order('view_count', { ascending: false })
       .range(from, to)
       .then(({ data, error, count }) => {
+        if (error) return { data, error, count };
         if (data) {
           const reshapedData = data.map((item) => ({
             ...item,
@@ -131,7 +142,7 @@ class VocabularyModel {
           }));
           return { data: reshapedData, error, count };
         }
-        return { data, error, count };
+        return { data: [], error, count };
       });
   }
 
