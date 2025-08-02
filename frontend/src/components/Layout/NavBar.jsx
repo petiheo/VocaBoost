@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { DropdownArrow } from "../assets/icons/index";
-import DropdownMenu from "./DropdownMenu";
+import { DropdownArrow } from "../../assets/icons/index";
+import DropdownMenu from "../Navigation/DropdownMenu";
 
 const NavBar = () => {
 

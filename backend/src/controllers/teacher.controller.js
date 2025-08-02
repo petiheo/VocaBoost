@@ -20,7 +20,7 @@ class TeacherController {
         file
       );
 
-      const message = result.isUpdate 
+      const message = result.isUpdate
         ? 'Your teacher verification request has been updated successfully.'
         : 'Your teacher verification request has been submitted successfully.';
 

@@ -1,7 +1,7 @@
 import { Header, SideBar, Footer } from '../../components';
-import CarouselVocabSection from '../../components/CarouselVocabSection';
+import CarouselVocabSection from '../../components/Vocabulary/CarouselVocabSection';
 import { useState, useEffect } from 'react';
-import  LoadingCursor from '../../components/cursor/LoadingCursor';
+import  LoadingCursor from '../../components/UI/LoadingCursor';
 import { useDebounce } from '../../hooks/useDebounce'; 
 import { VocabularyListCard } from '../../components';
 

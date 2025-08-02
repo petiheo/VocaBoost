@@ -1,18 +1,24 @@
 import { useState } from "react";
 import { useAuth } from "../../services/Auth/authContext";
 import { Footer, Header, SideBar } from "../../components/index.jsx";
-import LoadingCursor from "../../components/cursor/LoadingCursor";
+import LoadingCursor from "../../components/UI/LoadingCursor.jsx";
 import { useUserProfile } from "../../hooks/useUserProfile";
 import {
   ProfileInput,
   TeacherVerification,
   ProfileAvatar,
 } from "../../components/Profile/ProfileComponents";
-import { validateProfile, validateDisplayName, validateDailyGoal, validateAvatarFile } from "../../utils/validation";
+import {
+  validateProfile,
+  validateDisplayName,
+  validateDailyGoal,
+  validateAvatarFile,
+} from "../../utils/validation";
 
 const Profile = () => {
   const { user } = useAuth();
-  const { isLoading, userProfile, formData, setFormData, updateProfile } = useUserProfile();
+  const { isLoading, userProfile, formData, setFormData, updateProfile } =
+    useUserProfile();
   const [isEditing, setIsEditing] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
 
@@ -25,25 +31,25 @@ const Profile = () => {
 
     // Real-time validation
     let fieldErrors = [];
-    if (name === 'displayName') {
+    if (name === "displayName") {
       fieldErrors = validateDisplayName(value);
-    } else if (name === 'dailyGoal') {
+    } else if (name === "dailyGoal") {
       fieldErrors = validateDailyGoal(value);
     }
 
-    setValidationErrors(prev => ({
+    setValidationErrors((prev) => ({
       ...prev,
-      [name]: fieldErrors.length > 0 ? fieldErrors : undefined
+      [name]: fieldErrors.length > 0 ? fieldErrors : undefined,
     }));
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
-    
+
     // Validate all fields before submitting
     const validation = validateProfile(formData);
     setValidationErrors(validation.errors);
-    
+
     if (!validation.isValid) {
       return; // Don't submit if validation fails
     }
@@ -65,25 +71,25 @@ const Profile = () => {
     if (file) {
       // Validate avatar file
       const avatarErrors = validateAvatarFile(file);
-      setValidationErrors(prev => ({
+      setValidationErrors((prev) => ({
         ...prev,
-        avatar: avatarErrors.length > 0 ? avatarErrors : undefined
+        avatar: avatarErrors.length > 0 ? avatarErrors : undefined,
       }));
 
       // Only create preview if file is valid
       if (avatarErrors.length === 0) {
         const previewUrl = URL.createObjectURL(file);
-        setFormData(prev => ({ 
-          ...prev, 
+        setFormData((prev) => ({
+          ...prev,
           avatarFile: file,
-          avatarPreview: previewUrl
+          avatarPreview: previewUrl,
         }));
       } else {
         // Clear file if invalid
-        setFormData(prev => ({ 
-          ...prev, 
+        setFormData((prev) => ({
+          ...prev,
           avatarFile: null,
-          avatarPreview: null
+          avatarPreview: null,
         }));
       }
     }
@@ -105,7 +111,7 @@ const Profile = () => {
           <LoadingCursor loading={isLoading} />
 
           <h2>My Profile</h2>
-          
+
           <ProfileAvatar
             avatarUrl={formData.avatarPreview || userProfile?.avatar_url}
             displayName={formData.displayName}
@@ -170,32 +176,34 @@ const Profile = () => {
 
           <TeacherVerification
             userProfile={userProfile}
-            onVerificationClick={() => window.location.href = "/teacher-verification"}
+            onVerificationClick={() =>
+              (window.location.href = "/teacher-verification")
+            }
           />
 
-          {userProfile?.teacherVerification?.status === "approved" && 
-           userProfile?.teacherVerification?.institution && (
-            <ProfileInput
-              label="School"
-              name="school"
-              type="text"
-              value={userProfile.teacherVerification.institution}
-              disabled={true}
-              className="readonly"
-            />
-          )}
+          {userProfile?.teacherVerification?.status === "approved" &&
+            userProfile?.teacherVerification?.institution && (
+              <ProfileInput
+                label="School"
+                name="school"
+                type="text"
+                value={userProfile.teacherVerification.institution}
+                disabled={true}
+                className="readonly"
+              />
+            )}
 
-          {userProfile?.teacherVerification?.status === "approved" && 
-           userProfile?.school_email && (
-            <ProfileInput
-              label="School Email"
-              name="schoolEmail"
-              type="email"
-              value={userProfile.school_email}
-              disabled={true}
-              className="readonly"
-            />
-          )}
+          {userProfile?.teacherVerification?.status === "approved" &&
+            userProfile?.school_email && (
+              <ProfileInput
+                label="School Email"
+                name="schoolEmail"
+                type="email"
+                value={userProfile.school_email}
+                disabled={true}
+                className="readonly"
+              />
+            )}
 
           {/* Action Buttons */}
           {!isEditing ? (
@@ -220,18 +228,14 @@ const Profile = () => {
                   setFormData({
                     ...formData,
                     avatarFile: null,
-                    avatarPreview: null
+                    avatarPreview: null,
                   });
                   setValidationErrors({}); // Clear validation errors
                 }}
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="save-btn"
-                disabled={isLoading}
-              >
+              <button type="submit" className="save-btn" disabled={isLoading}>
                 {isLoading ? "Saving..." : "Save Changes"}
               </button>
             </div>

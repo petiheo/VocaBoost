@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import MainPageLogo from "../assets/Logo.svg";
-import SearchBar from "./SearchBar.jsx";
-import DropdownMenu from "./DropdownMenu.jsx";
-import { useAuth } from "../services/Auth/authContext.jsx";
-import { Bell, Plus } from "../assets/Auth/index.jsx";
-import { useEmailVerificationRedirect } from "../hooks/useEmailVerificationRedirect.js";
+import MainPageLogo from "../../assets/Logo.svg";
+import SearchBar from "../Forms/SearchBar.jsx";
+import DropdownMenu from "../Navigation/DropdownMenu.jsx";
+import { useAuth } from "../../services/Auth/authContext.jsx";
+import { Bell, Plus } from "../../assets/Auth/index.jsx";
+import { useEmailVerificationRedirect } from "../../hooks/useEmailVerificationRedirect.js";
 
 const Header = ({ searchQuery, onSearchChange }) => {
     const { user, loading } = useAuth();

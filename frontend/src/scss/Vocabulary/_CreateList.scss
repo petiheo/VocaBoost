@@ -49,6 +49,22 @@
         opacity: 0.9;
       }
     }
+
+    &--cancel {
+      background-color: #FFFCF7;
+      color: #2a1e17;
+      width: 10rem;
+      font-weight: bold;
+      font-size: 1.2rem;
+      border: 0.075rem solid #2a1e17;
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
   }
 
   &__header {
@@ -269,6 +285,15 @@
     border-radius: 999px;
     color: #FFF3DF;
   }
+
+  &__form--cancel {
+    font-size: 1rem;
+    width: 10rem;
+    padding: 0.8rem 0 0.8rem; 
+    border-radius: 999px;
+    color: #2a1e17;
+  }
+
 }
 
 // Enhanced input component styles

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../../services/Auth/authService";
-import AccountPageInput from "../../components/AccountPageInput";
-import LoadingCursor from "../../components/cursor/LoadingCursor";
+import AccountPageInput from "../../components/Forms/AccountPageInput";
+import LoadingCursor from "../../components/UI/LoadingCursor";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
