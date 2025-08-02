@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS public.monthly_user_stats (
 );
 
 -- Apply the timestamp trigger for automatic `updated_at` updates.
-CREATE TRIGGER set_timestamp_monthly_user_stats BEFORE UPDATE ON public.monthly_user_stats
+CREATE TRIGGER set_timestamp_monthly_user_statistics BEFORE UPDATE ON public.monthly_user_stats
     FOR EACH ROW EXECUTE FUNCTION public.trigger_set_timestamp();
 
 
@@ -64,7 +64,7 @@ $$;
 --  3. Update the Migration Tracking Table
 -- =================================================================
 INSERT INTO schema_migrations (version, description)
-VALUES ('015', 'Create monthly_user_stats table and update function for progress tracking')
+VALUES ('018', 'Create monthly_user_stats table and update function for progress tracking')
 ON CONFLICT (version) DO NOTHING;
 
 COMMIT;

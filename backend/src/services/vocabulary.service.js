@@ -41,7 +41,7 @@ class VocabularyService {
   }
 
   async findUserLists(userId, options) {
-    const { page = 1, limit = 20 } = options;
+    const { page = null, limit = null } = options;
     const { from, to } = this._getPagination(page, limit);
     const { data, error, count } = await vocabularyModel.findUserLists(userId, {
       ...options,
@@ -59,7 +59,7 @@ class VocabularyService {
   }
 
   async searchPublicLists(options) {
-    const { page = 1, limit = 20 } = options;
+    const { page = null, limit = null } = options;
     const { from, to } = this._getPagination(page, limit);
     const { data, error, count } = await vocabularyModel.searchPublicLists({
       ...options,
@@ -90,8 +90,45 @@ class VocabularyService {
       );
     }
 
+    if (!skipPermissionCheck) {
+      await vocabularyModel.upsertListHistory(userId, listId).catch((err) => {
+        logger.error(
+          `Failed to update history for user ${userId} and list ${listId}:`,
+          err
+        );
+      });
+    }
+
     list.tags = list.tags.map((t) => t.name);
     return list;
+  }
+
+  async findHistoryLists(userId, { page = null, limit = null }) {
+    const { from, to } = this._getPagination(page, limit);
+
+    const { data, error, count } = await vocabularyModel.findHistoryLists(
+      userId,
+      from,
+      to
+    );
+    if (error) throw error;
+
+    return {
+      lists: data || [],
+      pagination: this._formatPagination(page, limit, count),
+    };
+  }
+
+  async findPopularLists({ page = null, limit = null }) {
+    const { from, to } = this._getPagination(page, limit);
+
+    const { data, error, count } = await vocabularyModel.findPopularLists(from, to);
+    if (error) throw error;
+
+    return {
+      lists: data || [],
+      pagination: this._formatPagination(page, limit, count),
+    };
   }
 
   async updateList(listId, userId, updateData) {
@@ -306,7 +343,7 @@ class VocabularyService {
     await vocabularyModel.updateWordCount(listId);
   }
 
-  async findWordsByListId(listId, userId, { page = 1, limit = 25 }) {
+  async findWordsByListId(listId, userId, { page = null, limit = null }) {
     await this.findListById(listId, userId);
     const { from, to } = this._getPagination(page, limit);
     const {
@@ -333,7 +370,7 @@ class VocabularyService {
   }
 
   async searchWordsInList(listId, userId, options) {
-    const { page = 1, limit = 20, sortBy, q } = options;
+    const { page = null, limit = null, sortBy, q } = options;
     await this.findListById(listId, userId);
     if (sortBy && sortBy.split(':').length !== 2) {
       throw new ValidationError([
@@ -540,16 +577,29 @@ class VocabularyService {
   }
 
   _getPagination(page, size) {
-    const limit = size ? +size : 20;
-    const from = page ? (page - 1) * limit : 0;
-    const to = page ? from + size - 1 : size - 1;
-    return { from, to };
+    if (page == null || size == null) {
+      return { from: null, to: null, limit: null };
+    }
+
+    const limit = +size; 
+    const from = (page - 1) * limit;
+    const to = from + size - 1;
+    return { from, to, limit };
   }
 
   _formatPagination(page, limit, totalItems) {
+    if (page == null || limit == null) {
+      return { totalItems: totalItems || 0 };
+    }
+
     const currentPage = Number(page);
     const totalPages = Math.ceil(totalItems / limit);
-    return { currentPage, totalPages, totalItems, limit: Number(limit) };
+    return {
+      currentPage,
+      totalPages,
+      totalItems: totalItems || 0,
+      limit: Number(limit),
+    };
   }
 }
 
