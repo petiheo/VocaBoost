@@ -7,36 +7,147 @@ class ReviewModel {
   // =================================================================
 
   async findListsWithDueWords(userId, from, to) {
-    return await supabase.rpc('get_lists_with_due_words', {
-      p_user_id: userId,
-      p_limit: to - from + 1,
-      p_offset: from,
-    });
+    // Step 1: Find all word_ids that are due for the user.
+    const { data: dueProgress, error: progressError } = await supabase
+      .from('user_word_progress')
+      .select('word_id')
+      .eq('user_id', userId)
+      .lte('next_review_date', new Date().toISOString());
+
+    if (progressError) throw progressError;
+    if (!dueProgress || dueProgress.length === 0) {
+      return { data: [], error: null };
+    }
+
+    const dueWordIds = dueProgress.map(p => p.word_id);
+
+    // Step 2: Get the unique list_ids for those due words.
+    const { data: listRecords, error: listError } = await supabase
+      .from('vocabulary')
+      .select('list_id')
+      .in('id', dueWordIds);
+
+    if (listError) throw listError;
+    if (!listRecords || listRecords.length === 0) {
+      return { data: [], error: null };
+    }
+    
+    const uniqueListIds = [...new Set(listRecords.map(r => r.list_id))];
+
+    // Step 3: Now fetch the full details for those unique lists, with pagination applied here.
+    return await supabase
+      .from('vocab_lists')
+      .select('id, title, word_count, creator:users(id, display_name, role, avatar_url), tags(name)')
+      .in('id', uniqueListIds)
+      .order('updated_at', { ascending: false })
+      .range(from, to);
   }
 
-  async findUpcomingReviewLists(userId, limit, offset) {
-    return await supabase.rpc('get_upcoming_review_lists', {
-      p_user_id: userId,
-      p_limit: limit,
-      p_offset: offset,
+  async findUpcomingReviewLists(userId, from, to) {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    const sevenDaysFromNow = new Date(tomorrow);
+    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+
+    // Step 1: Find all progress records within the upcoming date range.
+    const { data: upcomingProgress, error: progressError } = await supabase
+      .from('user_word_progress')
+      .select('word_id, next_review_date')
+      .eq('user_id', userId)
+      .gte('next_review_date', tomorrow.toISOString())
+      .lt('next_review_date', sevenDaysFromNow.toISOString());
+      
+    if (progressError) throw progressError;
+    if (!upcomingProgress || upcomingProgress.length === 0) {
+        return { data: [], error: null };
+    }
+
+    const upcomingWordIds = upcomingProgress.map(p => p.word_id);
+    
+    // Step 2: Get the list_id and details for each of those upcoming words.
+    const { data: wordDetails, error: wordError } = await supabase
+      .from('vocabulary')
+      .select('list_id, vocab_lists(*, creator:users(id, display_name, role, avatar_url))')
+      .in('id', upcomingWordIds);
+      
+    if (wordError) throw wordError;
+
+    // Step 3: Process the data to find the soonest review for each unique list.
+    const listsMap = new Map();
+    upcomingProgress.forEach(progress => {
+      const wordDetail = wordDetails.find(w => w.id === progress.word_id);
+      if (wordDetail && wordDetail.vocab_lists) {
+        const listId = wordDetail.list_id;
+        if (!listsMap.has(listId) || new Date(progress.next_review_date) < new Date(listsMap.get(listId).next_review_date)) {
+          listsMap.set(listId, {
+            ...wordDetail.vocab_lists,
+            next_review_date: progress.next_review_date
+          });
+        }
+      }
     });
+
+    const uniqueLists = Array.from(listsMap.values());
+    uniqueLists.sort((a, b) => new Date(a.next_review_date) - new Date(b.next_review_date));
+
+    // Apply pagination manually after sorting
+    const paginatedData = uniqueLists.slice(from, to + 1);
+
+    return { data: paginatedData, error: null };
+  }
+
+  async countListsWithDueWords(userId) {
+    const { data: dueProgress, error: progressError } = await supabase
+      .from('user_word_progress')
+      .select('word_id')
+      .eq('user_id', userId)
+      .lte('next_review_date', new Date().toISOString());
+
+    if (progressError) throw progressError;
+    if (!dueProgress || dueProgress.length === 0) return 0;
+
+    const dueWordIds = dueProgress.map(p => p.word_id);
+
+    const { data: listRecords, error: listError } = await supabase
+      .from('vocabulary')
+      .select('list_id')
+      .in('id', dueWordIds);
+      
+    if (listError) throw listError;
+
+    return new Set(listRecords.map(r => r.list_id)).size;
   }
 
   async countListsWithScheduledWords(userId) {
-    const { data, error } = await supabase.rpc(
-      'count_distinct_lists_for_user_progress',
-      { p_user_id: userId }
-    );
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
 
-    if (error) {
-      logger.error(
-        `Error counting lists with scheduled words for user ${userId}:`,
-        error
-      );
-      throw error;
-    }
+    const sevenDaysFromNow = new Date(tomorrow);
+    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
 
-    return data || 0;
+    const { data: upcomingProgress, error: progressError } = await supabase
+      .from('user_word_progress')
+      .select('word_id')
+      .eq('user_id', userId)
+      .gte('next_review_date', tomorrow.toISOString())
+      .lt('next_review_date', sevenDaysFromNow.toISOString());
+
+    if (progressError) throw progressError;
+    if (!upcomingProgress || upcomingProgress.length === 0) return 0;
+      
+    const upcomingWordIds = upcomingProgress.map(p => p.word_id);
+    
+    const { data: listRecords, error: listError } = await supabase
+      .from('vocabulary')
+      .select('list_id')
+      .in('id', upcomingWordIds);
+    
+    if (listError) throw listError;
+
+    return new Set(listRecords.map(r => r.list_id)).size;
   }
 
   async findDueWordsGroupedByList(userId) {

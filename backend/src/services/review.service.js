@@ -10,33 +10,62 @@ class ReviewService {
   // =================================================================
   async getListsWithDueWords(userId, { page = 1, limit = 10 }) {
     const { from, to } = this._getPagination(page, limit);
-    const { data, error } = await reviewModel.findListsWithDueWords(
-      userId,
-      from,
-      to
-    );
+    
+    const { data, error } = await reviewModel.findListsWithDueWords(userId, from, to);
     if (error) throw error;
-
+  
+    const totalItems = await reviewModel.countListsWithDueWords(userId);
+  
+    const formattedLists = (data || []).map(list => ({
+        id: list.id,
+        title: list.title,
+        wordCount: list.word_count,
+        creator: { 
+            id: list.creator.id,
+            display_name: list.creator.display_name,
+            role: list.creator.role,
+            avatar_url: list.creator.avatar_url
+        },
+        tags: list.tags.map(t => t.name) 
+    }));
+  
     return {
-      listsWithDueWords: data,
-      pagination: { currentPage: page, limit },
+      listsWithDueWords: formattedLists,
+      pagination: this._formatPagination(page, limit, totalItems),
     };
   }
 
   async getUpcomingReviewLists(userId, { page = 1, limit = 5 }) {
     const { from, to } = this._getPagination(page, limit);
-
-    const rpcLimit = to - from + 1;
-    const rpcOffset = from;
-
-    const { data: lists, error: rpcError } =
-      await reviewModel.findUpcomingReviewLists(userId, rpcLimit, rpcOffset);
-    if (rpcError) throw rpcError;
-
+  
+    const { data, error } = await reviewModel.findUpcomingReviewLists(userId, from, to);
+    if (error) throw error;
+  
     const totalItems = await reviewModel.countListsWithScheduledWords(userId);
-
+  
+    const now = new Date();
+    const formattedLists = (data || []).map(list => {
+        const nextReviewDate = new Date(list.next_review_date);
+        const diffTime = nextReviewDate - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+        return {
+            listId: list.id,
+            title: list.title,
+            wordCount: list.word_count,
+            creator: {
+                id: list.creator.id,
+                display_name: list.creator.display_name,
+                role: list.creator.role,
+                avatar_url: list.creator.avatar_url
+            },
+            tags: (list.tags || []).map(t => t.name),
+            next_review_in_days: Math.max(1, diffDays),
+        };
+    });
+  
     return {
-      lists: lists || [],
+      lists: formattedLists,
       pagination: this._formatPagination(page, limit, totalItems),
     };
   }
