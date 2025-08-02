@@ -16,7 +16,7 @@ class ReviewModel {
 
     if (progressError) throw progressError;
     if (!dueProgress || dueProgress.length === 0) {
-      return { data: [], error: null };
+      return { data: [], error: null, count: 0 };
     }
 
     const dueWordIds = dueProgress.map(p => p.word_id);
@@ -29,18 +29,23 @@ class ReviewModel {
 
     if (listError) throw listError;
     if (!listRecords || listRecords.length === 0) {
-      return { data: [], error: null };
+      return { data: [], error: null, count: 0 };
     }
     
     const uniqueListIds = [...new Set(listRecords.map(r => r.list_id))];
 
-    // Step 3: Now fetch the full details for those unique lists, with pagination applied here.
-    return await supabase
+    // Step 3: Fetch the full details for those unique lists, with optional pagination.
+    let query = supabase
       .from('vocab_lists')
-      .select('id, title, word_count, creator:users(id, display_name, role, avatar_url), tags(name)')
+      .select('id, title, word_count, creator:users(id, display_name, role, avatar_url), tags(name)', { count: 'exact' })
       .in('id', uniqueListIds)
-      .order('updated_at', { ascending: false })
-      .range(from, to);
+      .order('updated_at', { ascending: false });
+
+    if (from !== null && to !== null) {
+      query = query.range(from, to);
+    }
+    
+    return await query;
   }
 
   async findUpcomingReviewLists(userId, from, to) {
@@ -92,10 +97,11 @@ class ReviewModel {
     const uniqueLists = Array.from(listsMap.values());
     uniqueLists.sort((a, b) => new Date(a.next_review_date) - new Date(b.next_review_date));
 
-    // Apply pagination manually after sorting
-    const paginatedData = uniqueLists.slice(from, to + 1);
+    const paginatedData = (from !== null && to !== null) 
+      ? uniqueLists.slice(from, to + 1)
+      : uniqueLists; // If no pagination, return all results.
 
-    return { data: paginatedData, error: null };
+    return { data: paginatedData, error: null, count: uniqueLists.length }; 
   }
 
   async countListsWithDueWords(userId) {

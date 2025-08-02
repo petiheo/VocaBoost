@@ -8,7 +8,7 @@ class ReviewService {
   // =================================================================
   // GETTING DUE ITEMS
   // =================================================================
-  async getListsWithDueWords(userId, { page = 1, limit = 10 }) {
+  async getListsWithDueWords(userId, { page = null, limit = null }) {
     const { from, to } = this._getPagination(page, limit);
     
     const { data, error } = await reviewModel.findListsWithDueWords(userId, from, to);
@@ -35,7 +35,7 @@ class ReviewService {
     };
   }
 
-  async getUpcomingReviewLists(userId, { page = 1, limit = 5 }) {
+  async getUpcomingReviewLists(userId, { page = null, limit = null }) {
     const { from, to } = this._getPagination(page, limit);
   
     const { data, error } = await reviewModel.findUpcomingReviewLists(userId, from, to);
@@ -335,16 +335,29 @@ class ReviewService {
 
   // Helper for pagination
   _getPagination(page, size) {
-    const limit = size ? +size : 10;
-    const from = page ? (page - 1) * limit : 0;
-    const to = page ? from + size - 1 : size - 1;
-    return { from, to };
+    if (page == null || size == null) {
+      return { from: null, to: null, limit: null };
+    }
+
+    const limit = +size; 
+    const from = (page - 1) * limit;
+    const to = from + size - 1;
+    return { from, to, limit };
   }
 
   _formatPagination(page, limit, totalItems) {
+    if (page == null || limit == null) {
+      return { totalItems: totalItems || 0 };
+    }
+
     const currentPage = Number(page);
     const totalPages = Math.ceil(totalItems / limit);
-    return { currentPage, totalPages, totalItems, limit: Number(limit) };
+    return {
+      currentPage,
+      totalPages,
+      totalItems: totalItems || 0,
+      limit: Number(limit),
+    };
   }
 }
 
