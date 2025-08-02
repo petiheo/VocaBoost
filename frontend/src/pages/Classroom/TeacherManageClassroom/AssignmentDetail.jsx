@@ -49,7 +49,8 @@ export default function AssignmentDetail() {
       const res = await classroomService.getAssignmentDetails(classroomId, assignment?.id);
       if (res.success) {
         console.log("Fetch assignment detail thành công");
-        setAssignmentsDetail(res.data.vocabulary || []);
+        console.log(res.data);
+        setAssignmentsDetail(res.data);
       }
       else {
         console.log(res.message);
@@ -102,10 +103,10 @@ export default function AssignmentDetail() {
               </div>
             </div>
             <div className="assignment-meta">
-              <p><strong>Total words:</strong> {assignment?.total_words || 0}</p>
-              <p><strong>Start date:</strong> {assignment?.start_date ? format(new Date(assignment.start_date), 'd/M/yyyy') : 'N/A'}</p>
-              <p> <strong>Learner reviewed:</strong> {assignment?.reviewed_learner_count || 0}</p>
-              <p><strong>Due date:</strong> {assignment?.due_date ? format(new Date(assignment.due_date), 'd/M/yyyy') : 'N/A'}</p>
+              <p><strong>Total words:</strong> {assignmentsDetail?.total_words || 0}</p>
+              <p><strong>Start date:</strong> {assignmentsDetail?.start_date ? format(new Date(assignment.start_date), 'd/M/yyyy') : 'N/A'}</p>
+              <p> <strong>Learner reviewed:</strong> {assignmentsDetail?.reviewed_learner_count || 0}</p>
+              <p><strong>Due date:</strong> {assignmentsDetail?.due_date ? format(new Date(assignment.due_date), 'd/M/yyyy') : 'N/A'}</p>
             </div>
           </div>
 
@@ -113,7 +114,7 @@ export default function AssignmentDetail() {
 
           <div className="word-list">
             <SeeMoreSection
-              items={assignmentsDetail?.data?.vocabulary}
+              items={assignmentsDetail?.vocabulary}
               renderItem={(item, index) => (
                 <div className="word-card" key={index}>
                   <strong>{item?.term}</strong>
