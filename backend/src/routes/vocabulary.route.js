@@ -27,6 +27,8 @@ vocabularyRouter.get('/lists/history', vocabularyController.getHistoryLists);
 
 vocabularyRouter.get('/search', vocabularyController.searchPublicLists);
 
+vocabularyRouter.get('/lists/popular', vocabularyController.getPopularLists);
+
 vocabularyRouter.get('/lists/:listId', vocabularyController.getListById);
 
 vocabularyRouter.put(

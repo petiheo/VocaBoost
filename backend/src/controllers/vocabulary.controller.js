@@ -85,6 +85,27 @@ class VocabularyController {
     }
   }
 
+  async getPopularLists(req, res) {
+    try {
+      const { page, limit } = req.query;
+
+      const result = await vocabularyService.findPopularLists({ page, limit });
+
+      return ResponseUtils.success(
+        res,
+        'Popular lists retrieved successfully.',
+        result
+      );
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getPopularLists',
+        'Failed to retrieve popular lists.'
+      );
+    }
+  }
+
   async getListById(req, res) {
     try {
       const { listId } = req.params;

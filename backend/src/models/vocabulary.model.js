@@ -97,6 +97,34 @@ class VocabularyModel {
       });
   }
 
+  async findPopularLists(from, to) {
+    return await supabase
+      .from('vocab_lists')
+      .select(`
+        listId:id,
+        title,
+        description,
+        wordCount:word_count,
+        view_count,
+        creator:users (display_name),
+        tags (name)
+      `, { count: 'exact' })
+      .eq('privacy_setting', 'public')
+      .eq('is_active', true)
+      .order('view_count', { ascending: false })
+      .range(from, to)
+      .then(({ data, error, count }) => {
+          if (data) {
+              const reshapedData = data.map(item => ({
+                  ...item,
+                  tags: item.tags.map(t => t.name)
+              }));
+              return { data: reshapedData, error, count };
+          }
+          return { data, error, count };
+      });
+  }
+
   async updateList(listId, updateData) {
     return await supabase
       .from('vocab_lists')

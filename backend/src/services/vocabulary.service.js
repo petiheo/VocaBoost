@@ -106,6 +106,18 @@ class VocabularyService {
     };
   }
 
+  async findPopularLists({ page = 1, limit = 10 }) {
+    const { from, to } = this._getPagination(page, limit);
+    
+    const { data, error, count } = await vocabularyModel.findPopularLists(from, to);
+    if (error) throw error;
+
+    return {
+      lists: data || [],
+      pagination: this._formatPagination(page, limit, count)
+    };
+  }
+
   async updateList(listId, userId, updateData) {
     await this._verifyListOwnership(listId, userId);
 
