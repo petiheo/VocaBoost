@@ -1,4 +1,3 @@
-// src/services/vocabularyService.js
 import api from "../../lib/api";
 
 const vocabularyService = {
@@ -84,6 +83,21 @@ const vocabularyService = {
       headers: {
         "Content-Type": "multipart/form-data",
       },
+    });
+    return res.data;
+  },
+
+  // 14. Generate example sentences
+  generateExample: async (wordId, data) => {
+    if (wordId) {
+      const res = await api.post(`/vocabulary/words/${wordId}/generate-example`, data);
+      return res.data;
+    }
+    
+    const res = await api.post(`/vocabulary/generate-example`, {
+      term: data.term,
+      definition: data.definition,
+      context: data.context
     });
     return res.data;
   }

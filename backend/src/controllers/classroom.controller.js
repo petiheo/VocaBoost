@@ -17,7 +17,12 @@ class ClassroomController {
         capacity_limit,
       });
 
-      return ResponseUtils.success(res, 'Classroom created successfully', newClassroom, 201);
+      return ResponseUtils.success(
+        res,
+        'Classroom created successfully',
+        newClassroom,
+        201
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -34,7 +39,11 @@ class ClassroomController {
 
       const classrooms = await classroomService.getClassroomsByTeacherId(userId);
 
-      return ResponseUtils.success(res, 'Classrooms retrieved successfully', classrooms);
+      return ResponseUtils.success(
+        res,
+        'Classrooms retrieved successfully',
+        classrooms
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -79,7 +88,11 @@ class ClassroomController {
       const pendingRequests =
         await classroomService.getPendingJoinRequests(classroomId);
 
-      return ResponseUtils.success(res, 'Pending requests retrieved successfully', pendingRequests);
+      return ResponseUtils.success(
+        res,
+        'Pending requests retrieved successfully',
+        pendingRequests
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -96,7 +109,10 @@ class ClassroomController {
       const { learnerId } = req.body;
 
       if (!learnerId) {
-        return ResponseUtils.validationError(res, 'Missing learnerId in request body.');
+        return ResponseUtils.validationError(
+          res,
+          'Missing learnerId in request body.'
+        );
       }
 
       await classroomService.approveJoinRequest(classroomId, learnerId);
@@ -118,7 +134,10 @@ class ClassroomController {
       const { learnerId } = req.body;
 
       if (!learnerId) {
-        return ResponseUtils.validationError(res, 'Missing learnerId in request body.');
+        return ResponseUtils.validationError(
+          res,
+          'Missing learnerId in request body.'
+        );
       }
 
       await classroomService.rejectJoinRequest(classroomId, learnerId);
@@ -174,12 +193,18 @@ class ClassroomController {
       const { learnerId } = req.body;
 
       if (!learnerId) {
-        return ResponseUtils.validationError(res, 'Missing learnerId in request body.');
+        return ResponseUtils.validationError(
+          res,
+          'Missing learnerId in request body.'
+        );
       }
 
       await classroomService.removeLearner(classroomId, learnerId);
 
-      return ResponseUtils.success(res, 'Learner has been removed from the classroom.');
+      return ResponseUtils.success(
+        res,
+        'Learner has been removed from the classroom.'
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -218,7 +243,11 @@ class ClassroomController {
         q
       );
 
-      return ResponseUtils.success(res, 'Search results retrieved successfully', results);
+      return ResponseUtils.success(
+        res,
+        'Search results retrieved successfully',
+        results
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -262,7 +291,11 @@ class ClassroomController {
 
       const result = await classroomService.acceptInvitation(token, user);
 
-      return ResponseUtils.success(res, 'You have successfully joined the classroom.', result);
+      return ResponseUtils.success(
+        res,
+        'You have successfully joined the classroom.',
+        result
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -324,7 +357,12 @@ class ClassroomController {
       const assignmentData = this._extractAssignmentData(req);
       const assignment = await classroomService.createAssignment(assignmentData);
 
-      return ResponseUtils.success(res, 'Assignment created successfully.', assignment, 201);
+      return ResponseUtils.success(
+        res,
+        'Assignment created successfully.',
+        assignment,
+        201
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -340,7 +378,11 @@ class ClassroomController {
       const learnerId = req.user.userId;
       const result = await classroomService.getJoinedClassroomsByLearner(learnerId);
 
-      return ResponseUtils.success(res, 'Joined classrooms retrieved successfully', result);
+      return ResponseUtils.success(
+        res,
+        'Joined classrooms retrieved successfully',
+        result
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -358,7 +400,11 @@ class ClassroomController {
       const invitations =
         await classroomService.getClassroomInvitations(classroomId);
 
-      return ResponseUtils.success(res, 'Invitations retrieved successfully', invitations);
+      return ResponseUtils.success(
+        res,
+        'Invitations retrieved successfully',
+        invitations
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -376,7 +422,11 @@ class ClassroomController {
       const assignments =
         await classroomService.getClassroomAssignments(classroomId);
 
-      return ResponseUtils.success(res, 'Assignments retrieved successfully', assignments);
+      return ResponseUtils.success(
+        res,
+        'Assignments retrieved successfully',
+        assignments
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -397,7 +447,11 @@ class ClassroomController {
         learnerId
       );
 
-      return ResponseUtils.success(res, 'To-review assignments retrieved successfully', result);
+      return ResponseUtils.success(
+        res,
+        'To-review assignments retrieved successfully',
+        result
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -418,7 +472,11 @@ class ClassroomController {
         learnerId
       );
 
-      return ResponseUtils.success(res, 'Reviewed assignments retrieved successfully', result);
+      return ResponseUtils.success(
+        res,
+        'Reviewed assignments retrieved successfully',
+        result
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -439,7 +497,11 @@ class ClassroomController {
         learnerId
       );
 
-      return ResponseUtils.success(res, 'Overdue assignments retrieved successfully', result);
+      return ResponseUtils.success(
+        res,
+        'Overdue assignments retrieved successfully',
+        result
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -460,7 +522,11 @@ class ClassroomController {
         assignmentId
       );
 
-      return ResponseUtils.success(res, 'Assignment details retrieved successfully', result);
+      return ResponseUtils.success(
+        res,
+        'Assignment details retrieved successfully',
+        result
+      );
     } catch (error) {
       return ErrorHandler.handleError(
         res,
@@ -477,7 +543,10 @@ class ClassroomController {
       const { isAutoApprovalEnabled } = req.body;
 
       if (typeof isAutoApprovalEnabled !== 'boolean') {
-        return ResponseUtils.validationError(res, 'isAutoApprovalEnabled must be a boolean.');
+        return ResponseUtils.validationError(
+          res,
+          'isAutoApprovalEnabled must be a boolean.'
+        );
       }
 
       const updatedClassroom = await classroomService.changeAutoApproveSetting(

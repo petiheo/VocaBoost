@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Header, SideBar, Footer } from "../../components/index.jsx";
 import classroomService from "../../services/Classroom/classroomService.js";
 import { useNavigate } from "react-router-dom";
-import LoadingCursor from "../../components/cursor/LoadingCursor";
+import LoadingCursor from "../../components/UI/LoadingCursor";
 
 export default function CreateClassroom() {
 

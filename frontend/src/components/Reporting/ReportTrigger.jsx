@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Report from './Report';
-import { ReportIcon } from '../assets/icons/index'; 
+import { ReportIcon } from '../../assets/icons/index'; 
 
 const ReportTrigger = ({wordId}) => {
   const [show, setShow] = useState(false);

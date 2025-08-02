@@ -1,4 +1,4 @@
-import { SearchBarPattern } from "../assets/icons/index"
+import { SearchBarPattern } from "../../assets/icons/index"
 
 const SearchBar = ({ searchQuery, onSearchChange }) => {
   return (

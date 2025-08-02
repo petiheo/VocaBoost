@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom"
 import { useEffect } from "react"
 
-import Logo from "../../components/Logo"
+import Logo from "../../components/Layout/Logo"
 import { LearnerPattern, TeacherPattern1, TeacherPattern2 } from "../../assets/icons"
 import authService from "../../services/Auth/authService"
 

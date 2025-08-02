@@ -1,5 +1,5 @@
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
+import Header from "../../components/Layout/Header";
+import Footer from "../../components/Layout/Footer";
 import "../../assets/icons/index";
 import { Link, Outlet } from "react-router-dom";
 import { Pattern1, Pattern2, Pattern3, Pattern4, Pattern5, Pattern6, Pattern7, Pattern8 } from "../../assets/icons/index";
@@ -7,7 +7,7 @@ import { PatternCard1, PatternCard2, PatternCard3 } from "../../assets/icons/ind
 import { Group41, Group52, Group53, Group56, Group78 } from "../../assets/icons/index";
 import { Union, Vector, Group8 } from '../../assets/icons/index';
 import { useEffect } from "react";
-import { useToast } from "../../components/ToastProvider";
+import { useToast } from "../../components/Providers/ToastProvider";
 
 const patterns = {
     1: Pattern1,

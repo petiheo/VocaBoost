@@ -7,7 +7,6 @@ const ResponseUtils = require('./utils/response');
 const ErrorHandler = require('./utils/errorHandler');
 
 const router = require('./routes/index.route');
-const cors = require('cors');
 
 require('./config/passport.config');
 

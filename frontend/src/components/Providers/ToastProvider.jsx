@@ -1,10 +1,14 @@
 import { createContext, useContext, useState } from "react";
-import ToastNotification from "./ToastNotification";
+import ToastNotification from "../UI/ToastNotification";
 
 const ToastContext = createContext();
 
 export const ToastProvider = ({ children }) => {
-  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });

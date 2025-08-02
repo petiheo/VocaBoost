@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Logo from "../../components/Logo";
+import Logo from "../../components/Layout/Logo";
 import { UploadPattern } from "../../assets/icons";
-import AccountPageInput from "../../components/AccountPageInput";
+import AccountPageInput from "../../components/Forms/AccountPageInput";
 import { RedAsterisk } from "../../assets/Auth";
 import teacherService from "../../services/Teacher/teacherService";
-import LoadingCursor from "../../components/cursor/LoadingCursor";
+import LoadingCursor from "../../components/UI/LoadingCursor";
 import authService from "../../services/Auth/authService";
 
 export default function TeacherVerification() {

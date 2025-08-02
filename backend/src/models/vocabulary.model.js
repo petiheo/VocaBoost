@@ -505,6 +505,8 @@ class VocabularyModel {
       .upsert({
         vocabulary_id: wordId,
         example_sentence: exampleData.exampleSentence,
+        ai_generated: exampleData.aiGenerated || false,
+        generation_prompt: exampleData.generationPrompt || null,
       })
       .select()
       .single();

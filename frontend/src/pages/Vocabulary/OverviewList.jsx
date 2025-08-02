@@ -4,7 +4,7 @@ import { Header, SideBar, Footer } from "../../components";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { RightMoreIcon, TotalWordIcon, CategoryIcon, TimeIcon, LearnerIcon } from "../../assets/Vocabulary";
 import { jwtDecode } from "jwt-decode"; // Thư viện để giải mã JWT
-import { useToast } from "../../components/ToastProvider.jsx";
+import { useToast } from "../../components/Providers/ToastProvider.jsx";
 
 
 export default function OverviewList() {

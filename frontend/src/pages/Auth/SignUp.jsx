@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import AccountPageInput from "../../components/AccountPageInput"
+import AccountPageInput from "../../components/Forms/AccountPageInput"
 import MainPageLogo from "../../assets/Logo.svg";
 import { GoogleLogo } from "../../assets/icons/index";
 import authService from "../../services/Auth/authService";
 import { SignInSignUpBG } from "../../assets/Auth";
-import LoadingCursor from "../../components/cursor/LoadingCursor";
+import LoadingCursor from "../../components/UI/LoadingCursor";
 import { handleSignupError, clearAuthErrors } from "../../utils/authErrorHandler";
 
 const handleGoogleSignUp = () => {
