@@ -1,6 +1,10 @@
--- This is the MODIFIED version.
--- It now filters for reviews between tomorrow and 7 days from now.
+-- Migration: Add functions for upcoming review lists
+-- Author: VocaBoost Backend Team
+-- Date: 2025-08-02
 
+BEGIN;
+
+-- This function finds upcoming review lists for a user, excluding today's reviews.
 CREATE OR REPLACE FUNCTION get_upcoming_review_lists(
     p_user_id UUID,
     p_limit INT,
@@ -16,7 +20,6 @@ RETURNS TABLE (
 BEGIN
     RETURN QUERY
     WITH list_next_review AS (
-        -- For each list, find the soonest (minimum) next_review_date for the given user
         SELECT
             p.list_id,
             MIN(p.next_review_date) as next_review_date
@@ -24,12 +27,8 @@ BEGIN
             public.user_word_progress p
         WHERE
             p.user_id = p_user_id
-            -- CRITICAL FILTER:
-            -- Only consider words with a review date that is AFTER today.
-            -- We use NOW()::DATE + 1 to get the start of tomorrow.
-            AND p.next_review_date >= (NOW()::DATE + 1)
-            -- AND only consider words due in the next 7 days from tomorrow.
-            AND p.next_review_date < (NOW()::DATE + 8)
+            AND p.next_review_date >= (NOW()::DATE + 1) -- From tomorrow
+            AND p.next_review_date < (NOW()::DATE + 8)  -- Up to 7 days from now
         GROUP BY
             p.list_id
     )
@@ -38,7 +37,6 @@ BEGIN
         vl.title,
         vl.word_count AS "wordCount",
         json_build_object('display_name', u.display_name) AS creator,
-        -- Calculate the difference in days from now. Since we've filtered, it will be >= 1.
         GREATEST(1, DATE_PART('day', lnr.next_review_date - NOW()))::INT AS "next_review_in_days"
     FROM
         public.vocab_lists vl
@@ -53,13 +51,15 @@ BEGIN
     LIMIT p_limit
     OFFSET p_offset;
 END;
+$$ LANGUAGE plpgsql;
 
+-- This function counts the number of lists that have upcoming reviews for pagination.
 CREATE OR REPLACE FUNCTION count_distinct_lists_for_user_progress(
     p_user_id UUID
 )
 RETURNS INT AS $$
 BEGIN
-    RETURN (
+    RETURN ( -- <-- CORRECTED: Changed from RETURNS to RETURN
         SELECT COUNT(DISTINCT p.list_id)
         FROM public.user_word_progress p
         WHERE
@@ -70,3 +70,10 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql;
+
+-- Record the migration
+INSERT INTO schema_migrations (version, description) 
+VALUES ('017', 'Create functions for upcoming review lists')
+ON CONFLICT (version) DO NOTHING;
+
+COMMIT;
