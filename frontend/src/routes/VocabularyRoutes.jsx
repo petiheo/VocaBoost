@@ -15,6 +15,10 @@ const vocabularyRoutes = [
     element: <CreateList />
   },
   {
+    path: "/vocabulary/create/new",
+    element: <CreateList />
+  },
+  {
     path: "/vocabulary",
     element: <Dashboard />
   },

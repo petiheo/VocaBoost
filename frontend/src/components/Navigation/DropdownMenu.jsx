@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom"
-import { DropDownMenuPattern1, DropDownMenuPattern2, DropDownMenuPattern3 } from "../assets/icons/index"
-import authService from "../services/Auth/authService";
-import { useAuth } from "../services/Auth/authContext";
+import { DropDownMenuPattern1, DropDownMenuPattern2, DropDownMenuPattern3 } from "../../assets/icons/index"
+import authService from "../../services/Auth/authService";
+import { useAuth } from "../../services/Auth/authContext";
 
 const DropdownMenu = () => {
     const [isOpen, setIsOpen] = useState(false);

@@ -1,4 +1,4 @@
-import NavBar from "../../components/Navbar"
+import NavBar from "../../components/Layout/Navbar"
 export default function CreateList() {
     return (
         <>

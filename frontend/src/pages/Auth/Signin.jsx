@@ -1,16 +1,16 @@
 import "../../assets/icons/index";
 import { Link } from "react-router-dom";
-import AccountPageInput from "../../components/AccountPageInput"
+import AccountPageInput from "../../components/Forms/AccountPageInput"
 import MainPageLogo from "../../assets/Logo.svg";
 import { GoogleLogo } from "../../assets/icons/index";
 import { useNavigate } from 'react-router-dom' // Import useNavigate for navigation
 import authService from "../../services/Auth/authService";
 import { SignInSignUpBG } from "../../assets/Auth";
 import { useState, useEffect } from "react";
-import LoadingCursor from "../../components/cursor/LoadingCursor";
+import LoadingCursor from "../../components/UI/LoadingCursor";
 import { useAuth } from "../../services/Auth/authContext";
 import { handleLoginError, clearAuthErrors } from "../../utils/authErrorHandler";
-import { useToast } from "../../components/ToastProvider";
+import { useToast } from "../../components/Providers/ToastProvider";
 
 
 

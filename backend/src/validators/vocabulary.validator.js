@@ -153,6 +153,39 @@ const vocabularyValidator = {
       .withMessage('Synonyms cannot be empty strings.'),
     handleValidationErrors,
   ],
+
+  generateExample: [
+    param('wordId')
+      .isUUID()
+      .withMessage('URL parameter wordId must be a valid UUID.'),
+    body('context')
+      .optional()
+      .trim()
+      .isLength({ min: 2, max: 500 })
+      .withMessage('Context must be between 2 and 500 characters.'),
+    handleValidationErrors,
+  ],
+
+  generateExampleForNewWord: [
+    body('term')
+      .notEmpty()
+      .trim()
+      .isLength({ min: 1, max: 200 })
+      .withMessage('Term is required and must be between 1 and 200 characters.'),
+    body('definition')
+      .notEmpty()
+      .trim()
+      .isLength({ min: 1, max: 1000 })
+      .withMessage(
+        'Definition is required and must be between 1 and 1000 characters.'
+      ),
+    body('context')
+      .optional()
+      .trim()
+      .isLength({ min: 2, max: 500 })
+      .withMessage('Context must be between 2 and 500 characters.'),
+    handleValidationErrors,
+  ],
 };
 
 module.exports = vocabularyValidator;

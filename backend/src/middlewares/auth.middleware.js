@@ -19,8 +19,15 @@ const authMiddleware = async (req, res, next) => {
     }
 
     // Block only specific problematic statuses, allow others like 'pending_verification'
-    if (user.account_status === 'inactive' || user.account_status === 'suspended' || user.account_status === 'banned') {
-      return ResponseUtils.forbidden(res, `Account ${user.account_status}. Please contact support.`);
+    if (
+      user.account_status === 'inactive' ||
+      user.account_status === 'suspended' ||
+      user.account_status === 'banned'
+    ) {
+      return ResponseUtils.forbidden(
+        res,
+        `Account ${user.account_status}. Please contact support.`
+      );
     }
 
     // Attach user info to request (including email verification status)
@@ -41,7 +48,13 @@ const authMiddleware = async (req, res, next) => {
       return ResponseUtils.unauthorized(res, 'Token expired');
     }
 
-    return ErrorHandler.handleError(res, error, 'authMiddleware', 'Authentication error', 500);
+    return ErrorHandler.handleError(
+      res,
+      error,
+      'authMiddleware',
+      'Authentication error',
+      500
+    );
   }
 };
 

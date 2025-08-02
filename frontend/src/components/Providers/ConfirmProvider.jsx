@@ -1,6 +1,6 @@
 //  Tạo một useConfirm hook sử dụng React Context
 import { createContext, useState, useContext } from "react";
-import ConfirmModal from "./ConfirmModal"; // component đã làm trước đó
+import ConfirmModal from "../UI/ConfirmModal"; // component đã làm trước đó
 
 const ConfirmContext = createContext();
 

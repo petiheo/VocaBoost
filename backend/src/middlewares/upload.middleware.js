@@ -15,7 +15,11 @@ const handleMulterError = (err, req, res, next) => {
     }
 
     if (err.code === 'LIMIT_UNEXPECTED_FILE') {
-      return ResponseUtils.error(res, `Unexpected field name. Expected: ${err.field}`, 400);
+      return ResponseUtils.error(
+        res,
+        `Unexpected field name. Expected: ${err.field}`,
+        400
+      );
     }
 
     // Custom file type errors

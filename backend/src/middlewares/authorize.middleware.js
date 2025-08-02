@@ -49,7 +49,13 @@ const hasClassroomAccess = async (req, res, next) => {
 
     return ResponseUtils.forbidden(res, 'You do not have access to this classroom.');
   } catch (err) {
-    return ErrorHandler.handleError(res, err, 'hasClassroomAccess', 'Internal server error during access check.', 500);
+    return ErrorHandler.handleError(
+      res,
+      err,
+      'hasClassroomAccess',
+      'Internal server error during access check.',
+      500
+    );
   }
 };
 
