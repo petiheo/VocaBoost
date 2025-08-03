@@ -71,7 +71,7 @@
     margin-top: auto; // THAY BẰNG DÒNG NÀY để đẩy footer xuống đáy
     padding-top: 1rem; // Thêm padding để đảm bảo có khoảng trống phía trên footer
     font-family: $font-inriasans;
-    
+
     .user-block {
       display: flex;
       align-items: center;
@@ -79,9 +79,23 @@
       .avatar {
         width: 36px;
         height: 36px;
-        background-color: #d8cfc3;
         border-radius: 50%;
         margin-right: 0.5rem;
+
+        .img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover; // This ensures the image covers the area without distortion
+        }
+
+        .placeholder {
+          background-color: #d8cfc3;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
       }
 
       .user-info {
@@ -89,11 +103,11 @@
         flex-direction: column;
 
         .username {
-          font-size: 0.85rem;
+          font-size: 14px;
           font-weight: 600;
           color: #222;
 
-          max-width: 90px;
+          max-width: 100px;
 
           white-space: nowrap; // giữ nội dung trên 1 dòng duy nhất
           overflow: hidden;
@@ -101,7 +115,7 @@
         }
 
         .role-tag {
-          font-size: 0.7rem;
+          font-size: 0.8rem;
           background-color: #d6e5ff;
           color: #1b4da3;
           padding: 2px 6px;

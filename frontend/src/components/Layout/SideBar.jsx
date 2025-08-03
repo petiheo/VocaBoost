@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../../assets/Logo.svg";
 import {Home, Learning, History, Analysis, Setting, LogOut, ArrowRight, ArrowLeft} from "../../assets/icons/index";
+import { MyClassroom } from "../../assets/Auth";
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -29,7 +30,7 @@ export default function Sidebar() {
             <span className="sidebar__label">My Vocabulary Lists</span>
           </Link>
           <Link to="/my-classroom" className="sidebar__link">
-            <img src={History} alt="my classroom icon" />
+            <img src={MyClassroom} alt="my classroom icon" />
             <span className="sidebar__label">My Classrooms</span>
           </Link>
           <Link to="/homepage" className="sidebar__link">

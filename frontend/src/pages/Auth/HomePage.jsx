@@ -56,7 +56,7 @@ const HomePage = () => {
           description: list.description,
           username: list.creator?.display_name,
           role: list.creator?.role,
-          avatar_url: list.creator?.avatar_url
+          avatarUrl: list.creator?.avatar_url
         }));
         setRecentLists({ data: transformedRecent, isLoading: false, error: null });
 
@@ -66,7 +66,7 @@ const HomePage = () => {
           description: list.description,
           username: list.creator?.display_name,
           role: list.creator?.role,
-          avatar_url: list.creator?.avatar_url
+          avatarUrl: list.creator?.avatar_url
         }));
         setPopularLists({ data: transformedPopular, isLoading: false, error: null });
 
@@ -102,7 +102,7 @@ const HomePage = () => {
           description: list.description,
           username: list.creator.display_name, 
           role: list.creator.role,
-          avatar_url: list.creator.avatar_url,
+          avatarUrl: list.creator.avatar_url,
         }));
         
         setSearchResults({ 
@@ -147,7 +147,7 @@ const HomePage = () => {
           description: list.description,
           username: list.creator?.display_name,
           role: list.creator?.role,
-          avatar_url: list.creator?.avatar_url,
+          avatarUrl: list.creator?.avatar_url,
         }));
         setReviewLists({ data: transformedReview, isLoading: false, error: null });
       } catch (err) {

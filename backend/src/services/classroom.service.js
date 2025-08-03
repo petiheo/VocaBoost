@@ -500,6 +500,7 @@ class ClassroomService {
         due_date: item.assignments.due_date,
         status: 'overdue',
         learner_status: item.status,
+        creator:item.assignments.user
       }));
   }
 

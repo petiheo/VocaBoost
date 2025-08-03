@@ -5,31 +5,22 @@ export default function VocabularyListCard({
   title,
   description,
   username,
+  avatarUrl,
   role,
-  avatar_url,
   nextReview,
   buttonContent,
-  completionDate, 
+  completionDate,
   result
 }) {
-
-  const avatarStyle = {
-    // Nếu có avatar_url, dùng nó làm ảnh nền. Nếu không, dùng ảnh mặc định.
-    backgroundImage: `url(${avatar_url})`,
-
-    // Các thuộc tính này đảm bảo ảnh luôn đẹp, không bị méo
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-  };
 
   return (
     <div className="vocab-card">
       <h4 className="vocab-title">{title}</h4>
       <p className="vocab-desc">{description}</p>
-      { completionDate ? (
+      {completionDate ? (
         <>
-        <span className="vocab-completion-date">{completionDate !== "N/A" ? (`Completion date: ${completionDate}`):("")}</span>
-        <span className="vocab-result">{result !== "0%" ? (`Result: ${result}`):("")}</span>
+          <span className="vocab-completion-date">{completionDate !== "N/A" ? (`Completion date: ${completionDate}`) : ("")}</span>
+          <span className="vocab-result">{result !== "0%" ? (`Result: ${result}`) : ("")}</span>
         </>
       ): (<></>)}
       { nextReview ? (
@@ -39,7 +30,15 @@ export default function VocabularyListCard({
       ): (<></>)}
       <div className="vocab-footer">
         <div className="user-block">
-          <div className="avatar" style={avatarStyle} />
+          <div className="avatar">
+            {avatarUrl ?
+              (<img src={avatarUrl} alt="Avatar" className="avatar img" /> // Dung hinh anh 
+              ) : (
+                <span className="avatar placeholder">
+                  {username.charAt(0).toUpperCase() || "?"}
+                </span> // dung chu cai dau cua email 
+              )}
+          </div>
           <div className="user-info">
             <span className="username">{username}</span>
             <span className="role-tag">{role}</span>

@@ -38,7 +38,7 @@ const Header = ({ searchQuery, onSearchChange }) => {
                 <div className="header__user">
 
                     {/* Create list action */}
-                    <Link to="/" className="homepage_create-list">
+                    <Link to="/vocabulary" className="homepage_create-list">
                         <img src={Plus} alt="create-list-icon" style={{width: "30px"}}/>
                     </Link>
 

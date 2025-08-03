@@ -1,6 +1,12 @@
 @use '../Fonts' as *;
 
 .manage-classroom-learner {
+
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+    background: #FFFCF7;
+    
     font-family: $font-inriasans;
     background-color: #fdfbf7;
     margin: auto;
