@@ -4,7 +4,7 @@ export default function LearnerSubMenu() {
   return (
     <div className="learner-submenu">
       <NavLink
-        to="/classroom"
+        to="/my-classroom"
         className={({ isActive }) =>
           `submenu-tab ${isActive ? "active" : ""}`
         }

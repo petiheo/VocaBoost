@@ -3658,13 +3658,6 @@ h2 {
   border-radius: 10px;
   resize: vertical;
 }
-.create-list__form--title {
-  background-color: #f3e8cd;
-}
-.create-list__form--description {
-  background-color: #f8f3e8;
-  min-height: 100px;
-}
 .create-list__form--submit {
   background-color: #352d24;
   color: white;
@@ -3776,10 +3769,16 @@ h2 {
 }
 .create-list__word-box--row {
   display: flex;
-  gap: 1rem;
   align-items: flex-start;
 }
-.create-list__word-box--row input[type=text] {
+.create-list__word-box--ai {
+  display: flex;
+  align-items: flex-end;
+}
+.create-list__word-box--row, .create-list__word-box--ai {
+  gap: 1rem;
+}
+.create-list__word-box--row input[type=text], .create-list__word-box--ai input[type=text] {
   flex: 1;
   padding: 0.75rem;
   border-radius: 8px;
@@ -3787,14 +3786,14 @@ h2 {
   background-color: #f9ddb3;
   font-size: 1rem;
 }
-.create-list__word-box--row .input-note {
+.create-list__word-box--row .input-note, .create-list__word-box--ai .input-note {
   font-size: 0.8rem;
   color: #C03B3B;
   font-weight: bold;
   margin-top: 0.5rem;
   margin-left: 0.1rem;
 }
-.create-list__word-box--row .input-title {
+.create-list__word-box--row .input-title, .create-list__word-box--ai .input-title {
   font-size: 1rem;
   font-weight: bold;
   color: #756746;
@@ -3848,6 +3847,7 @@ h2 {
   border-radius: 6px;
   padding: 0.5rem 1rem;
   font-weight: bold;
+  height: 70%;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -3910,16 +3910,16 @@ h2 {
   font-family: "Inria Sans", sans-serif;
   padding: 0.75rem;
   font-size: 0.95rem;
-  border: 2px solid #e1e5e9;
+  border: 2px solid #F8F3E8;
   border-radius: 8px;
-  background-color: #f8f9fa;
+  background-color: #F8F3E8;
   transition: all 0.2s ease;
 }
 .create-list-input-group .create-list-input:focus {
   outline: none;
   border-color: #ffc107;
   box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
-  background-color: #fff;
+  background-color: #F8F3E8;
 }
 .create-list-input-group .create-list-input.error {
   border-color: #e74c3c;
@@ -3936,8 +3936,6 @@ h2 {
   font-family: "Inria Sans", sans-serif;
 }
 .create-list-input-group .create-list-input-errors {
-  display: flex;
-  flex-direction: column;
   gap: 0.25rem;
   margin-left: 0.5rem;
 }
@@ -3945,7 +3943,6 @@ h2 {
   color: #e74c3c;
   font-size: 0.8rem;
   font-weight: 500;
-  display: block;
 }
 
 .create-list__word-input-group {
@@ -3986,7 +3983,6 @@ h2 {
   background-color: #fef5f5;
 }
 .create-list__word-input-group .word-input-errors {
-  display: flex;
   flex-direction: column;
   gap: 0.2rem;
 }
