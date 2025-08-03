@@ -2282,6 +2282,10 @@ h2 {
 }
 
 .manage-classroom-learner {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  background: #FFFCF7;
   font-family: "Inria Sans", sans-serif;
   background-color: #fdfbf7;
   margin: auto;
@@ -3146,19 +3150,31 @@ h2 {
 .vocab-card .vocab-footer .user-block .avatar {
   width: 28px;
   height: 28px;
-  background-color: #d8cfc3;
   border-radius: 50%;
   margin-right: 0.5rem;
+}
+.vocab-card .vocab-footer .user-block .avatar .img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.vocab-card .vocab-footer .user-block .avatar .placeholder {
+  background-color: #d8cfc3;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .vocab-card .vocab-footer .user-block .user-info {
   display: flex;
   flex-direction: column;
 }
 .vocab-card .vocab-footer .user-block .user-info .username {
-  font-size: 0.85rem;
+  font-size: 10px;
   font-weight: 600;
   color: #222;
-  max-width: 90px;
+  max-width: 100px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3635,6 +3651,20 @@ h2 {
 .create-list__form--submit:hover {
   opacity: 0.9;
 }
+.create-list__form--cancel {
+  background-color: #FFFCF7;
+  color: #2a1e17;
+  width: 10rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border: 0.075rem solid #2a1e17;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.create-list__form--cancel:hover {
+  opacity: 0.9;
+}
 .create-list__header {
   font-family: "Lalezar", sans-serif;
   font-size: 2.25rem;
@@ -3822,6 +3852,122 @@ h2 {
   padding: 0.8rem 0 0.8rem;
   border-radius: 999px;
   color: #FFF3DF;
+}
+.create-list__form--cancel {
+  font-size: 1rem;
+  width: 10rem;
+  padding: 0.8rem 0 0.8rem;
+  border-radius: 999px;
+  color: #2a1e17;
+}
+
+.create-list-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.create-list-input-group .create-list-input-label {
+  font-family: "Inria Sans", sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.create-list-input-group .create-list-input-label .required-asterisk {
+  color: #e74c3c;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+.create-list-input-group .create-list-input {
+  font-family: "Inria Sans", sans-serif;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  transition: all 0.2s ease;
+}
+.create-list-input-group .create-list-input:focus {
+  outline: none;
+  border-color: #ffc107;
+  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+  background-color: #fff;
+}
+.create-list-input-group .create-list-input.error {
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+  background-color: #fdf2f2;
+}
+.create-list-input-group .create-list-input::placeholder {
+  color: #6c757d;
+  opacity: 0.7;
+}
+.create-list-input-group textarea.create-list-input {
+  resize: vertical;
+  min-height: 80px;
+  font-family: "Inria Sans", sans-serif;
+}
+.create-list-input-group .create-list-input-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+}
+.create-list-input-group .create-list-input-errors .error-message {
+  color: #e74c3c;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: block;
+}
+
+.create-list__word-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.create-list__word-input-group .word-input-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.create-list__word-input-group .word-input-label .required-asterisk {
+  color: #e74c3c;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+.create-list__word-input-group .word-input {
+  font-family: "Inria Sans", sans-serif;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+.create-list__word-input-group .word-input:focus {
+  outline: none;
+  border-color: #ffc107;
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.15);
+}
+.create-list__word-input-group .word-input.error {
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.15);
+  background-color: #fef5f5;
+}
+.create-list__word-input-group .word-input-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.create-list__word-input-group .word-input-errors .error-message {
+  color: #e74c3c;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 .create-list-input-group {
