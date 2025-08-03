@@ -106,7 +106,12 @@ export default function ClassroomTitle() {
                         <img src={JoinCodeIcon} alt="join-code-icon" width="13px" />
                     </span>
                     <span className="tag"><img src={ClassroomTitlePattern} alt="classroom-memebers" width="13px" /> {selectedClassroom.learner_count}</span>
-                    <span className="tag">{selectedClassroom.classroom_status}</span>
+                    {user?.role === "teacher" ? (
+                        <span className="tag">{selectedClassroom.classroom_status}</span>
+                    ):(
+                        <span className="tag">{selectedClassroom.status}</span>
+                    )}
+                    
                 </div>
             </div>
 

@@ -486,7 +486,11 @@ class ClassroomModel {
                 sublist_count,
                 due_date,
                 start_date,
-                classroom_id
+                classroom_id,
+                user:users!fk_assignments_teacher (
+                  email,
+                  avatar_url
+                )
             )
             `
       )
@@ -495,6 +499,7 @@ class ClassroomModel {
 
     if (error) throw error;
 
+    console.log(data[0].assignments);
     return data.filter((item) => item.assignments?.classroom_id === classroomId);
   }
 

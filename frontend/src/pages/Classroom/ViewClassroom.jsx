@@ -9,16 +9,6 @@ const tabs = [
     { name: "Overdue assignment" }
 ];
 
-const dummyLists = Array(8).fill({
-    title: "IELTS Academy",
-    description: "A helpful list of commonly used English words to boost your reading and speaking skills",
-    username: "nguyenhoangphihung@gmail.com",
-    role: "Teacher",
-    reviewProgress: "2/5",
-    completionDate: "Aug, 28th, 2025",
-    result: "80%"
-});
-
 export default function ManageClassroomLearner() {
 
     const [activeTab, setActiveTab] = useState("To-review");
@@ -54,6 +44,7 @@ export default function ManageClassroomLearner() {
                         break;
                     default:
                         res = await classroomService.getOverdueAssignments(classroomId);
+                        console.log(res);
                 }
 
                 if (res.success && Array.isArray(res.data)) {
@@ -117,16 +108,17 @@ export default function ManageClassroomLearner() {
                                     key={assignment.assignment_id || index}
                                     title={assignment.title}
                                     description={`Exercise method: ${assignment.exercise_method}`}
-                                    username={`Due: ${new Date(assignment.due_date).toLocaleDateString()}`}
-                                    role="Assignment"
+                                    username={assignment.creator.email}
+                                    role="Teacher"
                                     reviewProgress={`${assignment.completed_sublist_index || 0}/${assignment.sublist_count || 0}`}
                                     completionDate={new Date(assignment.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                     result={assignment.learner_status || 'Pending'}
+                                    buttonContent="Overview"
                                 />
                             ))}
                         </div>
                     ) : (
-                        <div className="empty-state">
+                        <div className="empty-list">
                             <p>No assignments found for {activeTab.toLowerCase()}.</p>
                         </div>
                     )}
