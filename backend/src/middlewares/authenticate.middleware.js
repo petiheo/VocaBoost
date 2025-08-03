@@ -3,7 +3,7 @@ const userModel = require('../models/user.model');
 const logger = require('../utils/logger');
 const { ResponseUtils, ErrorHandler } = require('../utils');
 
-const authMiddleware = async (req, res, next) => {
+const authenticateMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -18,17 +18,22 @@ const authMiddleware = async (req, res, next) => {
       return ResponseUtils.unauthorized(res, 'User not found');
     }
 
-    // Block only specific problematic statuses, allow others like 'pending_verification'
-    if (user.account_status === 'inactive' || user.account_status === 'suspended' || user.account_status === 'banned') {
-      return ResponseUtils.forbidden(res, `Account ${user.account_status}. Please contact support.`);
+    if (
+      user.account_status === 'inactive' ||
+      user.account_status === 'suspended' ||
+      user.account_status === 'banned'
+    ) {
+      return ResponseUtils.forbidden(
+        res,
+        `Account ${user.account_status}. Please contact support.`
+      );
     }
 
-    // Attach user info to request (including email verification status)
     req.user = {
       userId: decoded.userId,
       email: decoded.email,
       role: user.role, // Use current role from DB, not from token
-      emailVerified: user.email_verified, // Include verification status for individual endpoints to check
+      emailVerified: user.email_verified,
     };
 
     next();
@@ -41,8 +46,14 @@ const authMiddleware = async (req, res, next) => {
       return ResponseUtils.unauthorized(res, 'Token expired');
     }
 
-    return ErrorHandler.handleError(res, error, 'authMiddleware', 'Authentication error', 500);
+    return ErrorHandler.handleError(
+      res,
+      error,
+      'authenticateMiddleware',
+      'Authentication error',
+      500
+    );
   }
 };
 
-module.exports = authMiddleware;
+module.exports = authenticateMiddleware;

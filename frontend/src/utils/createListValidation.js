@@ -24,17 +24,14 @@ export const validateListTitle = (title) => {
 export const validateListDescription = (description) => {
   const errors = [];
   
+  // Description is now optional
   if (!description || description.trim().length === 0) {
-    errors.push("Description is required");
-    return errors;
+    return errors; // No errors if empty - it's optional
   }
   
   const trimmed = description.trim();
   
-  if (trimmed.length < 10) {
-    errors.push("Description must be at least 10 characters long");
-  }
-  
+  // Removed minimum length constraint - only check maximum length
   if (trimmed.length > 500) {
     errors.push("Description must be less than 500 characters");
   }
@@ -125,11 +122,30 @@ export const validateWordSynonyms = (synonyms) => {
   const errors = [];
   
   // Synonyms is optional
-  if (!synonyms || synonyms.trim().length === 0) {
+  if (!synonyms) {
     return errors;
   }
   
-  const trimmed = synonyms.trim();
+  // Handle both string and array formats
+  let synonymsString = "";
+  if (Array.isArray(synonyms)) {
+    // If it's an array, join with commas
+    if (synonyms.length === 0) {
+      return errors;
+    }
+    synonymsString = synonyms.join(",");
+  } else if (typeof synonyms === "string") {
+    // If it's already a string
+    if (synonyms.trim().length === 0) {
+      return errors;
+    }
+    synonymsString = synonyms;
+  } else {
+    // Invalid type
+    return errors;
+  }
+  
+  const trimmed = synonymsString.trim();
   
   // Check for invalid ending characters
   if (/[^a-zA-Z0-9)]$/.test(trimmed)) {
@@ -160,7 +176,7 @@ export const validateWordTranslation = (translation) => {
 };
 
 // Validate entire word object
-export const validateWord = (word, index) => {
+export const validateWord = (word) => {
   const errors = {};
   
   const termErrors = validateWordTerm(word.term);
@@ -219,7 +235,7 @@ export const validateCreateListForm = (title, description, words) => {
   let hasWordErrors = false;
   
   words.forEach((word, index) => {
-    const wordValidation = validateWord(word, index);
+    const wordValidation = validateWord(word);
     if (!wordValidation.isValid) {
       wordErrors[index] = wordValidation.errors;
       hasWordErrors = true;

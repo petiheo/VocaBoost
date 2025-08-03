@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Logo from "../assets/Logo.svg";
-import {Home, Learning, History, Analysis, Setting, LogOut, ArrowRight, ArrowLeft} from "../assets/icons/index";
+import Logo from "../../assets/Logo.svg";
+import {Home, Learning, History, Analysis, Setting, LogOut, ArrowRight, ArrowLeft} from "../../assets/icons/index";
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(true);

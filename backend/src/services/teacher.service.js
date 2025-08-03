@@ -4,7 +4,6 @@ const teacherRequestModel = require('../models/teacherRequest.model');
 const logger = require('../utils/logger');
 
 class TeacherService {
-
   async submitRequest(userId, data, file) {
     try {
       const uploadResult = await storageService.uploadTeacherCredential(
@@ -25,7 +24,9 @@ class TeacherService {
           additionalNotes: data.additionalNotes,
         });
         isUpdate = true;
-        logger.info(`Updated existing teacher verification request for user ${userId}`);
+        logger.info(
+          `Updated existing teacher verification request for user ${userId}`
+        );
       } else {
         // Create new request
         teacherRequest = await teacherRequestModel.create({

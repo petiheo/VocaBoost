@@ -1,7 +1,7 @@
 import { useState } from "react";
 import authService from "../../services/Auth/authService";
-import AccountPageInput from "../../components/AccountPageInput";
-import LoadingCursor from "../../components/cursor/LoadingCursor";
+import AccountPageInput from "../../components/Forms/AccountPageInput";
+import LoadingCursor from "../../components/UI/LoadingCursor";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");

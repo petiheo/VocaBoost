@@ -2,22 +2,19 @@ const express = require('express');
 const authRouter = express.Router();
 const passport = require('passport');
 
-const rateLimiter = require('../middlewares/rateLimiter.middleware');
 const authValidators = require('../validators/auth.validator');
 const authController = require('../controllers/auth.controller');
-const authMiddleware = require('../middlewares/auth.middleware');
+const authenticateMiddleware = require('../middlewares/authenticate.middleware');
 
 // Registration & Login & Logout
 authRouter.post(
   '/register',
-  // rateLimiter,
   authValidators.register,
   authController.register
 );
 
 authRouter.post(
   '/login',
-  // rateLimiter,
   authValidators.login,
   authController.login
 );
@@ -39,14 +36,12 @@ authRouter.get('/google/callback', authController.googleCallback);
 // Password Reset Flow
 authRouter.post(
   '/forgot-password',
-  rateLimiter,
   authValidators.email,
   authController.forgotPassword
 );
 
 authRouter.post(
   '/reset-password',
-  rateLimiter,
   authValidators.resetPassword,
   authController.resetPassword
 );
@@ -65,6 +60,6 @@ authRouter.post(
   authController.getAccountStatus
 );
 
-authRouter.get('/validate-token', authMiddleware, authController.validateToken);
+authRouter.get('/validate-token', authenticateMiddleware, authController.validateToken);
 
 module.exports = authRouter;
