@@ -6,16 +6,17 @@
 
     &__body {
         min-height: 100%;
+        width: 100vw;
         margin: 2em 0;
 
         display: flex;
-        gap: 2em;
+        gap: 5em;
     }
 
     &__content {
         background: #FFFCF7;
-        min-width: 70%;
-        margin: 0 auto;
+        min-width: 90vw;
+        // margin: 0 auto;
         gap: 2em;
     }
 }
