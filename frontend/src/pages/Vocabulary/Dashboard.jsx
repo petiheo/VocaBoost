@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Footer, Header, SideBar, LearnerSubMenu, ReportTrigger } from "../../components/index.jsx";
+import { Footer, Header, SideBar, LearnerSubMenu } from "../../components/index.jsx";
 import { DropdownIcon, MoreIcon, PlusIcon } from "../../assets/Vocabulary/index.jsx";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
@@ -20,6 +20,7 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const confirm = useConfirm();
     const toast = useToast();
+    const [isOpen, setIsOpen] = useState(false);
 
     const handleCreateNewList = () => {
         navigate('/vocabulary/create/new');
@@ -93,9 +94,8 @@ export default function Dashboard() {
         <div className="dashboard">
             <Header />
             <LearnerSubMenu />
-            <ReportTrigger />
             <div className="dashboard__content">
-                <SideBar />
+                <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
 
                 <div className="dashboard__main">
                     <div className="dashboard__topbar">

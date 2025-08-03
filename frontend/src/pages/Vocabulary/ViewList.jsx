@@ -18,6 +18,7 @@ export default function ViewList() {
 
   const confirm = useConfirm();
   const toast = useToast();
+  const [isOpen, setIsOpen] = useState(false);
 
 
   const handleCopy = async (text) => {
@@ -64,7 +65,7 @@ export default function ViewList() {
     <div className="view-list">
       <Header />
       <div className="view-list__content">
-        <SideBar />
+        <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         <main className="view-list__main">
           {listInfo && (
             <>

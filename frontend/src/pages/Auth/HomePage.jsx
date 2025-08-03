@@ -39,6 +39,8 @@ const HomePage = () => {
     error: null 
   });
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const [isOpen, setIsOpen] = useState(false);
+
 
   useEffect(() => {
     if (searchQuery) return; 
@@ -175,7 +177,7 @@ const HomePage = () => {
       />
 
       <div className="homepage__body">
-        <SideBar />
+        <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         <main className="homepage__main">
           <section className="homepage__content">
             
