@@ -109,6 +109,7 @@ export default function ManageClassroomLearner() {
                                     title={assignment.title}
                                     description={`Exercise method: ${assignment.exercise_method}`}
                                     username={assignment.creator.email}
+                                    avatarUrl={assignment.creator?.avatar_url}
                                     role="Teacher"
                                     reviewProgress={`${assignment.completed_sublist_index || 0}/${assignment.sublist_count || 0}`}
                                     completionDate={new Date(assignment.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}

@@ -5,7 +5,9 @@ const Footer = () => {
     return (
         <div className="footer">
             <div className="footer-left">
-                <img src={Logo} alt="logo" className='logo' />
+                <Link to="/homepage">
+                    <img src={Logo} alt="logo" className='logo' />
+                </Link>
                 <div className="support-button-list">
                     <Link to="/signin" className="about">About</Link>
                     <Link to="/signin" className="carees">Careers</Link>
@@ -15,7 +17,7 @@ const Footer = () => {
                 </div>
             </div>
             <div className="footer-right">
-                
+
             </div>
         </div>
     );
