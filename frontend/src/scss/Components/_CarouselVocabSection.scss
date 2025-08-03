@@ -120,3 +120,23 @@ $text-color-light: #555;
   font-style: italic;
   font-size: 1.1rem;
 }
+
+.loading-container {
+  width: 100%;
+  text-align: center;
+  padding: 4rem 0;
+  font-family: $font-inriasans;
+  color: #888;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  width: 100%;
+  text-align: center;
+  padding: 4rem 0;
+  font-family: $font-inriasans;
+  color: #cc4343;
+  font-style: italic;
+  font-size: 1.1rem;
+}

@@ -3135,6 +3135,12 @@ h2 {
   color: #2932B1;
   font-weight: bold;
 }
+.vocab-card .vocab-next-review {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  color: #2932B1;
+  font-weight: bold;
+}
 .vocab-card .vocab-footer {
   display: flex;
   justify-content: space-between;
@@ -3148,8 +3154,8 @@ h2 {
   align-items: center;
 }
 .vocab-card .vocab-footer .user-block .avatar {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   margin-right: 0.5rem;
 }
@@ -3171,7 +3177,7 @@ h2 {
   flex-direction: column;
 }
 .vocab-card .vocab-footer .user-block .user-info .username {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   color: #222;
   max-width: 100px;
@@ -3180,7 +3186,7 @@ h2 {
   text-overflow: ellipsis;
 }
 .vocab-card .vocab-footer .user-block .user-info .role-tag {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   background-color: #d6e5ff;
   color: #1b4da3;
   padding: 2px 6px;
@@ -3292,6 +3298,26 @@ h2 {
   padding: 4rem 0;
   font-family: "Inria Sans", sans-serif;
   color: #888;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+.loading-container {
+  width: 100%;
+  text-align: center;
+  padding: 4rem 0;
+  font-family: "Inria Sans", sans-serif;
+  color: #888;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  width: 100%;
+  text-align: center;
+  padding: 4rem 0;
+  font-family: "Inria Sans", sans-serif;
+  color: #cc4343;
   font-style: italic;
   font-size: 1.1rem;
 }
@@ -3859,115 +3885,6 @@ h2 {
   padding: 0.8rem 0 0.8rem;
   border-radius: 999px;
   color: #2a1e17;
-}
-
-.create-list-input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.create-list-input-group .create-list-input-label {
-  font-family: "Inria Sans", sans-serif;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: #2c3e50;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-.create-list-input-group .create-list-input-label .required-asterisk {
-  color: #e74c3c;
-  font-weight: bold;
-  font-size: 1.1rem;
-}
-.create-list-input-group .create-list-input {
-  font-family: "Inria Sans", sans-serif;
-  padding: 0.75rem;
-  font-size: 0.95rem;
-  border: 2px solid #e1e5e9;
-  border-radius: 8px;
-  background-color: #f8f9fa;
-  transition: all 0.2s ease;
-}
-.create-list-input-group .create-list-input:focus {
-  outline: none;
-  border-color: #ffc107;
-  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
-  background-color: #fff;
-}
-.create-list-input-group .create-list-input.error {
-  border-color: #e74c3c;
-  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
-  background-color: #fdf2f2;
-}
-.create-list-input-group .create-list-input::placeholder {
-  color: #6c757d;
-  opacity: 0.7;
-}
-.create-list-input-group textarea.create-list-input {
-  resize: vertical;
-  min-height: 80px;
-  font-family: "Inria Sans", sans-serif;
-}
-.create-list-input-group .create-list-input-errors {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  margin-left: 0.5rem;
-}
-.create-list-input-group .create-list-input-errors .error-message {
-  color: #e74c3c;
-  font-size: 0.8rem;
-  font-weight: 500;
-  display: block;
-}
-
-.create-list__word-input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.create-list__word-input-group .word-input-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #495057;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-.create-list__word-input-group .word-input-label .required-asterisk {
-  color: #e74c3c;
-  font-weight: bold;
-  font-size: 0.9rem;
-}
-.create-list__word-input-group .word-input {
-  font-family: "Inria Sans", sans-serif;
-  padding: 0.5rem;
-  font-size: 0.9rem;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  background-color: #fff;
-  transition: all 0.2s ease;
-}
-.create-list__word-input-group .word-input:focus {
-  outline: none;
-  border-color: #ffc107;
-  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.15);
-}
-.create-list__word-input-group .word-input.error {
-  border-color: #e74c3c;
-  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.15);
-  background-color: #fef5f5;
-}
-.create-list__word-input-group .word-input-errors {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-.create-list__word-input-group .word-input-errors .error-message {
-  color: #e74c3c;
-  font-size: 0.75rem;
-  font-weight: 500;
 }
 
 .create-list-input-group {

@@ -4,19 +4,7 @@ import { useState, useEffect } from 'react';
 import  LoadingCursor from '../../components/UI/LoadingCursor';
 import { useDebounce } from '../../hooks/useDebounce'; 
 import { VocabularyListCard } from '../../components';
-
-// Import các hàm fetch từ service của bạn
-// import { getReviewLists, getRecentLists, getPopularLists } from '../../service/user/user';
-
-// mock data
-const allMockLists = [
-  { listId: '1234', title: 'Thế Hoàng', description: 'A helpful list of commonly used English words to boost your reading and speaking skills', username: 'Username', role: 'Teacher'},
-  { listId: '1234', title: 'Phi Hùng', description: 'A helpful list of commonly used English words to boost your reading and speaking skills', username: 'Username', role: 'Teacher'},
-  { listId: '1234', title: 'Trúc Mai', description: 'A helpful list of commonly used English words to boost your reading and speaking skills', username: 'Username', role: 'Teacher'},
-  { listId: '1234', title: 'Quang Nghị', description: 'A helpful list of commonly used English words to boost your reading and speaking skills', username: 'Username', role: 'Teacher'},
-  { listId: '1234', title: 'Hiệp Thắng', description: 'A helpful list of commonly used English words to boost your reading and speaking skills', username: 'Username', role: 'Teacher'},
-];
-
+import vocabularyService from '../../services/Vocabulary/vocabularyService';
 
 // Component cho các Tab
 const ReviewTabs = ({ activeTab, onTabChange }) => (
@@ -44,7 +32,12 @@ const HomePage = () => {
   const [activeReviewTab, setActiveReviewTab] = useState('today');
 
   const [searchQuery, setSearchQuery] = useState(''); 
-  const [searchResults, setSearchResults] = useState({ data: [], isLoading: false, error: null });
+  const [searchResults, setSearchResults] = useState({ 
+    data: [], 
+    pagination: null, // Thêm state để lưu thông tin phân trang
+    isLoading: false, 
+    error: null 
+  });
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
   useEffect(() => {
@@ -52,12 +45,31 @@ const HomePage = () => {
 
     const fetchStaticLists = async () => {
       try {
-        const [recentData, popularData] = await Promise.all([
-          getRecentLists(),
-          getPopularLists()
+        const [historyResponse, popularResponse] = await Promise.all([
+            vocabularyService.getHistoryLists(),
+            vocabularyService.getPopularLists()
         ]);
-        setRecentLists({ data: recentData, isLoading: false, error: null });
-        setPopularLists({ data: popularData, isLoading: false, error: null });
+
+        const transformedRecent = (historyResponse.lists || []).map(list => ({
+          id: list.listId,
+          title: list.title,
+          description: list.description,
+          username: list.creator?.display_name,
+          role: list.creator?.role,
+          avatarUrl: list.creator?.avatar_url
+        }));
+        setRecentLists({ data: transformedRecent, isLoading: false, error: null });
+
+        const transformedPopular = (popularResponse.lists || []).map(list => ({
+          id: list.listId,
+          title: list.title,
+          description: list.description,
+          username: list.creator?.display_name,
+          role: list.creator?.role,
+          avatarUrl: list.creator?.avatar_url
+        }));
+        setPopularLists({ data: transformedPopular, isLoading: false, error: null });
+
       } catch (err) {
         console.error("Failed to fetch homepage lists:", err);
         const errorState = { data: [], isLoading: false, error: err };
@@ -65,27 +77,43 @@ const HomePage = () => {
         setPopularLists(errorState);
       }
     };
-    fetchStaticLists();
-  }, [searchQuery]); // Chạy 1 lần
+    if (!searchQuery) {
+      fetchStaticLists();
+    }
+  }, [searchQuery]);
 
   useEffect(() => {
     // Nếu query đã debounce là rỗng, không làm gì cả, xóa kết quả cũ
     if (debouncedSearchQuery === '') {
-      setSearchResults({ data: [], isLoading: false, error: null });
+      setSearchResults({ data: [], pagination: null, isLoading: false, error: null });
       return;
     }
 
     const fetchSearchResults = async () => {
       setSearchResults({ data: [], isLoading: true, error: null });
       try {
-        // const results = await searchAllLists(debouncedSearchQuery);
-        const results = allMockLists.filter(list => 
-          list.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
-        );
-        setSearchResults({ data: results, isLoading: false, error: null });
+        const { lists: apiLists, pagination } = await vocabularyService.searchPublicLists({ q: debouncedSearchQuery });
+
+        // Dịch dữ liệu từ API sang định dạng mà VocabularyListCard cần
+        const transformedLists = apiLists.map(list => ({
+          id: list.id,
+          listId: list.id, // Giữ lại listId nếu component con cần
+          title: list.title,
+          description: list.description,
+          username: list.creator.display_name, 
+          role: list.creator.role,
+          avatarUrl: list.creator.avatar_url,
+        }));
+        
+        setSearchResults({ 
+          data: transformedLists, 
+          pagination: pagination, 
+          isLoading: false, 
+          error: null 
+        });
 
       } catch (err) {
-        setSearchResults({ data: [], isLoading: false, error: err });
+        setSearchResults({ data: [], pagination: null, isLoading: false, error: err });
       }
     };
 
@@ -101,51 +129,42 @@ const HomePage = () => {
     }
   };
   
-  // Theo dõi sự thay đổi của `activeReviewTab` để fetch lại dữ liệu
+  // 2. useEffect để fetch REVIEW LISTS dựa vào tab đang active
   useEffect(() => {
     const fetchReviewData = async () => {
       setReviewLists({ data: [], isLoading: true, error: null });
-
       try {
-        let data;
-        // Dựa vào tab đang active để gọi API tương ứng, tùy chỉnh theo API chung hay riêng
+        let response;
         if (activeReviewTab === 'today') {
-          data = await getReviewListsToday();
-        } else if (activeReviewTab === 'upcoming') {
-          data = await getReviewListsUpcoming();
+          response = await vocabularyService.getDueLists();
+        } else {
+          response = await vocabularyService.getUpcomingLists();
         }
         
-        // Cập nhật state với dữ liệu mới
-        setReviewLists({ data: data, isLoading: false, error: null });
+        const transformedReview = (response.lists || []).map(list => ({
+          id: list.id || list.listId,
+          title: list.title,
+          description: list.description,
+          username: list.creator?.display_name,
+          role: list.creator?.role,
+          avatarUrl: list.creator?.avatar_url,
+        }));
+        setReviewLists({ data: transformedReview, isLoading: false, error: null });
       } catch (err) {
         console.error(`Failed to fetch ${activeReviewTab} review lists:`, err);
         setReviewLists({ data: [], isLoading: false, error: err });
       }
     };
 
-    fetchReviewData();
-  }, [activeReviewTab]); 
+    if (!searchQuery) {
+        fetchReviewData();
+    }
+  }, [activeReviewTab, searchQuery]); 
 
   const handleTabChange = (tabIdentifier) => {
     if (tabIdentifier !== activeReviewTab) {
       setActiveReviewTab(tabIdentifier);
     }
-  };
-
-  const renderCarouselSection = (sectionState, title, children = null) => {
-    if (sectionState.isLoading) {
-      return <LoadingCursor />;
-    }
-
-    if (sectionState.error) {
-      return <p>Could not load this section. Please try again later.</p>;
-    }
-
-    return (
-      <CarouselVocabSection title={title} vocabLists={sectionState.data}>
-        {children}
-      </CarouselVocabSection>
-    );
   };
 
   return (
@@ -171,7 +190,7 @@ const HomePage = () => {
                     }
 
                     if (searchResults.error) {
-                      return <p className="search-status-message error">Error finding lists. Please try again.</p>;
+                      return <p className="search-status-message error">Error finding lists. Please try again. {searchQuery.error}</p>;
                     }
 
                     if (searchResults.data.length === 0) {
@@ -190,31 +209,31 @@ const HomePage = () => {
               </section>
             ) : (
               <>
-              <CarouselVocabSection title="REVIEW LISTS" vocabLists={allMockLists}>
-                <ReviewTabs 
-                  activeTab={activeReviewTab} 
-                  onTabChange={handleTabChange} 
-                />
-              </CarouselVocabSection>
-
-              <CarouselVocabSection title="RECENTLY LISTS" vocabLists={allMockLists} />
-
-              <CarouselVocabSection title="POPULAR LISTS" vocabLists={allMockLists} />
-              
-              {/* {reviewLists.isLoading ? (
-                <LoadingCursor />
-              ) : reviewLists.error ? (
-                <p>Could not load review section.</p>
-              ) : (
-                <CarouselVocabSection title="REVIEW LISTS" vocabLists={reviewLists.data}>
+                <CarouselVocabSection 
+                  title="REVIEW LISTS" 
+                  vocabLists={reviewLists.data}
+                  isLoading={reviewLists.isLoading} 
+                  error={reviewLists.error}        
+                >
                   <ReviewTabs 
                     activeTab={activeReviewTab} 
                     onTabChange={handleTabChange} 
                   />
                 </CarouselVocabSection>
-              )}
-              {renderCarouselSection(recentLists, 'RECENTLY LISTS')}
-              {renderCarouselSection(popularLists, 'POPULAR LISTS')}  */}
+
+                <CarouselVocabSection 
+                  title="RECENTLY LISTS" 
+                  vocabLists={recentLists.data}
+                  isLoading={recentLists.isLoading} 
+                  error={recentLists.error}         
+                />
+
+                <CarouselVocabSection 
+                  title="POPULAR LISTS" 
+                  vocabLists={popularLists.data}
+                  isLoading={popularLists.isLoading} 
+                  error={popularLists.error}         
+                />
               </>
             )}
 

@@ -7,19 +7,11 @@ export default function VocabularyListCard({
   username,
   avatarUrl,
   role,
+  nextReview,
   buttonContent,
   completionDate,
   result
 }) {
-  const navigate = useNavigate();
-
-  const handleReviewClick = () => {
-    if (listId) {
-      buttonContent === 'Overview' ? navigate(`/`) : navigate(`/signin`);
-    } else {
-      console.error("Cannot navigate: list.id is missing.");
-    }
-  };
 
   return (
     <div className="vocab-card">
@@ -30,7 +22,12 @@ export default function VocabularyListCard({
           <span className="vocab-completion-date">{completionDate !== "N/A" ? (`Completion date: ${completionDate}`) : ("")}</span>
           <span className="vocab-result">{result !== "0%" ? (`Result: ${result}`) : ("")}</span>
         </>
-      ) : (<></>)}
+      ): (<></>)}
+      { nextReview ? (
+        <>
+        <span className="vocab-next-review">{completionDate !== "N/A" ? (`Next review in ${nextReview} days`):("")}</span>
+        </>
+      ): (<></>)}
       <div className="vocab-footer">
         <div className="user-block">
           <div className="avatar">
@@ -48,7 +45,7 @@ export default function VocabularyListCard({
           </div>
         </div>
 
-        <button className="btn review-btn" onClick={handleReviewClick} >{buttonContent}</button>
+        <button className="btn review-btn" >{buttonContent}</button>
       </div>
     </div>
   );
