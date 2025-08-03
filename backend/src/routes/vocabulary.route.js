@@ -1,14 +1,13 @@
 const express = require('express');
 const vocabularyRouter = express.Router();
 
-const authMiddleware = require('../middlewares/auth.middleware');
+const authenticateMiddleware = require('../middlewares/authenticate.middleware');
 const uploadMiddleware = require('../middlewares/upload.middleware');
-const rateLimiter = require('../middlewares/rateLimiter.middleware');
 
 const vocabularyValidator = require('../validators/vocabulary.validator');
 const vocabularyController = require('../controllers/vocabulary.controller');
 
-vocabularyRouter.use(authMiddleware);
+vocabularyRouter.use(authenticateMiddleware);
 
 // =================================================================
 //  LIST ROUTES
@@ -16,7 +15,6 @@ vocabularyRouter.use(authMiddleware);
 
 vocabularyRouter.post(
   '/lists',
-  rateLimiter,
   ...vocabularyValidator.createList,
   vocabularyController.createList
 );

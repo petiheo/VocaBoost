@@ -8,9 +8,9 @@ const {
   hasClassroomAccess,
   requireClassRole,
 } = require('../middlewares/authorize.middleware');
-const authenticate = require('../middlewares/auth.middleware');
+const authenticateMiddleware = require('../middlewares/authenticate.middleware');
 
-classroomRouter.use(authenticate);
+classroomRouter.use(authenticateMiddleware);
 
 // Tạo lớp học mới
 classroomRouter.post(
