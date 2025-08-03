@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { Header, SideBar, Footer } from "../../../components";
+import { useState } from "react";
 
 export default function ClassroomLayout() {
   const [isOpen, setIsOpen] = useState(false);

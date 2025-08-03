@@ -49,7 +49,7 @@ const Sidebar = ({isOpen, setIsOpen}) => {
             <img src={MyClassroom} alt="my classroom icon" />
             <span className="sidebar__label">My Classrooms</span>
           </Link>
-          <Link to="" className="sidebar__link" onClick={() => toast("Feature coming soon!", "success")}>
+          <Link to="#" className="sidebar__link" onClick={e => { e.preventDefault(); toast("Feature coming soon!", "success"); }}>
             <img src={Analysis} alt="analysis icon" />
             <span className="sidebar__label">Learning Statistics</span>
           </Link>
@@ -60,9 +60,9 @@ const Sidebar = ({isOpen, setIsOpen}) => {
           <hr className="sidebar__divider" />
           <Link to="/profile" className="sidebar__link">
             <img src={Setting} alt="setting icon" />
-            <span className="sidebar__label">Setting</span>
+            <span className="sidebar__label">Settings</span>
           </Link>
-          <Link to="" className="sidebar__link" onClick={handleLogOut}>
+          <Link to="#" className="sidebar__link" onClick={handleLogOut}>
             <img src={LogOut} alt="logout icon" />
             <span className="sidebar__label">Log out</span>
           </Link>
