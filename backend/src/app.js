@@ -1,14 +1,14 @@
 const express = require('express');
 const passport = require('passport');
 const app = express();
-const logger = require('../utils/logger');
-const securityMiddleware = require('../middlewares/security.middleware');
-const ResponseUtils = require('../utils/response');
-const ErrorHandler = require('../utils/errorHandler');
+const logger = require('./utils/logger');
+const securityMiddleware = require('./middlewares/security.middleware');
+const ResponseUtils = require('./utils/response');
+const ErrorHandler = require('./utils/errorHandler');
 
-const router = require('../routes/index.route');
+const router = require('./routes/index.route');
 
-require('../config/passport.config');
+require('./config/passport.config');
 
 app.use(express.json());
 
