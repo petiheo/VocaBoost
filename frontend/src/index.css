@@ -3131,6 +3131,12 @@ h2 {
   color: #2932B1;
   font-weight: bold;
 }
+.vocab-card .vocab-next-review {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  color: #2932B1;
+  font-weight: bold;
+}
 .vocab-card .vocab-footer {
   display: flex;
   justify-content: space-between;
@@ -3144,8 +3150,8 @@ h2 {
   align-items: center;
 }
 .vocab-card .vocab-footer .user-block .avatar {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   background-color: #d8cfc3;
   border-radius: 50%;
   margin-right: 0.5rem;
@@ -3276,6 +3282,26 @@ h2 {
   padding: 4rem 0;
   font-family: "Inria Sans", sans-serif;
   color: #888;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+.loading-container {
+  width: 100%;
+  text-align: center;
+  padding: 4rem 0;
+  font-family: "Inria Sans", sans-serif;
+  color: #888;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  width: 100%;
+  text-align: center;
+  padding: 4rem 0;
+  font-family: "Inria Sans", sans-serif;
+  color: #cc4343;
   font-style: italic;
   font-size: 1.1rem;
 }
@@ -3635,6 +3661,20 @@ h2 {
 .create-list__form--submit:hover {
   opacity: 0.9;
 }
+.create-list__form--cancel {
+  background-color: #FFFCF7;
+  color: #2a1e17;
+  width: 10rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border: 0.075rem solid #2a1e17;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.create-list__form--cancel:hover {
+  opacity: 0.9;
+}
 .create-list__header {
   font-family: "Lalezar", sans-serif;
   font-size: 2.25rem;
@@ -3822,6 +3862,13 @@ h2 {
   padding: 0.8rem 0 0.8rem;
   border-radius: 999px;
   color: #FFF3DF;
+}
+.create-list__form--cancel {
+  font-size: 1rem;
+  width: 10rem;
+  padding: 0.8rem 0 0.8rem;
+  border-radius: 999px;
+  color: #2a1e17;
 }
 
 .create-list-input-group {

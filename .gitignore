@@ -94,5 +94,5 @@ public/
 .branches
 
 # Auto-generated CSS files
-frontend/src/index.css
-frontend/src/index.css.map
+/frontend/src/index.css
+/frontend/src/index.css.map

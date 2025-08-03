@@ -6,18 +6,20 @@ export default function VocabularyListCard({
   description,
   username,
   role,
+  avatar_url,
+  nextReview,
   buttonContent,
   completionDate, 
   result
 }) {
-  const navigate = useNavigate();
 
-  const handleReviewClick = () => {
-    if (listId) {
-      buttonContent === 'Overview' ? navigate(`/`) : navigate(`/signin`);
-    } else {
-      console.error("Cannot navigate: list.id is missing.");
-    }
+  const avatarStyle = {
+    // Nếu có avatar_url, dùng nó làm ảnh nền. Nếu không, dùng ảnh mặc định.
+    backgroundImage: `url(${avatar_url})`,
+
+    // Các thuộc tính này đảm bảo ảnh luôn đẹp, không bị méo
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
   };
 
   return (
@@ -30,16 +32,21 @@ export default function VocabularyListCard({
         <span className="vocab-result">{result !== "0%" ? (`Result: ${result}`):("")}</span>
         </>
       ): (<></>)}
+      { nextReview ? (
+        <>
+        <span className="vocab-next-review">{completionDate !== "N/A" ? (`Next review in ${nextReview} days`):("")}</span>
+        </>
+      ): (<></>)}
       <div className="vocab-footer">
         <div className="user-block">
-          <div className="avatar" />
+          <div className="avatar" style={avatarStyle} />
           <div className="user-info">
             <span className="username">{username}</span>
             <span className="role-tag">{role}</span>
           </div>
         </div>
 
-        <button className="btn review-btn" onClick={handleReviewClick} >{buttonContent}</button>
+        <button className="btn review-btn" >{buttonContent}</button>
       </div>
     </div>
   );
