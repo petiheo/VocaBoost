@@ -66,6 +66,31 @@ class VocabularyController {
     }
   }
 
+  async getHistoryLists(req, res) {
+    try {
+      const userId = req.user.userId;
+      const { page, limit } = req.query;
+
+      const result = await vocabularyService.findHistoryLists(userId, {
+        page,
+        limit,
+      });
+
+      return ResponseUtils.success(
+        res,
+        "User's list history retrieved successfully.",
+        result
+      );
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        `getHistoryLists - User ${req.user?.userId}`,
+        'Failed to retrieve list history.'
+      );
+    }
+  }
+
   async searchPublicLists(req, res) {
     try {
       const { q, tags, sortBy, page, limit } = req.query;
@@ -88,6 +113,27 @@ class VocabularyController {
         'searchPublicLists',
         'Internal server error',
         500
+      );
+    }
+  }
+
+  async getPopularLists(req, res) {
+    try {
+      const { page, limit } = req.query;
+
+      const result = await vocabularyService.findPopularLists({ page, limit });
+
+      return ResponseUtils.success(
+        res,
+        'Popular lists retrieved successfully.',
+        result
+      );
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getPopularLists',
+        'Failed to retrieve popular lists.'
       );
     }
   }
