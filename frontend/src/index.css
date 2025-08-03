@@ -1726,12 +1726,10 @@ h2 {
 .assignment-page__container {
   display: flex;
   gap: 2em;
-  margin: 2em 0;
 }
 .assignment-page__content {
   display: flex;
   flex-direction: column;
-  gap: 2em;
   width: 100%;
 }
 .assignment-page .tabs {
@@ -1751,6 +1749,7 @@ h2 {
   font-weight: bold;
 }
 .assignment-page .controls {
+  margin: 20px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1771,7 +1770,7 @@ h2 {
 }
 .assignment-page .assignment-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
   gap: 1rem;
 }
 .assignment-page .assignment-grid .assignment-card {
@@ -1848,7 +1847,6 @@ h2 {
 .learners-layout__content {
   background: #FFFCF7;
   min-width: 90vw;
-  gap: 2em;
 }
 
 .student-list-page {

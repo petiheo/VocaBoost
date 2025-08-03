@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import classroomService from "../../../services/Classroom/classroomService";
 import { format } from 'date-fns';
-
+import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 
 export default function AssignmentPage() {
     // Xử lý việc navigate
@@ -60,7 +60,7 @@ export default function AssignmentPage() {
                     </div>
 
                     {/* Grid */}
-                    <div className="assignment-grid">
+                    {/* <div className="assignment-grid">
                         {assignments.length > 0 ? (
                             assignments.map((assignment) => (
                                 <div className="assignment-card"
@@ -80,12 +80,40 @@ export default function AssignmentPage() {
                                 <div className="empty-list">"No assignment available"</div>
                             </>
                         )}
-                    </div>
+                    </div> */}
 
                     {/* See more */}
-                    <div className="see-more">
-                        <button className="btn see-more-btn">See more ▼</button>
-                    </div>
+                    {assignments.length === 0 ? (
+                        <>
+                            <div className="empty-list">"No assignment available"</div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="assignment-grid">
+                                <SeeMoreSection
+                                    items={assignments}
+                                    renderItem={(item) => (
+                                        <div className="assignment-card" key={item.id}
+                                            onClick={() => {
+                                                localStorage.setItem("selectedAssignment", JSON.stringify(item));
+                                                navigate(`/classroom/assignment-detail`);
+                                            }}
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            <h4>{item?.title}</h4>
+                                            <p className="assignment-page__item">{item?.words_per_review} word</p>
+                                            <p className="due">Due: {item?.due_date ? format(new Date(item.due_date), 'd/M/yyyy') : 'N/A'}</p>
+                                        </div>
+                                    )}
+                                    initialCount={4}
+                                    step={4}
+                                    wrapperClassName="assignment-grid"
+                                    itemWrapperTag="div"
+                                />
+                            </div>
+                        </>
+                    )}
+
                 </div>
             </div>
         </div>
