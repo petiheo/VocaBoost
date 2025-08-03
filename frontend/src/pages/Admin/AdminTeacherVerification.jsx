@@ -58,7 +58,7 @@ export default function TeacherInformationDisplay() {
 
                             <div className="teacher-verification__upload-box">
                                 <div className="teacher-verification__preview" style={{ display: 'block' }}>
-                                    <img src={dummyTeacherData.verificationDocumentUrl} alt="Verification Preview" />
+                                    {/* <img src={dummyTeacherData.verificationDocumentUrl} alt="Verification Preview" /> */}
                                 </div>
                             </div>
                         </div>
