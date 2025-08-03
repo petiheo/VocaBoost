@@ -57,6 +57,13 @@
     font-weight: bold;
   }
 
+  .vocab-next-review{
+    font-family: $font-inter;
+    font-size: 10px;
+    color: #2932B1;
+    font-weight: bold;
+  }
+
   .vocab-footer {
     display: flex;
     justify-content: space-between;
@@ -70,8 +77,8 @@
       align-items: center;
 
       .avatar {
-        width: 28px;
-        height: 28px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
         margin-right: 0.5rem;
 
