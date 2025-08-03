@@ -21,6 +21,7 @@ const Profile = () => {
     useUserProfile();
   const [isEditing, setIsEditing] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -104,7 +105,7 @@ const Profile = () => {
       <Header />
       <div className="profile__container">
         <div className="profile__sidebar">
-          <SideBar />
+          <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         </div>
 
         <form className="profile__content" onSubmit={handleSave}>

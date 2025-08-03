@@ -17,6 +17,8 @@ export default function CreateClassroom() {
 
     // Xử lý cursor xoay khi bấm nút đăng nhập 
     const [isLoading, setIsLoading] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+
 
     const handleCreateClassroom = async (e) => {
         e.preventDefault();
@@ -64,7 +66,7 @@ export default function CreateClassroom() {
             <Header />
             <div className="create-classroom__content">
                 {/* side bar  */}
-                <SideBar />
+                <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
                 <form className="create-classroom__form" onSubmit={handleCreateClassroom}>
                     <h1 className="create-classroom__header">Create new classroom</h1>
                     <div className="classroom-name">

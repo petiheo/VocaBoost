@@ -13,6 +13,7 @@ export default function OverviewList() {
   const [listInfo, setListInfo] = useState(null);
   const [words, setWords] = useState([]);
   const toast = useToast(); 
+  const [isOpen, setIsOpen] = useState(false);
 
   const currentUserId = localStorage.getItem("userId"); // hoặc lấy từ context
   const [isOwner, setIsOwner] = useState(false);
@@ -71,7 +72,7 @@ export default function OverviewList() {
     <div className="overview-list">
       <Header />
       <div className="overview-list__content">
-        <SideBar />
+        <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         <main className="overview-list__main">
             {listInfo && (
             <>
