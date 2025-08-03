@@ -20,6 +20,7 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const confirm = useConfirm();
     const toast = useToast();
+    const [isOpen, setIsOpen] = useState(false);
 
     const handleCreateNewList = () => {
         navigate('/vocabulary/create/new');
@@ -94,7 +95,7 @@ export default function Dashboard() {
             <Header />
             <LearnerSubMenu />
             <div className="dashboard__content">
-                <SideBar />
+                <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
 
                 <div className="dashboard__main">
                     <div className="dashboard__topbar">
