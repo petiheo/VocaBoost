@@ -499,7 +499,6 @@ class ClassroomModel {
 
     if (error) throw error;
 
-    console.log(data[0].assignments);
     return data.filter((item) => item.assignments?.classroom_id === classroomId);
   }
 
