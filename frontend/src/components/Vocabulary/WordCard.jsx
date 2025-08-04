@@ -124,7 +124,7 @@ const WordCard = ({
       </div>
 
       {/* Third Row - Example with AI button */}
-      <div className="create-list__word-box--row">
+      <div className="create-list__word-box--ai">
         <div className="create-list__word-box--field">
           <WordInput
             label="Example sentence"

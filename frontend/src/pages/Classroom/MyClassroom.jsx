@@ -15,6 +15,8 @@ export default function MyClassroomPage() {
   const [classrooms, setClassrooms] = useState([]);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+
 
   // Lấy pathname hiện tại, ví dụ: "/my-classroom"
   const [currentTab, setCurrentTab] = useState("Teaching");
@@ -72,7 +74,7 @@ export default function MyClassroomPage() {
       <Header />
       <div className="my-classroom-container">
         <div className="my-classroom-sidebar">
-          <SideBar />
+            <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         </div>
         <div className="my-classroom-page">
 

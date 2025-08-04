@@ -2,7 +2,7 @@ import { useState } from 'react';
 import VocabularyListCard from '../Classroom/VocabularyListCard'; 
 import { LeftArrow, RightArrow } from '../../assets/User';
 
-export default function CarouselVocabSection({ title, children, vocabLists = [] }) {
+export default function CarouselVocabSection({ title, children, vocabLists = [], isLoading, error }) {
   const [startIndex, setStartIndex] = useState(0);
 
 // Hiển thị 4 card mỗi lần
@@ -33,37 +33,34 @@ export default function CarouselVocabSection({ title, children, vocabLists = [] 
 
       <div className="carousel-body">
 
-        {hasData ? (
-            <>
-                <button className="nav-arrow prev" onClick={handlePrev} disabled={startIndex === 0}>
-                    <img src={LeftArrow} alt="Previous" />
-                </button>
-
-                <div className="carousel-viewport">
-                    <div className="carousel-slider" style={sliderStyle}>
-                        {vocabLists.map((list, idx) => (
-                        <div className="carousel-item" key={idx}>
-                            <VocabularyListCard
-                            listId={list.listId}
-                            title={list.title}
-                            description={list.description}
-                            username={list.username}
-                            role={list.role}
+        {isLoading ? (
+          <p className="loading-container"> Loading...</p>
+        ) : error ? (
+          <p className="error-message">Could not load this section.</p>
+        ) : vocabLists.length > 0 ? (
+          <>
+            <button className="nav-arrow prev" onClick={handlePrev} disabled={startIndex === 0}>
+                <img src={LeftArrow} alt="Previous" />
+            </button>
+            <div className="carousel-viewport">
+                <div className="carousel-slider" style={sliderStyle}>
+                    {vocabLists.map((list) => (
+                      <div className="carousel-item" key={list.id}>
+                          <VocabularyListCard
+                            {...list}
                             buttonContent={title === 'REVIEW LISTS' ? 'Review' : 'Overview'}
-                            />
-                        </div>
-                        ))}
-                    </div>
+                          />
+                      </div>
+                    ))}
                 </div>
-
-                <button className="nav-arrow next" onClick={handleNext} disabled={startIndex + itemsPerPage >= vocabLists.length}>
-                    <img src={RightArrow} alt="Next" />
-                </button>
-            </>
+            </div>
+            <button className="nav-arrow next" onClick={handleNext} disabled={startIndex + itemsPerPage >= vocabLists.length}>
+                <img src={RightArrow} alt="Next" />
+            </button>
+          </>
         ) : (
-            <p className="no-data-message">No vocabulary lists available.</p>
+          <p className="no-data-message">No vocabulary lists available.</p>
         )}
-
       </div>
     </section>
   );

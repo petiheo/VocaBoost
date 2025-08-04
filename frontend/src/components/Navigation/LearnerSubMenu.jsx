@@ -1,10 +1,14 @@
 import { NavLink } from "react-router-dom";
+import { useToast } from "../Providers/ToastProvider.jsx";
 
 export default function LearnerSubMenu() {
+
+  const toast = useToast();
+
   return (
     <div className="learner-submenu">
       <NavLink
-        to="/classroom"
+        to="/my-classroom"
         className={({ isActive }) =>
           `submenu-tab ${isActive ? "active" : ""}`
         }
@@ -22,10 +26,13 @@ export default function LearnerSubMenu() {
       </NavLink>
 
       <NavLink
-        to="/statistics"
         className={({ isActive }) =>
-          `submenu-tab ${isActive ? "active" : ""}`
+          `submenu-tab ${isActive ? "" : "active"}`
         }
+        onClick = {(e) => {
+          e.preventDefault();
+          toast("This feature is coming soon!", "success");
+        }}
       >
         Statistic
       </NavLink>

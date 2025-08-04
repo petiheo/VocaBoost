@@ -26,16 +26,6 @@
       resize: vertical;
     }
 
-    &--title {
-      background-color: #f3e8cd;
-
-    }
-
-    &--description {
-      background-color: #f8f3e8;
-      min-height: 100px;
-    }
-
     &--submit {
       background-color: #352d24;
       color: white;
@@ -163,11 +153,20 @@
       border: 1px solid  #2a1e17;
       background-color: #FFF1D9;
     } 
-  
+
     &--row {
       display: flex;
-      gap: 1rem;
       align-items: flex-start;
+    }
+
+    &--ai {
+      display: flex;
+      align-items: flex-end;
+    }
+  
+    &--row,
+    &--ai {
+      gap: 1rem;
   
       input[type="text"] {
         flex: 1;
@@ -250,6 +249,7 @@
     border-radius: 6px;
     padding: 0.5rem 1rem;
     font-weight: bold;
+    height: 70%;
     cursor: pointer;
     white-space: nowrap;
   }
@@ -322,16 +322,16 @@
     font-family: 'Inria Sans', sans-serif;
     padding: 0.75rem;
     font-size: 0.95rem;
-    border: 2px solid #e1e5e9;
+    border: 2px solid #F8F3E8;
     border-radius: 8px;
-    background-color: #f8f9fa;
+    background-color: #F8F3E8;
     transition: all 0.2s ease;
     
     &:focus {
       outline: none;
       border-color: #ffc107;
       box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
-      background-color: #fff;
+      background-color: #F8F3E8;
     }
     
     &.error {
@@ -353,8 +353,6 @@
   }
   
   .create-list-input-errors {
-    display: flex;
-    flex-direction: column;
     gap: 0.25rem;
     margin-left: 0.5rem;
     
@@ -362,7 +360,6 @@
       color: #e74c3c;
       font-size: 0.8rem;
       font-weight: 500;
-      display: block;
     }
   }
 }
@@ -411,7 +408,7 @@
   }
   
   .word-input-errors {
-    display: flex;
+    // display: flex;
     flex-direction: column;
     gap: 0.2rem;
     

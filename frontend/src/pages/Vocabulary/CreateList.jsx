@@ -1,4 +1,4 @@
-import React from "react";
+import { useState} from "react";
 import { useParams } from "react-router-dom";
 import { Header, SideBar, Footer } from "../../components/index.jsx";
 import ListMetadataForm from "../../components/Vocabulary/ListMetadataForm.jsx";
@@ -11,6 +11,7 @@ export default function CreateList() {
   const { listId } = useParams();
   const isNewList = listId === 'new';
   const actualListId = isNewList ? null : listId;
+  const [isOpen, setIsOpen] = useState(false);
   
   // Custom hooks for separated concerns
   const validationHook = useFormValidation();
@@ -54,7 +55,7 @@ export default function CreateList() {
     <div className="create-list">
       <Header />
       <div className="create-list__content">
-        <SideBar />
+        <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         <form className="create-list__form" onSubmit={handleSubmit}>
           <ListMetadataForm
             title={title}

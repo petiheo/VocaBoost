@@ -73,6 +73,7 @@ function AssignExercise() {
 
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
+    const [isOpen, setIsOpen] = useState(false);
 
     const handleCreateAssignment = async (e) => {
         e.preventDefault();
@@ -143,7 +144,7 @@ function AssignExercise() {
             <Header />
             <div className="assign-exercise__container">
                 <div className="assign-exercise__sidebar">
-                    <SideBar />
+                    <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
                 </div>
 
                 <form className="assign-exercise__content" onSubmit={handleCreateAssignment}>

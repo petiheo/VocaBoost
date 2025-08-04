@@ -12,6 +12,7 @@ const tabs = [
 export default function ManageClassroomLearner() {
 
     const [activeTab, setActiveTab] = useState("To-review");
+    const [isOpen, setIsOpen] = useState(false);
 
     // Xử lý việc navigate
     const navigate = useNavigate();
@@ -67,7 +68,7 @@ export default function ManageClassroomLearner() {
             <Header />
             <div className="manage-classroom-learner__container">
                 <div className="manage-classroom__sidebar">
-                    <SideBar />
+                    <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
                 </div>
                 <div className="manage-classroom-learner__content">
                     {/* Title */}
@@ -108,7 +109,7 @@ export default function ManageClassroomLearner() {
                                     key={assignment.assignment_id || index}
                                     title={assignment.title}
                                     description={`Exercise method: ${assignment.exercise_method}`}
-                                    username={assignment.creator.email}
+                                    username={assignment.creator?.email}
                                     avatarUrl={assignment.creator?.avatar_url}
                                     role="Teacher"
                                     reviewProgress={`${assignment.completed_sublist_index || 0}/${assignment.sublist_count || 0}`}
