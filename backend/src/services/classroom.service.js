@@ -455,6 +455,7 @@ class ClassroomService {
       due_date: item.assignments.due_date,
       status: 'assigned',
       learner_status: item.status,
+      creator:item.assignments.user
     }));
   }
 
@@ -473,6 +474,7 @@ class ClassroomService {
       sublist_count: item.assignments.sublist_count,
       due_date: item.assignments.due_date,
       learner_status: item.status,
+      creator:item.assignments.user
     }));
   }
 

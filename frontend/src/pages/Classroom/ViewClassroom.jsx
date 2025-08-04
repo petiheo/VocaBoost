@@ -109,7 +109,7 @@ export default function ManageClassroomLearner() {
                                     key={assignment.assignment_id || index}
                                     title={assignment.title}
                                     description={`Exercise method: ${assignment.exercise_method}`}
-                                    username={assignment.creator.email}
+                                    username={assignment.creator?.email}
                                     avatarUrl={assignment.creator?.avatar_url}
                                     role="Teacher"
                                     reviewProgress={`${assignment.completed_sublist_index || 0}/${assignment.sublist_count || 0}`}
