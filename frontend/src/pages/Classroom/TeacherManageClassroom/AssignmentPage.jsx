@@ -59,29 +59,6 @@ export default function AssignmentPage() {
                         <div className="sort">Sort by ▼</div>
                     </div>
 
-                    {/* Grid */}
-                    {/* <div className="assignment-grid">
-                        {assignments.length > 0 ? (
-                            assignments.map((assignment) => (
-                                <div className="assignment-card"
-                                    key={assignment?.id}
-                                    onClick={() => {
-                                        localStorage.setItem("selectedAssignment", JSON.stringify(assignment));
-                                        navigate(`/classroom/assignment-detail`);
-                                    }}
-                                >
-                                    <h4>{assignment?.title}</h4>
-                                    <p className="assignment-page__item">{assignment?.words_per_review} word</p>
-                                    <p className="due">Due: {assignment?.due_date ? format(new Date(assignment.due_date), 'd/M/yyyy') : 'N/A'}</p>
-                                </div>
-                            ))
-                        ) : (
-                            <>
-                                <div className="empty-list">"No assignment available"</div>
-                            </>
-                        )}
-                    </div> */}
-
                     {/* See more */}
                     {assignments.length === 0 ? (
                         <>
