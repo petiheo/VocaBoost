@@ -1,17 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
 
 const tabs = [
-  { name: "Assignments", route: "/classroom/assignment-page" },
-  {
-    name: "Learners",
-    route:  "/classroom/learners-list",
-    matchRoutes: [
-      "/classroom/pending-request",
-      "/classroom/learners-list",
-      "/classroom/approve-join-classroom-request",
-      "/classroom/add-students",
-    ]
-  },
+  { name: "Details", route: "/classroom/assignment-detail" },
+  { name: "Statistics", route: "/classroom/statistics" },
 ];
 
 export default function TeacherClassroomMenuTab() {
@@ -45,4 +36,3 @@ export default function TeacherClassroomMenuTab() {
     </div>
   );
 }
-

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { SeeMore } from "../../assets/Classroom";
 
-const SeeMoreSection = ({ items = [], renderItem, initialCount, step, wrapperClassName = "", itemWrapperTag: Tag = "div" }) => {
+const SeeMoreSection = ({ items = [], renderItem, initialCount, step, wrapperClassName = "", itemWrapperTag: Tag = "div", className = "see-more-section"}) => {
     const [visibleCount, setVisibleCount] = useState(initialCount);
 
     const handleSeeMore = () => {
