@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "sass src/scss/main.scss src/index.css && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "sass src/scss:public",
