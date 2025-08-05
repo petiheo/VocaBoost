@@ -8,8 +8,8 @@
 @use 'ReportTrigger';
 @use "SideBar";
 @use "LearnerSubMenu";
-@use "ToastNotification";
 @use "ConfirmModal";
+@use "ReactToastify";
 @forward "Dropdown" as dropdown-*;
 @forward "ClassroomTitle";
 @forward "TeacherClassroomMenuTab";

@@ -10,13 +10,14 @@ const WordInput = ({
   required = false, 
   errors = [], 
   className = "",
+  classPrefix = "create-list",
   ...props 
 }) => {
   const hasErrors = errors && errors.length > 0;
   const inputClassName = `word-input ${className} ${hasErrors ? 'error' : ''}`.trim();
   
   return (
-    <div className="create-list__word-input-group">
+    <div className={`${classPrefix}__word-input-group`}>
       <div className="word-input-label">
         {label}
         {required && <span className="required-asterisk">*</span>}
@@ -54,7 +55,8 @@ WordInput.propTypes = {
   placeholder: PropTypes.string,
   required: PropTypes.bool,
   errors: PropTypes.arrayOf(PropTypes.string),
-  className: PropTypes.string
+  className: PropTypes.string,
+  classPrefix: PropTypes.string
 };
 
 export default WordInput;

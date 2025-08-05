@@ -17,8 +17,6 @@ const ListMetadataForm = ({
 }) => {
   return (
     <>
-      <h1 className="create-list__header">Create new list</h1>
-
       <CreateListInput
         label="Title"
         name="list-title"

@@ -16,7 +16,6 @@ export { default as AssignSubMenu } from "./Navigation/AssignSubMenu.jsx";
 
 
 // UI Components
-export { default as ToastNotification } from "./UI/ToastNotification.jsx";
 export { default as ConfirmModal } from "./UI/ConfirmModal.jsx";
 
 // Providers

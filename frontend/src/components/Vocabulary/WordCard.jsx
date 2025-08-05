@@ -11,6 +11,7 @@ const WordCard = ({
   onDelete,
   onToggleSelect,
   onGenerateExample,
+  classPrefix = "create-list",
 }) => {
   const handleCardClick = (e) => {
     // Prevent selection when clicking on interactive elements
@@ -32,17 +33,18 @@ const WordCard = ({
 
   return (
     <div
-      className={`create-list__word-box ${
-        isSelected ? "create-list__word-box--selected" : ""
+      className={`${classPrefix}__word-box ${
+        isSelected ? `${classPrefix}__word-box--selected` : ""
       }`}
       onClick={handleCardClick}
+      data-word-index={index}
     >
-      <div className="create-list__word-box--header">
-        <div className="create-list__word-box--index">
+      <div className={`${classPrefix}__word-box--header`}>
+        <div className={`${classPrefix}__word-box--index`}>
           {index + 1}
         </div>
         <button
-          className="create-list__word-box--remove"
+          className={`${classPrefix}__word-box--remove`}
           type="button"
           onClick={handleDeleteClick}
         >
@@ -50,11 +52,11 @@ const WordCard = ({
         </button>
       </div>
 
-      <hr className="create-list__word-box--divider" />
+      <hr className={`${classPrefix}__word-box--divider`} />
       
       {/* First Row */}
-      <div className="create-list__word-box--row">
-        <div className="create-list__word-box--field">
+      <div className={`${classPrefix}__word-box--row`}>
+        <div className={`${classPrefix}__word-box--field`}>
           <WordInput
             label="Term"
             name={`term-${index}`}
@@ -64,10 +66,11 @@ const WordCard = ({
             onChange={(e) => onWordChange(index, "term", e.target.value)}
             required={true}
             errors={validationErrors?.words?.[index]?.term}
+            classPrefix={classPrefix}
           />
         </div>
 
-        <div className="create-list__word-box--field">
+        <div className={`${classPrefix}__word-box--field`}>
           <WordInput
             label="Definition"
             name={`definition-${index}`}
@@ -77,10 +80,11 @@ const WordCard = ({
             onChange={(e) => onWordChange(index, "definition", e.target.value)}
             required={true}
             errors={validationErrors?.words?.[index]?.definition}
+            classPrefix={classPrefix}
           />
         </div>
 
-        <div className="create-list__word-box--field">
+        <div className={`${classPrefix}__word-box--field`}>
           <WordInput
             label="Phonetics"
             name={`phonetics-${index}`}
@@ -90,13 +94,14 @@ const WordCard = ({
             onChange={(e) => onWordChange(index, "phonetics", e.target.value)}
             required={false}
             errors={validationErrors?.words?.[index]?.phonetics}
+            classPrefix={classPrefix}
           />
         </div>
       </div>
 
       {/* Second Row */}
-      <div className="create-list__word-box--row">
-        <div className="create-list__word-box--field">
+      <div className={`${classPrefix}__word-box--row`}>
+        <div className={`${classPrefix}__word-box--field`}>
           <WordInput
             label="Synonyms"
             name={`synonyms-${index}`}
@@ -106,10 +111,11 @@ const WordCard = ({
             onChange={(e) => onWordChange(index, "synonyms", e.target.value)}
             required={false}
             errors={validationErrors?.words?.[index]?.synonyms}
+            classPrefix={classPrefix}
           />
         </div>
 
-        <div className="create-list__word-box--field">
+        <div className={`${classPrefix}__word-box--field`}>
           <WordInput
             label="Translation"
             name={`translation-${index}`}
@@ -119,13 +125,14 @@ const WordCard = ({
             onChange={(e) => onWordChange(index, "translation", e.target.value)}
             required={false}
             errors={validationErrors?.words?.[index]?.translation}
+            classPrefix={classPrefix}
           />
         </div>
       </div>
 
       {/* Third Row - Example with AI button */}
-      <div className="create-list__word-box--ai">
-        <div className="create-list__word-box--field">
+      <div className={`${classPrefix}__word-box--ai`}>
+        <div className={`${classPrefix}__word-box--field`}>
           <WordInput
             label="Example sentence"
             name={`exampleSentence-${index}`}
@@ -135,11 +142,12 @@ const WordCard = ({
             onChange={(e) => onWordChange(index, "exampleSentence", e.target.value)}
             required={false}
             errors={validationErrors?.words?.[index]?.exampleSentence}
+            classPrefix={classPrefix}
           />
         </div>
         <button 
           type="button" 
-          className="create-list__ai-btn"
+          className={`${classPrefix}__ai-btn`}
           onClick={() => onGenerateExample(index)}
           disabled={isGeneratingExample}
         >

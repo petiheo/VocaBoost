@@ -57,6 +57,8 @@ export default function CreateList() {
       <div className="create-list__content">
         <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         <form className="create-list__form" onSubmit={handleSubmit}>
+          <h1 className="create-list__header">Create List</h1>
+
           <ListMetadataForm
             title={title}
             description={description}

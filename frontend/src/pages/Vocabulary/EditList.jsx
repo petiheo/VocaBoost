@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Header, SideBar, Footer } from "../../components/index.jsx";
 import ListMetadataForm from "../../components/Vocabulary/ListMetadataForm.jsx";
 import EditWordsSection from "../../components/Vocabulary/EditWordsSection.jsx";
-import SafeEditList from "../../components/SafeEditList.jsx";
+import SafeEditList from "../../components/Vocabulary/SafeEditList.jsx";
 import { useEditWordManagement } from "../../hooks/useEditWordManagement.js";
 import { useFormValidation } from "../../hooks/useFormValidation.js";
 import { useEditListManagement } from "../../hooks/useEditListManagement.js";
@@ -91,6 +91,7 @@ export default function EditList() {
               words={words}
               selectedWordIds={selectedWordIds}
               loadingAI={loadingAI}
+              validationErrors={validationErrors}
               onWordChange={handleWordChange}
               onDeleteWord={deleteWord}
               onToggleWordSelection={toggleWordSelection}
