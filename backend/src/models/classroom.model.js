@@ -474,7 +474,7 @@ class ClassroomModel {
       )
       .eq('classroom_id', classroomId)
       .order('start_date', { ascending: false });
-      
+
     console.log(data);
     if (error) throw error;
     return data;
@@ -509,7 +509,6 @@ class ClassroomModel {
       .in('status', statusList);
 
     if (error) throw error;
-    
     return data.filter((item) => item.assignments?.classroom_id === classroomId);
   }
 

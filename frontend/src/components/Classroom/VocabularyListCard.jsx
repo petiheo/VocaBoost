@@ -35,7 +35,7 @@ export default function VocabularyListCard({
               (<img src={avatarUrl} alt="Avatar" className="avatar img" /> // Dung hinh anh 
               ) : (
                 <span className="avatar placeholder">
-                  {username.charAt(0).toUpperCase() || "?"}
+                  {username?.charAt(0).toUpperCase() || "?"}
                 </span> // dung chu cai dau cua email 
               )}
           </div>

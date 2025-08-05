@@ -96,3 +96,7 @@ public/
 # Auto-generated CSS files
 /frontend/src/index.css
 /frontend/src/index.css.map
+
+# Vercel
+/backend/.vercel
+/frontend/.vercel

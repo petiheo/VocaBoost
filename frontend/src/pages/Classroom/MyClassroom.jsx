@@ -14,7 +14,6 @@ const tabs = [
 export default function MyClassroomPage() {
   const [classrooms, setClassrooms] = useState([]);
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
