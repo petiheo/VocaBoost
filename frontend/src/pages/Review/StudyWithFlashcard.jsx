@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation, data } from "react-router-dom";
 import { Header, SideBar, Footer, ReportTrigger } from "../../components";
 import reviewService from "../../services/Review/reviewService";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
-import reportService from "../../services/Report/reportService";
 import { useToast } from "../../components/Providers/ToastProvider.jsx";
 import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
 import { ArrowLeftIcon, ArrowRightIcon } from "../../assets/Review";
@@ -218,14 +217,7 @@ export default function StudyWithFlashcard() {
     }
   };
 
-  const handleReportSubmit = async (reason) => {
-    try {
-      await reportService.reportContent(currentWord.id, reason);
-      toast("Report submitted successfully", "success");
-    } catch (error) {
-      toast("Failed to submit report", "error");
-    }
-  };
+  // Removed handleReportSubmit - now handled directly in ReportTrigger for reusability
 
   const handleEndSession = async () => {
     try {
@@ -292,7 +284,6 @@ export default function StudyWithFlashcard() {
                 <div className="card__report-trigger">
                   <ReportTrigger 
                     wordId={currentWord.id}
-                    onReportSubmit={handleReportSubmit}
                   />
                 </div>
                 <div className="card__content">
@@ -303,7 +294,6 @@ export default function StudyWithFlashcard() {
                 <div className="card__report-trigger">
                   <ReportTrigger 
                     wordId={currentWord.id}
-                    onReportSubmit={handleReportSubmit}
                   />
                 </div>
                 <div className="card__content">

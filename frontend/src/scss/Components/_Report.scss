@@ -6,6 +6,17 @@
         position: relative;
         text-align: center;
         animation: modalAppear 0.3s ease-out;
+        pointer-events: all; // Ensure modal content can receive events
+        user-select: auto; // Allow text selection within modal
+        
+        // Prevent event bubbling
+        * {
+            pointer-events: auto;
+        }
+        
+        // Create isolated stacking context
+        isolation: isolate;
+        contain: layout style;
     }
 
     &-title {
@@ -102,20 +113,11 @@
   }
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
-  20%, 40%, 60%, 80% { transform: translateX(8px); }
-}
-
-.shake-animation {
-  animation: shake 0.6s ease-in-out;
-}
-
 // React Modal specific overrides
 .ReactModal__Overlay {
   opacity: 0;
   transition: opacity 300ms ease-in-out;
+  pointer-events: all !important; // Ensure overlay catches all events
 
   &--after-open {
     opacity: 1;
@@ -137,4 +139,45 @@
   &--before-close {
     transform: scale(0.9) translateY(-20px);
   }
+}
+
+// Portal styling for blocking interactions
+.report-modal-portal {
+  .ReactModal__Overlay {
+    user-select: none; // Prevent text selection
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: all !important; // Force overlay to catch all events
+    
+    // Block all interactions except modal content
+    * {
+      pointer-events: none !important;
+    }
+    
+    // Re-enable events for modal content
+    .report-modal-content,
+    .report-modal-content * {
+      pointer-events: auto !important;
+      user-select: auto !important;
+    }
+  }
+}
+
+// Enhanced shake animation with stronger effect
+@keyframes shake {
+  0%, 100% { 
+    transform: translateX(0) scale(1); 
+  }
+  10%, 30%, 50%, 70%, 90% { 
+    transform: translateX(-10px) scale(1.02); 
+  }
+  20%, 40%, 60%, 80% { 
+    transform: translateX(10px) scale(1.02); 
+  }
+}
+
+.shake-animation {
+  animation: shake 0.6s ease-in-out;
+  box-shadow: 0 8px 32px rgba(220, 38, 38, 0.2) !important; // Red glow during shake
 }

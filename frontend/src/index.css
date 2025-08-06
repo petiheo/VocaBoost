@@ -2742,6 +2742,13 @@ h2 {
   position: relative;
   text-align: center;
   animation: modalAppear 0.3s ease-out;
+  pointer-events: all;
+  user-select: auto;
+  isolation: isolate;
+  contain: layout style;
+}
+.report-modal-content * {
+  pointer-events: auto;
 }
 .report-title {
   font-family: "Lalezar", serif;
@@ -2826,24 +2833,10 @@ h2 {
     transform: scale(1) translateY(0);
   }
 }
-@keyframes shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  10%, 30%, 50%, 70%, 90% {
-    transform: translateX(-8px);
-  }
-  20%, 40%, 60%, 80% {
-    transform: translateX(8px);
-  }
-}
-.shake-animation {
-  animation: shake 0.6s ease-in-out;
-}
-
 .ReactModal__Overlay {
   opacity: 0;
   transition: opacity 300ms ease-in-out;
+  pointer-events: all !important;
 }
 .ReactModal__Overlay--after-open {
   opacity: 1;
@@ -2861,6 +2854,38 @@ h2 {
 }
 .ReactModal__Content--before-close {
   transform: scale(0.9) translateY(-20px);
+}
+
+.report-modal-portal .ReactModal__Overlay {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  pointer-events: all !important;
+}
+.report-modal-portal .ReactModal__Overlay * {
+  pointer-events: none !important;
+}
+.report-modal-portal .ReactModal__Overlay .report-modal-content,
+.report-modal-portal .ReactModal__Overlay .report-modal-content * {
+  pointer-events: auto !important;
+  user-select: auto !important;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0) scale(1);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-10px) scale(1.02);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(10px) scale(1.02);
+  }
+}
+.shake-animation {
+  animation: shake 0.6s ease-in-out;
+  box-shadow: 0 8px 32px rgba(220, 38, 38, 0.2) !important;
 }
 
 .report-trigger-button {
@@ -3037,6 +3062,7 @@ h2 {
   width: auto;
   max-width: 80vh;
   min-width: 300px;
+  z-index: 11000 !important;
 }
 
 .Toastify__toast {
