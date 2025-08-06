@@ -5,12 +5,14 @@ import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 import {
     ClassroomTitle,
     TeacherClassroomMenuTab,
-    SearchBar, ClassroomDropdownMenu
+    SearchBar, ClassroomDropdownMenu,
+    PendingRequestSkeleton
 } from "../../../components/index";
 
 export default function PendingRequestPage() {
     // Dùng để lưu thông tin request
     const [request, setRequest] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     // Xử lý thanh search bar 
     const [searchQuery, setSearchQuery] = useState("");
@@ -23,12 +25,15 @@ export default function PendingRequestPage() {
     useEffect(() => {
         const fetchPendingRequest = async () => {
             try {
+                setLoading(true);
                 const res = await classroomService.getPendingJoinRequets();
                 if (res.success && Array.isArray(res.data)) {
                     setRequest(res.data);
                 }
             } catch (error) {
                 console.error("Lỗi khi lấy danh sách lớp học:", error);
+            } finally {
+                setLoading(false);
             }
         }
         fetchPendingRequest();
@@ -38,6 +43,10 @@ export default function PendingRequestPage() {
         setRequest(request.filter((_, i) => i !== learner_id));
     };
 
+
+    if (loading) {
+        return <PendingRequestSkeleton />;
+    }
 
     return (
         <div className="pending-request__page">

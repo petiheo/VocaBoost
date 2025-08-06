@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ClassroomTitle, TeacherClassroomMenuTab } from "../../../components";
+import { ClassroomTitle, TeacherClassroomMenuTab, AssignmentPageSkeleton } from "../../../components";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import classroomService from "../../../services/Classroom/classroomService";
@@ -42,6 +42,10 @@ export default function AssignmentPage() {
         }
         fetchAssignments();
     }, [classroomId]);
+
+    if (isLoading) {
+        return <AssignmentPageSkeleton />;
+    }
 
     return (
         <div className="assignment-page">

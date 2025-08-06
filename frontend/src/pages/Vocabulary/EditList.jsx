@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Header, SideBar, Footer } from "../../components/index.jsx";
+import { Header, SideBar, Footer, ListFormSkeleton } from "../../components/index.jsx";
 import ListMetadataForm from "../../components/Vocabulary/ListMetadataForm.jsx";
 import EditWordsSection from "../../components/Vocabulary/EditWordsSection.jsx";
 import SafeEditList from "../../components/Vocabulary/SafeEditList.jsx";
@@ -36,6 +36,7 @@ export default function EditList() {
     selectedTags,
     availableTags,
     isLoading,
+    isSubmitting,
     handleTitleChange,
     handleDescriptionChange,
     handleSubmit,
@@ -57,7 +58,7 @@ export default function EditList() {
         <Header />
         <div className="edit-list__content">
           <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
-          <div className="edit-list__loading">Loading...</div>
+          <ListFormSkeleton isEditMode={true} />
         </div>
         <Footer />
       </div>
@@ -101,17 +102,21 @@ export default function EditList() {
             />
 
             <div className="edit-list__actions">
-              <input
+              <button
                 type="button"
-                value="Cancel"
                 className="edit-list__form--cancel"
                 onClick={handleCancel}
-              />
-              <input
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
                 type="submit"
-                value="Save Changes"
-                className="edit-list__form--submit"
-              />
+                className={`edit-list__form--submit ${isSubmitting ? 'edit-list__form--submit--loading' : ''}`}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
+              </button>
             </div>
           </form>
         </div>

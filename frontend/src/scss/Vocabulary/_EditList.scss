@@ -283,6 +283,177 @@
     padding: 0.8rem 0 0.8rem; 
     border-radius: 999px;
     color: #FFF3DF;
+    background-color: #352d24;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    &--loading {
+      background-color: #6b6660;
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  &__form--cancel {
+    font-size: 1rem;
+    width: 10rem;
+    padding: 0.8rem 0 0.8rem; 
+    border-radius: 999px;
+    color: #2a1e17;
+    background-color: #FFFCF7;
+    font-weight: bold;
+    border: 0.075rem solid #2a1e17;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+}
+
+// Word input field styles
+.edit-list__word-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  
+  .word-input-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    
+    .required-asterisk {
+      color: #e74c3c;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+  }
+  
+  .word-input {
+    font-family: 'Inria Sans', sans-serif;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    background-color: #fff;
+    transition: all 0.2s ease;
+    
+    &:focus {
+      outline: none;
+      border-color: #ffc107;
+      box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.1);
+    }
+    
+    &.error {
+      border-color: #e74c3c;
+      background-color: #fef2f2;
+    }
+    
+    &::placeholder {
+      color: #6c757d;
+      opacity: 0.8;
+    }
+  }
+  
+  .word-input-errors {
+    // display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    
+    .error-message {
+      color: #e74c3c;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+  }
+}
+
+// Enhanced input component styles
+.edit-list-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  
+  .edit-list-input-label {
+    font-family: 'Inria Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    
+    .required-asterisk {
+      color: #e74c3c;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+  }
+  
+  .edit-list-input {
+    font-family: 'Inria Sans', sans-serif;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    border: 2px solid #F8F3E8;
+    border-radius: 8px;
+    background-color: #F8F3E8;
+    transition: all 0.2s ease;
+    
+    &:focus {
+      outline: none;
+      border-color: #ffc107;
+      box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+      background-color: #F8F3E8;
+    }
+    
+    &.error {
+      border-color: #e74c3c;
+      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+      background-color: #fdf2f2;
+    }
+    
+    &::placeholder {
+      color: #6c757d;
+      opacity: 0.7;
+    }
+  }
+  
+  textarea.edit-list-input {
+    resize: vertical;
+    min-height: 80px;
+    font-family: 'Inria Sans', sans-serif;
+  }
+  
+  .edit-list-input-errors {
+    gap: 0.25rem;
+    margin-left: 0.5rem;
+    
+    .error-message {
+      color: #e74c3c;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
   }
 
   &__form--cancel {
