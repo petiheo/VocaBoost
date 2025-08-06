@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../services/Auth/authContext";
-import { Footer, Header, SideBar } from "../../components/index.jsx";
+import { Footer, Header, SideBar, ProfileSkeleton } from "../../components/index.jsx";
 import LoadingCursor from "../../components/UI/LoadingCursor.jsx";
 import { useUserProfile } from "../../hooks/useUserProfile";
 import {
@@ -98,6 +98,21 @@ const Profile = () => {
 
   if (!user) {
     return <div>Please log in to view your profile.</div>;
+  }
+
+  if (isLoading && !userProfile) {
+    return (
+      <div className="profile">
+        <Header />
+        <div className="profile__container">
+          <div className="profile__sidebar">
+            <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
+          </div>
+          <ProfileSkeleton />
+        </div>
+        <Footer />
+      </div>
+    );
   }
 
   return (

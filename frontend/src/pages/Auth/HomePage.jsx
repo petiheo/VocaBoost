@@ -1,10 +1,11 @@
-import { Header, SideBar, Footer, Pagination } from '../../components';
+import { Header, SideBar, Footer, SearchResultsGridSkeleton, CarouselSectionSkeleton } from '../../components';
 import CarouselVocabSection from '../../components/Vocabulary/CarouselVocabSection';
 import { useState, useEffect } from 'react';
 import  LoadingCursor from '../../components/UI/LoadingCursor';
 import { useDebounce } from '../../hooks/useDebounce'; 
 import { VocabularyListCard } from '../../components';
 import vocabularyService from '../../services/Vocabulary/vocabularyService';
+import { useSkeletonToggle } from '../../hooks/useSkeletonToggle';
 
 // Component cho các Tab
 const ReviewTabs = ({ activeTab, onTabChange }) => (
@@ -48,6 +49,8 @@ const HomePage = () => {
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [isOpen, setIsOpen] = useState(false);
 
+  // Development skeleton toggle hook
+  const { isLoading: isSkeletonLoading } = useSkeletonToggle();
 
   useEffect(() => {
     if (searchQuery) return; 
@@ -206,8 +209,8 @@ const HomePage = () => {
                 
                 <div className="search-results-content">
                   {(() => {
-                    if (searchResults.isLoading) {
-                      return <p className="search-status-message loading">Searching...</p>;
+                    if (isSkeletonLoading(searchResults.isLoading)) {
+                      return <SearchResultsGridSkeleton count={8} />;
                     }
 
                     if (searchResults.error) {
@@ -230,58 +233,43 @@ const HomePage = () => {
               </section>
             ) : (
               <>
-                <section className="review-lists-section">
-                  <div className="section-header">
-                    <h2>REVIEW LISTS</h2>
+                {isSkeletonLoading(reviewLists.isLoading) ? (
+                  <CarouselSectionSkeleton title="REVIEW LISTS" showTabs={true} />
+                ) : (
+                  <CarouselVocabSection 
+                    title="REVIEW LISTS" 
+                    vocabLists={reviewLists.data}
+                    isLoading={reviewLists.isLoading} 
+                    error={reviewLists.error}        
+                  >
                     <ReviewTabs 
                       activeTab={activeReviewTab} 
                       onTabChange={handleTabChange} 
                     />
-                  </div>
+                  </CarouselVocabSection>
+                )}
 
-                  {reviewLists.isLoading ? (
-                    <div className="loading-container">Loading...</div>
-                  ) : reviewLists.error ? (
-                    <div className="error-message">Could not load review lists.</div>
-                  ) : reviewLists.data.length > 0 ? (
-                    <>
-                      <div className="review-lists-grid">
-                        {reviewLists.data.map((list) => (
-                          <VocabularyListCard
-                            key={list.id}
-                            {...list}
-                          />
-                        ))}
-                      </div>
-                      
-                      {reviewLists.pagination && (
-                        <Pagination
-                          pagination={reviewLists.pagination}
-                          onPageChange={handleReviewPageChange}
-                          className="review-pagination"
-                        />
-                      )}
-                    </>
-                  ) : (
-                    <div className="no-data-message">
-                      No review lists available for {activeReviewTab === 'today' ? 'today' : 'upcoming'}.
-                    </div>
-                  )}
-                </section>
+                {isSkeletonLoading(recentLists.isLoading) ? (
+                  <CarouselSectionSkeleton title="RECENTLY LISTS" />
+                ) : (
+                  <CarouselVocabSection 
+                    title="RECENTLY LISTS" 
+                    vocabLists={recentLists.data}
+                    isLoading={recentLists.isLoading} 
+                    error={recentLists.error}         
+                  />
+                )}
 
-                <CarouselVocabSection 
-                  title="RECENTLY LISTS" 
-                  vocabLists={recentLists.data}
-                  isLoading={recentLists.isLoading} 
-                  error={recentLists.error}         
-                />
-
-                <CarouselVocabSection 
-                  title="POPULAR LISTS" 
-                  vocabLists={popularLists.data}
-                  isLoading={popularLists.isLoading} 
-                  error={popularLists.error}         
-                />
+                {isSkeletonLoading(popularLists.isLoading) ? (
+                  <CarouselSectionSkeleton title="POPULAR LISTS" />
+                ) : (
+                  <CarouselVocabSection 
+                    title="POPULAR LISTS" 
+                    vocabLists={popularLists.data}
+                    isLoading={popularLists.isLoading} 
+                    error={popularLists.error}         
+                  />
+                )}
               </>
             )}
 

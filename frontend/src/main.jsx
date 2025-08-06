@@ -6,6 +6,7 @@ import authRoutes from "./routes/AuthRoutes";
 import vocabularyRoutes from "./routes/VocabularyRoutes.jsx";
 import classroomRoutes from "./routes/ClassroomRoutes.jsx";
 import userRoutes from "./routes/UserRoutes.jsx";
+import devRoutes from "./routes/DevRoutes.jsx"; 
 import reviewRoutes from "./routes/Review.Routes.jsx";
 
 const router = createBrowserRouter([
@@ -13,6 +14,7 @@ const router = createBrowserRouter([
   ...vocabularyRoutes,
   ...classroomRoutes,
   ...userRoutes,
+  ...devRoutes,
   ...reviewRoutes,
 ]);
 
