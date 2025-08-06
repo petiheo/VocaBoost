@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 
 const tabs = [
-  { name: "Dashboard", route: "/admin/dashboard" },
+  { name: "General", route: "/admin-general" },
 
   {
     name: "Users",
@@ -13,9 +13,6 @@ const tabs = [
       "/teacher-request",
     ]
   },
-
-  { name: "Content", route: "/admin/content" },
-  { name: "Statistics", route: "/admin/statistics" },
 ];
 
 export default function TeacherClassroomMenuTab() {

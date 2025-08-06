@@ -23,7 +23,7 @@ const TeacherRequest = () => {
 
                 <section className="requests-section">
                     <div className="requests-header">
-                        <h1>Teacher's Request</h1>
+                        <h1>General</h1>
                         <div className="pending-request__filter-dropdown">
                             <span>All lists: </span>
                             <select
