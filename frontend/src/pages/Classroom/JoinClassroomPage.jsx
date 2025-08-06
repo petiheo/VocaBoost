@@ -5,15 +5,16 @@ import classroomService from "../../services/Classroom/classroomService"
 export default function JoinClassroomPage() {
     const [inputCode, setInputCode] = useState("");
     const [status, setStatus] = useState("default");
-    const [submittedCode, setSubmittedCode] = useState("");
     const [errors, setErrors] = useState({});
+    const [isJoining, setIsJoining] = useState(false);
 
     const handleJoin = async (e) => {
-        if (!inputCode) return;
+        if (!inputCode || isJoining) return;
+        
+        setIsJoining(true);
 
         try {
             const res = await classroomService.joinRequest(inputCode);
-            setSubmittedCode(inputCode);
             if (res.success) {
                 if (res.message.includes("joined")) {
                     setStatus("success");
@@ -38,11 +39,13 @@ export default function JoinClassroomPage() {
                     error.response?.data?.message ||
                     "Unexpected error occurred. Please try again.",
             });
+        } finally {
+            setIsJoining(false);
         }
     };
 
     if (status != "default") {
-        return <JoinClassroomStatus status={status} code={submittedCode} errorMsg={errors.server} />
+        return <JoinClassroomStatus status={status} code={inputCode} errorMsg={errors.server} />
     }
 
     return (
@@ -56,8 +59,12 @@ export default function JoinClassroomPage() {
                     value={inputCode}
                     onChange={(e) => setInputCode(e.target.value)}
                 />
-                <button className="join-classroom__button" onClick={handleJoin}>
-                    Join
+                <button 
+                    className={`join-classroom__button ${isJoining ? 'join-classroom__button--loading' : ''}`} 
+                    onClick={handleJoin}
+                    disabled={isJoining}
+                >
+                    {isJoining ? 'Joining...' : 'Join'}
                 </button>
             </div>
         </div>

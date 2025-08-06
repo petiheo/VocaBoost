@@ -1,25 +1,29 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Header, SideBar, Footer } from "../../components";
+import { Header, SideBar, Footer, OverviewListSkeleton } from "../../components";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { RightMoreIcon, TotalWordIcon, CategoryIcon, TimeIcon, LearnerIcon } from "../../assets/Vocabulary";
 import { jwtDecode } from "jwt-decode"; // Thư viện để giải mã JWT
-import { useToast } from "../../components/ToastProvider.jsx";
-
+import { useToast } from "../../components/Providers/ToastProvider.jsx";
+import { useSkeletonToggle } from "../../hooks/useSkeletonToggle";
 
 export default function OverviewList() {
   const { listId } = useParams(); // Lấy ID từ URL
   console.log("List ID from params:", listId); // Kiểm tra trong console
   const [listInfo, setListInfo] = useState(null);
   const [words, setWords] = useState([]);
+  const [loading, setLoading] = useState(true);
   const toast = useToast(); 
+  const [isOpen, setIsOpen] = useState(false);
 
   const currentUserId = localStorage.getItem("userId"); // hoặc lấy từ context
   const [isOwner, setIsOwner] = useState(false);
+  const { isLoading: isSkeletonLoading } = useSkeletonToggle();
 
   useEffect(() => {
     const fetchListAndWords = async () => {
       try {
+        setLoading(true);
         const list = await vocabularyService.getListById(listId);
         const words = await vocabularyService.getWordsByListId(listId);
 
@@ -44,6 +48,8 @@ export default function OverviewList() {
         setIsOwner(isMine);
       } catch (error) {
         console.error("Failed to load list:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -71,8 +77,11 @@ export default function OverviewList() {
     <div className="overview-list">
       <Header />
       <div className="overview-list__content">
-        <SideBar />
-        <main className="overview-list__main">
+        <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
+        {isSkeletonLoading(loading) ? (
+          <OverviewListSkeleton />
+        ) : (
+          <main className="overview-list__main">
             {listInfo && (
             <>
               <div className="overview-list__header">
@@ -160,12 +169,18 @@ export default function OverviewList() {
                       Add to my list
                     </button>
                   )}
-                  <button className="overview-list__button filled">Review now</button>
+                  <button 
+                    className="overview-list__button filled"
+                    onClick={() => window.location.href = `/review/${listInfo.id}`}
+                  >
+                    Review now
+                  </button>
                 </div>
               </section>
             </>
             )}
-        </main>
+          </main>
+        )}
       </div>
       <Footer />
     </div>

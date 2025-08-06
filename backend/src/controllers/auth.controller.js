@@ -81,16 +81,9 @@ class AuthController {
   // TODO: frontend sẽ xử lý xóa JWT, sau này có thể triển khai thêm blacklist token
   async logout(req, res) {
     try {
-      return res.status(200).json({
-        success: true,
-        message: 'Logout successful',
-      });
+      return ResponseUtils.success(res, 'Logout successful');
     } catch (error) {
-      logger.error('Logout error: ', error);
-      return res.status(400).json({
-        success: false,
-        message: 'Logout failed',
-      });
+      return ErrorHandler.handleError(res, error, 'logout', 'Logout failed', 400);
     }
   }
 

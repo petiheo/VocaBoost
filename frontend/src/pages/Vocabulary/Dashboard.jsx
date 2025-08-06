@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Footer, Header, SideBar, LearnerSubMenu, ReportTrigger } from "../../components/index.jsx";
+import { Footer, Header, SideBar, LearnerSubMenu, ReportTrigger, CardSkeleton } from "../../components/index.jsx";
 import { DropdownIcon, MoreIcon, PlusIcon } from "../../assets/Vocabulary/index.jsx";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
-import { useConfirm } from "../../components/ConfirmProvider.jsx";
-import { useToast } from "../../components/ToastProvider.jsx";
+import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
+import { useToast } from "../../components/Providers/ToastProvider.jsx";
 
 export default function Dashboard() {
     const [lists, setLists] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [visibleRows, setVisibleRows] = useState(2);
     const [columns, setColumns] = useState(3);
     const [activeListId, setActiveListId] = useState(null);
+    const [deletingListId, setDeletingListId] = useState(null);
     const [filterMode, setFilterMode] = useState(null); // 'alphabet' | 'tag' | null
     const [showFilterOptions, setShowFilterOptions] = useState(false);
     const [alphabetFilter, setAlphabetFilter] = useState(null);
@@ -20,49 +22,57 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const confirm = useConfirm();
     const toast = useToast();
+    const [isOpen, setIsOpen] = useState(false);
 
-    const handleCreateNewList = async () => {
+    const handleCreateNewList = () => {
+        navigate('/vocabulary/create/new');
+    };
+
+    const fetchLists = async () => {
         try {
-            const payload = {
-                title: "Untitled List",
-                description: "",
-                privacy_setting: "private",
-                tags: [],
-            };
-
-            const res = await vocabularyService.createList(payload);
-            const listId = res?.data?.list?.id;
-
-            if (listId) {
-                navigate(`/vocabulary/create/${listId}`); //  Navigate với ID
-            } else {
-                toast("Failed to create new list.", "error");
-                console.log("Response:", res);
-            }
-        } catch (error) {
-            console.error("Error creating list:", error);
-            toast("Something went wrong. Please try again.", "error");
+            setLoading(true);
+            const res = await vocabularyService.getMyLists();
+            const listsData = res.lists || []; 
+            setLists(listsData.map(list => ({
+                id: list.id,
+                title: list.title,
+                description: list.description,
+                owner: list.creator?.display_name || "Unknown",
+                role: list.creator?.role || "unknown",  
+                tags: list.tags || [],
+            })));
+        } catch (err) {
+            console.error("Failed to fetch lists:", err);
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        async function fetchLists() {
-            try {
-                const res = await vocabularyService.getMyLists();
-                setLists(res.map(list => ({
-                    id: list.id,
-                    title: list.title,
-                    description: list.description,
-                    owner: list.creator?.display_name || "Unknown",
-                    role: list.creator?.role || "unknown",  
-                    tags: list.tags || [],
-                })));
-            } catch (err) {
-                console.error("Failed to fetch lists:", err);
-            }
-        }
-
         fetchLists();
+    }, []);
+
+    // Refresh lists when user returns to the page (e.g., after creating a new list)
+    useEffect(() => {
+        const handleFocus = () => {
+            fetchLists();
+        };
+
+        window.addEventListener('focus', handleFocus);
+        
+        // Also listen for visibility change (when tab becomes visible)
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                fetchLists();
+            }
+        };
+        
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, []);
 
     useEffect(() => {
@@ -114,7 +124,7 @@ export default function Dashboard() {
             <LearnerSubMenu />
             <ReportTrigger />
             <div className="dashboard__content">
-                <SideBar />
+                <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
 
                 <div className="dashboard__main">
                     <div className="dashboard__topbar">
@@ -196,67 +206,76 @@ export default function Dashboard() {
                     </div>
 
                     <div className="dashboard__list-grid">
-                        {filteredLists.slice(0, visibleCount).map((list, idx) => (
-                            <div className="dashboard__list-card" key={list.id || idx}>
-                                <div className="dashboard__list-header">
-                                    <button className="dashboard__list-title" onClick={() => navigate(`/vocabulary/overview/${list.id}`)}>
-                                        {list.title.length > 20
-                                            ? list.title.slice(0, 20) + "..."
-                                            : list.title}
-                                    </button>
-                                    <div className="dashboard__more-button-wrapper">
-                                        <button
-                                            className="dashboard__more-button"
-                                            onClick={() => setActiveListId((prevId) => (prevId === list.id ? null : list.id))}
-                                        >
-                                            <img src={MoreIcon} alt="more" className="more-icon" />
+                        {loading ? (
+                            <CardSkeleton count={visibleCount} />
+                        ) : (
+                            filteredLists.slice(0, visibleCount).map((list, idx) => (
+                                <div className="dashboard__list-card" key={list.id || idx}>
+                                    <div className="dashboard__list-header">
+                                        <button className="dashboard__list-title" onClick={() => navigate(`/vocabulary/overview/${list.id}`)}>
+                                            {list.title.length > 20
+                                                ? list.title.slice(0, 20) + "..."
+                                                : list.title}
                                         </button>
-
-                                        {activeListId === list.id && (
-                                            <div className="dashboard__more-popup">
-                                            <div
-                                                className="more-option delete"
-                                                onClick={async () => {
-                                                const confirmed =  await confirm("Are you sure you want to delete this list?");
-                                                if (!confirmed) return;
-
-                                                try {
-                                                    await vocabularyService.deleteList(list.id);
-                                                    // Cập nhật lại list trong Dashboard
-                                                    setLists(prev => prev.filter(item => item.id !== list.id));
-                                                    setActiveListId(null);
-                                                } catch (err) {
-                                                    console.error("Delete failed:", err);
-                                                    toast("Failed to delete list.", "error");
-                                                }
-                                                }}
+                                        <div className="dashboard__more-button-wrapper">
+                                            <button
+                                                className="dashboard__more-button"
+                                                onClick={() => setActiveListId((prevId) => (prevId === list.id ? null : list.id))}
                                             >
-                                                Delete List
-                                            </div>
-                                            </div>
-                                        )}
-                                    </div>
+                                                <img src={MoreIcon} alt="more" className="more-icon" />
+                                            </button>
 
-                                </div>
-                                <p className="dashboard__list-description">
-                                    {list.description }
-                                </p>
-                                <div className="dashboard__list-footer">
-                                    <div className="dashboard__user">
-                                        <div className="avatar" />
-                                        <div>
-                                            <div className="username">{list.owner}</div>
-                                            {list.role && (
-                                            <div className={`role ${list.role.toLowerCase()}`}>
-                                                {list.role.charAt(0).toUpperCase() + list.role.slice(1)}
-                                            </div>
+                                            {activeListId === list.id && (
+                                                <div className="dashboard__more-popup">
+                                                <div
+                                                    className={`more-option delete ${deletingListId === list.id ? 'deleting' : ''}`}
+                                                    onClick={async () => {
+                                                    if (deletingListId === list.id) return;
+                                                    const confirmed = await confirm("Are you sure you want to delete this list?");
+                                                    if (!confirmed) return;
+
+                                                    setDeletingListId(list.id);
+                                                    try {
+                                                        await vocabularyService.deleteList(list.id);
+                                                        // Cập nhật lại list trong Dashboard
+                                                        setLists(prev => prev.filter(item => item.id !== list.id));
+                                                        setActiveListId(null);
+                                                        toast("List deleted successfully", "success");
+                                                    } catch (err) {
+                                                        console.error("Delete failed:", err);
+                                                        toast("Failed to delete list.", "error");
+                                                    } finally {
+                                                        setDeletingListId(null);
+                                                    }
+                                                    }}
+                                                >
+                                                    {deletingListId === list.id ? 'Deleting...' : 'Delete List'}
+                                                </div>
+                                                </div>
                                             )}
                                         </div>
+
                                     </div>
-                                    <button className="dashboard__overview-btn" onClick={() => navigate(`/vocabulary/overview/${list.id}`)}>Overview list</button>
+                                    <p className="dashboard__list-description">
+                                        {list.description }
+                                    </p>
+                                    <div className="dashboard__list-footer">
+                                        <div className="dashboard__user">
+                                            <div className="avatar" />
+                                            <div>
+                                                <div className="username">{list.owner}</div>
+                                                {list.role && (
+                                                <div className={`role ${list.role.toLowerCase()}`}>
+                                                    {list.role.charAt(0).toUpperCase() + list.role.slice(1)}
+                                                </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <button className="dashboard__overview-btn" onClick={() => navigate(`/vocabulary/overview/${list.id}`)}>Overview list</button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
 
                     {visibleCount < lists.length && (

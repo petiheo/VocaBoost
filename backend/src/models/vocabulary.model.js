@@ -1,4 +1,5 @@
 const { supabase } = require('../config/supabase.config');
+const logger = require('../utils/logger');
 
 class VocabularyModel {
   // =================================================================
@@ -7,7 +8,7 @@ class VocabularyModel {
   async findListById(listId) {
     return await supabase
       .from('vocab_lists')
-      .select('*, creator:users(id, display_name, role), tags(name)')
+      .select('*, creator:users(id, display_name, role, avatar_url), tags(name)') 
       .eq('id', listId)
       .single();
   }
@@ -17,10 +18,10 @@ class VocabularyModel {
     let query = supabase
       .from('vocab_lists')
       .select(
-        'id, title, description, privacy_setting, word_count, updated_at, tags(name), creator:users(id, display_name, role)',
+        'id, title, description, privacy_setting, word_count, updated_at, tags(name), creator:users(id, display_name, role, avatar_url)',
         { count: 'exact' }
       )
-      .eq('creator_id', userId);
+      .eq('creator_id', userId); 
 
     if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
     if (privacy) query = query.eq('privacy_setting', privacy);
@@ -31,7 +32,11 @@ class VocabularyModel {
     } else {
       query = query.order('updated_at', { ascending: false });
     }
-    return await query.range(from, to);
+    if (from !== null && to !== null) {
+      query = query.range(from, to);
+    }
+    
+    return await query;
   }
 
   async searchPublicLists(options) {
@@ -39,13 +44,13 @@ class VocabularyModel {
     let query = supabase
       .from('vocab_lists')
       .select(
-        'id, title, description, word_count, updated_at, creator:users(id, display_name, role), tags(name)',
+        'id, title, description, word_count, updated_at, creator:users(id, display_name, role, avatar_url), tags(name)',
         { count: 'exact' }
       )
       .eq('privacy_setting', 'public')
       .eq('is_active', true);
 
-    if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
+    if (q) query = query.or(`title.ilike.%${q}%`);
     if (tags) {
       const tagArray = tags.split(',').map((t) => t.trim());
       query = query.in('tags.name', tagArray);
@@ -56,7 +61,105 @@ class VocabularyModel {
     } else {
       query = query.order('word_count', { ascending: false });
     }
-    return await query.range(from, to);
+    if (from !== null && to !== null) {
+      query = query.range(from, to);
+    }
+    
+    return await query;
+  }
+
+  async upsertListHistory(userId, listId) {
+    return await supabase
+      .from('user_list_history')
+      .upsert(
+        {
+          user_id: userId,
+          list_id: listId,
+          last_accessed_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id, list_id' }
+      );
+  }
+
+  async findHistoryLists(userId, from, to) {
+    let query = supabase
+      .from('user_list_history')
+      .select(
+        `
+        last_accessed_at,
+        list:vocab_lists (
+            id,
+            title,
+            description,
+            word_count,
+            privacy_setting,
+            created_at,
+            creator:users (id, display_name, role, avatar_url),
+            tags (name)
+        )
+      `,
+        { count: 'exact' }
+      )
+      .eq('user_id', userId)
+      .order('last_accessed_at', { ascending: false });
+    
+    if (from !== null && to !== null) {
+      query = query.range(from, to);
+    }
+
+    return await query.then(({ data, error, count }) => {
+        if (error) return { data, error, count };
+        if (data) {
+          const reshapedData = data.map((item) => {
+            if (!item.list) return null; 
+            return {
+              ...item.list,
+              tags: item.list.tags.map(t => t.name),
+              last_accessed_at: item.last_accessed_at,
+            }
+          }).filter(Boolean);
+          return { data: reshapedData, error, count };
+        }
+        return { data: [], error, count };
+      });
+  }
+
+  async findPopularLists(from, to) {
+    let query = supabase
+      .from('vocab_lists')
+      .select(
+        `
+        id,
+        title,
+        description,
+        word_count,
+        privacy_setting,
+        created_at,
+        view_count,
+        creator:users (id, display_name, role, avatar_url),
+        tags (name)
+      `,
+        { count: 'exact' }
+      )
+      .eq('privacy_setting', 'public')
+      .eq('is_active', true)
+      .order('view_count', { ascending: false });
+
+    if (from !== null && to !== null) {
+      query = query.range(from, to);
+    }
+
+    return await query.then(({ data, error, count }) => {
+        if (error) return { data, error, count };
+        if (data) {
+          const reshapedData = data.map((item) => ({
+            ...item,
+            tags: item.tags.map((t) => t.name),
+          }));
+          return { data: reshapedData, error, count };
+        }
+        return { data: [], error, count };
+      });
   }
 
   async updateList(listId, updateData) {
@@ -122,7 +225,7 @@ class VocabularyModel {
     if (!data.vocab_lists) {
       // This is a data integrity issue (a word exists without a list),
       // but we handle it safely by treating the word as inaccessible.
-      console.error(`Data integrity issue: Word ${wordId} has no associated list.`);
+      logger.error(`Data integrity issue: Word ${wordId} has no associated list.`);
       return { data: null, error: new Error('Word has no associated list.') };
     }
 
@@ -130,21 +233,24 @@ class VocabularyModel {
   }
 
   async findWordsByListId(listId, from, to) {
-    // ==========================================================
-    // ===== NEW, MULTI-STEP QUERY LOGIC ========================
-    // ==========================================================
     try {
-      // Step 1: Fetch the paginated list of basic word info.
+      // Step 1: Build the base query for fetching word info.
+      let query = supabase
+        .from('vocabulary')
+        .select('*', { count: 'exact' })
+        .eq('list_id', listId)
+        .order('created_at', { ascending: true });
+      
+      if (from !== null && to !== null) {
+        query = query.range(from, to);
+      }
+
+      // Execute the query (which may or may not be paginated)
       const {
         data: words,
         error: wordsError,
         count,
-      } = await supabase
-        .from('vocabulary')
-        .select('*', { count: 'exact' })
-        .eq('list_id', listId)
-        .order('created_at', { ascending: true })
-        .range(from, to);
+      } = await query;
 
       if (wordsError) throw wordsError;
       if (!words || words.length === 0) {
@@ -154,23 +260,21 @@ class VocabularyModel {
       // Step 2: Get all the IDs of the words we just fetched.
       const wordIds = words.map((word) => word.id);
 
-      // Step 3: Fetch all examples for those specific words in a single query.
+      // Step 3: Fetch all examples for those specific words.
       const { data: examples, error: examplesError } = await supabase
         .from('vocabulary_examples')
         .select('*')
         .in('vocabulary_id', wordIds);
-
       if (examplesError) throw examplesError;
 
-      // Step 4: Fetch all synonyms for those specific words in a single query.
+      // Step 4: Fetch all synonyms for those specific words.
       const { data: synonyms, error: synonymsError } = await supabase
         .from('word_synonyms')
         .select('word_id, synonym')
         .in('word_id', wordIds);
-
       if (synonymsError) throw synonymsError;
 
-      // Step 5: Map the examples and synonyms to their parent words for efficient lookup.
+      // Step 5: Map the examples and synonyms to their parent words.
       const examplesMap = new Map(examples.map((ex) => [ex.vocabulary_id, ex]));
       const synonymsMap = new Map();
       synonyms.forEach((s) => {
@@ -189,7 +293,7 @@ class VocabularyModel {
 
       return { data: enrichedWords, error: null, count };
     } catch (error) {
-      console.error(`Error in findWordsByListId for list ${listId}:`, error);
+      logger.error(`Error in findWordsByListId for list ${listId}:`, error);
       return { data: null, error, count: 0 };
     }
   }
@@ -251,18 +355,15 @@ class VocabularyModel {
 
       return { data: enrichedWords, error: null };
     } catch (error) {
-      console.error(`Error in findWordsByIds:`, error);
+      logger.error(`Error in findWordsByIds:`, error);
       return { data: null, error };
     }
   }
 
   async searchInList(listId, options) {
-    // ==========================================================
-    // ===== NEW, MULTI-STEP QUERY LOGIC ========================
-    // ==========================================================
     const { q, sortBy, from, to } = options;
     try {
-      // Step 1: Fetch the paginated list of words that match the search query.
+      // Step 1: Build the base search query without pagination.
       let query = supabase
         .from('vocabulary')
         .select('*', { count: 'exact' })
@@ -278,7 +379,12 @@ class VocabularyModel {
         query = query.order('created_at', { ascending: true });
       }
 
-      const { data: words, error: wordsError, count } = await query.range(from, to);
+      if (from !== null && to !== null) {
+        query = query.range(from, to);
+      }
+      
+      // Execute the query
+      const { data: words, error: wordsError, count } = await query;
 
       if (wordsError) throw wordsError;
       if (!words || words.length === 0) {
@@ -288,23 +394,21 @@ class VocabularyModel {
       // Step 2: Get all the IDs of the words we just fetched.
       const wordIds = words.map((word) => word.id);
 
-      // Step 3: Fetch all examples for those specific words in a single query.
+      // Step 3: Fetch all examples for those specific words.
       const { data: examples, error: examplesError } = await supabase
         .from('vocabulary_examples')
         .select('*')
         .in('vocabulary_id', wordIds);
-
       if (examplesError) throw examplesError;
 
-      // Step 4: Fetch all synonyms for those specific words in a single query.
+      // Step 4: Fetch all synonyms for those specific words.
       const { data: synonyms, error: synonymsError } = await supabase
         .from('word_synonyms')
         .select('word_id, synonym')
         .in('word_id', wordIds);
-
       if (synonymsError) throw synonymsError;
 
-      // Step 5: Map the examples and synonyms to their parent words for efficient lookup.
+      // Step 5: Map the examples and synonyms to their parent words.
       const examplesMap = new Map(examples.map((ex) => [ex.vocabulary_id, ex]));
       const synonymsMap = new Map();
       synonyms.forEach((s) => {
@@ -323,7 +427,7 @@ class VocabularyModel {
 
       return { data: enrichedWords, error: null, count };
     } catch (error) {
-      console.error(
+      logger.error(
         `Error in searchInList for list ${listId} with query "${q}":`,
         error
       );
@@ -383,7 +487,7 @@ class VocabularyModel {
       return { data: finalWordObject, error: null };
     } catch (error) {
       // Catch any database error from the three steps and return it.
-      console.error(`Error in findById for word ${id}:`, error);
+      logger.error(`Error in findById for word ${id}:`, error);
       return { data: null, error };
     }
   }
@@ -401,6 +505,8 @@ class VocabularyModel {
       .upsert({
         vocabulary_id: wordId,
         example_sentence: exampleData.exampleSentence,
+        ai_generated: exampleData.aiGenerated || false,
+        generation_prompt: exampleData.generationPrompt || null,
       })
       .select()
       .single();
@@ -462,6 +568,28 @@ class VocabularyModel {
 
   async updateWordCount(listId) {
     return await supabase.rpc('update_list_word_count', { list_id_param: listId });
+  }
+
+  // Update list access to ensure it remains available after session
+  async updateListAccess(listId, userId) {
+    // Check if user has access to the list first
+    const { data: list, error: listError } = await supabase
+      .from('vocab_lists')
+      .select('id, creator_id, privacy_setting')
+      .eq('id', listId)
+      .single();
+
+    if (listError) throw listError;
+    if (!list) throw new Error('List not found');
+
+    // If user is creator, they always have access
+    if (list.creator_id === userId) {
+      return { success: true };
+    }
+
+    // For other cases, we could add logic to ensure proper access
+    // This is a placeholder for more complex access control if needed
+    return { success: true };
   }
 }
 

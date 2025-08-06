@@ -9,6 +9,8 @@ import {
     // Manage classroom
     AddLearners, ApproveJoinClassroomRequest, ManageClassroomLayout, LearnersList, PendingRequest,
     AssignmentDetail,
+    Statistic,
+    JoiningVerify,
 } from "../pages/Classroom"
 
 const classroomRoutes = [
@@ -67,7 +69,16 @@ const classroomRoutes = [
                 path: "assignment-detail",
                 element: <AssignmentDetail />
             },
+            {
+                path: "statistics",
+                element: <Statistic/>
+            },
         ]
+    },
+
+    {
+        path: "/accept-invitation",
+        element: <JoiningVerify/>
     },
 ];
 export default classroomRoutes;

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ClassroomTitle, TeacherClassroomMenuTab, ClassroomDropdownMenu } from "../../../components";
 import classroomService from "../../../services/Classroom/classroomService";
+import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 
 
 export default function ApproveJoinClassroomRequest() {
@@ -42,7 +43,7 @@ export default function ApproveJoinClassroomRequest() {
             const res = await classroomService.approveJoinRequest({ classroomId, learnerId: id });
             if (res.success) {
                 console.log("Approve thanh cong");
-                setLearners(requests.filter((r) => r.learner_id !== id));
+                setRequests(requests.filter((r) => r.learner_id !== id));
             }
         } catch (error) {
             console.error(error.message);
@@ -116,26 +117,33 @@ export default function ApproveJoinClassroomRequest() {
                     </div>
                 </div>
 
-
-                <div className="student-list">
-                    {requests.map((r) => (
-                        <div className="student-row" key={r.learner_id}>
-                            <span>{r.email}</span>
-                            <div className="buttons">
-                                <button className="btn approve"
-                                    onClick={() => handleApproveJoinRequest(r.learner_id)}
-                                >Approve</button>
-                                <button className="btn decline"
-                                    onClick={() => handleRejectJoinRequest(r.learner_id)}
-                                >Decline</button>
-                            </div>
+                {requests.length === 0 ? (
+                    <>
+                        <div className="empty-list">"No request available"</div>
+                    </>
+                ) : (
+                    <>
+                        <div className="student-list">
+                            <SeeMoreSection
+                                items={requests}
+                                renderItem={(item) => (
+                                    <div className="student-row" key={item.learner_id}>
+                                        <span>{item.email}</span>
+                                        <div className="buttons">
+                                            <button className="btn approve"
+                                                onClick={() => handleApproveJoinRequest(item.learner_id)}
+                                            >Approve</button>
+                                            <button className="btn decline"
+                                                onClick={() => handleRejectJoinRequest(item.learner_id)}
+                                            >Decline</button>
+                                        </div>
+                                    </div>
+                                )}
+                            />
                         </div>
-                    ))}
-                </div>
+                    </>
+                )}
 
-                <div className="see-more">
-                    <button className="btn light">See more ▼</button>
-                </div>
             </div>
         </div>
     );

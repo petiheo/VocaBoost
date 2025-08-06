@@ -2,10 +2,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 const tabs = [
   { name: "Assignments", route: "/classroom/assignment-page" },
-  { name: "Statistics", route: "/classroom/statistics" },
   {
     name: "Learners",
-    route: "/classroom/approve-join-classroom-request",
+    route:  "/classroom/learners-list",
     matchRoutes: [
       "/classroom/pending-request",
       "/classroom/learners-list",

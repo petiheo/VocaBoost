@@ -1,6 +1,12 @@
 @use '../Fonts' as *;
 
 .manage-classroom-learner {
+
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+    background: #FFFCF7;
+
     font-family: $font-inriasans;
     background-color: #fdfbf7;
     margin: auto;
@@ -49,54 +55,14 @@
 }
 
 .list-grid {
+    // display: grid;
+    // grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    // gap: 1em;
+
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-row: repeat (2, 1fr);
-    gap: 1em;
-
-    .list-card {
-        background-color: #fff8e1;
-        border-radius: 10px;
-        padding: 1rem;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-        transition: box-shadow 0.3s ease;
-
-        &:hover {
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-        }
-
-        h4 {
-            margin-bottom: 0.4rem;
-            font-size: 1rem;
-        }
-
-        p {
-            font-size: 0.85rem;
-            color: #555;
-        }
-
-        .list-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1rem;
-
-            .username {
-                font-size: 0.8rem;
-                color: #333;
-            }
-
-            .btn.dark {
-                background-color: #2f2f2f;
-                color: white;
-                padding: 0.4rem 0.8rem;
-                border: none;
-                border-radius: 4px;
-                font-size: 0.8rem;
-                cursor: pointer;
-            }
-        }
-    }
+    grid-template-rows: repeat (2, 1fr);
+    gap: 28px;
 }
 
 .see-more {

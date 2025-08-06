@@ -1,6 +1,7 @@
 const vocabularyModel = require('../models/vocabulary.model');
 const reviewModel = require('../models/review.model');
-
+const logger = require('../utils/logger');
+const aiService = require('./ai.service');
 class ForbiddenError extends Error {
   constructor(message = 'User does not have permission for this action.') {
     super(message);
@@ -40,7 +41,7 @@ class VocabularyService {
   }
 
   async findUserLists(userId, options) {
-    const { page = 1, limit = 20 } = options;
+    const { page = null, limit = null } = options;
     const { from, to } = this._getPagination(page, limit);
     const { data, error, count } = await vocabularyModel.findUserLists(userId, {
       ...options,
@@ -58,7 +59,7 @@ class VocabularyService {
   }
 
   async searchPublicLists(options) {
-    const { page = 1, limit = 20 } = options;
+    const { page = null, limit = null } = options;
     const { from, to } = this._getPagination(page, limit);
     const { data, error, count } = await vocabularyModel.searchPublicLists({
       ...options,
@@ -89,8 +90,45 @@ class VocabularyService {
       );
     }
 
+    if (!skipPermissionCheck) {
+      await vocabularyModel.upsertListHistory(userId, listId).catch((err) => {
+        logger.error(
+          `Failed to update history for user ${userId} and list ${listId}:`,
+          err
+        );
+      });
+    }
+
     list.tags = list.tags.map((t) => t.name);
     return list;
+  }
+
+  async findHistoryLists(userId, { page = null, limit = null }) {
+    const { from, to } = this._getPagination(page, limit);
+
+    const { data, error, count } = await vocabularyModel.findHistoryLists(
+      userId,
+      from,
+      to
+    );
+    if (error) throw error;
+
+    return {
+      lists: data || [],
+      pagination: this._formatPagination(page, limit, count),
+    };
+  }
+
+  async findPopularLists({ page = null, limit = null }) {
+    const { from, to } = this._getPagination(page, limit);
+
+    const { data, error, count } = await vocabularyModel.findPopularLists(from, to);
+    if (error) throw error;
+
+    return {
+      lists: data || [],
+      pagination: this._formatPagination(page, limit, count),
+    };
   }
 
   async updateList(listId, userId, updateData) {
@@ -144,6 +182,8 @@ class VocabularyService {
       image_url,
       exampleSentence,
       synonyms,
+      aiGenerated,
+      generationPrompt,
     } = wordData;
 
     // 1. Create the core word
@@ -160,7 +200,11 @@ class VocabularyService {
 
     // 2. Add the optional example
     if (exampleSentence) {
-      await vocabularyModel.upsertExample(newWord.id, { exampleSentence });
+      await vocabularyModel.upsertExample(newWord.id, {
+        exampleSentence,
+        aiGenerated: aiGenerated || false,
+        generationPrompt: generationPrompt || null,
+      });
     }
 
     // 3. Add the optional synonyms
@@ -169,9 +213,8 @@ class VocabularyService {
         word_id: newWord.id,
         synonym: s.trim(),
       }));
-      // Using .catch() here makes this step non-blocking. If synonyms fail, the word is still created.
       await vocabularyModel.createSynonyms(synonymsToInsert).catch((err) => {
-        console.error(`Failed to add synonyms for new word ${newWord.id}:`, err);
+        logger.error(`Failed to add synonyms for new word ${newWord.id}:`, err);
       });
     }
 
@@ -207,12 +250,12 @@ class VocabularyService {
     if (finalExamples.length > 0) {
       await vocabularyModel
         .createExamplesBulk(finalExamples)
-        .catch((err) => console.error('Bulk example creation failed:', err));
+        .catch((err) => logger.error('Bulk example creation failed:', err));
     }
     if (finalSynonyms.length > 0) {
       await vocabularyModel
         .createSynonyms(finalSynonyms)
-        .catch((err) => console.error('Bulk synonym creation failed:', err));
+        .catch((err) => logger.error('Bulk synonym creation failed:', err));
     }
 
     if (newWords && newWords.length > 0) {
@@ -242,6 +285,8 @@ class VocabularyService {
       image_url,
       exampleSentence,
       synonyms,
+      aiGenerated,
+      generationPrompt,
     } = updateData;
 
     // 1. Update core word fields
@@ -262,7 +307,11 @@ class VocabularyService {
     // 2. Update the example (if provided)
     if (exampleSentence !== undefined) {
       if (exampleSentence) {
-        await vocabularyModel.upsertExample(wordId, { exampleSentence });
+        await vocabularyModel.upsertExample(wordId, {
+          exampleSentence,
+          aiGenerated: aiGenerated || false,
+          generationPrompt: generationPrompt || null,
+        });
       } else {
         await vocabularyModel.deleteExample(wordId);
       }
@@ -294,7 +343,7 @@ class VocabularyService {
     await vocabularyModel.updateWordCount(listId);
   }
 
-  async findWordsByListId(listId, userId, { page = 1, limit = 25 }) {
+  async findWordsByListId(listId, userId, { page = null, limit = null }) {
     await this.findListById(listId, userId);
     const { from, to } = this._getPagination(page, limit);
     const {
@@ -321,7 +370,7 @@ class VocabularyService {
   }
 
   async searchWordsInList(listId, userId, options) {
-    const { page = 1, limit = 20, sortBy, q } = options;
+    const { page = null, limit = null, sortBy, q } = options;
     await this.findListById(listId, userId);
     if (sortBy && sortBy.split(':').length !== 2) {
       throw new ValidationError([
@@ -336,6 +385,60 @@ class VocabularyService {
     } = await vocabularyModel.searchInList(listId, { q, sortBy, from, to });
     if (error) throw error;
     return { words, pagination: this._formatPagination(page, limit, count) };
+  }
+
+  async generateExample(wordId, userId, context = null) {
+    await this._verifyWordPermission(wordId, userId, 'write');
+
+    const { data: word, error } = await vocabularyModel.findById(wordId);
+    if (error || !word) throw new Error('Word not found');
+
+    if (!aiService.isAvailable()) {
+      throw new Error('AI service is temporarily unavailable');
+    }
+
+    try {
+      const example = await aiService.generateExample(
+        word.term,
+        word.definition,
+        context
+      );
+
+      await vocabularyModel.upsertExample(wordId, {
+        exampleSentence: example,
+        aiGenerated: true,
+      });
+
+      return {
+        wordId,
+        term: word.term,
+        example,
+      };
+    } catch (error) {
+      logger.error(`Failed to generate example for word ${wordId}:`, error);
+      throw new Error('Failed to generate example sentence. Please try again.');
+    }
+  }
+
+  async generateExampleForNewWord(term, definition, context = null) {
+    if (!aiService.isAvailable()) {
+      throw new Error('AI service is temporarily unavailable');
+    }
+
+    try {
+      const example = await aiService.generateExample(term, definition, context);
+      const generationPrompt = `Generate example for "${term}" (${definition})${context ? ` in context: ${context}` : ''}`;
+
+      return {
+        term: term,
+        example,
+        aiGenerated: true,
+        generationPrompt: generationPrompt,
+      };
+    } catch (error) {
+      logger.error(`Failed to generate example for new word ${term}:`, error);
+      throw new Error('Failed to generate example sentence. Please try again.');
+    }
   }
 
   // =================================================================
@@ -452,11 +555,17 @@ class VocabularyService {
       if (!newWord) return;
 
       if (itemType === 'example' && originalWord.exampleSentence) {
-        itemsToInsert.push({
+        const exampleData = {
           vocabulary_id: newWord.id,
           example_sentence: originalWord.exampleSentence,
-          translation: originalWord.translation,
-        });
+          ai_generated: originalWord.aiGenerated || false,
+          generation_prompt: originalWord.generationPrompt || null,
+        };
+        console.log(
+          `Creating example for word "${originalWord.term}":`,
+          exampleData
+        );
+        itemsToInsert.push(exampleData);
       }
       if (itemType === 'synonym' && originalWord.synonyms) {
         originalWord.synonyms.forEach((synonym) => {
@@ -468,16 +577,29 @@ class VocabularyService {
   }
 
   _getPagination(page, size) {
-    const limit = size ? +size : 20;
-    const from = page ? (page - 1) * limit : 0;
-    const to = page ? from + size - 1 : size - 1;
-    return { from, to };
+    if (page == null || size == null) {
+      return { from: null, to: null, limit: null };
+    }
+
+    const limit = +size; 
+    const from = (page - 1) * limit;
+    const to = from + size - 1;
+    return { from, to, limit };
   }
 
   _formatPagination(page, limit, totalItems) {
+    if (page == null || limit == null) {
+      return { totalItems: totalItems || 0 };
+    }
+
     const currentPage = Number(page);
     const totalPages = Math.ceil(totalItems / limit);
-    return { currentPage, totalPages, totalItems, limit: Number(limit) };
+    return {
+      currentPage,
+      totalPages,
+      totalItems: totalItems || 0,
+      limit: Number(limit),
+    };
   }
 }
 

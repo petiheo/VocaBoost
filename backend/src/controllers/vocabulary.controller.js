@@ -1,5 +1,7 @@
 const vocabularyService = require('../services/vocabulary.service');
 const storageService = require('../services/storage.service');
+const logger = require('../utils/logger');
+const { ResponseUtils, ErrorHandler } = require('../utils');
 
 class VocabularyController {
   // =================================================================
@@ -16,18 +18,23 @@ class VocabularyController {
         creatorId
       );
 
-      return res.status(201).json({
-        success: true,
-        message: 'Vocabulary list created successfully.',
-        data: { list: newList },
-      });
+      return ResponseUtils.success(
+        res,
+        'Vocabulary list created successfully.',
+        { list: newList },
+        201
+      );
     } catch (error) {
       if (error.isValidationError) {
-        return res.status(400).json({ success: false, errors: error.errors });
+        return ResponseUtils.validationError(res, 'Validation failed', error.errors);
       }
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'createList',
+        'Internal server error',
+        500
+      );
     }
   }
 
@@ -44,15 +51,43 @@ class VocabularyController {
         limit,
       });
 
-      return res.status(200).json({
-        success: true,
-        data: result.lists,
+      return ResponseUtils.success(res, null, {
+        lists: result.lists,
         pagination: result.pagination,
       });
     } catch (error) {
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getUserLists',
+        'Internal server error',
+        500
+      );
+    }
+  }
+
+  async getHistoryLists(req, res) {
+    try {
+      const userId = req.user.userId;
+      const { page, limit } = req.query;
+
+      const result = await vocabularyService.findHistoryLists(userId, {
+        page,
+        limit,
+      });
+
+      return ResponseUtils.success(
+        res,
+        "User's list history retrieved successfully.",
+        result
+      );
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        `getHistoryLists - User ${req.user?.userId}`,
+        'Failed to retrieve list history.'
+      );
     }
   }
 
@@ -67,15 +102,39 @@ class VocabularyController {
         limit,
       });
 
-      return res.status(200).json({
-        success: true,
-        data: result.lists,
+      return ResponseUtils.success(res, null, {
+        lists: result.lists,
         pagination: result.pagination,
       });
     } catch (error) {
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'searchPublicLists',
+        'Internal server error',
+        500
+      );
+    }
+  }
+
+  async getPopularLists(req, res) {
+    try {
+      const { page, limit } = req.query;
+
+      const result = await vocabularyService.findPopularLists({ page, limit });
+
+      return ResponseUtils.success(
+        res,
+        'Popular lists retrieved successfully.',
+        result
+      );
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getPopularLists',
+        'Failed to retrieve popular lists.'
+      );
     }
   }
 
@@ -86,25 +145,24 @@ class VocabularyController {
       const list = await vocabularyService.findListById(listId, userId);
 
       if (!list) {
-        return res
-          .status(404)
-          .json({ success: false, error: 'Resource not found.' });
+        return ResponseUtils.notFound(res, 'Resource not found.');
       }
 
-      return res.status(200).json({
-        success: true,
-        data: { list },
-      });
+      return ResponseUtils.success(res, null, { list });
     } catch (error) {
       if (error.isForbidden) {
-        return res.status(403).json({
-          success: false,
-          error: 'Forbidden: You do not have permission to perform this action.',
-        });
+        return ResponseUtils.forbidden(
+          res,
+          'Forbidden: You do not have permission to perform this action.'
+        );
       }
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getListById',
+        'Internal server error',
+        500
+      );
     }
   }
 
@@ -120,24 +178,26 @@ class VocabularyController {
         updateData
       );
 
-      return res.status(200).json({
-        success: true,
-        message: 'Vocabulary list updated successfully.',
-        data: { list: updatedList },
+      return ResponseUtils.success(res, 'Vocabulary list updated successfully.', {
+        list: updatedList,
       });
     } catch (error) {
       if (error.isForbidden) {
-        return res.status(403).json({
-          success: false,
-          error: 'Forbidden: You do not have permission to perform this action.',
-        });
+        return ResponseUtils.forbidden(
+          res,
+          'Forbidden: You do not have permission to perform this action.'
+        );
       }
       if (error.isValidationError) {
-        return res.status(400).json({ success: false, errors: error.errors });
+        return ResponseUtils.validationError(res, 'Validation failed', error.errors);
       }
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'updateList',
+        'Internal server error',
+        500
+      );
     }
   }
 
@@ -148,20 +208,21 @@ class VocabularyController {
 
       await vocabularyService.deleteList(listId, userId);
 
-      return res.status(200).json({
-        success: true,
-        message: 'Vocabulary list deleted successfully.',
-      });
+      return ResponseUtils.success(res, 'Vocabulary list deleted successfully.');
     } catch (error) {
       if (error.isForbidden) {
-        return res.status(403).json({
-          success: false,
-          error: 'Forbidden: You do not have permission to perform this action.',
-        });
+        return ResponseUtils.forbidden(
+          res,
+          'Forbidden: You do not have permission to perform this action.'
+        );
       }
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'deleteList',
+        'Internal server error',
+        500
+      );
     }
   }
 
@@ -177,21 +238,26 @@ class VocabularyController {
 
       const newWord = await vocabularyService.createWord(listId, wordData, userId);
 
-      return res.status(201).json({
-        success: true,
-        message: 'Word added successfully.',
-        data: { word: newWord },
-      });
+      return ResponseUtils.success(
+        res,
+        'Word added successfully.',
+        { word: newWord },
+        201
+      );
     } catch (error) {
       if (error.isForbidden) {
-        return res.status(403).json({
-          success: false,
-          error: 'Forbidden: You do not have permission to perform this action.',
-        });
+        return ResponseUtils.forbidden(
+          res,
+          'Forbidden: You do not have permission to perform this action.'
+        );
       }
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'createWord',
+        'Internal server error',
+        500
+      );
     }
   }
 
@@ -203,21 +269,21 @@ class VocabularyController {
 
       const result = await vocabularyService.createWordsBulk(listId, words, userId);
 
-      return res.status(201).json({
-        success: true,
-        message: 'Bulk operation completed.',
-        data: result,
-      });
+      return ResponseUtils.success(res, 'Bulk operation completed.', result, 201);
     } catch (error) {
       if (error.isForbidden) {
-        return res.status(403).json({
-          success: false,
-          error: 'Forbidden: You do not have permission to perform this action.',
-        });
+        return ResponseUtils.forbidden(
+          res,
+          'Forbidden: You do not have permission to perform this action.'
+        );
       }
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'createWordsBulk',
+        'Internal server error',
+        500
+      );
     }
   }
 
@@ -233,21 +299,23 @@ class VocabularyController {
         updateData
       );
 
-      return res.status(200).json({
-        success: true,
-        message: 'Word updated successfully.',
-        data: { word: updatedWord },
+      return ResponseUtils.success(res, 'Word updated successfully.', {
+        word: updatedWord,
       });
     } catch (error) {
       if (error.isForbidden) {
-        return res.status(403).json({
-          success: false,
-          error: 'Forbidden: You do not have permission to perform this action.',
-        });
+        return ResponseUtils.forbidden(
+          res,
+          'Forbidden: You do not have permission to perform this action.'
+        );
       }
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'updateWord',
+        'Internal server error',
+        500
+      );
     }
   }
 
@@ -258,19 +326,21 @@ class VocabularyController {
 
       await vocabularyService.deleteWord(wordId, userId);
 
-      return res
-        .status(200)
-        .json({ success: true, message: 'Word deleted successfully.' });
+      return ResponseUtils.success(res, 'Word deleted successfully.');
     } catch (error) {
       if (error.isForbidden) {
-        return res.status(403).json({
-          success: false,
-          error: 'Forbidden: You do not have permission to perform this action.',
-        });
+        return ResponseUtils.forbidden(
+          res,
+          'Forbidden: You do not have permission to perform this action.'
+        );
       }
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'deleteWord',
+        'Internal server error',
+        500
+      );
     }
   }
 
@@ -286,26 +356,27 @@ class VocabularyController {
       });
 
       if (!result) {
-        return res
-          .status(404)
-          .json({ success: false, error: 'Resource not found.' });
+        return ResponseUtils.notFound(res, 'Resource not found.');
       }
 
-      return res.status(200).json({
-        success: true,
-        data: { words: result.words },
+      return ResponseUtils.success(res, null, {
+        words: result.words,
         pagination: result.pagination,
       });
     } catch (error) {
       if (error.isForbidden) {
-        return res.status(403).json({
-          success: false,
-          error: 'Forbidden: You do not have permission to perform this action.',
-        });
+        return ResponseUtils.forbidden(
+          res,
+          'Forbidden: You do not have permission to perform this action.'
+        );
       }
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getWordsByListId',
+        'Internal server error',
+        500
+      );
     }
   }
 
@@ -317,24 +388,24 @@ class VocabularyController {
       const word = await vocabularyService.findWordById(wordId, userId);
 
       if (!word) {
-        return res.status(404).json({ success: false, error: 'Word not found.' });
+        return ResponseUtils.notFound(res, 'Word not found.');
       }
 
-      return res.status(200).json({
-        success: true,
-        data: { word },
-      });
+      return ResponseUtils.success(res, null, { word });
     } catch (error) {
       if (error.isForbidden) {
-        return res.status(403).json({
-          success: false,
-          error: 'Forbidden: You do not have permission to view this word.',
-        });
+        return ResponseUtils.forbidden(
+          res,
+          'Forbidden: You do not have permission to view this word.'
+        );
       }
-      console.error(`Error fetching word ${req.params.wordId}:`, error);
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getWordById',
+        'Internal server error',
+        500
+      );
     }
   }
 
@@ -345,10 +416,9 @@ class VocabularyController {
       const userId = req.user.userId;
 
       if (!q) {
-        return res.status(400).json({
-          success: false,
-          errors: [{ field: 'q', message: "A search query 'q' is required." }],
-        });
+        return ResponseUtils.validationError(res, 'Validation failed', [
+          { field: 'q', message: "A search query 'q' is required." },
+        ]);
       }
 
       const result = await vocabularyService.searchWordsInList(listId, userId, {
@@ -358,23 +428,25 @@ class VocabularyController {
         limit,
       });
 
-      return res.status(200).json({
-        success: true,
-        data: { words: result.words },
+      return ResponseUtils.success(res, null, {
+        words: result.words,
         pagination: result.pagination,
       });
     } catch (error) {
       if (error.isForbidden) {
-        return res.status(403).json({
-          success: false,
-          error: 'Forbidden: You do not have permission to view this list.',
-        });
+        return ResponseUtils.forbidden(
+          res,
+          'Forbidden: You do not have permission to view this list.'
+        );
       }
 
-      console.error('Search words error:', error);
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'searchWordsInList',
+        'Internal server error',
+        500
+      );
     }
   }
 
@@ -385,14 +457,15 @@ class VocabularyController {
   async getAllTags(req, res) {
     try {
       const tags = await vocabularyService.findAllTags();
-      return res.status(200).json({
-        success: true,
-        data: { tags },
-      });
+      return ResponseUtils.success(res, null, { tags });
     } catch (error) {
-      return res
-        .status(500)
-        .json({ success: false, error: 'Internal server error' });
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'getAllTags',
+        'Internal server error',
+        500
+      );
     }
   }
 
@@ -402,9 +475,7 @@ class VocabularyController {
       const userId = req.user.userId;
 
       if (!file) {
-        return res
-          .status(400)
-          .json({ success: false, error: 'No image file provided.' });
+        return ResponseUtils.error(res, 'No image file provided.', 400);
       }
 
       const imageUrl = await storageService.uploadWordImage(file, userId);
@@ -416,17 +487,76 @@ class VocabularyController {
         });
       }
 
-      return res.status(201).json({
-        success: true,
-        message: 'Image uploaded successfully.',
-        data: { imageUrl },
+      return ResponseUtils.success(
+        res,
+        'Image uploaded successfully.',
+        { imageUrl },
+        201
+      );
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'uploadImageForWord',
+        'Internal server error during file upload.',
+        500
+      );
+    }
+  }
+
+  async generateExample(req, res) {
+    try {
+      const { wordId } = req.params;
+      const userId = req.user.userId;
+      const { context } = req.body;
+
+      const result = await vocabularyService.generateExample(
+        wordId,
+        userId,
+        context
+      );
+
+      return ResponseUtils.success(res, 'Example generated successfully.', {
+        example: result,
       });
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        error: 'Internal server error during file upload.',
+      if (error.isForbidden) {
+        return ResponseUtils.forbidden(
+          res,
+          'Forbidden: You do not have permission to perform this action.'
+        );
+      }
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'generateExample',
+        'Internal server error',
+        500
+      );
+    }
+  }
+
+  async generateExampleForNewWord(req, res) {
+    try {
+      const { term, definition, context } = req.body;
+
+      const result = await vocabularyService.generateExampleForNewWord(
+        term,
+        definition,
+        context
+      );
+
+      return ResponseUtils.success(res, 'Example generated successfully.', {
+        example: result,
       });
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'generateExampleForNewWord',
+        'Internal server error',
+        500
+      );
     }
   }
 }

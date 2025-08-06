@@ -7,19 +7,19 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   min-height: 220px;
   max-width: 300px;
-  gap: 10px;
 
   overflow: hidden;
   text-overflow: ellipsis;
 
   .vocab-title {
+    font-family: $font-lalezar;
     font-size: 1.2rem;
-    font-weight: 700;
+    font-weight: normal;
     color: #2b2b2b;
     margin: 0;
+    margin-bottom: 0.5rem;
 
     white-space: nowrap; // giữ nội dung trên 1 dòng duy nhất
     overflow: hidden;
@@ -27,6 +27,7 @@
   }
 
   .vocab-desc {
+    font-family: $font-inriasans;
     font-size: 0.9rem;
     color: #444;
     margin: 0;
@@ -45,9 +46,18 @@
     font-size: 10px;
     color: #2932B1;
     font-weight: bold;
+    margin-top: 0.5rem;
+    margin-bottom: 0.3rem;
   }
 
   .vocab-result {
+    font-family: $font-inter;
+    font-size: 10px;
+    color: #2932B1;
+    font-weight: bold;
+  }
+
+  .vocab-next-review{
     font-family: $font-inter;
     font-size: 10px;
     color: #2932B1;
@@ -58,18 +68,46 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 1.5rem;
+    margin-top: auto;
+    padding-top: 1rem; 
+    font-family: $font-inriasans;
 
     .user-block {
       display: flex;
       align-items: center;
-
+      min-width: 150px;
+      gap: 5%; 
+      
       .avatar {
-        width: 28px;
-        height: 28px;
-        background-color: #d8cfc3;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        margin-right: 0.5rem;
+        
+        border: none;
+        border-radius: 50%;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        
+        .img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover; // This ensures the image covers the area without distortion
+        }
+        
+        .placeholder {
+          background-color: #4A5568;
+          color: white;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
       }
 
       .user-info {
@@ -77,11 +115,11 @@
         flex-direction: column;
 
         .username {
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: 13px;
+          font-weight: bold;
           color: #222;
 
-          max-width: 90px;
+          max-width: 100px;
 
           white-space: nowrap; // giữ nội dung trên 1 dòng duy nhất
           overflow: hidden;
@@ -90,10 +128,11 @@
 
         .role-tag {
           font-size: 0.7rem;
+          font-weight: bold;
           background-color: #d6e5ff;
           color: #1b4da3;
           padding: 2px 6px;
-          border-radius: 5px;
+          border-radius: 7px;
           margin-top: 2px;
           width: fit-content;
         }
@@ -104,6 +143,7 @@
       background-color: #2e2a25;
       color: #fff;
       font-size: 0.85rem;
+      font-weight: bold;
       padding: 0.5rem 1rem;
       border: none;
       border-radius: 20px;

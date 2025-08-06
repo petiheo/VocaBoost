@@ -4,8 +4,12 @@ import { Line } from "../../../assets/Classroom";
 import classroomService from "../../../services/Classroom/classroomService";
 import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 import { useNavigate } from "react-router-dom";
+import { AssignSubMenu, AssignmentDetailSkeleton } from "../../../components";
 
 export default function AssignmentDetail() {
+
+  // Lấy pathname hiện tại, ví dụ: "/my-classroom"
+  const [currentTab, setCurrentTab] = useState("Details");
 
   // quan ly trang thai "..."
   const [showDropdown, setShowDropdown] = useState(false);
@@ -38,21 +42,33 @@ export default function AssignmentDetail() {
 
   //Khởi tạo biến lưu dữ liệu của Assignment
   const [assignmentsDetail, setAssignmentsDetail] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (currentTab !== "Details")
+      return;
+
     if (!classroomId || !assignment?.id) {
       console.error("Missing classroom ID or assignment ID");
       return;
     }
 
     const fetchingAssignmentDetail = async () => {
-      const res = await classroomService.getAssignmentDetails(classroomId, assignment?.id);
-      if (res.success) {
-        console.log("Fetch assignment detail thành công");
-        setAssignmentsDetail(res.data.vocabulary || []);
-      }
-      else {
-        console.log(res.message);
+      try {
+        setLoading(true);
+        const res = await classroomService.getAssignmentDetails(classroomId, assignment?.id);
+        if (res.success) {
+          console.log("Fetch assignment detail thành công");
+          console.log(res.data);
+          setAssignmentsDetail(res.data);
+        }
+        else {
+          console.log(res.message);
+        }
+      } catch (error) {
+        console.error("Error fetching assignment details:", error);
+      } finally {
+        setLoading(false);
       }
     }
     fetchingAssignmentDetail();
@@ -66,7 +82,7 @@ export default function AssignmentDetail() {
     try {
       const res = await classroomService.deleteAssignment(classroomId, assignment?.id)
       if (res.success) {
-        console.log("Xoá lớp assignment thành công");
+        console.log("Xoá assignment thành công");
         localStorage.removeItem("selectedAssignment");
         setTimeout(() => {
           navigate("/classroom/assignment-page");
@@ -78,11 +94,15 @@ export default function AssignmentDetail() {
   };
 
 
+  if (loading) {
+    return <AssignmentDetailSkeleton />;
+  }
+
   return (
     <div className="assignment-detail-page">
       <div className="content">
         <div className="assignment-detail__container">
-          <h1>Assignment Details</h1>
+          {/* <h1>Assignment Details</h1> */}
 
           <div className="assignment-box">
             <div className="assignment-header">
@@ -102,18 +122,20 @@ export default function AssignmentDetail() {
               </div>
             </div>
             <div className="assignment-meta">
-              <p><strong>Total words:</strong> {assignment?.total_words || 0}</p>
-              <p><strong>Start date:</strong> {assignment?.start_date ? format(new Date(assignment.start_date), 'd/M/yyyy') : 'N/A'}</p>
-              <p> <strong>Learner reviewed:</strong> {assignment?.reviewed_learner_count || 0}</p>
-              <p><strong>Due date:</strong> {assignment?.due_date ? format(new Date(assignment.due_date), 'd/M/yyyy') : 'N/A'}</p>
+              <p><strong>Total words:</strong> {assignmentsDetail?.total_words || 0}</p>
+              <p><strong>Start date:</strong> {assignmentsDetail?.start_date ? format(new Date(assignment.start_date), 'd/M/yyyy') : 'N/A'}</p>
+              <p> <strong>Learner reviewed:</strong> {assignmentsDetail?.reviewed_learner_count || 0}</p>
+              <p><strong>Due date:</strong> {assignmentsDetail?.due_date ? format(new Date(assignment.due_date), 'd/M/yyyy') : 'N/A'}</p>
             </div>
           </div>
 
-          <img src={Line} alt="line" className="line" style={{ width: "100%" }} />
+          <AssignSubMenu/>
+
+          {/* <img src={Line} alt="line" className="line" style={{ width: "100%" }} /> */}
 
           <div className="word-list">
             <SeeMoreSection
-              items={assignmentsDetail?.data?.vocabulary}
+              items={assignmentsDetail?.vocabulary}
               renderItem={(item, index) => (
                 <div className="word-card" key={index}>
                   <strong>{item?.term}</strong>

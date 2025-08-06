@@ -1,21 +1,15 @@
 const classroomModel = require('../models/classroom.model');
 const logger = require('../utils/logger');
+const { ResponseUtils, ErrorHandler } = require('../utils');
 
 const requireRole = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        error: 'Authentication required',
-      });
+      return ResponseUtils.unauthorized(res, 'Authentication required');
     }
 
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        error: 'Forbidden',
-        message: 'Insufficient permissions',
-      });
+      return ResponseUtils.forbidden(res, 'Insufficient permissions');
     }
 
     next();
@@ -28,10 +22,7 @@ const hasClassroomAccess = async (req, res, next) => {
     const { userId, role: globalRole } = req.user;
     const classroom = await classroomModel.getClassroomById(classroomId);
     if (!classroom || classroom.classroom_status === 'deleted') {
-      return res.status(404).json({
-        success: false,
-        message: 'Classroom not found or has been deleted.',
-      });
+      return ResponseUtils.notFound(res, 'Classroom not found or has been deleted.');
     }
 
     // Admin has full access
@@ -56,16 +47,15 @@ const hasClassroomAccess = async (req, res, next) => {
       return next();
     }
 
-    return res.status(403).json({
-      success: false,
-      message: 'You do not have access to this classroom.',
-    });
+    return ResponseUtils.forbidden(res, 'You do not have access to this classroom.');
   } catch (err) {
-    logger.error('hasClassroomAccess error:', err);
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error during access check.',
-    });
+    return ErrorHandler.handleError(
+      res,
+      err,
+      'hasClassroomAccess',
+      'Internal server error during access check.',
+      500
+    );
   }
 };
 
@@ -74,18 +64,28 @@ const requireClassRole = (...allowedRoles) => {
     const classRole = req.classRole; // set by hasClassroomAccess
 
     if (!classRole || !allowedRoles.includes(classRole)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Insufficient classroom permissions.',
-      });
+      return ResponseUtils.forbidden(res, 'Insufficient classroom permissions.');
     }
 
     next();
   };
 };
 
+const requireAdmin = (req, res, next) => {
+  if (!req.user) {
+    return ResponseUtils.unauthorized(res, 'Authentication required');
+  }
+
+  if (req.user.role !== 'admin') {
+    return ResponseUtils.forbidden(res, 'Access denied. Admin role required.');
+  }
+
+  next();
+};
+
 module.exports = {
   requireRole,
   hasClassroomAccess,
   requireClassRole,
+  requireAdmin,
 };

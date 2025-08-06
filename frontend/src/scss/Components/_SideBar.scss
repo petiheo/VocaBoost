@@ -26,6 +26,20 @@
     }
   }
 
+  &.open {
+    width: 250px;
+    padding: 1.5rem;
+
+    .sidebar__logo,
+    .sidebar__nav,
+    .sidebar__section,
+    .sidebar__title,
+    .sidebar__divider,
+    .sidebar__link {
+      visibility: visible;
+    }
+  }
+
   .sidebar__logo {
     margin-bottom: 2rem;
 

@@ -1,13 +1,24 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ClassroomTitle, TeacherClassroomMenuTab, SearchBar, ClassroomDropdownMenu } from "../../../components/index"
+import { ClassroomTitle, TeacherClassroomMenuTab, SearchBar, ClassroomDropdownMenu, LearnersListSkeleton } from "../../../components/index"
 import classroomService from "../../../services/Classroom/classroomService";
+import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 
 
 export default function StudentListPage() {
+    // Xử lý lưu trữ dữ liệu learner
     const [learners, setLearners] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [loading, setLoading] = useState(true);
+
+    // Dùng để navigate trang
     const navigate = useNavigate();
+
+    // Xử lý thanh search bar 
+    const [searchQuery, setSearchQuery] = useState("");
+
+    // Xử lý Learner list hiện theo search bar
+    const filterLearners = learners.filter((learners) =>
+        learners?.email.toLowerCase().includes(searchQuery.toLowerCase()));
 
     // Truy xuất dữ liệu lớp học được lưu khi users chọn classroom ở trang MyClassroom. 
     const [classroomId, setClassroomId] = useState(() => {
@@ -23,21 +34,24 @@ export default function StudentListPage() {
 
         const fetchLearnersList = async () => {
             try {
+                setLoading(true);
                 const res = await classroomService.getLearnerInClassroom(classroomId);
                 if (res.success && Array.isArray(res.data)) {
                     setLearners(res.data)
                 }
             } catch (error) {
                 console.error("Lỗi khi lấy danh sách lớp học:", error);
+            } finally {
+                setLoading(false);
             }
         }
         fetchLearnersList();
     }, [classroomId]);
 
-    const handleRemove = async(id) => {
+    const handleRemove = async (id) => {
         try {
             const res = await classroomService.removeALearner({ classroomId, learnerId: id });
-            if (res.success){
+            if (res.success) {
                 console.log("Remove thanh cong");
                 setLearners(learners.filter((l) => l.learner_id !== id));
             }
@@ -47,6 +61,10 @@ export default function StudentListPage() {
         }
     };
 
+
+    if (loading) {
+        return <LearnersListSkeleton />;
+    }
 
     return (
         <div className="student-list-page">
@@ -59,28 +77,37 @@ export default function StudentListPage() {
                     <Link to="../add-students" className="btn btn--dark"> + Add Student</Link>
 
                     <div className="pending-request__search-block">
-                        <SearchBar />
+                        <SearchBar value={searchQuery} onChange={setSearchQuery} placeHolder={"Enter learner email you want to find"} />
                         <div className="search-block--dropdown-menu">
                             <ClassroomDropdownMenu students={learners.length} />
                         </div>
                     </div>
                 </div>
 
-                {/* Student list */}
-                <div className="student-list">
-                    {learners.map((l) => (
-                        <div className="student-row" key={l.learner_id}>
-                            <span>{l.email}</span>
-                            <button className="btn light" onClick={() => handleRemove(l.learner_id)}>
-                                Remove
-                            </button>
+                {learners.length === 0 ? (
+                    <>
+                        <div className="empty-list">"No learner available"</div>
+                    </>
+                ) : (
+                    <>
+                        <div className="student-list">
+                            <SeeMoreSection
+                                items={filterLearners}
+                                renderItem={(item) => (
+                                    <div className="student-row" key={item.learner_id}>
+                                        <span>{item.email}</span>
+                                        <button className="btn light" onClick={() => handleRemove(item.learner_id)}>
+                                            Remove
+                                        </button>
+                                    </div>
+                                )}
+                            />
                         </div>
-                    ))}
-                </div>
 
-                <div className="see-more">
-                    <button className="btn see-more-btn">See more ▼</button>
-                </div>
+                    </>
+                )}
+
+
             </div>
         </div>
     );

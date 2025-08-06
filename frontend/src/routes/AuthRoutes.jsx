@@ -15,7 +15,6 @@ import {
     MainPage
 } from "../pages/Auth";
 
-
 const authRoutes = [
     { path: "/", element: <MainPage /> },
     { path: "/auth/success", element: <AuthSuccess /> },

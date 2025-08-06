@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { Header, Footer, SideBar, VocabularyListCard, ClassroomTitle } from "../../components";
+import { Header, Footer, SideBar, VocabularyListCard, ClassroomTitle, ViewClassroomSkeleton } from "../../components";
 import { useNavigate } from "react-router-dom";
 import classroomService from "../../services/Classroom/classroomService";
+import SeeMoreSection from "../../components/Classroom/SeeMoreSection";
+// import { addDevDelay } from "../../utils/devUtils";
+import { useSkeletonToggle } from "../../hooks/useSkeletonToggle";
 
 const tabs = [
     { name: "To-review" },
@@ -9,23 +12,16 @@ const tabs = [
     { name: "Overdue assignment" }
 ];
 
-const dummyLists = Array(8).fill({
-    title: "IELTS Academy",
-    description: "A helpful list of commonly used English words to boost your reading and speaking skills",
-    username: "nguyenhoangphihung@gmail.com",
-    role: "Teacher",
-    reviewProgress: "2/5",
-    completionDate: "Aug, 28th, 2025",
-    result: "80%"
-});
-
-
 export default function ManageClassroomLearner() {
 
     const [activeTab, setActiveTab] = useState("To-review");
+    const [isOpen, setIsOpen] = useState(false);
 
     // Xử lý việc navigate
     const navigate = useNavigate();
+
+    // Development skeleton toggle (only in development)
+    const { isLoading: skeletonToggle } = useSkeletonToggle();
 
     // Get id về để fetch data 
     const [classroomId, setClassroomId] = useState(() => {
@@ -34,115 +30,119 @@ export default function ManageClassroomLearner() {
     })
 
     // Xử lý việc fetch dữ liệu lớp học cho learner
-    // const [isLoading, setIsLoading] = useState(false);
-    // const [assignments, setAssignments] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [assignments, setAssignments] = useState([]);
 
-    // useEffect(() => {
-    //     if (!classroomId || isLoading) {
-    //         return;
-    //     }
+    useEffect(() => {
+        if (!classroomId) {
+            return;
+        }
 
-    //     const fetchAssignments = async () => {
-    //         setIsLoading(true);
-    //         try {
-    //             let res;
-    //             switch (activeTab) {
-    //                 case "To-review":
-    //                     res = await classroomService.getToReviewAssignments(classroomId);
-    //                     break;
-    //                 case "Reviewed":
-    //                     res = await classroomService.getReviewedAssignments(classroomId);
-    //                     break;
-    //                 default:
-    //                     res = await classroomService.getOverdueAssignments(classroomId);
-    //             }
+        const fetchAssignments = async () => {
+            setIsLoading(true);
+            try {
+                // Artificial delay for skeleton testing (only in development)
+                // await addDevDelay(2000); // 2 seconds delay
+                
+                let res;
+                switch (activeTab) {
+                    case "To-review":
+                        res = await classroomService.getToReviewAssignments(classroomId);
+                        break;
+                    case "Reviewed":
+                        res = await classroomService.getReviewedAssignments(classroomId);
+                        break;
+                    default:
+                        res = await classroomService.getOverdueAssignments(classroomId);
+                        console.log(res);
+                }
 
-    //             if (res.success && Array.isArray(res.data)) {
-    //                 setAssignments(res.data);
-    //                 console.log("Fetch assignments thành công");
-    //             }
-    //         } catch (error) {
-    //             console.error("Lỗi khi fetch assignments:", error);
-    //             navigate("/fail");
-    //         } finally {
-    //             setIsLoading(false);
-    //         }
-    //     };
-    //     fetchAssignments();
+                if (res.success && Array.isArray(res.data)) {
+                    setAssignments(res.data);
+                    console.log("Fetch assignments thành công");
+                }
+            } catch (error) {
+                console.error("Lỗi khi fetch assignments:", error);
+                navigate("/fail");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchAssignments();
 
-    // }, [activeTab, classroomId]);
+    }, [activeTab, classroomId, navigate]);
 
     return (
         <div className="manage-classroom-learner">
             <Header />
             <div className="manage-classroom-learner__container">
                 <div className="manage-classroom__sidebar">
-                    <SideBar />
+                    <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
                 </div>
-                <div className="manage-classroom-learner__content">
-                    {/* Title */}
-                    <ClassroomTitle />
+                {skeletonToggle(isLoading) ? (
+                    <ViewClassroomSkeleton />
+                ) : (
+                    <div className="manage-classroom-learner__content">
+                        {/* Title */}
+                        <ClassroomTitle />
 
-                    {/* Menu tab */}
-                    <div className="sub-menu-tabs">
-                        <div className="tab-list">
-                            {tabs.map((tab, idx) => (
-                                <div
-                                    key={idx}
-                                    className={`tab ${(activeTab === tab.name) ? "active" : ""}`}
-                                    onClick={() => setActiveTab(tab.name)}
-                                >
-                                    {tab.name}
-                                </div>
-                            ))}
+                        {/* Menu tab */}
+                        <div className="sub-menu-tabs">
+                            <div className="tab-list">
+                                {tabs.map((tab, idx) => (
+                                    <div
+                                        key={idx}
+                                        className={`tab ${(activeTab === tab.name) ? "active" : ""}`}
+                                        onClick={() => setActiveTab(tab.name)}
+                                    >
+                                        {tab.name}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
 
 
-                    {/* Top Bar */}
-                    <div className="list-topbar">
-                        <span>All lists: 12</span>
-                        <div className="filter">Filter by ▼</div>
-                    </div>
+                        {/* Top Bar */}
+                        <div className="list-topbar">
+                            <span>All lists: {assignments.length}</span>
+                            <div className="filter">Filter by ▼</div>
+                        </div>
 
 
-                    {/* List Grid */}
-                    {activeTab === "To-review" ? (
-                        <div className="list-grid">
-                            {dummyLists.map((list, index) => (
-                                <VocabularyListCard
-                                    key={index}
-                                    {...list}
+                        {/* See more */}
+                        {assignments.length > 0 ? (
+                        <>
+                            {/* <div className="list-grid"> */}
+                                <SeeMoreSection
+                                    items={assignments}
+                                    renderItem={(item, index) => (
+                                        <VocabularyListCard
+                                            key={item.assignment_id || index}
+                                            title={item.title}
+                                            description={`Exercise method: ${item.exercise_method}`}
+                                            username={item.creator?.email}
+                                            avatarUrl={item.creator?.avatar_url}
+                                            role="Teacher"
+                                            reviewProgress={`${item.completed_sublist_index || 0}/${item.sublist_count || 0}`}
+                                            completionDate={new Date(item.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            result={item.learner_status || 'Pending'}
+                                            buttonContent="Overview"
+                                        />
+                                    )}
+                                    initialCount={4}
+                                    step={4}
+                                    wrapperClassName="list-grid"
+                                    itemWrapperTag="div"
                                 />
-                            ))}
-                        </div>
-                    ) : activeTab === "Reviewed" ? (
-                        <div className="list-grid">
-                            {dummyLists.map((list, index) => (
-                                <VocabularyListCard
-                                    key={index}
-                                    {...list}
-                                />
-                            ))}
-                        </div>
+                            {/* </div> */}
+                        </>
                     ) : (
-                        <div className="list-grid">
-                            {dummyLists.map((list, index) => (
-                                <VocabularyListCard
-                                    key={index}
-                                    {...list}
-                                />
-                            ))}
+                        <div className="empty-list">
+                            <p>No assignments found for {activeTab.toLowerCase()}.</p>
                         </div>
                     )}
-
-
-
-                    {/* See more */}
-                    <div className="see-more">
-                        <button className="btn see-more-btn">See more ▼</button>
                     </div>
-                </div>
+                )}
             </div>
             <Footer />
         </div>

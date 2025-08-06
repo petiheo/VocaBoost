@@ -4,7 +4,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #fffcf8;
+    background-color: #FFFCF7;
     height: 100vh;
     padding: 2rem;
 
@@ -18,10 +18,15 @@
         text-align: center;
         border: 1px solid #f1efec;
 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
         h2.join-classroom__title {
             font-family: $font-lalezar;
             font-size: 1.5rem;
-            font-weight: 700;
+            font-weight: normal;
             color: #2c231b;
             margin-bottom: 0.5rem;
         }
@@ -29,21 +34,23 @@
         .join-classroom__message {
             font-family: $font-inriasans;
             font-size: 0.85rem;
-            color: #5b5149;
+            font-weight: 600;
+            color: #2A1E17;
             margin-bottom: 1rem;
         }
 
         .join-classroom__code-input {
+            font-family: $font-inriasans;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c231b;
             background-color: #f2f2f2;
             border: none;
             border-radius: 0.5rem;
             padding: 0.75rem 1rem;
-            width: 100%;
-            font-size: 1rem;
-            font-weight: 600;
+            width: 60%;
             text-align: center;
             margin-bottom: 1.25rem;
-            color: #2c231b;
 
             &:focus {
                 outline: none;
@@ -60,10 +67,28 @@
             border: none;
             font-size: 0.95rem;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
 
-            &:hover {
+            max-width: 50%;
+
+            &:hover:not(:disabled) {
                 background-color: #1f1914;
+            }
+
+            &:active:not(:disabled) {
+                background-color: #D6D6D6;
+                border-radius: 9999px;
+            }
+
+            &:disabled {
+                cursor: not-allowed;
+                opacity: 0.6;
+            }
+
+            &--loading {
+                background-color: #6b6660;
+                opacity: 0.7;
+                cursor: not-allowed;
             }
         }
     }

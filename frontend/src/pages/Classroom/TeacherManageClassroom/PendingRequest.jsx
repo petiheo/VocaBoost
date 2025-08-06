@@ -1,40 +1,52 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import classroomService from "../../../services/Classroom/classroomService";
+import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 import {
     ClassroomTitle,
     TeacherClassroomMenuTab,
-    SearchBar, ClassroomDropdownMenu
+    SearchBar, ClassroomDropdownMenu,
+    PendingRequestSkeleton
 } from "../../../components/index";
-import classroomService from "../../../services/Classroom/classroomService";
-
-// const initialStudents = Array(7).fill("Jane Smith");
 
 export default function PendingRequestPage() {
+    // Dùng để lưu thông tin request
     const [request, setRequest] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Xử lý thanh search bar 
     const [searchQuery, setSearchQuery] = useState("");
+
+    // Xử lý request hiện theo search bar
+    const filterRequest = request.filter((request) => 
+        request?.email.toLowerCase().includes(searchQuery.toLowerCase()));
 
     // Fetch data về trang 
     useEffect(() => {
         const fetchPendingRequest = async () => {
             try {
+                setLoading(true);
                 const res = await classroomService.getPendingJoinRequets();
                 if (res.success && Array.isArray(res.data)) {
                     setRequest(res.data);
                 }
             } catch (error) {
                 console.error("Lỗi khi lấy danh sách lớp học:", error);
+            } finally {
+                setLoading(false);
             }
         }
         fetchPendingRequest();
     }, [])
     // Xử lý nút Cancel (chưa hoàn thiện)
-    const handleCancel = (learner_id) => {
+    const handleCancel = async (id) => {
         setRequest(request.filter((_, i) => i !== learner_id));
     };
 
-    const filteredRequest = request.filter((r) =>
-        r.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+
+    if (loading) {
+        return <PendingRequestSkeleton />;
+    }
 
     return (
         <div className="pending-request__page">
@@ -47,7 +59,7 @@ export default function PendingRequestPage() {
                     <Link to="../add-students" className="btn btn--dark"> + Add Student</Link>
 
                     <div className="pending-request__search-block">
-                        <SearchBar />
+                        <SearchBar value={searchQuery} onChange={searchQuery} placeHolder={"Enter learner email you want to find"}/>
                         <div className="search-block--dropdown-menu">
                             <ClassroomDropdownMenu students={request.length} />
                         </div>
@@ -55,22 +67,22 @@ export default function PendingRequestPage() {
                 </div>
 
                 {/* Student list */}
+
                 <div className="pending-request__student-list">
-                    {filteredRequest.map((r) => (
-                        <div className="pending-request__student-row" key={r.learner_id}>
-                            <span>{r.email}</span>
+                    <SeeMoreSection 
+                        items={request}
+                        renderItem={(item) => (
+                            <div className="pending-request__student-row" key={item.learner_id}>
+                            <span>{item.email}</span>
                             <button
                                 className="btn btn--light"
-                                onClick={() => handleCancel(learner_id)}
+                                onClick={() => handleCancel(item.learner_id)}
                             >
                                 Cancel
                             </button>
                         </div>
-                    ))}
-                </div>
-
-                <div className="pending-request__see-more">
-                    <button className="btn btn--see-more">See more ▼</button>
+                        )}
+                    /> 
                 </div>
             </div>
         </div>

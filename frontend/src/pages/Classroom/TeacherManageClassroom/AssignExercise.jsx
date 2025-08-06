@@ -2,13 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Header, SideBar, Footer } from '../../../components';
 import classroomService from '../../../services/Classroom/classroomService';
 import { useNavigate } from 'react-router-dom';
-
-const vocabularyOptions = [
-    'Unit 1 Vocabulary',
-    'Unit 2 Vocabulary',
-    'IELTS Academic',
-    'Intro to SE - Chapter 5'
-];
+import vocabularyService from '../../../services/Vocabulary/vocabularyService'
 
 function AssignExercise() {
     // Truy xuất dữ liệu lớp học được lưu khi users chọn classroom ở trang MyClassroom. 
@@ -27,26 +21,44 @@ function AssignExercise() {
 
     // Xử lý phần tìm kiếm vocabulary list 
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [selectedVocab, setSelectedVocab] = useState('');
+    const [selectedVocabId, setSelectedVocabId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [showError, setShowError] = useState(false);
     const dropdownRef = useRef(null);
 
+    // Xử lý việc lấy data vocab của giáo viên 
+    const [vocabList, setVocabList] = useState([]);
+
+    useEffect(() => {
+        const fetchVocabularyList = async () => {
+            try {
+                const res = await vocabularyService.getMyLists();
+                setVocabList(res.lists);
+            } catch (error) {
+                console.error("Lỗi khi lấy danh sách lớp học:", error);
+            }
+        }
+        fetchVocabularyList();
+    }, [])
+
     // Xử lý thanh chọn list từ vựng
-    const filteredOptions = vocabularyOptions.filter(option =>
-        option.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredOptions = vocabList.filter(lists =>
+        lists.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleSelect = (option) => {
-        setSelectedVocab(option);
-        setSearchTerm(option);
+        // setSelectedVocab(option);
+        setSelectedVocabId(option.id);
+        setSearchTerm(option.title);
         setDropdownOpen(false);
         setShowError(false);
     };
 
+
     const handleBlur = () => {
-        if (!vocabularyOptions.some(option => option.toLowerCase() === searchTerm.toLowerCase())) {
+        if (!vocabList.some(lists => lists.title.toLowerCase() === searchTerm.toLowerCase())) {
             setShowError(true);
+            setSelectedVocabId(null);
         } else {
             setShowError(false);
         }
@@ -59,14 +71,13 @@ function AssignExercise() {
         "Word Association": "word_association"
     };
 
-
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
-
+    const [isOpen, setIsOpen] = useState(false);
 
     const handleCreateAssignment = async (e) => {
         e.preventDefault();
-        const vocabListId = "3ecb287e-453a-4c97-a590-e85742d0b9d2"; // chinh lai thanh id
+        const vocabListId = selectedVocabId;
         const title = searchTerm;
         const wordsPerReview = parseInt(e.target["words_per_review"].value);
         const formatDate = (dateStr) => new Date(`${dateStr}T10:00:00Z`).toISOString();
@@ -74,8 +85,8 @@ function AssignExercise() {
 
         const newErrors = {};
 
-        if (startDate === dueDate) {
-            newErrors.date =  "The start date must be different from the due date.";
+        if (startDate >= dueDate) {
+            newErrors.date = "The start date must be different from the due date.";
         }
 
         if (title.length === 0) {
@@ -125,12 +136,15 @@ function AssignExercise() {
         };
     }, []);
 
+
+
+
     return (
         <div className="assign-exercise">
             <Header />
             <div className="assign-exercise__container">
                 <div className="assign-exercise__sidebar">
-                    <SideBar />
+                    <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
                 </div>
 
                 <form className="assign-exercise__content" onSubmit={handleCreateAssignment}>
@@ -150,17 +164,19 @@ function AssignExercise() {
                                     setSearchTerm(e.target.value);
                                     setDropdownOpen(true);
                                 }}
+                                autoComplete="off"
+                                onFocus={() => setDropdownOpen(true)}
                                 onBlur={handleBlur}
                             />
                             {dropdownOpen && filteredOptions.length > 0 && (
                                 <div className="dropdown-options">
-                                    {filteredOptions.map((option, idx) => (
+                                    {filteredOptions.map((option) => (
                                         <div
-                                            key={idx}
+                                            key={option.id}
                                             className="option"
                                             onMouseDown={() => handleSelect(option)}
                                         >
-                                            {option}
+                                            {option.title}
                                         </div>
                                     ))}
                                 </div>

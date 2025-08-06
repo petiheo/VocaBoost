@@ -90,18 +90,6 @@ ALTER TABLE public.notifications ADD CONSTRAINT fk_notifications_recipient
 ALTER TABLE public.achievements ADD CONSTRAINT fk_achievements_user 
     FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
--- For vocabulary_examples
-ALTER TABLE public.vocabulary_examples ADD CONSTRAINT fk_vocab_examples_vocabulary 
-    FOREIGN KEY (vocabulary_id) REFERENCES public.vocabulary(id) ON DELETE CASCADE;
-
--- For word_synonyms
-ALTER TABLE public.word_synonyms ADD CONSTRAINT fk_word_synonyms_word 
-    FOREIGN KEY (word_id) REFERENCES public.vocabulary(id) ON DELETE CASCADE;
-
--- For user_word_progress
-ALTER TABLE public.user_word_progress ADD CONSTRAINT fk_user_word_progress_word 
-    FOREIGN KEY (word_id) REFERENCES public.vocabulary(id) ON DELETE CASCADE;
-
 INSERT INTO schema_migrations (version, description) 
 VALUES ('007', 'Add foreign key constraints');
 

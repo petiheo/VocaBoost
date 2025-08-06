@@ -1,12 +1,11 @@
 const express = require('express');
 const userRouter = express.Router();
-const authMiddleware = require('../middlewares/auth.middleware');
-const rateLimiter = require('../middlewares/rateLimiter.middleware');
+const authenticateMiddleware = require('../middlewares/authenticate.middleware');
 const userValidators = require('../validators/user.validator');
 const userController = require('../controllers/user.controller');
 const uploadMiddleware = require('../middlewares/upload.middleware');
 
-userRouter.use(authMiddleware);
+userRouter.use(authenticateMiddleware);
 
 userRouter.get('/profile', userController.getProfile);
 
@@ -19,9 +18,10 @@ userRouter.put(
 
 userRouter.post(
   '/report',
-  rateLimiter,
   userValidators.reportContent,
   userController.reportContent
 );
+
+userRouter.get('/profile/statistics', userController.getUserStatistics);
 
 module.exports = userRouter;

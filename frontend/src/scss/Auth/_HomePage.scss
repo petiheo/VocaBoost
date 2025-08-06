@@ -1,3 +1,5 @@
+@use '../Fonts' as *;
+
 .homepage__wrapper {
   display: flex;
   flex-direction: column;
@@ -11,7 +13,110 @@
   &__main {
     margin: auto;
     flex: 1;
-    background-color: #FFFCF7;
-
   }
 }
+
+.homepage__main {
+  padding: 2rem;
+}
+
+.homepage__content {
+  // Đây là container chính giúp thụt vào 2 bên
+  max-width: 90%; // Giới hạn chiều rộng tối đa
+  margin: 0 auto;   // Tự động căn giữa
+}
+
+.search-results-section {
+  width: 100%;
+  
+  h2 {
+    font-family: $font-inriasans;
+    font-size: 2rem; 
+    font-weight: 600;
+    color: #2D2D2D;
+    margin-bottom: 2rem; 
+  }
+  .search-status-message {
+    width: 100%;
+    padding: 3rem 1rem;
+    text-align: center;
+    font-size: 1.1rem;
+    font-family: $font-inriasans;
+    border-radius: 10px;
+    background-color: #f8f8f8;
+
+    &.loading {
+      color: #555;
+    }
+
+    &.error {
+      background-color: #fff0f0;
+      color: #d8000c; // Màu đỏ cho lỗi
+      font-weight: 500;
+    }
+
+    &.empty {
+      color: #666;
+    }
+  }
+}
+
+.search-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem; // Khoảng cách giữa các card theo cả chiều ngang và dọc
+}
+
+.review-lists-section {
+  width: 100%;
+  margin-bottom: 3rem;
+
+  .section-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+
+    h2 {  
+      font-family: $font-lalezar;
+      font-size: 2.5rem;
+      font-weight: normal;
+      color: #2D2D2D;
+      margin: 0;
+    }
+  }
+
+  .review-lists-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .loading-container, 
+  .error-message, 
+  .no-data-message {
+    padding: 3rem 1rem;
+    text-align: center;
+    font-size: 1.1rem;
+    font-family: $font-inriasans;
+    border-radius: 10px;
+    background-color: #f8f8f8;
+  }
+
+  .error-message {
+    background-color: #fff0f0;
+    color: #d8000c;
+    font-weight: 500;
+  }
+
+  .no-data-message {
+    color: #666;
+  }
+
+  .review-pagination {
+    margin-top: 2rem;
+  }
+}
+
+
+

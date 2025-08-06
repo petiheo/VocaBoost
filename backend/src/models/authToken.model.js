@@ -1,4 +1,4 @@
-const supabase = require('../config/database');
+const { supabase } = require('../config/supabase.config');
 
 class AuthToken {
   static async create(token, userId, tokenType, expiresAt) {

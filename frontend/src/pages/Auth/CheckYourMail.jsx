@@ -12,8 +12,9 @@ export default function CheckYourMail() {
     const [resendMessage, setResendMessage] = useState("");
     const [resendError, setResendError] = useState("");
     
-    // Check if user came from sign-up or sign-in
+    // Check if user came from sign-up or unverified login
     const isFromSignUp = location.state?.fromSignUp || false;
+    const isFromUnverified = location.state?.fromUnverified || false;
     
     useEffect(() => {
         // Get email from location state or localStorage
@@ -51,7 +52,7 @@ export default function CheckYourMail() {
                 minHeight: "100vh",
             }}>
             <div className="sign-up-successfully">
-                {isFromSignUp ? "Sign up successfully" : "Email verification required"}
+                {isFromSignUp ? "Sign up successfully" : isFromUnverified ? "Email verification required" : "Email verification required"}
             </div>
             <div className="check-your-mail">Check your mail!</div>
             

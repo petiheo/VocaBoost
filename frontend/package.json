@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "sass src/scss/main.scss src/index.css && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "sass src/scss:public",
@@ -18,8 +18,10 @@
     "jwt-decode": "^4.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-loading-skeleton": "^3.5.0",
     "react-router-dom": "^7.6.3",
-    "react-select": "^5.10.2"
+    "react-select": "^5.10.2",
+    "react-toastify": "^11.0.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

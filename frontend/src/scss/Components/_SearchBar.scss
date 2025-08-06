@@ -1,9 +1,15 @@
+@use '../Fonts' as *; 
+
 .searchbar-container {
   display: flex;
   align-items: center;
+
   background-color: #f1f1f1; 
-  border-radius: 12px;
   padding: 10px 16px;
+  border-radius: 9999px;
+
+  font-family: $font-inriasans;
+
   width: 100%;
   min-width: 200px;
   max-width: 80%;
@@ -17,6 +23,6 @@
   background: transparent;
   outline: none;
   font-size: 16px;
-  color: #333;
+  color: #989898;
   width: 100%;
 }

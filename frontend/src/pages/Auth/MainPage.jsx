@@ -1,11 +1,13 @@
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
+import Header from "../../components/Layout/Header";
+import Footer from "../../components/Layout/Footer";
 import "../../assets/icons/index";
 import { Link, Outlet } from "react-router-dom";
 import { Pattern1, Pattern2, Pattern3, Pattern4, Pattern5, Pattern6, Pattern7, Pattern8 } from "../../assets/icons/index";
 import { PatternCard1, PatternCard2, PatternCard3 } from "../../assets/icons/index";
 import { Group41, Group52, Group53, Group56, Group78 } from "../../assets/icons/index";
 import { Union, Vector, Group8 } from '../../assets/icons/index';
+import { useEffect } from "react";
+import { useToast } from "../../components/Providers/ToastProvider";
 
 const patterns = {
     1: Pattern1,
@@ -33,6 +35,42 @@ const Group = {
 }
 
 export default function MainPage() {
+    const showToast = useToast();
+
+    // Check for logout notifications on component mount (fallback for users landing on mainpage)
+    useEffect(() => {
+        const logoutReason = sessionStorage.getItem("logoutReason");
+        if (logoutReason) {
+            let message = "";
+            switch (logoutReason) {
+                case "manual":
+                    message = "You have been successfully logged out.";
+                    showToast(message, "success");
+                    break;
+                case "expired":
+                    message = "Your session has expired. Please log in again.";
+                    showToast(message, "error");
+                    break;
+                case "unauthorized":
+                    message = "Your session is invalid. Please log in again.";
+                    showToast(message, "error");
+                    break;
+                case "unverified":
+                    message = "Please verify your email address before logging in.";
+                    showToast(message, "error");
+                    break;
+                case "verification_error":
+                    message = "Unable to verify account status. Please try again.";
+                    showToast(message, "error");
+                    break;
+                default:
+                    break;
+            }
+            // Clear the logout reason after showing notification
+            sessionStorage.removeItem("logoutReason");
+        }
+    }, [showToast]);
+
     return (
         <div className="main-page">
             <Header/>

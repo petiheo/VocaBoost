@@ -1,71 +1,104 @@
 import { useState, useEffect } from "react";
-import { Header, Footer, SideBar } from "../../components/index";
+import { Header, Footer, SideBar, ClassroomCardSkeleton } from "../../components/index";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import classroomService from "../../services/Classroom/classroomService";
 import { useAuth } from "../../services/Auth/authContext";
+import SeeMoreSection from "../../components/Classroom/SeeMoreSection";
+
 
 const tabs = [
-  { name: "My classroom", route: "/my-classroom" },
-  { name: "My vocabulary list", route: "/my-vocabulary-list" },
-  { name: "Statistic", route: "/statistic" },
+  { name: "Teaching" },
+  { name: "Joined" },
 ];
 
 export default function MyClassroomPage() {
-  // const [userRole, setUserRole] = useState("teacher"); // 'teacher' | 'learner'
   const [classrooms, setClassrooms] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+
 
   // Lấy pathname hiện tại, ví dụ: "/my-classroom"
-  const currentPath = location.pathname;
+  const [currentTab, setCurrentTab] = useState("Teaching");
+
 
   useEffect(() => {
     const fetchClassroom = async () => {
       try {
+        setLoading(true);
+        let apiCall
         // Trường hợp là giáo viên
-        // if(user?.role === "teacher"){
-          const res = await classroomService.myClassroom();
+        if (user?.role === "teacher") {
+          let res;
+          switch (currentTab) {
+            case "Teaching":
+              apiCall = classroomService.myClassroom();
+              console.log("Fetching TEACHING classrooms for teacher...");
+              break;
+            case "Joined":
+              apiCall = classroomService.getMyJoined();
+              console.log("Fetching JOINED classrooms for teacher...");
+              break
+            default:
+              setClassrooms([]);
+              console.log("Error - Do not know currentTab");
+              return;
+          }
+
+        } else if (user?.role === "learner") { // Trường hợp là học sinh
+          apiCall = classroomService.getMyJoined();
+          console.log("Fetching JOINED classrooms for learner...");
+        }
+        if (apiCall) {
+          const res = await apiCall;
+
           if (res.success && Array.isArray(res.data)) {
             setClassrooms(res.data);
           }
-        // }
-        // Trường hợp là học sinh
-        // else if(user?.role === "learner"){
-        //   const res = await classroomService.getMyJoined();
-        //   if (res.success && Array.isArray(res.data)) {
-        //     setClassrooms(res.data);
-        //   }
-        // }
+          else {
+            setClassrooms([]);
+          }
+        }
+        else {
+          setClassrooms([]);
+        }
       } catch (error) {
         console.error("Lỗi khi lấy danh sách lớp học:", error);
-      };
+        setClassrooms([]);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchClassroom();
-  }, [])
+  }, [currentTab])
 
   return (
     <div className="my-classroom">
       <Header />
       <div className="my-classroom-container">
         <div className="my-classroom-sidebar">
-          <SideBar />
+            <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         </div>
         <div className="my-classroom-page">
 
-          <div className="sub-menu-tabs">
-            <div className="tab-list">
-              {tabs.map((tab, idx) => (
-                <div
-                  key={idx}
-                  className={`tab ${currentPath === tab.route ? "active" : ""}`}
-                  onClick={() => navigate(tab.route)}
-                >
-                  {tab.name}
-                </div>
-              ))}
+          <h1>My Classroom</h1>
+
+          {user.role === "teacher" && (
+            <div className="sub-menu-tabs">
+              <div className="tab-list">
+                {tabs.map((tab, idx) => (
+                  <div
+                    key={idx}
+                    className={`tab ${currentTab === tab.name ? "active" : ""}`}
+                    onClick={() => setCurrentTab(tab.name)}
+                  >
+                    {tab.name}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Actions */}
           <div className="actions">
@@ -76,31 +109,45 @@ export default function MyClassroomPage() {
             <span className="total">All classrooms: {classrooms.length} </span>
           </div>
 
-          {/* Classroom List */}
-          <div className="classroom-list">
-            {classrooms.length === 0 ? (
-              <p className="no-classroom-message">No classroom available.</p>
-            ) : (classrooms.map((c, index) => (
-              <div className="classroom-card"
-                key={c.id}
-                onClick={() => {
-                  localStorage.setItem("selectedClassroom", JSON.stringify(c)) // luu thông tin của classroom được chọn
-                  navigate(`/classroom/approve-join-classroom-request`); // Điều hướng
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                <div className="info">
-                  <span>{c.assignment_count} lists | {c.learner_count} members</span>
-                  <h3>{c.name}</h3>
-                </div>
-              </div>
-            )))}
-          </div>
-
           {/* See more */}
-          <div className="see-more">
-            <button className="btn see-more-btn">See more ▼</button>
-          </div>
+          {loading ? (
+            <div className="classroom-list">
+              <ClassroomCardSkeleton count={4} />
+            </div>
+          ) : classrooms.length === 0 ? (
+            <>
+              <div className="empty-list">"No classrom available"</div>
+            </>
+          ) : (
+            <>
+              <div className="classroom-list">
+                <SeeMoreSection
+                  items={classrooms}
+                  renderItem={(item, index) => (
+                    <div className="classroom-card" key={item.id}
+                      onClick={() => {
+                        localStorage.setItem("selectedClassroom", JSON.stringify(item)) // luu thông tin của classroom được chọn
+                        // Điều hướng
+                        {user?.role === "teacher" ? (
+                          navigate(`/classroom/learners-list`)
+                        ):(navigate(`/view-classroom`))}
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <div className="info">
+                        <span>{item.assignment_count} assignments | {item.learner_count} members</span>
+                        <h3>{item.name}</h3>
+                      </div>
+                    </div>
+                  )}
+                  initialCount={2}
+                  step={3}
+                  wrapperClassName="word-list"
+                  itemWrapperTag="div"
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
       <Footer />

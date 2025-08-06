@@ -92,3 +92,7 @@ public/
 
 # Supabase
 .branches
+
+# Vercel
+/backend/.vercel
+/frontend/.vercel

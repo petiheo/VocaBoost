@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function ClassroomTitle() {
     const navigate = useNavigate();
-    const { user, loading } = useAuth(); // load du lieu cua tai khoan
+    const { user } = useAuth(); // load du lieu cua tai khoan
 
     // load du lieu cua lop hoc duoc chon 
     const selectedClassroom = JSON.parse(localStorage.getItem("selectedClassroom"));
@@ -77,35 +77,25 @@ export default function ClassroomTitle() {
     return (
         <div className="class-header">
             {/* {user?.role === "teacher" ? ( */}
-                <div className="dropdown-container" ref={dropdownRef}>
-                    <button
-                        className="dropdown-toggle"
-                        onClick={() => setShowDropdown(!showDropdown)}
-                    >
-                        ⋯
-                    </button>
-                    {showDropdown && (
+            <div className="dropdown-container" ref={dropdownRef}>
+                <button
+                    className="dropdown-toggle"
+                    onClick={() => setShowDropdown(!showDropdown)}
+                >
+                    ⋯
+                </button>
+                {showDropdown &&
+                    (user?.role === "teacher" ? (
                         <div className="dropdown-menu">
                             <button onClick={handleRemoveClassroom} className="dropdown-item">Remove</button>
                         </div>
-                    )}
-                </div>
-            {/* ) : (
-                <div className="dropdown-container" ref={dropdownRef}>
-                    <button
-                        className="dropdown-toggle"
-                        onClick={() => setShowDropdown(!showDropdown)}
-                    >
-                        ⋯
-                    </button>
-                    {showDropdown && (
+                    ) : (
                         <div className="dropdown-menu">
-                            <button onClick={handleLeaveClassroom} className="dropdown-item">Remove</button>
+                            <button onClick={handleLeaveClassroom} className="dropdown-item">Leave</button>
                         </div>
-                    )}
-                </div>
-            )} */}
-
+                    ))
+                }
+            </div>
 
             <div className="header-left">
                 <h2>{selectedClassroom.name}</h2>
@@ -116,7 +106,12 @@ export default function ClassroomTitle() {
                         <img src={JoinCodeIcon} alt="join-code-icon" width="13px" />
                     </span>
                     <span className="tag"><img src={ClassroomTitlePattern} alt="classroom-memebers" width="13px" /> {selectedClassroom.learner_count}</span>
-                    <span className="tag">{selectedClassroom.classroom_status}</span>
+                    {user?.role === "teacher" ? (
+                        <span className="tag">{selectedClassroom.classroom_status}</span>
+                    ):(
+                        <span className="tag">{selectedClassroom.status}</span>
+                    )}
+                    
                 </div>
             </div>
 

@@ -427,17 +427,16 @@ class ClassroomModel {
   }
 
   async getLearnerAssignmentsByClassroomAndLearner(classroomId, learnerId) {
-    const { data, error } = await supabase
-      .from('learner_assignments')
-      .select('assignment_id')
-      .eq('learner_id', learnerId)
-      .in(
-        'assignment_id',
-        supabase.from('assignments').select('id').eq('classroom_id', classroomId)
-      );
+    const { data, error } = await supabase.rpc(
+      'get_learner_assignments_by_classroom',
+      {
+        p_classroom_id: classroomId,
+        p_learner_id: learnerId,
+      }
+    );
 
     if (error) throw error;
-    return data.map((row) => row.assignment_id);
+    return data ? data.map((row) => row.assignment_id) : [];
   }
 
   async createLearnerAssignmentsBatch(assignments) {
@@ -463,12 +462,20 @@ class ClassroomModel {
             words_per_review,
             sublist_count,
             created_at,
-            updated_at
+            updated_at,
+            vocab_lists (
+              creator:users (
+                  email,
+                  avatar_url,
+                  display_name
+              )
+            )
             `
       )
       .eq('classroom_id', classroomId)
       .order('start_date', { ascending: false });
 
+    console.log(data);
     if (error) throw error;
     return data;
   }
@@ -487,7 +494,14 @@ class ClassroomModel {
                 sublist_count,
                 due_date,
                 start_date,
-                classroom_id
+                classroom_id,
+                vocab_lists (
+                  creator:users (
+                      email,
+                      avatar_url,
+                      display_name
+                  )
+                )
             )
             `
       )
@@ -495,7 +509,6 @@ class ClassroomModel {
       .in('status', statusList);
 
     if (error) throw error;
-
     return data.filter((item) => item.assignments?.classroom_id === classroomId);
   }
 
