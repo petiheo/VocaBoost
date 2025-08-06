@@ -96,6 +96,7 @@ body {
   font-family: "Lalezar", sans-serif;
   font-size: 30px;
   margin: 0;
+  font-weight: normal;
 }
 .requests-section .requests-header .filter-dropdown {
   display: flex;
