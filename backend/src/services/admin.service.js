@@ -90,20 +90,13 @@ class AdminService {
       throw new Error('Report not found or is not open.');
     }
 
-    const resolutionStatus = action === 'approve' ? 'approved' : 'dismissed';
-
     // If the report is approved, the content is bad and must be deleted.
-    if (action === 'approve') {
-      const listId = await vocabularyModel.findWordOwnerList(report.word_id);
+    if (action === 'resolved') {
       await vocabularyModel.deleteWord(report.word_id);
-      if (listId) {
-          // Update the word count on the parent list
-          await vocabularyModel.updateWordCount(listId);
-      }
     }
 
     // Update the report itself with the resolution
-    const { data: updatedReport, error: updateError } = await adminModel.updateReportStatus(reportId, resolutionStatus, adminId, notes);
+    const { data: updatedReport, error: updateError } = await adminModel.updateReportStatus(reportId, action, adminId, notes);
     if (updateError) throw updateError;
     
     return updatedReport;

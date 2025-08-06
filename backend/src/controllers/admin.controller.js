@@ -110,12 +110,12 @@ class AdminController {
       const { notes } = req.body;
       const adminId = req.user.userId;
       
-      const result = await adminService.resolveReport(reportId, adminId, 'approve', notes);
+      const result = await adminService.resolveReport(reportId, adminId, 'resolved', notes);
       
       return ResponseUtils.success(res, 'Report approved successfully. The associated content has been removed.', {
           reportId: result.id,
           status: result.status,
-          resolution: 'approved',
+          resolution: 'resolved',
           notes: result.resolution_notes,
           resolvedBy: result.resolver_id
       });
@@ -133,7 +133,7 @@ class AdminController {
       const { notes } = req.body;
       const adminId = req.user.userId;
 
-      const result = await adminService.resolveReport(reportId, adminId, 'dismiss', notes);
+      const result = await adminService.resolveReport(reportId, adminId, 'dismissed', notes);
 
       return ResponseUtils.success(res, 'Report dismissed successfully. The content will remain on the platform.', {
           reportId: result.id,
