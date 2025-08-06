@@ -3,6 +3,232 @@
 @import url("https://fonts.googleapis.com/css2?family=Lalezar&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+.account-page-label {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.account-page-value {
+  background-color: #f0f2f5;
+  padding: 10px;
+  border-radius: 5px;
+  min-height: 40px;
+}
+
+.teacher-verification__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.teacher-verification__buttons {
+  display: flex;
+  gap: 2em;
+  justify-content: center;
+  align-items: center;
+}
+.teacher-verification__buttons .btn {
+  width: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+}
+.teacher-verification__buttons .btn_approve {
+  background-color: #d0f5d0;
+  color: #206f20;
+}
+.teacher-verification__buttons .btn_decline {
+  background-color: #fcd2d2;
+  color: #b50000;
+}
+
+body {
+  margin: 0;
+  font-family: "Arial", sans-serif;
+  background-color: #fdfaf5;
+  color: #333;
+}
+
+.teacher-request-page {
+  font-family: "Inria Sans", sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1rem 5rem;
+}
+
+.dashboard-nav {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #eee;
+}
+.dashboard-nav a {
+  padding: 1rem 2rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+.dashboard-nav a.active {
+  border-bottom: 2px solid #333;
+  background-color: #f7d99d;
+  border-radius: 10px 10px 0 0;
+}
+
+.requests-section {
+  background-color: #FFFCF7;
+  padding: 2rem;
+  border-radius: 10px;
+}
+.requests-section .requests-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.requests-section .requests-header h1 {
+  font-family: "Lalezar", sans-serif;
+  font-size: 30px;
+  margin: 0;
+  font-weight: normal;
+}
+.requests-section .requests-header .filter-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.requests-section .find-user-bar {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 2rem;
+}
+.requests-section .find-user-bar .search-icon {
+  color: #757575;
+}
+.requests-section .find-user-bar input {
+  border: none;
+  outline: none;
+  background: transparent;
+  margin-left: 0.5rem;
+  width: 100%;
+}
+
+.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Inria Sans", sans-serif;
+}
+.requests-table th,
+.requests-table td {
+  padding: 1rem;
+  text-align: center;
+}
+.requests-table th {
+  color: #2A1E17;
+  font-size: 20px;
+  font-weight: normal;
+}
+.requests-table tbody tr {
+  background-color: #fff8e1;
+  border-bottom: 10px solid #FFFCF7;
+  border-radius: 10px;
+}
+.requests-table td {
+  max-width: 200px;
+}
+.requests-table td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.requests-table td:last-child {
+  max-width: 100px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.requests-table td .btn {
+  display: flex;
+  gap: 2em;
+  justify-content: center;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-right: 5px;
+}
+.requests-table .review-btn {
+  background-color: #f7d99d;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.see-more-container {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.see-more-btn {
+  background-color: transparent;
+  border: 1px solid #eee;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer {
+  background-color: #333;
+  color: #fff;
+  padding: 2rem 5rem;
+}
+.footer .footer-content {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #555;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+.footer .footer-content .footer-logo {
+  display: flex;
+  align-items: center;
+}
+.footer .footer-content .footer-logo img {
+  width: 40px;
+  height: 40px;
+  margin-right: 0.5rem;
+  filter: brightness(0) invert(1);
+}
+.footer .footer-content .contact-info {
+  text-align: right;
+}
+.footer .footer-content .contact-info p {
+  margin: 0.2rem 0;
+}
+.footer .footer-bottom {
+  text-align: center;
+  color: #757575;
+  font-size: 0.8rem;
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -247,7 +473,6 @@
 }
 
 .teacher-verification {
-  background-color: #F8F8F8;
   height: 100vh;
 }
 .teacher-verification__header {
@@ -619,7 +844,470 @@
   width: auto;
   object-fit: contain;
   display: block;
-  padding: 1em;
+  margin: 0 auto;
+}
+.top-pattern .pattern1 {
+  grid-column: 1/4;
+  grid-row: 2;
+}
+.top-pattern .pattern2 {
+  grid-column: 3/6;
+  grid-row: 1;
+}
+.top-pattern .pattern3 {
+  grid-column: 2/3;
+  grid-row: 1;
+  margin-right: 2em;
+}
+.top-pattern .pattern4 {
+  grid-column: 8/11;
+  grid-row: 1;
+}
+.top-pattern .pattern5 {
+  grid-column: 8/10;
+  grid-row: 2;
+}
+.top-pattern .pattern6 {
+  grid-column: 11/12;
+  grid-row: 2;
+}
+.top-pattern .pattern7 {
+  grid-column: 12/13;
+  grid-row: 1;
+}
+.top-pattern .pattern8 {
+  grid-column: 13/15;
+  grid-row: 2;
+  margin-top: 4em;
+}
+
+.main-info {
+  display: flex;
+}
+.main-info .content {
+  width: 50vw;
+  margin-left: 50px;
+}
+.main-info .content h1 {
+  font-family: "Lalezar", sans-serif;
+  font-size: 140px;
+  margin: 0;
+}
+.main-info .content h2 {
+  font-family: "Inria Sans", sans-serif;
+  font-size: 40px;
+  margin: 0;
+}
+.main-info .content p {
+  font-family: "Inria Sans", sans-serif;
+  font-size: 18px;
+  margin: 0;
+}
+.main-info .content .get-started {
+  margin-top: 50px;
+  height: 3em;
+  width: 12em;
+  background-color: #352D24;
+  font-family: "Inria Sans", sans-serif;
+  font-size: 1.35em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  color: #FFF6E3;
+  border: none;
+  padding: 0;
+  border-radius: 50px;
+}
+.main-info .pattern-card-container {
+  width: 50vw;
+  height: 554px;
+  padding-top: 2em;
+}
+.main-info .pattern-card-container .pattern-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.main-info .pattern-card-container .pattern-card .pattern-card1 {
+  position: absolute;
+  right: 30%;
+  top: 0%;
+  width: 60%;
+}
+.main-info .pattern-card-container .pattern-card .pattern-card2 {
+  position: absolute;
+  right: 20%;
+  top: 10%;
+  width: 60%;
+}
+.main-info .pattern-card-container .pattern-card .pattern-card3 {
+  position: absolute;
+  right: 10%;
+  top: 12%;
+  width: 60%;
+}
+
+.slogan .group1 {
+  margin-top: 3em;
+  width: 100%;
+}
+
+.struggling {
+  text-align: center;
+  font-family: "Inria Sans", sans-serif;
+  color: #352D24;
+  font-weight: bold;
+  font-size: 40px;
+  margin-top: 3em;
+}
+
+.--- {
+  text-align: center;
+  font-family: "Inria Sans", sans-serif;
+  color: #352D24;
+  font-weight: bold;
+  font-size: 40px;
+}
+
+.dont-worry {
+  text-align: center;
+  font-family: "Inria Sans", sans-serif;
+  color: #352D24;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.slogans-grid {
+  max-height: 40vh;
+  display: grid;
+  grid-template-columns: 40% 60%;
+  grid-template-rows: repeat(2, auto);
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2em;
+}
+.slogans-grid .group2 {
+  grid-column: 2/3;
+  grid-row: 1/2;
+  justify-self: center;
+}
+.slogans-grid .group3 {
+  grid-column: 1/2;
+  grid-row: 1/2;
+  justify-self: center;
+}
+.slogans-grid .group4 {
+  grid-column: 1/3;
+  transform: none;
+  justify-self: center;
+}
+
+.there-is {
+  text-align: center;
+  margin-top: 3em;
+  font-family: "Inria Sans", sans-serif;
+  font-size: 33px;
+}
+
+.a-new-way-to-learn {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  font-family: "Inria Sans", sans-serif;
+  font-size: 50px;
+  font-weight: bold;
+}
+.a-new-way-to-learn .way {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #DD483C;
+  background-color: #FEC957;
+  width: 117px;
+  border-radius: 11px;
+}
+.a-new-way-to-learn .learn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #E8F4FF;
+  background-color: #458DD1;
+  width: 138px;
+  border-radius: 11px;
+}
+
+.group5 {
+  margin-top: 2em;
+  width: 100%;
+}
+
+.boxes {
+  margin-top: 3em;
+  display: flex;
+  gap: 10%;
+  justify-content: center;
+}
+.boxes-fill-in-blank {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 250px;
+  gap: 10px;
+  background-color: #EFEFEF;
+  border-radius: 43px;
+  padding: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+.boxes-fill-in-blank h1 {
+  color: #A43939;
+  font-family: "Lalezar", sans-serif;
+  margin: 0;
+  margin-block-end: 0;
+}
+.boxes-fill-in-blank .content {
+  color: #A43939;
+  font-family: "Inria Sans", sans-serif;
+  text-align: center;
+  margin-top: 10px;
+}
+.boxes-flashcard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 250px;
+  gap: 10px;
+  background-color: #EFEFEF;
+  border-radius: 43px;
+  padding: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+.boxes-flashcard h1 {
+  color: #3C5A9A;
+  font-family: "Lalezar", sans-serif;
+  margin: 0;
+  margin-block-end: 0;
+}
+.boxes-flashcard .content {
+  color: #3C5A9A;
+  font-family: "Inria Sans", sans-serif;
+  text-align: center;
+  margin-top: 10px;
+}
+.boxes-word-association {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 250px;
+  gap: 10px;
+  background-color: #EFEFEF;
+  border-radius: 43px;
+  padding: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+.boxes-word-association h1 {
+  text-align: center;
+  color: #4D8850;
+  font-family: "Lalezar", sans-serif;
+  font-size: 28.5px;
+  margin: 0;
+  margin-block-end: 0;
+}
+.boxes-word-association .content {
+  color: #4D8850;
+  font-family: "Inria Sans", sans-serif;
+  text-align: center;
+  margin-top: 10px;
+}
+.boxes-word-association .group8 {
+  width: 50px;
+}
+
+.ready-to-start {
+  margin: 3em 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.ready-to-start .so-you-ready-to-start {
+  font-family: "Lalezar", sans-serif;
+  font-size: 50px;
+  text-align: center;
+}
+.ready-to-start .get-started {
+  height: 3em;
+  width: 12em;
+  background-color: #352D24;
+  font-family: "Inria Sans", sans-serif;
+  font-size: 1.35em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  color: #FFF6E3;
+  border: none;
+  padding: 0;
+  border-radius: 50px;
+}
+
+@media screen and (max-width: 927px) {
+  .top-pattern {
+    height: 18vh;
+  }
+}
+@media screen and (max-width: 750px) {
+  .top-pattern {
+    flex-direction: column;
+    height: 40vh;
+  }
+  .top-pattern .left-pattern {
+    height: 20vh;
+  }
+  .top-pattern .right-pattern {
+    height: 20vh;
+  }
+  .main-info {
+    flex-direction: column-reverse;
+    height: 60vh;
+  }
+  .main-info .pattern-card-container {
+    height: 40vh;
+    width: 60vw;
+  }
+  .main-info .content {
+    height: 20vh;
+  }
+}
+.forgot {
+  background-image: url("./assets/icons/ForgotPassword/ForgotPassword.svg");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.forgot__form {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 3rem;
+  border-radius: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 550px;
+  font-family: "Lalezar", sans-serif;
+}
+.forgot__form h2 {
+  font-size: 2rem;
+  color: #3a2b1d;
+  font-weight: lighter;
+  margin-bottom: 2.5rem;
+}
+.forgot__form .input {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+.forgot__form .input label {
+  align-self: flex-start;
+  text-align: left;
+  margin-bottom: 0.5rem;
+  margin-left: 3rem;
+}
+.forgot__form .input__container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+.forgot__form .input input[type=email] {
+  padding: 12px 16px;
+  font-size: 1rem;
+  width: 80%;
+  border-radius: 8px;
+  border: none;
+  background-color: #f5f5f5;
+  align-self: center;
+}
+.forgot__form .input input[type=submit] {
+  padding: 12px 24px;
+  width: 60%;
+  background-color: #a85b15;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.forgot__form .input input[type=submit]:hover {
+  background-color: #8a470f;
+}
+.forgot__form .input input[type=submit]:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.forgot__success {
+  background-color: #d4edda;
+  color: #155724;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  width: 80%;
+  align-self: center;
+}
+.forgot__error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  width: 80%;
+  align-self: center;
+}
+
+.check-your-mail-container {
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: "Lalezar", sans-serif;
+}
+.check-your-mail-container .sign-up-successfully {
+  margin-top: 3em;
+  font-size: 30px;
+}
+.check-your-mail-container .check-your-mail {
+  font-size: 70px;
+}
+.check-your-mail-container .email-info {
+  margin: 1em 0;
+  font-size: 18px;
+  color: #555;
+  text-align: center;
+}
+.check-your-mail-container .email-info strong {
+  color: #333;
+}
+.check-your-mail-container .resend-section {
+  margin: 2em 0;
+  text-align: center;
+}
+.check-your-mail-container .resend-section p {
   margin-bottom: 1em;
   font-size: 16px;
   color: #666;

@@ -1,19 +1,60 @@
 import { useNavigate } from 'react-router-dom';
-import { Line } from '../../assets/Classroom';
-import { AdminSubMenu, Footer, Header } from '../../components';
+import adminService from '../../services/Admin/adminService';
+import { Header, Footer, AdminSubMenu } from '../../components';
+import { useEffect, useState } from 'react';
 
 const TeacherRequest = () => {
-    const requests = [
-        { id: 123, username: 'Mia Nguyen', email: 'janesmith@gmail.com' },
-        { id: 123, username: 'Mia Nguyen', email: 'janesmith@gmail.com' },
-        { id: 123, username: 'Mia Nguyen', email: 'janesmith@gmail.com' },
-        { id: 123, username: 'Mia Nguyen', email: 'janesmith@gmail.com' },
-        { id: 123, username: 'Mia Nguyen', email: 'janesmith@gmail.com' },
-        { id: 123, username: 'Mia Nguyen', email: 'janesmith@gmail.com' },
-        { id: 123, username: 'Mia Nguyen', email: 'janesmith@gmail.com' },
-    ];
 
     const navigate = useNavigate();
+
+    const [teacherRequests, setTeacherRequests] = useState([]);
+
+    const [isReload, setIsReload] = useState(false);
+
+    useEffect(() => {
+
+        const fetchTeacherRequests = async () => {
+            try {
+                const res = await adminService.getAllPendingTeacherRequest();
+                console.log("oke");
+                if (res.success && Array.isArray(res.data.requests)) {
+                    setTeacherRequests(res.data.requests);
+                }
+            } catch (error) {
+                console.error("Lỗi khi lấy danh sách request:", error);
+            }
+        }
+        fetchTeacherRequests();
+
+    }, [isReload]);
+
+
+    const handleApproveTeacherRequest = async (id) => {
+        try {
+            const res = await adminService.approveATeacherRequest(id);
+            if (res.success) {
+                setTeacherRequests(teacherRequests.filter((tr) => tr.requestId !== id));
+                console.log("Approve thanh cong");
+            }
+        } catch {
+            console.error(error.message);
+            navigate("/fail");
+        }
+    }
+
+    const handleRejectTeacherRequest = async (id) => {
+        try {
+            const res = await adminService.rejectATeacherRequest(id);
+            if (res.success) {
+                setTeacherRequests(teacherRequests.filter((tr) => tr.requestId !== id));
+                console.log("Reject thanh cong");
+            }
+        } catch {
+            console.error(error.message);
+            navigate("/fail");
+        }
+    }
+
 
     return (
         <div className="teacher-request-page">
@@ -25,14 +66,7 @@ const TeacherRequest = () => {
                     <div className="requests-header">
                         <h1>Teacher's Request</h1>
                         <div className="pending-request__filter-dropdown">
-                            <span>All lists: </span>
-                            <select
-                                value={location.pathname}
-                                onChange={(e) => navigate(e.target.value)}
-                            >
-                                <option value="/teacher-request">Teacher's Request</option>
-                                <option value="/teacher-request">General</option>
-                            </select>
+                            <span>All lists: {teacherRequests.length}</span>
                         </div>
                     </div>
                     <div className="find-user-bar">
@@ -48,23 +82,29 @@ const TeacherRequest = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {requests.map((request, index) => (
-                                <tr key={index}>
-                                    <td>{request.id}</td>
-                                    <td>{request.username}</td>
-                                    <td>{request.email}</td>
+                            {teacherRequests.map((request) => (
+                                <tr key={request?.requestId}>
+                                    <td>{request?.requestId}</td>
+                                    <td>{request?.user?.displayName}</td>
+                                    <td>{request?.user?.email}</td>
                                     <td>
                                         <div className="btn">
                                             <button className="btn approve"
-                                            // onClick={() => handleApproveJoinRequest(item.learner_id)}
+                                                onClick={() => handleApproveTeacherRequest(request.requestId)}
                                             >Approve</button>
                                             <button className="btn decline"
-                                            // onClick={() => handleRejectJoinRequest(item.learner_id)}
+                                                onClick={() => handleRejectTeacherRequest(request.requestId)}
                                             >Decline</button>
                                         </div>
                                     </td>
                                     <td>
-                                        <button className="review-btn" onClick={() => navigate("/admin-teacher-verification")}>Review</button>
+                                        <button className="review-btn"
+                                            onClick={() => {
+                                                localStorage.setItem("selectedRequest", JSON.stringify(request))
+                                                navigate("/admin-teacher-verification")
+                                                setIsReload(true)
+                                            }}>
+                                            Review</button>
                                     </td>
                                 </tr>
                             ))}

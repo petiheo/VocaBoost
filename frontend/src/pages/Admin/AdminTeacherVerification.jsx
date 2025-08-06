@@ -1,18 +1,59 @@
 import Logo from "../../components/Layout/Logo";
 import { UploadPattern } from "../../assets/icons";
-
-// Dữ liệu giả để hiển thị thông tin giáo viên
-const dummyTeacherData = {
-    fullName: "Nguyễn Thị Bích Thảo",
-    institution: "Đại học Khoa học Tự nhiên, ĐHQG-HCM",
-    schoolEmail: "ntbthao@hcmus.edu.vn",
-    additionalNotes: "Giảng viên khoa Công nghệ thông tin, chuyên ngành Kỹ thuật phần mềm.",
-    // Bạn có thể dùng một URL ảnh thật hoặc một ảnh placeholder
-    verificationDocumentUrl: "https://via.placeholder.com/400x250.png?text=Teacher+ID+Card+Preview",
-};
+import { useEffect, useState } from "react";
+import adminService from "../../services/Admin/adminService";
+import { useNavigate } from "react-router-dom";
 
 // Component giờ đây chỉ dùng để hiển thị thông tin
 export default function TeacherInformationDisplay() {
+    const [requestId, setRequestId] = useState(() => {
+        const selectedRequest = JSON.parse(localStorage.getItem("selectedRequest"));
+        return selectedRequest?.requestId || null;
+    });
+
+
+    const [teacherInformation, setTeacherInformation] = useState([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchTeacherInformation = async () => {
+            try {
+                const res = await adminService.getASpecificTeacherRequest(requestId);
+                if (res.success) {
+                    console.log(res.data);
+                    setTeacherInformation(res.data);
+                }
+            } catch (error) {
+                console.error("Lỗi khi lấy thông tin giáo viên", error);
+            }
+        }
+        fetchTeacherInformation();
+    }, [requestId]);
+
+    const handleApproveTeacherRequest = async (id) => {
+        try {
+            const res = await adminService.approveATeacherRequest(id);
+            if (res.success) {
+                console.log("Approve thanh cong");
+            }
+        } catch {
+            console.error(error.message);
+            navigate("/fail");
+        }
+    }
+
+    const handleRejectTeacherRequest = async (id) => {
+        try {
+            const res = await adminService.rejectATeacherRequest(id);
+            if (res.success) {
+                console.log("Reject thanh cong");
+            }
+        } catch {
+            console.error(error.message);
+            navigate("/fail");
+        }
+    }
+
     return (
         <div className="teacher-verification">
             <div className="teacher-verification__header">
@@ -28,17 +69,17 @@ export default function TeacherInformationDisplay() {
 
                             <div className="account-page-display-field">
                                 <label className="account-page-label">Full name:</label>
-                                <p className="account-page-value">{dummyTeacherData.fullName}</p>
+                                <p className="account-page-value">{teacherInformation.request?.user?.displayName}</p>
                             </div>
 
                             <div className="account-page-display-field">
                                 <label className="account-page-label">School:</label>
-                                <p className="account-page-value">{dummyTeacherData.institution}</p>
+                                <p className="account-page-value">{teacherInformation.request?.institution}</p>
                             </div>
 
                             <div className="account-page-display-field">
                                 <label className="account-page-label">School Email</label>
-                                <p className="account-page-value">{dummyTeacherData.schoolEmail}</p>
+                                <p className="account-page-value">{teacherInformation.request?.schoolEmail}</p>
                             </div>
 
                             <div className="account-page-display-field">
@@ -46,7 +87,7 @@ export default function TeacherInformationDisplay() {
                                     Additional notes:
                                 </label>
                                 <p className="account-page-value">
-                                    {dummyTeacherData.additionalNotes || "No additional notes."}
+                                    {teacherInformation.request?.additionalNotes || "No additional notes."}
                                 </p>
                             </div>
                         </div>
@@ -58,7 +99,9 @@ export default function TeacherInformationDisplay() {
 
                             <div className="teacher-verification__upload-box">
                                 <div className="teacher-verification__preview" style={{ display: 'block' }}>
-                                    {/* <img src={dummyTeacherData.verificationDocumentUrl} alt="Verification Preview" /> */}
+                                    <a href={teacherInformation.request?.credentials_url} target="_blank">
+                                        <img src={teacherInformation.request?.credentials_url} alt="Preview" />
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -66,10 +109,16 @@ export default function TeacherInformationDisplay() {
 
                     <div className="teacher-verification__buttons">
                         <button className="btn approve"
-                            // onClick={() => handleApproveJoinRequest(item.learner_id)}
+                            onClick={() => {
+                                handleApproveTeacherRequest(requestId)
+                                navigate("/teacher-request")
+                            }}
                         >Approve</button>
                         <button className="btn decline"
-                            // onClick={() => handleRejectJoinRequest(item.learner_id)}
+                            onClick={() => {
+                                handleRejectTeacherRequest(requestId)
+                                navigate("/teacher-request")
+                            }}
                         >Decline</button>
                     </div>
                 </div>
