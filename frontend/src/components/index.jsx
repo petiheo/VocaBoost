@@ -12,6 +12,7 @@ export { default as SearchBar } from "./Forms/SearchBar.jsx";
 // Navigation Components
 export { default as DropdownMenu } from "./Navigation/DropdownMenu.jsx";
 export { default as LearnerSubMenu } from "./Navigation/LearnerSubMenu.jsx";
+export { default as AdminSubMenu} from "./Navigation/AdminSubMenu.jsx"
 
 // UI Components
 export { default as ToastNotification } from "./UI/ToastNotification.jsx";
