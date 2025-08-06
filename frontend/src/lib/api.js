@@ -20,6 +20,8 @@ import("../services/Auth/authService.js").then((module) => {
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
+    console.log("API Request - URL:", config.url, "Token exists:", !!token); // Debug log
+    
     if (token) {
       // Skip token expiration check for auth endpoints and during OAuth flow
       const isAuthEndpoint =
@@ -34,6 +36,8 @@ api.interceptors.request.use(
         return Promise.reject(new Error("Token expired"));
       }
       config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      console.log("API Request - No token found in localStorage"); // Debug log
     }
     return config;
   },
@@ -75,6 +79,16 @@ api.interceptors.response.use(
       import.meta.env.MODE === "development"
     ) {
       console.error("Server error:", error.response.data);
+    }
+
+    // Don't log expected 404 errors for review endpoints (no due words)
+    if (
+      error.response?.status === 404 &&
+      error.config?.url?.includes('/review/') &&
+      error.response?.data?.message?.includes('No words are currently due for review')
+    ) {
+      // This is an expected behavior, not an error to log
+      return Promise.reject(error);
     }
 
     // Handle network errors silently in production

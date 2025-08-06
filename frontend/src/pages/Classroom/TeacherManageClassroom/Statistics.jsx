@@ -1,5 +1,5 @@
 import { Completion, LowPerformance, Time, TotalLearner } from "../../../assets/Classroom";
-import { ClassroomTitle, TeacherClassroomMenuTab } from "../../../components";
+import { AssignSubMenu, ClassroomTitle, TeacherClassroomMenuTab } from "../../../components";
 
 const learners = [
   { name: "Anna Nguyen", progress: 60, avgScore: "86%", lastActive: "Today" },
@@ -15,8 +15,8 @@ export default function Statistic() {
     return (
         <div className="statistics">
             <ClassroomTitle />
-            <TeacherClassroomMenuTab />
-
+            
+            <AssignSubMenu/>
             <section className="summary">
                 <div className="card pink">
                     <h4>Total Learners</h4>

@@ -8,8 +8,8 @@
 @use 'ReportTrigger';
 @use "SideBar";
 @use "LearnerSubMenu";
-@use "ToastNotification";
 @use "ConfirmModal";
+@forward 'BatchSummary';
 @forward "Dropdown" as dropdown-*;
 @forward "ClassroomTitle";
 @forward "TeacherClassroomMenuTab";

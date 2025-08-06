@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Footer, Header, SideBar, LearnerSubMenu, ReportTrigger } from "../../components/index.jsx";
+import { Footer, Header, SideBar, LearnerSubMenu } from "../../components/index.jsx";
 import { DropdownIcon, MoreIcon, PlusIcon } from "../../assets/Vocabulary/index.jsx";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
@@ -20,30 +20,54 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const confirm = useConfirm();
     const toast = useToast();
+    const [isOpen, setIsOpen] = useState(false);
 
     const handleCreateNewList = () => {
         navigate('/vocabulary/create/new');
     };
 
-    useEffect(() => {
-        async function fetchLists() {
-            try {
-                const res = await vocabularyService.getMyLists();
-                const listsData = res.lists || []; 
-                setLists(listsData.map(list => ({
-                    id: list.id,
-                    title: list.title,
-                    description: list.description,
-                    owner: list.creator?.display_name || "Unknown",
-                    role: list.creator?.role || "unknown",  
-                    tags: list.tags || [],
-                })));
-            } catch (err) {
-                console.error("Failed to fetch lists:", err);
-            }
+    const fetchLists = async () => {
+        try {
+            const res = await vocabularyService.getMyLists();
+            const listsData = res.lists || []; 
+            setLists(listsData.map(list => ({
+                id: list.id,
+                title: list.title,
+                description: list.description,
+                owner: list.creator?.display_name || "Unknown",
+                role: list.creator?.role || "unknown",  
+                tags: list.tags || [],
+            })));
+        } catch (err) {
+            console.error("Failed to fetch lists:", err);
         }
+    };
 
+    useEffect(() => {
         fetchLists();
+    }, []);
+
+    // Refresh lists when user returns to the page (e.g., after creating a new list)
+    useEffect(() => {
+        const handleFocus = () => {
+            fetchLists();
+        };
+
+        window.addEventListener('focus', handleFocus);
+        
+        // Also listen for visibility change (when tab becomes visible)
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                fetchLists();
+            }
+        };
+        
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, []);
 
     useEffect(() => {
@@ -93,9 +117,8 @@ export default function Dashboard() {
         <div className="dashboard">
             <Header />
             <LearnerSubMenu />
-            <ReportTrigger />
             <div className="dashboard__content">
-                <SideBar />
+                <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
 
                 <div className="dashboard__main">
                     <div className="dashboard__topbar">

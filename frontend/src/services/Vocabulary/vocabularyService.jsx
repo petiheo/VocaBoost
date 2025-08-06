@@ -16,7 +16,10 @@ const vocabularyService = {
   // 3. Tìm kiếm các danh sách công khai
   searchPublicLists: async (params = {}) => {
     const res = await api.get("/vocabulary/search", { params });
-    return res.data.data || [];
+    return {
+        lists: res.data.data.lists || [],
+        pagination: res.data.data.pagination || {}
+    };
   },
 
   // 4. Lấy chi tiết một danh sách
@@ -100,7 +103,78 @@ const vocabularyService = {
       context: data.context
     });
     return res.data;
-  }
+  },
+  // 15. Get Recently Viewed Lists
+  getHistoryLists: async (params = {}) => {
+    try {
+        const response = await api.get("/vocabulary/lists/history", { params });
+        if (response.data && response.data.success && response.data.data) {
+            return {
+                lists: response.data.data.lists || [],
+                pagination: response.data.pagination || {}
+            };
+        } else {
+            throw new Error(response.data.message || 'Invalid API response.');
+        }
+    } catch (error) {
+        console.error("API Error in getHistoryLists:", error);
+        throw error;
+    }
+  },
+
+  // 16. Get Popular Lists
+  getPopularLists: async (params = {}) => {
+    try {
+        const response = await api.get("/vocabulary/lists/popular", { params });
+        if (response.data && response.data.success && response.data.data) {
+            return {
+                lists: response.data.data.lists || [],
+                pagination: response.data.pagination || {}
+            };
+        } else {
+            throw new Error(response.data.message || 'Invalid API response.');
+        }
+    } catch (error) {
+        console.error("API Error in getPopularLists:", error);
+        throw error;
+    }
+  },
+
+  // 17. Get Lists with Due Words (cho tab "Today")
+  getDueLists: async (params = {}) => {
+    try {
+        const response = await api.get("/review/lists/due", { params });
+        if (response.data && response.data.success && response.data.data) {
+            return {
+                lists: response.data.data.listsWithDueWords || [],
+                pagination: response.data.pagination || {}
+            };
+        } else {
+            throw new Error(response.data.message || 'Invalid API response.');
+        }
+    } catch (error) {
+        console.error("API Error in getDueLists:", error);
+        throw error;
+    }
+  },
+
+  // 18. Get Upcoming Review Lists (cho tab "Upcoming")
+  getUpcomingLists: async (params = {}) => {
+    try {
+        const response = await api.get("/review/lists/upcoming", { params });
+        if (response.data && response.data.success && response.data.data) {
+            return {
+                lists: response.data.data.lists || [],
+                pagination: response.data.pagination || {}
+            };
+        } else {
+            throw new Error(response.data.message || 'Invalid API response.');
+        }
+    } catch (error) {
+        console.error("API Error in getUpcomingLists:", error);
+        throw error;
+    }
+  },
 };
 
 export default vocabularyService;

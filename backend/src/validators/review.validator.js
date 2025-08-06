@@ -19,6 +19,11 @@ const reviewValidator = {
         'sessionType must be one of: flashcard, fill_blank, word_association.'
       ),
 
+    body('practiceMode')
+      .optional()
+      .isBoolean()
+      .withMessage('practiceMode must be a boolean.'),
+
     handleValidationErrors,
   ],
 

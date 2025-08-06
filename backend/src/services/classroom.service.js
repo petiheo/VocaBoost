@@ -455,6 +455,7 @@ class ClassroomService {
       due_date: item.assignments.due_date,
       status: 'assigned',
       learner_status: item.status,
+      creator: item.assignments.vocab_lists.creator,
     }));
   }
 
@@ -464,7 +465,7 @@ class ClassroomService {
       learnerId,
       ['completed']
     );
-
+    
     return raw.map((item) => ({
       assignment_id: item.assignment_id,
       title: item.assignments.title,
@@ -473,6 +474,7 @@ class ClassroomService {
       sublist_count: item.assignments.sublist_count,
       due_date: item.assignments.due_date,
       learner_status: item.status,
+      creator: item.assignments.vocab_lists.creator,
     }));
   }
 
@@ -500,7 +502,7 @@ class ClassroomService {
         due_date: item.assignments.due_date,
         status: 'overdue',
         learner_status: item.status,
-        creator:item.assignments.user
+        creator:item.assignments.vocab_lists.creator,
       }));
   }
 

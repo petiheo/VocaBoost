@@ -21,7 +21,8 @@ class teacherRequestModel {
         user_id: data.userId,
         institution: data.institution,
         credentials_url: data.credentialsUrl,
-        // additionalNotes: data.additionalNotes, // trong DB chưa có
+        school_email: data.schoolEmail,
+        additional_notes: data.additionalNotes,
       })
       .select()
       .single();
@@ -34,10 +35,13 @@ class teacherRequestModel {
     const updateData = {
       institution: data.institution,
       credentials_url: data.credentialsUrl,
-      status: 'pending', // Reset status to pending when updating
-      rejection_reason: null, // Clear any previous rejection reason
-      updated_at: new Date().toISOString(),
+      additional_notes: data.additionalNotes, 
+      status: 'pending', 
+      school_email: data.schoolEmail,
+      rejection_reason: null, 
     };
+
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
 
     const { data: result, error } = await supabase
       .from('teacher_requests')

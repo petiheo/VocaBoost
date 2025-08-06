@@ -1,6 +1,5 @@
 const { GoogleGenAI } = require('@google/genai');
 const logger = require('../utils/logger');
-require('dotenv').config();
 
 class AIService {
   constructor() {
@@ -16,6 +15,9 @@ class AIService {
         apiKey: process.env.GEMINI_API_KEY,
         model: this.model,
       });
+      // Add a small delay between requests to avoid rate limiting
+      this.lastRequestTime = 0;
+      this.minRequestInterval = 500; // 500ms between requests
       logger.info(`Google Gemini AI initialized with model: ${this.model}`);
     } catch (error) {
       logger.error('Failed to initialize Google Gemini AI:', error);
@@ -32,20 +34,51 @@ class AIService {
       throw new Error('AI service is not available');
     }
 
-    try {
-      const prompt = this._buildExamplePrompt(word, definition, context);
+    const maxRetries = 3;
+    const retryDelay = 1000; // Start with 1 second
 
-      const response = await this.genAI.models.generateContent({
-        model: this.model,
-        contents: prompt,
-      });
-      const example = response.text;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // Rate limiting to prevent too many rapid requests
+        const now = Date.now();
+        const timeSinceLastRequest = now - this.lastRequestTime;
+        if (timeSinceLastRequest < this.minRequestInterval) {
+          await new Promise(resolve => 
+            setTimeout(resolve, this.minRequestInterval - timeSinceLastRequest)
+          );
+        }
+        
+        const prompt = this._buildExamplePrompt(word, definition, context);
 
-      logger.info(`Generated example for word: ${word}`);
-      return example;
-    } catch (error) {
-      logger.error('Failed to generate example:', error);
-      throw new Error('Failed to generate example sentence');
+        const response = await this.genAI.models.generateContent({
+          model: this.model,
+          contents: prompt,
+        });
+        const example = response.text;
+
+        logger.info(`Generated example for word: ${word}`);
+        this.lastRequestTime = Date.now();
+        return example;
+      } catch (error) {
+        const isOverloaded = error.message?.includes('overloaded') || 
+                           error.status === 'UNAVAILABLE' ||
+                           error.code === 503;
+        
+        if (isOverloaded && attempt < maxRetries) {
+          const waitTime = retryDelay * attempt;
+          logger.warn(`AI model overloaded, retrying in ${waitTime}ms (attempt ${attempt}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          continue;
+        }
+
+        logger.error(`Failed to generate example (attempt ${attempt}/${maxRetries}):`, error);
+        
+        // Provide user-friendly error message
+        if (isOverloaded) {
+          throw new Error('AI service is currently busy. Please try again in a few moments.');
+        }
+        throw new Error('Failed to generate example sentence');
+      }
     }
   }
 

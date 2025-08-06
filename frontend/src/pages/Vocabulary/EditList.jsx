@@ -1,15 +1,16 @@
-import React from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Header, SideBar, Footer } from "../../components/index.jsx";
 import ListMetadataForm from "../../components/Vocabulary/ListMetadataForm.jsx";
 import EditWordsSection from "../../components/Vocabulary/EditWordsSection.jsx";
-import SafeEditList from "../../components/SafeEditList.jsx";
+import SafeEditList from "../../components/Vocabulary/SafeEditList.jsx";
 import { useEditWordManagement } from "../../hooks/useEditWordManagement.js";
 import { useFormValidation } from "../../hooks/useFormValidation.js";
 import { useEditListManagement } from "../../hooks/useEditListManagement.js";
 export default function EditList() {
   const { listId } = useParams();
-  
+  const [isOpen, setIsOpen] = useState(false);
+
   // Custom hooks for separated concerns
   const validationHook = useFormValidation();
   const wordManagementHook = useEditWordManagement();
@@ -55,7 +56,7 @@ export default function EditList() {
       <div className="edit-list">
         <Header />
         <div className="edit-list__content">
-          <SideBar />
+          <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
           <div className="edit-list__loading">Loading...</div>
         </div>
         <Footer />
@@ -68,7 +69,7 @@ export default function EditList() {
       <div className="edit-list">
         <Header />
         <div className="edit-list__content">
-          <SideBar />
+          <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
           <form className="edit-list__form" onSubmit={handleSubmit}>
             <h1 className="edit-list__header">Edit List</h1>
             
@@ -90,6 +91,7 @@ export default function EditList() {
               words={words}
               selectedWordIds={selectedWordIds}
               loadingAI={loadingAI}
+              validationErrors={validationErrors}
               onWordChange={handleWordChange}
               onDeleteWord={deleteWord}
               onToggleWordSelection={toggleWordSelection}

@@ -71,8 +71,21 @@ const requireClassRole = (...allowedRoles) => {
   };
 };
 
+const requireAdmin = (req, res, next) => {
+  if (!req.user) {
+    return ResponseUtils.unauthorized(res, 'Authentication required');
+  }
+
+  if (req.user.role !== 'admin') {
+    return ResponseUtils.forbidden(res, 'Access denied. Admin role required.');
+  }
+
+  next();
+};
+
 module.exports = {
   requireRole,
   hasClassroomAccess,
   requireClassRole,
+  requireAdmin,
 };

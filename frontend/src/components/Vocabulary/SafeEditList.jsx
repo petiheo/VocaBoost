@@ -1,5 +1,5 @@
 import React from 'react';
-import ErrorBoundary from './Providers/ErrorBoundary.jsx';
+import ErrorBoundary from '../Providers/ErrorBoundary.jsx';
 
 class SafeEditListErrorBoundary extends React.Component {
   constructor(props) {

@@ -22,6 +22,7 @@ class TeacherService {
           institution: data.institution,
           credentialsUrl: uploadResult.url,
           additionalNotes: data.additionalNotes,
+          schoolEmail: data.schoolEmail,
         });
         isUpdate = true;
         logger.info(
@@ -34,6 +35,7 @@ class TeacherService {
           institution: data.institution,
           credentialsUrl: uploadResult.url,
           additionalNotes: data.additionalNotes,
+          schoolEmail: data.schoolEmail,
         });
         logger.info(`Created new teacher verification request for user ${userId}`);
       }

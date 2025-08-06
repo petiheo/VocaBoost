@@ -18,6 +18,7 @@ export default function ViewList() {
 
   const confirm = useConfirm();
   const toast = useToast();
+  const [isOpen, setIsOpen] = useState(false);
 
 
   const handleCopy = async (text) => {
@@ -33,6 +34,15 @@ export default function ViewList() {
   useEffect(() => {
     async function fetchData() {
       try {
+        console.log("ViewList - fetching data for listId:", listId);
+        console.log("ViewList - listId type:", typeof listId, "length:", listId?.length);
+        
+        // Validate listId
+        if (!listId || typeof listId !== 'string' || listId.trim() === '') {
+          console.error("Invalid listId:", listId);
+          return;
+        }
+        
         const info = await vocabularyService.getListById(listId);
         setListInfo(info);
 
@@ -64,7 +74,7 @@ export default function ViewList() {
     <div className="view-list">
       <Header />
       <div className="view-list__content">
-        <SideBar />
+        <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         <main className="view-list__main">
           {listInfo && (
             <>
@@ -158,7 +168,7 @@ export default function ViewList() {
               </div>
               <button
                   className="view-list__review-button"
-                  onClick={() => window.location.href = "/review/list-id"}
+                  onClick={() => window.location.href = `/review/${listId}`}
               >
                   Review now
               </button>
