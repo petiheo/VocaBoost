@@ -531,10 +531,10 @@ INSERT INTO session_word_results (session_id, word_id, result, response_time_ms,
 -- =================================================================
 -- CLASSROOM INVITATIONS
 -- =================================================================
-INSERT INTO classroom_invitations (id, classroom_id, email, token, expires_at, status) VALUES
-('70000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', 'newstudent1@email.com', 'inv_token_abc123', '2024-08-07 23:59:59+00', 'pending_invite'),
-('70000000-0000-0000-0000-000000000002', '40000000-0000-0000-0000-000000000002', 'newstudent2@email.com', 'inv_token_def456', '2024-08-05 23:59:59+00', 'pending_invite'),
-('70000000-0000-0000-0000-000000000003', '40000000-0000-0000-0000-000000000003', 'student6@email.com', 'inv_token_ghi789', '2024-07-25 23:59:59+00', 'joined');
+INSERT INTO classroom_invitations (id, classroom_id, email, token, expires_at, used_at, status) VALUES
+('70000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', 'newstudent1@email.com', 'inv_token_abc123', '2024-08-07 23:59:59+00', NULL, 'pending_invite'),
+('70000000-0000-0000-0000-000000000002', '40000000-0000-0000-0000-000000000002', 'newstudent2@email.com', 'inv_token_def456', '2024-08-05 23:59:59+00', NULL, 'pending_invite'),
+('70000000-0000-0000-0000-000000000003', '40000000-0000-0000-0000-000000000003', 'student6@email.com', 'inv_token_ghi789', '2024-07-25 23:59:59+00', '2024-07-20 10:00:00+00', 'joined');
 
 -- =================================================================
 -- NOTIFICATIONS
@@ -544,6 +544,7 @@ INSERT INTO notifications (id, recipient_id, notification_type, title, message, 
 ('80000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000012', 'reminder', 'Assignment Due Soon', 'Your assignment "Business Terms Review" is due in 2 days', false, '{"assignment_id": "50000000-0000-0000-0000-000000000002", "days_remaining": 2}', '/assignments/50000000-0000-0000-0000-000000000002', '2024-07-25 10:00:00+00'),
 ('80000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000013', 'achievement', 'Great Job!', 'You completed the IELTS Speaking Vocabulary assignment with a score of 92%!', true, '{"score": 92, "assignment_id": "50000000-0000-0000-0000-000000000003"}', '/achievements', '2024-07-30 16:46:00+00'),
 ('80000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000002', 'system', 'New Student Joined', 'A new student has joined your classroom "English for Academic Success"', false, '{"classroom_id": "40000000-0000-0000-0000-000000000001", "student_name": "Alex Nguyen"}', '/classrooms/40000000-0000-0000-0000-000000000001/learners', '2024-06-02 10:30:00+00'),
+('80000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000011', 'reminder', 'Daily Study Reminder', 'Don''t forget to review your vocabulary today! You''re on a 3-day streak.', false, '{"streak": 3, "daily_goal": 10}', '/review', '2024-07-31 08:00:00+00');
 ('80000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000011', 'reminder', 'Daily Study Reminder', 'Don''t forget to review your vocabulary today! You''re on a 3-day streak.', false, '{"streak": 3, "daily_goal": 10}', '/review', '2024-07-31 08:00:00+00');
 
 -- =================================================================

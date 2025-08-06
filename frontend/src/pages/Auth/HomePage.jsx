@@ -1,4 +1,4 @@
-import { Header, SideBar, Footer } from '../../components';
+import { Header, SideBar, Footer, Pagination } from '../../components';
 import CarouselVocabSection from '../../components/Vocabulary/CarouselVocabSection';
 import { useState, useEffect } from 'react';
 import  LoadingCursor from '../../components/UI/LoadingCursor';
@@ -25,11 +25,18 @@ const ReviewTabs = ({ activeTab, onTabChange }) => (
 );
 
 const HomePage = () => {
-  const [reviewLists, setReviewLists] = useState({ data: [], isLoading: true, error: null });
+  const [reviewLists, setReviewLists] = useState({ 
+    data: [], 
+    pagination: null, 
+    isLoading: true, 
+    error: null 
+  });
   const [recentLists, setRecentLists] = useState({ data: [], isLoading: true, error: null });
   const [popularLists, setPopularLists] = useState({ data: [], isLoading: true, error: null });
 
   const [activeReviewTab, setActiveReviewTab] = useState('today');
+  const [reviewPage, setReviewPage] = useState(1);
+  const [reviewLimit] = useState(10);
 
   const [searchQuery, setSearchQuery] = useState(''); 
   const [searchResults, setSearchResults] = useState({ 
@@ -134,13 +141,15 @@ const HomePage = () => {
   // 2. useEffect để fetch REVIEW LISTS dựa vào tab đang active
   useEffect(() => {
     const fetchReviewData = async () => {
-      setReviewLists({ data: [], isLoading: true, error: null });
+      setReviewLists({ data: [], pagination: null, isLoading: true, error: null });
       try {
         let response;
+        const params = { page: reviewPage, limit: reviewLimit };
+        
         if (activeReviewTab === 'today') {
-          response = await vocabularyService.getDueLists();
+          response = await vocabularyService.getDueLists(params);
         } else {
-          response = await vocabularyService.getUpcomingLists();
+          response = await vocabularyService.getUpcomingLists(params);
         }
         
         const transformedReview = (response.lists || []).map(list => ({
@@ -151,22 +160,32 @@ const HomePage = () => {
           role: list.creator?.role,
           avatarUrl: list.creator?.avatar_url,
         }));
-        setReviewLists({ data: transformedReview, isLoading: false, error: null });
+        setReviewLists({ 
+          data: transformedReview, 
+          pagination: response.pagination || null,
+          isLoading: false, 
+          error: null 
+        });
       } catch (err) {
         console.error(`Failed to fetch ${activeReviewTab} review lists:`, err);
-        setReviewLists({ data: [], isLoading: false, error: err });
+        setReviewLists({ data: [], pagination: null, isLoading: false, error: err });
       }
     };
 
     if (!searchQuery) {
         fetchReviewData();
     }
-  }, [activeReviewTab, searchQuery]); 
+  }, [activeReviewTab, reviewPage, reviewLimit, searchQuery]); 
 
   const handleTabChange = (tabIdentifier) => {
     if (tabIdentifier !== activeReviewTab) {
       setActiveReviewTab(tabIdentifier);
+      setReviewPage(1); // Reset to page 1 when changing tabs
     }
+  };
+
+  const handleReviewPageChange = (newPage) => {
+    setReviewPage(newPage);
   };
 
   return (
@@ -211,17 +230,44 @@ const HomePage = () => {
               </section>
             ) : (
               <>
-                <CarouselVocabSection 
-                  title="REVIEW LISTS" 
-                  vocabLists={reviewLists.data}
-                  isLoading={reviewLists.isLoading} 
-                  error={reviewLists.error}        
-                >
-                  <ReviewTabs 
-                    activeTab={activeReviewTab} 
-                    onTabChange={handleTabChange} 
-                  />
-                </CarouselVocabSection>
+                <section className="review-lists-section">
+                  <div className="section-header">
+                    <h2>REVIEW LISTS</h2>
+                    <ReviewTabs 
+                      activeTab={activeReviewTab} 
+                      onTabChange={handleTabChange} 
+                    />
+                  </div>
+
+                  {reviewLists.isLoading ? (
+                    <div className="loading-container">Loading...</div>
+                  ) : reviewLists.error ? (
+                    <div className="error-message">Could not load review lists.</div>
+                  ) : reviewLists.data.length > 0 ? (
+                    <>
+                      <div className="review-lists-grid">
+                        {reviewLists.data.map((list) => (
+                          <VocabularyListCard
+                            key={list.id}
+                            {...list}
+                          />
+                        ))}
+                      </div>
+                      
+                      {reviewLists.pagination && (
+                        <Pagination
+                          pagination={reviewLists.pagination}
+                          onPageChange={handleReviewPageChange}
+                          className="review-pagination"
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <div className="no-data-message">
+                      No review lists available for {activeReviewTab === 'today' ? 'today' : 'upcoming'}.
+                    </div>
+                  )}
+                </section>
 
                 <CarouselVocabSection 
                   title="RECENTLY LISTS" 

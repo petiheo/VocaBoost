@@ -26,25 +26,48 @@ export default function Dashboard() {
         navigate('/vocabulary/create/new');
     };
 
-    useEffect(() => {
-        async function fetchLists() {
-            try {
-                const res = await vocabularyService.getMyLists();
-                const listsData = res.lists || []; 
-                setLists(listsData.map(list => ({
-                    id: list.id,
-                    title: list.title,
-                    description: list.description,
-                    owner: list.creator?.display_name || "Unknown",
-                    role: list.creator?.role || "unknown",  
-                    tags: list.tags || [],
-                })));
-            } catch (err) {
-                console.error("Failed to fetch lists:", err);
-            }
+    const fetchLists = async () => {
+        try {
+            const res = await vocabularyService.getMyLists();
+            const listsData = res.lists || []; 
+            setLists(listsData.map(list => ({
+                id: list.id,
+                title: list.title,
+                description: list.description,
+                owner: list.creator?.display_name || "Unknown",
+                role: list.creator?.role || "unknown",  
+                tags: list.tags || [],
+            })));
+        } catch (err) {
+            console.error("Failed to fetch lists:", err);
         }
+    };
 
+    useEffect(() => {
         fetchLists();
+    }, []);
+
+    // Refresh lists when user returns to the page (e.g., after creating a new list)
+    useEffect(() => {
+        const handleFocus = () => {
+            fetchLists();
+        };
+
+        window.addEventListener('focus', handleFocus);
+        
+        // Also listen for visibility change (when tab becomes visible)
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                fetchLists();
+            }
+        };
+        
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, []);
 
     useEffect(() => {

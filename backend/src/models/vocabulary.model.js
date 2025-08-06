@@ -569,6 +569,28 @@ class VocabularyModel {
   async updateWordCount(listId) {
     return await supabase.rpc('update_list_word_count', { list_id_param: listId });
   }
+
+  // Update list access to ensure it remains available after session
+  async updateListAccess(listId, userId) {
+    // Check if user has access to the list first
+    const { data: list, error: listError } = await supabase
+      .from('vocab_lists')
+      .select('id, creator_id, privacy_setting')
+      .eq('id', listId)
+      .single();
+
+    if (listError) throw listError;
+    if (!list) throw new Error('List not found');
+
+    // If user is creator, they always have access
+    if (list.creator_id === userId) {
+      return { success: true };
+    }
+
+    // For other cases, we could add logic to ensure proper access
+    // This is a placeholder for more complex access control if needed
+    return { success: true };
+  }
 }
 
 module.exports = new VocabularyModel();

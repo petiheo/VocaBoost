@@ -1,0 +1,18 @@
+@use '../Fonts' as *;
+
+.batch-summary-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: $font-lalezar;
+  font-weight: normal;
+
+  .page-body {
+    display: flex;
+    flex: 1;
+  }
+
+  .main-content {
+    flex: 1;
+  }
+}

@@ -249,9 +249,86 @@ class ReviewModel {
       }));
 
       return enrichedWords;
+
     } catch (error) {
       logger.error(
         `Error in findDueWordsByListId for user ${userId} and list ${listId}:`,
+        error
+      );
+      throw error;
+    }
+  }
+
+  async findAllWordsByListId(listId, limit = 20) {
+    try {
+      // Get all words from the list for practice mode
+      const { data: allWords, error: wordsError } = await supabase
+        .from('vocabulary')
+        .select(`
+          id,
+          term,
+          definition,
+          phonetics,
+          image_url
+        `)
+        .eq('list_id', listId)
+        .limit(limit);
+
+      if (wordsError) throw wordsError;
+      if (!allWords || allWords.length === 0) {
+        return [];
+      }
+
+      const wordIds = allWords.map(word => word.id);
+
+      // Get examples for the words
+      const { data: examples, error: examplesError } = await supabase
+        .from('vocabulary_examples')
+        .select('vocabulary_id, example_sentence')
+        .in('vocabulary_id', wordIds);
+
+      if (examplesError) {
+        logger.warn(`Failed to fetch examples: ${examplesError.message}`);
+      }
+
+      // Get synonyms for the words  
+      const { data: synonyms, error: synonymsError } = await supabase
+        .from('word_synonyms')
+        .select('word_id, synonym')
+        .in('word_id', wordIds);
+
+      if (synonymsError) {
+        logger.warn(`Failed to fetch synonyms: ${synonymsError.message}`);
+      }
+
+      // Combine everything
+      const examplesByWordId = new Map();
+      (examples || []).forEach(ex => {
+        if (!examplesByWordId.has(ex.vocabulary_id)) {
+          examplesByWordId.set(ex.vocabulary_id, []);
+        }
+        examplesByWordId.get(ex.vocabulary_id).push({ example_sentence: ex.example_sentence });
+      });
+
+      const synonymsByWordId = new Map();
+      (synonyms || []).forEach(s => {
+        if (!synonymsByWordId.has(s.word_id)) {
+          synonymsByWordId.set(s.word_id, []);
+        }
+        synonymsByWordId.get(s.word_id).push(s.synonym);
+      });
+
+      const enrichedWords = allWords.map(word => ({
+        ...word,
+        examples: examplesByWordId.get(word.id) || [],
+        synonyms: synonymsByWordId.get(word.id) || []
+      }));
+
+      return enrichedWords;
+
+    } catch (error) {
+      logger.error(
+        `Error in findAllWordsByListId for list ${listId}:`,
         error
       );
       throw error;
@@ -265,12 +342,14 @@ class ReviewModel {
   async findActiveSession(userId) {
     const { data, error } = await supabase
       .from('revision_sessions')
-      .select('id, session_type, total_words, vocab_list_id, word_ids')
+      .select('id, session_type, total_words, vocab_list_id, word_ids, started_at')
       .eq('user_id', userId)
       .in('status', ['in_progress', 'interrupted'])
-      .maybeSingle();
+      .order('started_at', { ascending: false })
+      .limit(1)
+      .single();
 
-    if (error) throw error;
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows found
     return data;
   }
 
