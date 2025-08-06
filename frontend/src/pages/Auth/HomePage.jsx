@@ -1,10 +1,11 @@
-import { Header, SideBar, Footer } from '../../components';
+import { Header, SideBar, Footer, SearchResultsGridSkeleton, CarouselSectionSkeleton } from '../../components';
 import CarouselVocabSection from '../../components/Vocabulary/CarouselVocabSection';
 import { useState, useEffect } from 'react';
 import  LoadingCursor from '../../components/UI/LoadingCursor';
 import { useDebounce } from '../../hooks/useDebounce'; 
 import { VocabularyListCard } from '../../components';
 import vocabularyService from '../../services/Vocabulary/vocabularyService';
+import { useSkeletonToggle } from '../../hooks/useSkeletonToggle';
 
 // Component cho các Tab
 const ReviewTabs = ({ activeTab, onTabChange }) => (
@@ -25,11 +26,18 @@ const ReviewTabs = ({ activeTab, onTabChange }) => (
 );
 
 const HomePage = () => {
-  const [reviewLists, setReviewLists] = useState({ data: [], isLoading: true, error: null });
+  const [reviewLists, setReviewLists] = useState({ 
+    data: [], 
+    pagination: null, 
+    isLoading: true, 
+    error: null 
+  });
   const [recentLists, setRecentLists] = useState({ data: [], isLoading: true, error: null });
   const [popularLists, setPopularLists] = useState({ data: [], isLoading: true, error: null });
 
   const [activeReviewTab, setActiveReviewTab] = useState('today');
+  const [reviewPage, setReviewPage] = useState(1);
+  const [reviewLimit] = useState(10);
 
   const [searchQuery, setSearchQuery] = useState(''); 
   const [searchResults, setSearchResults] = useState({ 
@@ -41,6 +49,8 @@ const HomePage = () => {
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [isOpen, setIsOpen] = useState(false);
 
+  // Development skeleton toggle hook
+  const { isLoading: isSkeletonLoading } = useSkeletonToggle();
 
   useEffect(() => {
     if (searchQuery) return; 
@@ -134,13 +144,15 @@ const HomePage = () => {
   // 2. useEffect để fetch REVIEW LISTS dựa vào tab đang active
   useEffect(() => {
     const fetchReviewData = async () => {
-      setReviewLists({ data: [], isLoading: true, error: null });
+      setReviewLists({ data: [], pagination: null, isLoading: true, error: null });
       try {
         let response;
+        const params = { page: reviewPage, limit: reviewLimit };
+        
         if (activeReviewTab === 'today') {
-          response = await vocabularyService.getDueLists();
+          response = await vocabularyService.getDueLists(params);
         } else {
-          response = await vocabularyService.getUpcomingLists();
+          response = await vocabularyService.getUpcomingLists(params);
         }
         
         const transformedReview = (response.lists || []).map(list => ({
@@ -151,22 +163,32 @@ const HomePage = () => {
           role: list.creator?.role,
           avatarUrl: list.creator?.avatar_url,
         }));
-        setReviewLists({ data: transformedReview, isLoading: false, error: null });
+        setReviewLists({ 
+          data: transformedReview, 
+          pagination: response.pagination || null,
+          isLoading: false, 
+          error: null 
+        });
       } catch (err) {
         console.error(`Failed to fetch ${activeReviewTab} review lists:`, err);
-        setReviewLists({ data: [], isLoading: false, error: err });
+        setReviewLists({ data: [], pagination: null, isLoading: false, error: err });
       }
     };
 
     if (!searchQuery) {
         fetchReviewData();
     }
-  }, [activeReviewTab, searchQuery]); 
+  }, [activeReviewTab, reviewPage, reviewLimit, searchQuery]); 
 
   const handleTabChange = (tabIdentifier) => {
     if (tabIdentifier !== activeReviewTab) {
       setActiveReviewTab(tabIdentifier);
+      setReviewPage(1); // Reset to page 1 when changing tabs
     }
+  };
+
+  const handleReviewPageChange = (newPage) => {
+    setReviewPage(newPage);
   };
 
   return (
@@ -187,8 +209,8 @@ const HomePage = () => {
                 
                 <div className="search-results-content">
                   {(() => {
-                    if (searchResults.isLoading) {
-                      return <p className="search-status-message loading">Searching...</p>;
+                    if (isSkeletonLoading(searchResults.isLoading)) {
+                      return <SearchResultsGridSkeleton count={8} />;
                     }
 
                     if (searchResults.error) {
@@ -211,31 +233,43 @@ const HomePage = () => {
               </section>
             ) : (
               <>
-                <CarouselVocabSection 
-                  title="REVIEW LISTS" 
-                  vocabLists={reviewLists.data}
-                  isLoading={reviewLists.isLoading} 
-                  error={reviewLists.error}        
-                >
-                  <ReviewTabs 
-                    activeTab={activeReviewTab} 
-                    onTabChange={handleTabChange} 
+                {isSkeletonLoading(reviewLists.isLoading) ? (
+                  <CarouselSectionSkeleton title="REVIEW LISTS" showTabs={true} />
+                ) : (
+                  <CarouselVocabSection 
+                    title="REVIEW LISTS" 
+                    vocabLists={reviewLists.data}
+                    isLoading={reviewLists.isLoading} 
+                    error={reviewLists.error}        
+                  >
+                    <ReviewTabs 
+                      activeTab={activeReviewTab} 
+                      onTabChange={handleTabChange} 
+                    />
+                  </CarouselVocabSection>
+                )}
+
+                {isSkeletonLoading(recentLists.isLoading) ? (
+                  <CarouselSectionSkeleton title="RECENTLY LISTS" />
+                ) : (
+                  <CarouselVocabSection 
+                    title="RECENTLY LISTS" 
+                    vocabLists={recentLists.data}
+                    isLoading={recentLists.isLoading} 
+                    error={recentLists.error}         
                   />
-                </CarouselVocabSection>
+                )}
 
-                <CarouselVocabSection 
-                  title="RECENTLY LISTS" 
-                  vocabLists={recentLists.data}
-                  isLoading={recentLists.isLoading} 
-                  error={recentLists.error}         
-                />
-
-                <CarouselVocabSection 
-                  title="POPULAR LISTS" 
-                  vocabLists={popularLists.data}
-                  isLoading={popularLists.isLoading} 
-                  error={popularLists.error}         
-                />
+                {isSkeletonLoading(popularLists.isLoading) ? (
+                  <CarouselSectionSkeleton title="POPULAR LISTS" />
+                ) : (
+                  <CarouselVocabSection 
+                    title="POPULAR LISTS" 
+                    vocabLists={popularLists.data}
+                    isLoading={popularLists.isLoading} 
+                    error={popularLists.error}         
+                  />
+                )}
               </>
             )}
 

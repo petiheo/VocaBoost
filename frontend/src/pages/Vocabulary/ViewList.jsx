@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
-import { Header, SideBar, Footer } from "../../components";
+import { Header, SideBar, Footer, ViewListSkeleton } from "../../components";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { UploadImage, MoreIcon, ShareIcon, DropdownIcon } from "../../assets/Vocabulary";
 import { SearchBarPattern } from "../../assets/icons/index"
@@ -11,6 +11,8 @@ import { useToast } from "../../components/Providers/ToastProvider.jsx";
 export default function ViewList() {
   const [listInfo, setListInfo] = useState(null);
   const [words, setWords] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
   const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const [showShareBox, setShowShareBox] = useState(false);
   const [showMoreBox, setShowMoreBox] = useState(false);
@@ -34,6 +36,7 @@ export default function ViewList() {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
         const info = await vocabularyService.getListById(listId);
         setListInfo(info);
 
@@ -56,6 +59,8 @@ export default function ViewList() {
 
       } catch (err) {
         console.error("Error fetching list info or words:", err);
+      } finally {
+        setLoading(false);
       }
     }
     fetchData();
@@ -67,7 +72,9 @@ export default function ViewList() {
       <div className="view-list__content">
         <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         <main className="view-list__main">
-          {listInfo && (
+          {loading ? (
+            <ViewListSkeleton />
+          ) : listInfo && (
             <>
               <div className="view-list__header">
                 <div className="view-list__title-row">
@@ -88,22 +95,25 @@ export default function ViewList() {
                                 Edit List
                               </div>
                               <div
-                                className="more-option delete"
+                                className={`more-option delete ${isDeleting ? 'deleting' : ''}`}
                                 onClick={async () => {
-                                  confirm("Are you sure you want to delete this list?").then(confirmed => {
-                                    if (!confirmed) return;
-                                    try {
-                                      vocabularyService.deleteList(listInfo.id);
-                                      window.location.href = "/dashboard";
-                                    } catch (err) {
-                                      console.error("Failed to delete:", err);
-                                      toast("Failed to delete list.", "error");
-                                    }
-                                  });
-                                
+                                  if (isDeleting) return;
+                                  const confirmed = await confirm("Are you sure you want to delete this list?");
+                                  if (!confirmed) return;
+                                  
+                                  setIsDeleting(true);
+                                  try {
+                                    await vocabularyService.deleteList(listInfo.id);
+                                    toast("List deleted successfully", "success");
+                                    window.location.href = "/vocabulary";
+                                  } catch (err) {
+                                    console.error("Failed to delete:", err);
+                                    toast("Failed to delete list.", "error");
+                                    setIsDeleting(false);
+                                  }
                                 }}
                               >
-                                Delete List
+                                {isDeleting ? 'Deleting...' : 'Delete List'}
                               </div>
                             </div>
                           )}
@@ -159,7 +169,7 @@ export default function ViewList() {
               </div>
               <button
                   className="view-list__review-button"
-                  onClick={() => window.location.href = "/review/list-id"}
+                  onClick={() => window.location.href = `/review/${listId}`}
               >
                   Review now
               </button>

@@ -6,9 +6,12 @@ export default function JoinClassroomPage() {
     const [inputCode, setInputCode] = useState("");
     const [status, setStatus] = useState("default");
     const [errors, setErrors] = useState({});
+    const [isJoining, setIsJoining] = useState(false);
 
     const handleJoin = async (e) => {
-        if (!inputCode) return;
+        if (!inputCode || isJoining) return;
+        
+        setIsJoining(true);
 
         try {
             const res = await classroomService.joinRequest(inputCode);
@@ -36,6 +39,8 @@ export default function JoinClassroomPage() {
                     error.response?.data?.message ||
                     "Unexpected error occurred. Please try again.",
             });
+        } finally {
+            setIsJoining(false);
         }
     };
 
@@ -54,8 +59,12 @@ export default function JoinClassroomPage() {
                     value={inputCode}
                     onChange={(e) => setInputCode(e.target.value)}
                 />
-                <button className="join-classroom__button" onClick={handleJoin}>
-                    Join
+                <button 
+                    className={`join-classroom__button ${isJoining ? 'join-classroom__button--loading' : ''}`} 
+                    onClick={handleJoin}
+                    disabled={isJoining}
+                >
+                    {isJoining ? 'Joining...' : 'Join'}
                 </button>
             </div>
         </div>

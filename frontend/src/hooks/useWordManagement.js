@@ -73,7 +73,7 @@ export const useWordManagement = () => {
     const word = words[index];
     
     if (!word.term.trim() || !word.definition.trim()) {
-      toast("Please fill in both term and definition before generating an example.", "error");
+      toast("Please add term and definition first.", "error");
       return;
     }
 
@@ -100,7 +100,10 @@ export const useWordManagement = () => {
       }
     } catch (error) {
       console.error("Error generating example:", error);
-      toast("Failed to generate example. Please try again.", "error");
+      const errorMessage = error.response?.data?.message || 
+                         error.response?.data?.error || 
+                         "Failed to generate example. Please try again.";
+      toast(errorMessage, "error");
     } finally {
       setLoadingAI(prev => {
         const newSet = new Set(prev);

@@ -20,10 +20,10 @@
       }
 
       .assignment-box {
+        padding: 20px;
+        border-radius: 20px;
         background-color: #FFFAEF;
-        border-radius: 10px;
-        padding: 1rem 1.5rem;
-        margin-bottom: 2rem;
+        font-family: $font-inriasans;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
         .assignment-header {
@@ -67,7 +67,7 @@
         gap: 1rem;
 
       }
-      
+
       .word-card {
         background-color: #FFF7DD;
         border-radius: 8px;
@@ -80,17 +80,18 @@
           font-size: 1.1rem;
         }
       }
-      
+
     }
   }
 }
+
 .see-more {
   margin-top: 1.5rem;
-  
+
   display: flex;
   justify-self: center;
   align-self: center;
-  
+
   button {
     font-family: $font-inriasans;
     font-weight: 600;

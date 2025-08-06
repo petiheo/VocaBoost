@@ -105,7 +105,51 @@ class ReviewController {
         res,
         error,
         `getActiveSessionStatus - User ${req.user?.userId}`,
-        'Failed to retrieve session status.'
+        'Failed to retrieve active session status.'
+      );
+    }
+  }
+
+  // Get batch summary for current completed batch
+  async getBatchSummary(req, res) {
+    try {
+      const userId = req.user.userId;
+      const { sessionId } = req.params;
+
+      const summary = await reviewService.getBatchSummary(sessionId, userId);
+
+      return ResponseUtils.success(res, 'Batch summary retrieved successfully.', summary);
+    } catch (error) {
+      if (error.isForbidden) {
+        return ResponseUtils.forbidden(res, error.message);
+      }
+      return ErrorHandler.handleError(
+        res,
+        error,
+        `getBatchSummary - User ${req.user?.userId}`,
+        'Failed to retrieve batch summary.'
+      );
+    }
+  }
+
+  // Resume session after batch summary
+  async resumeSession(req, res) {
+    try {
+      const userId = req.user.userId;
+      const { sessionId } = req.params;
+
+      const sessionData = await reviewService.resumeSession(sessionId, userId);
+
+      return ResponseUtils.success(res, 'Session resumed successfully.', sessionData);
+    } catch (error) {
+      if (error.isForbidden) {
+        return ResponseUtils.forbidden(res, error.message);
+      }
+      return ErrorHandler.handleError(
+        res,
+        error,
+        `resumeSession - User ${req.user?.userId}`,
+        'Failed to resume session.'
       );
     }
   }
@@ -114,9 +158,19 @@ class ReviewController {
   async startSession(req, res) {
     try {
       const userId = req.user.userId;
-      const { listId, sessionType } = req.body;
+      const { listId, sessionType, practiceMode } = req.body;
 
-      const session = await reviewService.startSession(userId, listId, sessionType);
+      const session = await reviewService.startSession(userId, listId, sessionType, practiceMode);
+
+      // Check if we automatically switched to practice mode
+      if (session.message) {
+        return ResponseUtils.success(
+          res,
+          session.message,
+          { session },
+          201
+        );
+      }
 
       return ResponseUtils.success(
         res,
@@ -126,11 +180,11 @@ class ReviewController {
       );
     } catch (error) {
       // Handle specific known errors
-      if (error.message.includes('No words due for review in this list')) {
-        return ResponseUtils.error(res, error.message, 404);
-      }
       if (error.message.includes('has an active session')) {
         return ResponseUtils.conflict(res, error.message);
+      }
+      if (error.message.includes('has no words to practice')) {
+        return ResponseUtils.error(res, error.message, 404);
       }
       return ErrorHandler.handleError(
         res,

@@ -17,10 +17,10 @@
 
   &__topbar {
     display: flex;
+    align-items: flex-start;
     justify-content: space-between;
-    align-items: center;
     margin-bottom: 2rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
   &__create-button {
@@ -45,8 +45,8 @@
   &__filter-bar {
     display: flex;
     justify-content: right;
-    align-items: center;
-    flex-wrap: nowrap; // không xuống dòng
+    align-items: flex-start;
+    flex-wrap: wrap; // không xuống dòng
     gap: 1.5rem;
   }
 
@@ -70,6 +70,7 @@
   &__filter-dropdown {
     position: relative;
     display: inline-block;
+    max-width: 75rem;
   }
 
   &__filter-button {
@@ -118,10 +119,11 @@
 
   &__alphabet-filter,
   &__tag-filter {
+    justify-content: flex-end;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 1rem 0;
+    margin-top: 2rem;
     right: 0;
     -webkit-scrollbar: {
       display: none;
@@ -226,8 +228,15 @@
 
           &.delete {
           color: #a30000;
-          &:hover {
+          &:hover:not(.deleting) {
               background: #ffe5e5;
+          }
+
+          &.deleting {
+              color: #999;
+              cursor: not-allowed;
+              opacity: 0.6;
+              background: #f5f5f5;
           }
           }
       }

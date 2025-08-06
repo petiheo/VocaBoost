@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ClassroomTitle, TeacherClassroomMenuTab, SearchBar, ClassroomDropdownMenu } from "../../../components/index"
+import { ClassroomTitle, TeacherClassroomMenuTab, SearchBar, ClassroomDropdownMenu, LearnersListSkeleton } from "../../../components/index"
 import classroomService from "../../../services/Classroom/classroomService";
 import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 
@@ -8,6 +8,7 @@ import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 export default function StudentListPage() {
     // Xử lý lưu trữ dữ liệu learner
     const [learners, setLearners] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     // Dùng để navigate trang
     const navigate = useNavigate();
@@ -33,12 +34,15 @@ export default function StudentListPage() {
 
         const fetchLearnersList = async () => {
             try {
+                setLoading(true);
                 const res = await classroomService.getLearnerInClassroom(classroomId);
                 if (res.success && Array.isArray(res.data)) {
                     setLearners(res.data)
                 }
             } catch (error) {
                 console.error("Lỗi khi lấy danh sách lớp học:", error);
+            } finally {
+                setLoading(false);
             }
         }
         fetchLearnersList();
@@ -57,6 +61,10 @@ export default function StudentListPage() {
         }
     };
 
+
+    if (loading) {
+        return <LearnersListSkeleton />;
+    }
 
     return (
         <div className="student-list-page">

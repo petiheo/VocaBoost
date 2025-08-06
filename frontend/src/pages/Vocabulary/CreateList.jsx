@@ -1,6 +1,6 @@
-import React from "react";
+import { useState, useEffect} from "react";
 import { useParams } from "react-router-dom";
-import { Header, SideBar, Footer } from "../../components/index.jsx";
+import { Header, SideBar, Footer, ListFormSkeleton } from "../../components/index.jsx";
 import ListMetadataForm from "../../components/Vocabulary/ListMetadataForm.jsx";
 import WordsSection from "../../components/Vocabulary/WordsSection.jsx";
 import { useWordManagement } from "../../hooks/useWordManagement.js";
@@ -12,6 +12,7 @@ export default function CreateList() {
   const isNewList = listId === 'new';
   const actualListId = isNewList ? null : listId;
   const [isOpen, setIsOpen] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   
   // Custom hooks for separated concerns
   const validationHook = useFormValidation();
@@ -43,7 +44,14 @@ export default function CreateList() {
     handleCancel,
     setPrivacy,
     setSelectedTags,
+    isSubmitting,
   } = listManagementHook;
+
+  // Simulate initial loading for tags/setup
+  useEffect(() => {
+    const timer = setTimeout(() => setInitialLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Enhanced word change handler with validation clearing
   const handleWordChange = (index, field, value) => {
@@ -51,12 +59,27 @@ export default function CreateList() {
     clearFieldError('words', field, index);
   };
 
+  if (initialLoading) {
+    return (
+      <div className="create-list">
+        <Header />
+        <div className="create-list__content">
+          <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
+          <ListFormSkeleton isEditMode={false} />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="create-list">
       <Header />
       <div className="create-list__content">
         <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         <form className="create-list__form" onSubmit={handleSubmit}>
+          <h1 className="create-list__header">Create List</h1>
+
           <ListMetadataForm
             title={title}
             description={description}
@@ -88,14 +111,17 @@ export default function CreateList() {
               type="button"
               className="create-list__form--cancel"
               onClick={handleCancel}
+              disabled={isSubmitting}
             >
               Cancel
             </button>
-            <input
-              className="create-list__form--submit"
+            <button
+              className={`create-list__form--submit ${isSubmitting ? 'create-list__form--submit--loading' : ''}`}
               type="submit"
-              value="Create List"
-            />
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Creating...' : 'Create List'}
+            </button>
           </div>
         </form>
       </div>

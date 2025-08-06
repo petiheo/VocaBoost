@@ -38,7 +38,7 @@ export const useEditWordManagement = () => {
       setWords((prev) => prev.filter((_, i) => i !== index));
       setSelectedWordIds((prev) => {
         const newSelected = new Set(prev);
-        newSelected.delete(words[index].id);
+        newSelected.delete(words[index]?.id);
         return newSelected;
       });
     },
@@ -95,14 +95,12 @@ export const useEditWordManagement = () => {
       if (!word) {
         console.error("Word not found at index:", index);
         toast("Word not found. Please refresh and try again.", "error");
+        toast("Word not found.", "error");
         return;
       }
 
       if (!word.term?.trim() || !word.definition?.trim()) {
-        toast(
-          "Please fill in both term and definition before generating an example.",
-          "error"
-        );
+        toast("Please add term and definition first.", "error");
         return;
       }
 
@@ -163,10 +161,7 @@ export const useEditWordManagement = () => {
             toast("Example generated successfully!", "success");
           } catch (stateError) {
             console.error("Error updating word state:", stateError);
-            toast(
-              "Generated example but failed to update. Please try again.",
-              "error"
-            );
+            toast("Generated example but couldn't save it.", "error");
           }
         } else {
           console.error("Unexpected response structure:", response);
@@ -179,7 +174,10 @@ export const useEditWordManagement = () => {
           console.error("Response data:", error.response.data);
           console.error("Response status:", error.response.status);
         }
-        toast("Failed to generate example. Please try again.", "error");
+        const errorMessage = error.response?.data?.message || 
+                           error.response?.data?.error || 
+                           "Failed to generate example. Please try again.";
+        toast(errorMessage, "error");
       } finally {
         setLoadingAI((prev) => {
           const newSet = new Set(prev);
@@ -191,29 +189,65 @@ export const useEditWordManagement = () => {
     [words, toast, loadingAI]
   );
 
+  // Return ALL words that have any content - both existing and new words must be validated
   const getValidWords = useCallback(() => {
-    return words.filter((w) => w.term?.trim() && w.definition?.trim());
+    return words.filter((w) => {
+      const hasMainContent = (w.term && w.term.trim() !== '') || 
+                            (w.definition && w.definition.trim() !== '');
+      const hasOptionalContent = (w.phonetics && w.phonetics.trim() !== '') ||
+                                 (w.exampleSentence && w.exampleSentence.trim() !== '') ||
+                                 (w.synonyms && w.synonyms.toString().trim() !== '') ||
+                                 (w.translation && w.translation.trim() !== '') ||
+                                 (w.image && w.image.trim() !== '');
+      
+      // For EDIT: Any word with content (main or optional) should be validated
+      // This includes both existing words (with ID) and new words (without ID)
+      const hasAnyContent = hasMainContent || hasOptionalContent;
+      
+      if (hasAnyContent) {
+        console.log(`Word "${w.term}" included for validation (${w.id ? 'EXISTING' : 'NEW'}):`, {
+          hasMainContent,
+          hasOptionalContent,
+          isExisting: !!w.id,
+          isNew: !w.id
+        });
+      }
+      
+      return hasAnyContent;
+    });
   }, [words]);
 
-  // Edit-specific: Get words for update operation
+  // Edit-specific: Get words for update operation - returns ALL words with content
   const getWordsForUpdate = useCallback(() => {
+    const currentValidWords = getValidWords();
+    
+    console.log('Words for update operation:', {
+      originalCount: originalWords.length,
+      currentValidCount: currentValidWords.length,
+      existingInCurrent: currentValidWords.filter(w => w.id).length,
+      newInCurrent: currentValidWords.filter(w => !w.id).length
+    });
+    
     return {
       originalWords,
-      currentWords: getValidWords(),
+      currentWords: currentValidWords,
     };
   }, [originalWords, getValidWords]);
 
+  // Synchronized with useListManagement - improved word preparation
   const prepareWordsForSubmission = useCallback(() => {
     const validWords = getValidWords();
     return validWords.map((w) => ({
-      term: w.term,
-      definition: w.definition,
+      term: w.term || '',
+      definition: w.definition || '',
       phonetics: w.phonetics || "",
       synonyms: normalizeSynonyms(w.synonyms),
       translation: w.translation || "",
       exampleSentence: w.exampleSentence || "",
       aiGenerated: w.aiGenerated || false,
       generationPrompt: w.generationPrompt || null,
+      // Keep ID for edit operations
+      ...(w.id ? { id: w.id } : {}),
     }));
   }, [getValidWords, normalizeSynonyms]);
 

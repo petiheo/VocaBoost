@@ -18,6 +18,7 @@ const authenticateMiddleware = async (req, res, next) => {
       return ResponseUtils.unauthorized(res, 'User not found');
     }
 
+    // Block only specific problematic statuses, allow others like 'pending_verification'
     if (
       user.account_status === 'inactive' ||
       user.account_status === 'suspended' ||

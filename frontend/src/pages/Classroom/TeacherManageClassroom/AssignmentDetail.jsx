@@ -4,8 +4,12 @@ import { Line } from "../../../assets/Classroom";
 import classroomService from "../../../services/Classroom/classroomService";
 import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 import { useNavigate } from "react-router-dom";
+import { AssignSubMenu, AssignmentDetailSkeleton } from "../../../components";
 
 export default function AssignmentDetail() {
+
+  // Lấy pathname hiện tại, ví dụ: "/my-classroom"
+  const [currentTab, setCurrentTab] = useState("Details");
 
   // quan ly trang thai "..."
   const [showDropdown, setShowDropdown] = useState(false);
@@ -38,22 +42,33 @@ export default function AssignmentDetail() {
 
   //Khởi tạo biến lưu dữ liệu của Assignment
   const [assignmentsDetail, setAssignmentsDetail] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (currentTab !== "Details")
+      return;
+
     if (!classroomId || !assignment?.id) {
       console.error("Missing classroom ID or assignment ID");
       return;
     }
 
     const fetchingAssignmentDetail = async () => {
-      const res = await classroomService.getAssignmentDetails(classroomId, assignment?.id);
-      if (res.success) {
-        console.log("Fetch assignment detail thành công");
-        console.log(res.data);
-        setAssignmentsDetail(res.data);
-      }
-      else {
-        console.log(res.message);
+      try {
+        setLoading(true);
+        const res = await classroomService.getAssignmentDetails(classroomId, assignment?.id);
+        if (res.success) {
+          console.log("Fetch assignment detail thành công");
+          console.log(res.data);
+          setAssignmentsDetail(res.data);
+        }
+        else {
+          console.log(res.message);
+        }
+      } catch (error) {
+        console.error("Error fetching assignment details:", error);
+      } finally {
+        setLoading(false);
       }
     }
     fetchingAssignmentDetail();
@@ -79,11 +94,15 @@ export default function AssignmentDetail() {
   };
 
 
+  if (loading) {
+    return <AssignmentDetailSkeleton />;
+  }
+
   return (
     <div className="assignment-detail-page">
       <div className="content">
         <div className="assignment-detail__container">
-          <h1>Assignment Details</h1>
+          {/* <h1>Assignment Details</h1> */}
 
           <div className="assignment-box">
             <div className="assignment-header">
@@ -110,7 +129,9 @@ export default function AssignmentDetail() {
             </div>
           </div>
 
-          <img src={Line} alt="line" className="line" style={{ width: "100%" }} />
+          <AssignSubMenu/>
+
+          {/* <img src={Line} alt="line" className="line" style={{ width: "100%" }} /> */}
 
           <div className="word-list">
             <SeeMoreSection

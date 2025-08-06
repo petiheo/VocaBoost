@@ -18,6 +18,10 @@ reviewRouter.get('/lists/:listId/due-words', reviewController.getDueWordsByList)
 
 reviewRouter.get('/sessions/status', reviewController.getActiveSessionStatus);
 
+reviewRouter.get('/sessions/:sessionId/batch-summary', reviewController.getBatchSummary);
+
+reviewRouter.post('/sessions/:sessionId/resume', reviewController.resumeSession);
+
 reviewRouter.post(
   '/sessions/start',
   ...reviewValidator.startSession,

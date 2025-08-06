@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Header, Footer, SideBar } from "../../components/index";
+import { Header, Footer, SideBar, ClassroomCardSkeleton } from "../../components/index";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import classroomService from "../../services/Classroom/classroomService";
 import { useAuth } from "../../services/Auth/authContext";
@@ -13,8 +13,8 @@ const tabs = [
 
 export default function MyClassroomPage() {
   const [classrooms, setClassrooms] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -26,6 +26,7 @@ export default function MyClassroomPage() {
   useEffect(() => {
     const fetchClassroom = async () => {
       try {
+        setLoading(true);
         let apiCall
         // Trường hợp là giáo viên
         if (user?.role === "teacher") {
@@ -65,7 +66,9 @@ export default function MyClassroomPage() {
       } catch (error) {
         console.error("Lỗi khi lấy danh sách lớp học:", error);
         setClassrooms([]);
-      };
+      } finally {
+        setLoading(false);
+      }
     }
     fetchClassroom();
   }, [currentTab])
@@ -107,7 +110,11 @@ export default function MyClassroomPage() {
           </div>
 
           {/* See more */}
-          {classrooms.length === 0 ? (
+          {loading ? (
+            <div className="classroom-list">
+              <ClassroomCardSkeleton count={4} />
+            </div>
+          ) : classrooms.length === 0 ? (
             <>
               <div className="empty-list">"No classrom available"</div>
             </>

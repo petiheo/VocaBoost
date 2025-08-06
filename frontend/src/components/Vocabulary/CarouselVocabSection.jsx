@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import VocabularyListCard from '../Classroom/VocabularyListCard'; 
 import { LeftArrow, RightArrow } from '../../assets/User';
+import { VocabularyListCardSkeleton } from '../UI/Skeleton';
 
 export default function CarouselVocabSection({ title, children, vocabLists = [], isLoading, error }) {
   const [startIndex, setStartIndex] = useState(0);
@@ -34,7 +35,15 @@ export default function CarouselVocabSection({ title, children, vocabLists = [],
       <div className="carousel-body">
 
         {isLoading ? (
-          <p className="loading-container"> Loading...</p>
+          <div className="carousel-viewport">
+            <div className="carousel-slider" style={{ display: 'flex' }}>
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="carousel-item">
+                  <VocabularyListCardSkeleton />
+                </div>
+              ))}
+            </div>
+          </div>
         ) : error ? (
           <p className="error-message">Could not load this section.</p>
         ) : vocabLists.length > 0 ? (
