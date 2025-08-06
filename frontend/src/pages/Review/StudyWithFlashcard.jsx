@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Header, SideBar, Footer } from "../../components";
+import { Header, SideBar, Footer, ReportTrigger } from "../../components";
 import reviewService from "../../services/Review/reviewService";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
+import reportService from "../../services/Report/reportService";
 import { useToast } from "../../components/Providers/ToastProvider.jsx";
 import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
 import { ArrowLeftIcon, ArrowRightIcon } from "../../assets/Review";
@@ -217,6 +218,15 @@ export default function StudyWithFlashcard() {
     }
   };
 
+  const handleReportSubmit = async (reason) => {
+    try {
+      await reportService.reportContent(currentWord.id, reason);
+      toast("Report submitted successfully", "success");
+    } catch (error) {
+      toast("Failed to submit report", "error");
+    }
+  };
+
   const handleEndSession = async () => {
     try {
       await reviewService.endSession(session?.sessionId || sessionId);
@@ -279,10 +289,24 @@ export default function StudyWithFlashcard() {
           <div className="flashcard__animation" onClick={handleFlipCard}>
             <div className={`card__inner ${isFlipped ? "is-flipped" : ""}`}>
               <div className="card__face card__front">
-                {currentWord.term}
+                <div className="card__report-trigger">
+                  <ReportTrigger 
+                    wordId={currentWord.id}
+                    onReportSubmit={handleReportSubmit}
+                  />
+                </div>
+                <div className="card__content">
+                  {currentWord.term}
+                </div>
               </div>
               <div className="card__face card__back">
-                <div>
+                <div className="card__report-trigger">
+                  <ReportTrigger 
+                    wordId={currentWord.id}
+                    onReportSubmit={handleReportSubmit}
+                  />
+                </div>
+                <div className="card__content">
                   <div style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
                     {currentWord.definition}
                   </div>

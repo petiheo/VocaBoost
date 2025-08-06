@@ -3,9 +3,10 @@
   border: none;
   padding: 0;
   cursor: pointer;
+  z-index: 1000;
 
   img {
-    width: 1rem;
-    height: 1rem;
+    width: 1.2rem;
+    height: 1.2rem;
   }
 }

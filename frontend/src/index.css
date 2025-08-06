@@ -2738,27 +2738,10 @@ h2 {
 .report {
   font-family: "Inria Sans", serif;
 }
-.report-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-.report-modal {
-  width: 60%;
-  max-width: 550px;
-  background-color: #faf3e0;
-  border-radius: 20px;
-  padding: 40px;
+.report-modal-content {
   position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   text-align: center;
+  animation: modalAppear 0.3s ease-out;
 }
 .report-title {
   font-family: "Lalezar", serif;
@@ -2784,9 +2767,14 @@ h2 {
   resize: none;
   color: #2d1d0b;
   outline: none;
+  transition: border-color 0.2s ease;
 }
 .report-textarea::placeholder {
   color: #b4a790;
+}
+.report-textarea:focus {
+  border-color: #8b7766;
+  box-shadow: 0 0 0 2px rgba(139, 119, 102, 0.2);
 }
 
 .close-button {
@@ -2798,6 +2786,11 @@ h2 {
   border: none;
   cursor: pointer;
   color: #2d1d0b;
+  transition: all 0.2s ease;
+}
+.close-button:hover {
+  color: #d32f2f;
+  transform: scale(1.1);
 }
 
 .submit-button {
@@ -2812,10 +2805,62 @@ h2 {
   border: none;
   border-radius: 1rem;
   cursor: pointer;
-  transition: opacity 0.3s;
+  transition: all 0.3s ease;
 }
 .submit-button:hover {
-  opacity: 0.9;
+  background-color: #1a120a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.submit-button:active {
+  transform: translateY(0);
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-8px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(8px);
+  }
+}
+.shake-animation {
+  animation: shake 0.6s ease-in-out;
+}
+
+.ReactModal__Overlay {
+  opacity: 0;
+  transition: opacity 300ms ease-in-out;
+}
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+.ReactModal__Overlay--before-close {
+  opacity: 0;
+}
+
+.ReactModal__Content {
+  transform: scale(0.9) translateY(-20px);
+  transition: all 300ms ease-in-out;
+}
+.ReactModal__Content--after-open {
+  transform: scale(1) translateY(0);
+}
+.ReactModal__Content--before-close {
+  transform: scale(0.9) translateY(-20px);
 }
 
 .report-trigger-button {
@@ -2823,10 +2868,11 @@ h2 {
   border: none;
   padding: 0;
   cursor: pointer;
+  z-index: 1000;
 }
 .report-trigger-button img {
-  width: 1rem;
-  height: 1rem;
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 .sidebar {
@@ -3831,6 +3877,7 @@ h2 {
   flex: 1;
   flex-direction: column;
   align-items: center;
+  justify-self: center;
   min-height: 40rem;
   margin-bottom: 5rem;
 }
@@ -3893,6 +3940,7 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   backface-visibility: hidden;
   font-size: 2rem;
   padding: 1rem;
@@ -3904,6 +3952,12 @@ h2 {
 .flashcard__animation .card__back {
   background-color: #FFFFFF;
   transform: rotateY(180deg);
+}
+.flashcard__animation .card__report-trigger {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  z-index: 1000;
 }
 .flashcard__controls {
   margin-top: 1.5rem;
