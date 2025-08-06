@@ -136,6 +136,19 @@ class ReviewService {
   // SESSION MANAGEMENT
   // =================================================================
   async getActiveSession(userId) {
+    // Use optimized method that reduces N+1 queries
+    const sessionData = await reviewModel.getActiveSessionOptimized(userId);
+    if (!sessionData) return null;
+
+    // Apply shuffling to remaining words for better learning experience
+    return {
+      ...sessionData,
+      remainingWords: shuffleArray(sessionData.remainingWords),
+    };
+  }
+
+  // Legacy method kept for backward compatibility and fallback
+  async getActiveSessionLegacy(userId) {
     const activeSession = await reviewModel.findActiveSession(userId);
     if (!activeSession) return null;
 
