@@ -1,6 +1,5 @@
-const { verifyToken } = require('../helpers/jwt.helper');
+const { verifyTokenWithBlacklist } = require('../helpers/jwt.helper');
 const userModel = require('../models/user.model');
-const logger = require('../utils/logger');
 const { ResponseUtils, ErrorHandler } = require('../utils');
 
 const authenticateMiddleware = async (req, res, next) => {
@@ -11,7 +10,7 @@ const authenticateMiddleware = async (req, res, next) => {
     }
 
     const token = authHeader.substring(7);
-    const decoded = verifyToken(token);
+    const decoded = await verifyTokenWithBlacklist(token);
 
     const user = await userModel.findById(decoded.userId);
     if (!user) {

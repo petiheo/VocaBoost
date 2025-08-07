@@ -57,6 +57,18 @@ export default function SignUp() {
         setIsLoading(true);
         try {
             const res = await authService.register({ email, password });
+            
+            // Store tokens if provided (user can navigate but has limited access until verified)
+            if (res.data && res.data.token) {
+                localStorage.setItem("token", res.data.token);
+                if (res.data.refreshToken) {
+                    localStorage.setItem("refreshToken", res.data.refreshToken);
+                }
+                if (res.data.user) {
+                    localStorage.setItem("user", JSON.stringify(res.data.user));
+                }
+            }
+            
             navigate("/checkYourMail", { 
                 state: { 
                     fromSignUp: true, 

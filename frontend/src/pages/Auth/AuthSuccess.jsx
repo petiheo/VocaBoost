@@ -14,11 +14,15 @@ export default function AuthSuccess() {
   useEffect(() => {
     const handleGoogleAuth = async () => {
       const token = searchParams.get("token");
+      const refreshToken = searchParams.get("refreshToken");
       const isNewUser = searchParams.get("isNewUser") === "true";
 
       if (token) {
-        // Store token temporarily
+        // Store both tokens
         localStorage.setItem("token", token);
+        if (refreshToken) {
+          localStorage.setItem("refreshToken", refreshToken);
+        }
 
         try {
           // Validate token with server instead of client-side decoding
@@ -41,6 +45,7 @@ export default function AuthSuccess() {
           }
         } catch (error) {
           localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
           localStorage.removeItem("user");
           navigate("/signin");
         }
