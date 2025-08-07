@@ -49,7 +49,7 @@ class AdminService {
     return { request: updatedRequest, user: userProfile};
   }
 
-  async rejectTeacherRequest(requestId, adminId, reason) {
+  async rejectTeacherRequest(requestId, adminId, reason="") {
     const { data: originalRequest, error: findError } = await adminModel.findTeacherRequestById(requestId);
     if (findError) throw findError;
     if (!originalRequest || originalRequest.status !== 'pending') {

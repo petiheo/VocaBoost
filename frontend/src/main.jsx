@@ -8,6 +8,7 @@ import classroomRoutes from "./routes/ClassroomRoutes.jsx";
 import userRoutes from "./routes/UserRoutes.jsx";
 import devRoutes from "./routes/DevRoutes.jsx"; 
 import reviewRoutes from "./routes/Review.Routes.jsx";
+import adminRoutes from "./routes/AdminRoutes.jsx";
 
 const router = createBrowserRouter([
   ...authRoutes,
@@ -16,6 +17,7 @@ const router = createBrowserRouter([
   ...userRoutes,
   ...devRoutes,
   ...reviewRoutes,
+  ...adminRoutes,
 ]);
 
 createRoot(document.getElementById("root")).render(

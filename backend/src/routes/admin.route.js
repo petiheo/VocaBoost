@@ -29,7 +29,7 @@ adminRouter.put(
 
 adminRouter.put(
   '/teacher-requests/:requestId/reject',
-  ...adminValidator.rejectTeacherRequest, 
+  ...adminValidator.getRequestById, 
   adminController.rejectTeacherRequest
 );
 

@@ -55,15 +55,15 @@ class AdminController {
   async rejectTeacherRequest(req, res) {
     try {
       const { requestId } = req.params;
-      const { reason } = req.body;
+      // const { reason } = req.body;
       const adminId = req.user.userId;
 
-      const result = await adminService.rejectTeacherRequest(requestId, adminId, reason);
+      const result = await adminService.rejectTeacherRequest(requestId, adminId);
 
       return ResponseUtils.success(res, `Teacher request for '${result.user.display_name}' has been rejected.`, {
         requestId: result.request.id,
         status: result.request.status,
-        reason: result.request.rejection_reason,
+        // reason: result.request.rejection_reason,
         reviewedBy: result.request.reviewed_by,
       });
     } catch (error) {

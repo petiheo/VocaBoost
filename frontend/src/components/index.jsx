@@ -14,6 +14,7 @@ export { default as DropdownMenu } from "./Navigation/DropdownMenu.jsx";
 export { default as LearnerSubMenu } from "./Navigation/LearnerSubMenu.jsx";
 export { default as AssignSubMenu } from "./Navigation/AssignSubMenu.jsx";
 
+export { default as AdminSubMenu} from "./Navigation/AdminSubMenu.jsx"
 
 // UI Components
 export { default as ConfirmModal } from "./UI/ConfirmModal.jsx";
