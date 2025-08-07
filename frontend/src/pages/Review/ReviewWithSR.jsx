@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Header, SideBar, Footer } from "../../components";
+import { useNavigate, useParams } from "react-router-dom";
+import { Footer, Header, SideBar } from "../../components";
 import reviewService from "../../services/Review/reviewService";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { useToast } from "../../components/Providers/ToastProvider.jsx";
-import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
 import { DropdownIcon } from "../../assets/Vocabulary/index.jsx";
 
 export default function ReviewWithSR() {
   const { listId } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
-  const confirm = useConfirm();
   const [isOpen, setIsOpen] = useState(false);
 
   const [listInfo, setListInfo] = useState(null);
@@ -77,10 +75,7 @@ export default function ReviewWithSR() {
           sessionType = "flashcard";
       }
 
-      const requestData = {
-        listId: listId,
-        sessionType: sessionType,
-      };
+      const requestData = { listId, sessionType };
       console.log("Request data:", requestData);
 
       let sessionResponse;

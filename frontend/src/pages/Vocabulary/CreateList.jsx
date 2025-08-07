@@ -1,16 +1,16 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
-  Header,
-  SideBar,
   Footer,
+  Header,
   ListFormSkeleton,
+  SideBar,
 } from "../../components/index.jsx";
 import ListMetadataForm from "../../components/Vocabulary/ListMetadataForm.jsx";
 import WordsSection from "../../components/Vocabulary/WordsSection.jsx";
-import { useWordManagement } from "../../hooks/useWordManagement.js";
 import { useFormValidation } from "../../hooks/useFormValidation.js";
 import { useListManagement } from "../../hooks/useListManagement.js";
+import { useWordManagement } from "../../hooks/useWordManagement.js";
 
 export default function CreateList() {
   const { listId } = useParams();

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../components/Providers/ToastProvider.jsx";
 import vocabularyService from "../services/Vocabulary/vocabularyService";
@@ -262,7 +262,7 @@ export const useListManagement = (
 
         console.log(`Word at position ${originalIndex + 1} normalized:`, {
           original: word,
-          normalized: normalized,
+          normalized,
         });
 
         return normalized;

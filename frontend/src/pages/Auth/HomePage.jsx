@@ -1,14 +1,13 @@
+import { useEffect, useState } from "react";
 import {
-  Header,
-  SideBar,
   Footer,
+  Header,
   SearchResultsGridSkeleton,
-  CarouselSectionSkeleton,
+  SideBar,
+  VocabularyListCard,
 } from "../../components";
 import CarouselVocabSection from "../../components/Vocabulary/CarouselVocabSection";
-import { useState, useEffect } from "react";
 import { useDebounce } from "../../hooks/useDebounce";
-import { VocabularyListCard } from "../../components";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { useSkeletonToggle } from "../../hooks/useSkeletonToggle";
 
@@ -147,7 +146,7 @@ const HomePage = () => {
 
         setSearchResults({
           data: transformedLists,
-          pagination: pagination,
+          pagination,
           isLoading: false,
           error: null,
         });

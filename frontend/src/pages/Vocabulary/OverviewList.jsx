@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
-  Header,
-  SideBar,
   Footer,
+  Header,
   OverviewListSkeleton,
+  SideBar,
 } from "../../components";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import {
-  RightMoreIcon,
-  TotalWordIcon,
   CategoryIcon,
-  TimeIcon,
   LearnerIcon,
+  RightMoreIcon,
+  TimeIcon,
+  TotalWordIcon,
 } from "../../assets/Vocabulary";
 import { jwtDecode } from "jwt-decode"; // Thư viện để giải mã JWT
 import { useToast } from "../../components/Providers/ToastProvider.jsx";
@@ -27,7 +27,6 @@ export default function OverviewList() {
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
 
-  const currentUserId = localStorage.getItem("userId"); // hoặc lấy từ context
   const [isOwner, setIsOwner] = useState(false);
   const { isLoading: isSkeletonLoading } = useSkeletonToggle();
 

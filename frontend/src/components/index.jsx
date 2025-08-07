@@ -23,8 +23,8 @@ export * from "./UI/Skeleton";
 export { default as Pagination } from "./UI/Pagination.jsx";
 
 // Providers
-export { useConfirm, ConfirmProvider } from "./Providers/ConfirmProvider.jsx";
-export { useToast, ToastProvider } from "./Providers/ToastProvider.jsx";
+export { ConfirmProvider } from "./Providers/ConfirmProvider.jsx";
+export { ToastProvider } from "./Providers/ToastProvider.jsx";
 
 // Reporting Components
 export { default as Report } from "./Report/Report.jsx";

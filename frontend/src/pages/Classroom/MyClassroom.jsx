@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
-  Header,
-  Footer,
-  SideBar,
   ClassroomCardSkeleton,
+  Footer,
+  Header,
+  SideBar,
 } from "../../components/index";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import classroomService from "../../services/Classroom/classroomService";
-import { useAuth } from "../../services/Auth/authContext";
 import SeeMoreSection from "../../components/Classroom/SeeMoreSection";
+import { useAuth } from "../../services/Auth/authContext";
+import classroomService from "../../services/Classroom/classroomService";
 
 const tabs = [{ name: "Teaching" }, { name: "Joined" }];
 

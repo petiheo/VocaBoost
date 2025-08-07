@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import {
-  Header,
-  SideBar,
   Footer,
+  Header,
   ListFormSkeleton,
+  SideBar,
 } from "../../components/index.jsx";
-import ListMetadataForm from "../../components/Vocabulary/ListMetadataForm.jsx";
 import EditWordsSection from "../../components/Vocabulary/EditWordsSection.jsx";
+import ListMetadataForm from "../../components/Vocabulary/ListMetadataForm.jsx";
 import SafeEditList from "../../components/Vocabulary/SafeEditList.jsx";
+import { useEditListManagement } from "../../hooks/useEditListManagement.js";
 import { useEditWordManagement } from "../../hooks/useEditWordManagement.js";
 import { useFormValidation } from "../../hooks/useFormValidation.js";
-import { useEditListManagement } from "../../hooks/useEditListManagement.js";
 export default function EditList() {
   const { listId } = useParams();
   const [isOpen, setIsOpen] = useState(false);

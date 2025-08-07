@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation, data } from "react-router-dom";
-import { Header, SideBar, Footer, ReportTrigger } from "../../components";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { ArrowLeftIcon, ArrowRightIcon } from "../../assets/Review";
+import { Footer, Header, ReportTrigger, SideBar } from "../../components";
+import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
+import { useToast } from "../../components/Providers/ToastProvider.jsx";
 import reviewService from "../../services/Review/reviewService";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
-import { useToast } from "../../components/Providers/ToastProvider.jsx";
-import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
-import { ArrowLeftIcon, ArrowRightIcon } from "../../assets/Review";
 
 export default function StudyWithFlashcard() {
   const { sessionId, listId } = useParams();

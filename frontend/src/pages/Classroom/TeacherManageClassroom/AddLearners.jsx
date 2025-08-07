@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ClassroomTitle,
@@ -12,7 +12,7 @@ export default function AddStudentPage() {
   const [invitations, setInvitations] = useState([]); // lưu danh sách lời mời
 
   // Truy xuất dữ liệu lớp học được lưu khi users chọn classroom ở trang MyClassroom.
-  const [classroomId, setClassroomId] = useState(() => {
+  const [classroomId, _setClassroomId] = useState(() => {
     const selectedClassroom = JSON.parse(
       localStorage.getItem("selectedClassroom")
     );
@@ -20,7 +20,7 @@ export default function AddStudentPage() {
   });
 
   // Fetch data về trang
-  const fetchDataInvitations = async () => {
+  const fetchDataInvitations = useCallback(async () => {
     if (!classroomId) {
       console.error("Missing classroom ID");
       return;
@@ -34,11 +34,11 @@ export default function AddStudentPage() {
       console.error("Lỗi khi lấy danh sách lời mời:", error.message);
       navigate("/fail");
     }
-  };
+  }, [classroomId, navigate]);
 
   useEffect(() => {
     fetchDataInvitations();
-  }, [classroomId]);
+  }, [fetchDataInvitations]);
 
   // Xử lý việc gửi lời mời đến cho learners
   const handleInviteLearner = async (invited_email) => {

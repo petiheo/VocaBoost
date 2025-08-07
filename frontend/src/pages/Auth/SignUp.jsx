@@ -1,14 +1,14 @@
-import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import AccountPageInput from "../../components/Forms/AccountPageInput";
+import { Link, useNavigate } from "react-router-dom";
+import { SignInSignUpBG } from "../../assets/Auth";
 import MainPageLogo from "../../assets/Logo.svg";
 import { GoogleLogo } from "../../assets/icons/index";
-import authService from "../../services/Auth/authService";
-import { SignInSignUpBG } from "../../assets/Auth";
+import AccountPageInput from "../../components/Forms/AccountPageInput";
 import LoadingCursor from "../../components/UI/LoadingCursor";
+import authService from "../../services/Auth/authService";
 import {
-  handleSignupError,
   clearAuthErrors,
+  handleSignupError,
 } from "../../utils/authErrorHandler";
 
 const handleGoogleSignUp = () => {
@@ -79,7 +79,7 @@ export default function SignUp() {
       navigate("/checkYourMail", {
         state: {
           fromSignUp: true,
-          email: email,
+          email,
         },
       });
     } catch (error) {

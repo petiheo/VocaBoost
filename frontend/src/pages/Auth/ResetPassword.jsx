@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../../services/Auth/authService";
 import AccountPageInput from "../../components/Forms/AccountPageInput";
@@ -58,9 +58,9 @@ export default function ResetPassword() {
       setTimeout(() => {
         navigate("/signin");
       }, 2000);
-    } catch (error) {
+    } catch (e) {
       const errorMessage =
-        error.response?.data?.message ||
+        e.response?.data?.message ||
         "Error resetting password. Please try again.";
       setError(errorMessage);
     } finally {

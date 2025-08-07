@@ -22,9 +22,9 @@ export default function ForgotPassword() {
           "We've sent you a password reset link. Please check your inbox."
       );
       setEmail(""); // Clear email after successful submission
-    } catch (error) {
+    } catch (e) {
       const errorMessage =
-        error.response?.data?.message ||
+        e.response?.data?.message ||
         "Oops! Something went wrong while sending the email. Please try again.";
       setError(errorMessage);
     } finally {

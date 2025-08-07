@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import classroomService from "../../../services/Classroom/classroomService";
 import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
 import {
-  ClassroomTitle,
-  TeacherClassroomMenuTab,
-  SearchBar,
   ClassroomDropdownMenu,
+  ClassroomTitle,
   PendingRequestSkeleton,
+  SearchBar,
+  TeacherClassroomMenuTab,
 } from "../../../components/index";
 
 export default function PendingRequestPage() {

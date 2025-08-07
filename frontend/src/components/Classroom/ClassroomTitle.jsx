@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ClassroomTitlePattern,
   JoinCodeIcon,
@@ -35,30 +35,30 @@ export default function ClassroomTitle() {
 
   //Xử lý leave classroom (Learner)
   const handleLeaveClassroom = async () => {
-    console.log("Remove clicked");
+    console.info("Remove clicked");
     try {
       const res = await classroomService.leaveClassroom(selectedClassroom.id);
       if (res.success) {
-        console.log("Rời lớp học thành công");
+        console.info("Rời lớp học thành công");
         navigate("/my-classroom");
       }
     } catch (err) {
-      console.log("Lỗi rời lớp học ở ClassroomTitle", err);
+      console.error("Lỗi rời lớp học ở ClassroomTitle", err);
     }
   };
 
   // Xử lý remove classroom của teacher
   const handleRemoveClassroom = async () => {
-    console.log("Remove clicked");
+    console.info("Remove clicked");
     // Thêm logic xóa classroom ở đây nếu cần
     try {
       const res = await classroomService.deleteAClassroom(selectedClassroom.id);
       if (res.success) {
-        console.log("Xoá lớp học thành công");
+        console.info("Xoá lớp học thành công");
         navigate("/my-classroom");
       }
     } catch (err) {
-      console.log("Lỗi xoá lớp học ở ClassroomTitle", err);
+      console.error("Lỗi xoá lớp học ở ClassroomTitle", err);
     }
   };
 
@@ -70,7 +70,7 @@ export default function ClassroomTitle() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.log("Không thể sao chép", err);
+      console.error("Không thể sao chép", err);
     }
   };
 

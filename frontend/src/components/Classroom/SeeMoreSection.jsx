@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 import { SeeMore } from "../../assets/Classroom";
 
 const SeeMoreSection = ({
@@ -8,7 +9,7 @@ const SeeMoreSection = ({
   step,
   wrapperClassName = "",
   itemWrapperTag: Tag = "div",
-  className = "see-more-section",
+  className: _className = "see-more-section", // tránh lỗi no-unused-vars
 }) => {
   const [visibleCount, setVisibleCount] = useState(initialCount);
 
@@ -36,6 +37,16 @@ const SeeMoreSection = ({
       )}
     </div>
   );
+};
+
+SeeMoreSection.propTypes = {
+  items: PropTypes.array.isRequired,
+  renderItem: PropTypes.func.isRequired,
+  initialCount: PropTypes.number.isRequired,
+  step: PropTypes.number.isRequired,
+  wrapperClassName: PropTypes.string,
+  itemWrapperTag: PropTypes.elementType,
+  className: PropTypes.string,
 };
 
 export default SeeMoreSection;

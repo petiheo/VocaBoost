@@ -1,25 +1,24 @@
-import { useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import useClickOutside from "../../hooks/useClickOutside";
+import { useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { MyClassroom } from "../../assets/Auth";
 import {
+  Analysis,
+  ArrowLeft,
+  ArrowRight,
   Home,
   Learning,
-  Analysis,
-  Setting,
   LogOut,
-  ArrowRight,
-  ArrowLeft,
+  Setting,
 } from "../../assets/icons/index";
-import { MyClassroom } from "../../assets/Auth";
 import { useToast } from "../../components/Providers/ToastProvider.jsx";
-import authService from "../../services/Auth/authService";
+import useClickOutside from "../../hooks/useClickOutside";
 import { useAuth } from "../../services/Auth/authContext.jsx";
-import { useNavigate } from "react-router-dom";
+import authService from "../../services/Auth/authService";
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const sidebarRef = useRef(null);
   const toast = useToast();
-  const { user, logout: contextLogout } = useAuth();
+  const { logout: contextLogout } = useAuth();
   const navigate = useNavigate();
 
   useClickOutside(sidebarRef, () => setIsOpen(false), isOpen);

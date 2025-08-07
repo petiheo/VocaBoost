@@ -46,13 +46,11 @@ export default [
       ...reactHooks.configs.recommended.rules,
 
       // React specific
+      "react/prop-types": "off",
       "react/jsx-uses-react": "off", // Not needed in React 17+
       "react/react-in-jsx-scope": "off", // Not needed in React 17+
       "react/jsx-uses-vars": "error", // This will fix the unused component issue
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
+      "react-refresh/only-export-components": "off",
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
 
@@ -75,34 +73,26 @@ export default [
       ],
 
       // Best practices
-      "no-console": ["warn", { allow: ["warn", "error", "info"] }],
+      // "no-console": ["warn", { allow: ["warn", "error", "info"] }],
       "no-debugger": "error",
       "no-alert": "warn",
       "prefer-const": "error",
       "no-var": "error",
       eqeqeq: ["error", "always", { null: "ignore" }],
       curly: ["error", "multi-line"],
+      "react/no-unescaped-entities": "off",
 
       // ES6+
-      "arrow-body-style": ["warn", "as-needed"],
+      "arrow-body-style": "off",
       "prefer-arrow-callback": "warn",
-      "prefer-template": "warn",
+      "prefer-template": "off",
       "no-duplicate-imports": "error",
       "object-shorthand": ["warn", "always"],
-      "prefer-destructuring": [
-        "warn",
-        {
-          array: false,
-          object: true,
-        },
-        {
-          enforceForRenamedProperties: false,
-        },
-      ],
+      "prefer-destructuring": "off",
 
       // Code quality
       "no-lonely-if": "warn",
-      "no-nested-ternary": "warn",
+      "no-nested-ternary": "off",
       "no-unneeded-ternary": "warn",
       "no-useless-return": "warn",
       "prefer-object-spread": "warn",

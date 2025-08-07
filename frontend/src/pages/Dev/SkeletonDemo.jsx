@@ -37,7 +37,7 @@ const SkeletonDemo = () => {
     "ViewClassroomSkeleton"
   );
 
-  if (process.env.NODE_ENV !== "development") {
+  if (import.meta.env.MODE !== "development") {
     return <div>This page is only available in development mode.</div>;
   }
 

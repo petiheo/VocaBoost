@@ -2,7 +2,7 @@
 //  Mà frontend (React) không thể tự xử lý token trong URL nếu bạn không có route /auth/success tương ứng.
 
 import { useEffect, useRef } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import authService from "../../services/Auth/authService";
 import { useAuth } from "../../services/Auth/authContext";
 

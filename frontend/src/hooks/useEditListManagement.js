@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../components/Providers/ToastProvider.jsx";
 import vocabularyService from "../services/Vocabulary/vocabularyService";
@@ -95,7 +95,7 @@ export const useEditListManagement = (
 
   // Function to format validation errors for display (synchronized with useListManagement)
   const formatValidationErrors = useCallback((errors) => {
-    let errorMessages = [];
+    const errorMessages = [];
 
     // Title errors
     if (errors.title) {
@@ -272,7 +272,7 @@ export const useEditListManagement = (
           `Word at position ${originalIndex + 1} (${isExisting ? "EXISTING" : "NEW"}) normalized:`,
           {
             original: word,
-            normalized: normalized,
+            normalized,
           }
         );
 

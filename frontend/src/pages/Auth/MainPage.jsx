@@ -1,8 +1,13 @@
 import Header from "../../components/Layout/Header";
 import Footer from "../../components/Layout/Footer";
-import "../../assets/icons/index";
 import { Link, Outlet } from "react-router-dom";
 import {
+  Group41,
+  Group52,
+  Group53,
+  Group56,
+  Group78,
+  Group8,
   Pattern1,
   Pattern2,
   Pattern3,
@@ -11,20 +16,12 @@ import {
   Pattern6,
   Pattern7,
   Pattern8,
-} from "../../assets/icons/index";
-import {
   PatternCard1,
   PatternCard2,
   PatternCard3,
+  Union,
+  Vector,
 } from "../../assets/icons/index";
-import {
-  Group41,
-  Group52,
-  Group53,
-  Group56,
-  Group78,
-} from "../../assets/icons/index";
-import { Union, Vector, Group8 } from "../../assets/icons/index";
 import { useEffect } from "react";
 import { useToast } from "../../components/Providers/ToastProvider";
 
@@ -98,6 +95,7 @@ export default function MainPage() {
       <div className="top-pattern">
         {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
           <img
+            key={num}
             src={patterns[num]}
             alt={`pattern${num}`}
             className={`pattern${num}`}
@@ -124,6 +122,7 @@ export default function MainPage() {
           <div className="pattern-card">
             {[3, 2, 1].map((num) => (
               <img
+                key={num}
                 src={patternsCard[num]}
                 alt={`pattern${num}`}
                 className={`pattern-card${num}`}
@@ -144,7 +143,12 @@ export default function MainPage() {
 
       <div className="slogans-grid">
         {[2, 3, 4].map((num) => (
-          <img src={Group[num]} alt={`group${num}`} className={`group${num}`} />
+          <img
+            key={num}
+            src={Group[num]}
+            alt={`group${num}`}
+            className={`group${num}`}
+          />
         ))}
       </div>
 

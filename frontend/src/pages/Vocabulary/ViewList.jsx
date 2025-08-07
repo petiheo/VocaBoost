@@ -1,17 +1,16 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Header, SideBar, Footer, ViewListSkeleton } from "../../components";
-import vocabularyService from "../../services/Vocabulary/vocabularyService";
+import { SearchBarPattern } from "../../assets/icons/index";
 import {
-  UploadImage,
+  DropdownIcon,
   MoreIcon,
   ShareIcon,
-  DropdownIcon,
 } from "../../assets/Vocabulary";
-import { SearchBarPattern } from "../../assets/icons/index";
+import { Footer, Header, SideBar, ViewListSkeleton } from "../../components";
 import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
 import { useToast } from "../../components/Providers/ToastProvider.jsx";
 import useClickOutside from "../../hooks/useClickOutside";
+import vocabularyService from "../../services/Vocabulary/vocabularyService";
 
 export default function ViewList() {
   const [listInfo, setListInfo] = useState(null);

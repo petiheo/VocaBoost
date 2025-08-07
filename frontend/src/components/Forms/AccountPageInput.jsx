@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const AccountPageInput = (props) => {
   const inputRef = useRef(null); // tranh render lai khi thay doi props type

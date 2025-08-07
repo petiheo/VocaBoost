@@ -1,13 +1,12 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-import Logo from "../../components/Layout/Logo";
+import { RedAsterisk } from "../../assets/Auth";
 import { UploadPattern } from "../../assets/icons";
 import AccountPageInput from "../../components/Forms/AccountPageInput";
-import { RedAsterisk } from "../../assets/Auth";
-import teacherService from "../../services/Teacher/teacherService";
+import Logo from "../../components/Layout/Logo";
 import LoadingCursor from "../../components/UI/LoadingCursor";
 import authService from "../../services/Auth/authService";
+import teacherService from "../../services/Teacher/teacherService";
 
 export default function TeacherVerification() {
   const navigate = useNavigate();
@@ -50,7 +49,7 @@ export default function TeacherVerification() {
             navigate("/signin");
           }, 2000);
         }
-      } catch (error) {
+      } catch {
         setError("Authentication failed. Please login again.");
         setTimeout(() => {
           navigate("/signin");

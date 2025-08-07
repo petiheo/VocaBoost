@@ -1,4 +1,5 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const ClassroomDropdownMenu = ({ students }) => {
   const navigate = useNavigate();
@@ -18,6 +19,10 @@ const ClassroomDropdownMenu = ({ students }) => {
       </select>
     </div>
   );
+};
+
+ClassroomDropdownMenu.propTypes = {
+  students: PropTypes.array.isRequired,
 };
 
 export default ClassroomDropdownMenu;

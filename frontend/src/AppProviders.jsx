@@ -1,4 +1,5 @@
 import { StrictMode } from "react";
+import PropTypes from "prop-types";
 import { AuthProvider } from "./services/Auth/authContext.jsx";
 import { ConfirmProvider } from "./components/Providers/ConfirmProvider.jsx";
 import { ToastProvider } from "./components/Providers/ToastProvider.jsx";
@@ -17,3 +18,7 @@ export default function AppProviders({ children }) {
     </StrictMode>
   );
 }
+
+AppProviders.propTypes = {
+  children: PropTypes.node.isRequired,
+};

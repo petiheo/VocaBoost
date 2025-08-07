@@ -16,7 +16,7 @@ export function TableRowSkeleton({
     >
       {Array.from({ length: count }).map((_, rowIndex) => (
         <tr key={rowIndex}>
-          {Array.from({ length: columns }).map((_, colIndex) => (
+          {Array.from({ length: columns }).map((__, colIndex) => (
             <td key={colIndex}>
               <Skeleton height={16} />
             </td>

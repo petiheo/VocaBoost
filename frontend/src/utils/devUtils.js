@@ -8,8 +8,10 @@
  */
 export const addDevDelay = (ms = 2000) => {
   // Only add delay in development mode
-  if (process.env.NODE_ENV === "development") {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  if (import.meta.env.MODE === "development") {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
   }
   return Promise.resolve();
 };
@@ -28,13 +30,15 @@ export const simulateNetwork = async (apiCall, options = {}) => {
   } = options;
 
   // Only simulate in development
-  if (process.env.NODE_ENV !== "development") {
+  if (import.meta.env.MODE !== "development") {
     return await apiCall();
   }
 
   // Simulate network delay
   const networkDelay = slowNetwork ? delay + Math.random() * 1000 : delay;
-  await new Promise((resolve) => setTimeout(resolve, networkDelay));
+  await new Promise((resolve) => {
+    setTimeout(resolve, networkDelay);
+  });
 
   // Simulate network failure
   if (Math.random() < failureRate) {
@@ -49,7 +53,7 @@ export const simulateNetwork = async (apiCall, options = {}) => {
  * Useful for quickly testing skeleton states
  */
 export const createSkeletonToggle = () => {
-  if (process.env.NODE_ENV === "development") {
+  if (import.meta.env.MODE === "development") {
     // Add keyboard shortcut to toggle skeleton
     const toggleSkeleton = (callback) => {
       const handleKeyPress = (e) => {
@@ -74,7 +78,7 @@ export const createSkeletonToggle = () => {
  * Console helper for development
  */
 export const devLog = (...args) => {
-  if (process.env.NODE_ENV === "development") {
+  if (import.meta.env.MODE === "development") {
     console.log("[DEV]", ...args);
   }
 };

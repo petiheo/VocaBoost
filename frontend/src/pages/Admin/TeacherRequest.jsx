@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import adminService from "../../services/Admin/adminService";
-import { Header, Footer, AdminSubMenu } from "../../components";
+import { AdminSubMenu, Footer, Header } from "../../components";
 import { useEffect, useState } from "react";
 
 const TeacherRequest = () => {
@@ -32,7 +32,7 @@ const TeacherRequest = () => {
         setTeacherRequests(teacherRequests.filter((tr) => tr.requestId !== id));
         console.log("Approve thanh cong");
       }
-    } catch {
+    } catch (error) {
       console.error(error.message);
       navigate("/fail");
     }
@@ -45,7 +45,7 @@ const TeacherRequest = () => {
         setTeacherRequests(teacherRequests.filter((tr) => tr.requestId !== id));
         console.log("Reject thanh cong");
       }
-    } catch {
+    } catch (error) {
       console.error(error.message);
       navigate("/fail");
     }

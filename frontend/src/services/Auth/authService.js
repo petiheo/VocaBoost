@@ -61,9 +61,8 @@ const authService = {
   },
 
   // 5. Quên mật khẩu
-  forgotPassword: async (email) => {
-    return await api.post("/auth/forgot-password", { email });
-  },
+  forgotPassword: async (email) =>
+    await api.post("/auth/forgot-password", { email }),
 
   // 7. Đặt lại mật khẩu
   resetPassword: async (token, newPassword) => {
@@ -73,8 +72,8 @@ const authService = {
       );
     }
     const res = await api.post("/auth/reset-password", {
-      token: token,
-      newPassword: newPassword,
+      token,
+      newPassword,
     });
     return res.data;
   },
@@ -87,7 +86,7 @@ const authService = {
 
   // 9. Get account status
   getAccountStatus: async (email) => {
-    const res = await api.post("/auth/get-account-status", { email: email });
+    const res = await api.post("/auth/get-account-status", { email });
     return res.data;
   },
 
@@ -109,7 +108,7 @@ const authService = {
         },
       });
       return res.data;
-    } catch (error) {
+    } catch {
       // Token is invalid, clear it and redirect
       authService.clearSession();
       return null;
@@ -174,7 +173,7 @@ const authService = {
       };
 
       return isExpired;
-    } catch (error) {
+    } catch {
       // If we can't decode the token, assume it's valid and let server validate
       // This prevents clearing sessions during OAuth flows with different token formats
       tokenExpirationCache = {
@@ -194,7 +193,7 @@ const authService = {
     try {
       const userStr = localStorage.getItem("user");
       return userStr ? JSON.parse(userStr) : null;
-    } catch (e) {
+    } catch {
       return null;
     }
   },

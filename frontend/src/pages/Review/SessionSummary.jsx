@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { SideBar, Footer } from "../../components";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Footer, SideBar } from "../../components";
 import reviewService from "../../services/Review/reviewService";
 import { useToast } from "../../components/Providers/ToastProvider.jsx";
 import MainPageLogo from "../../assets/Logo.svg";

@@ -3,21 +3,21 @@ import { useAuth } from "../../services/Auth/authContext";
 import {
   Footer,
   Header,
-  SideBar,
   ProfileSkeleton,
+  SideBar,
 } from "../../components/index.jsx";
 import LoadingCursor from "../../components/UI/LoadingCursor.jsx";
 import { useUserProfile } from "../../hooks/useUserProfile";
 import {
+  ProfileAvatar,
   ProfileInput,
   TeacherVerification,
-  ProfileAvatar,
 } from "../../components/Profile/ProfileComponents";
 import {
-  validateProfile,
-  validateDisplayName,
-  validateDailyGoal,
   validateAvatarFile,
+  validateDailyGoal,
+  validateDisplayName,
+  validateProfile,
 } from "../../utils/validation";
 
 const Profile = () => {

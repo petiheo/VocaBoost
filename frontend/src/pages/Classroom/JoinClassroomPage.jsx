@@ -1,6 +1,6 @@
 import { useState } from "react";
-import JoinClassroomStatus from "./JoinClassroomStatus";
 import classroomService from "../../services/Classroom/classroomService";
+import JoinClassroomStatus from "./JoinClassroomStatus";
 
 export default function JoinClassroomPage() {
   const [inputCode, setInputCode] = useState("");
@@ -8,7 +8,7 @@ export default function JoinClassroomPage() {
   const [errors, setErrors] = useState({});
   const [isJoining, setIsJoining] = useState(false);
 
-  const handleJoin = async (e) => {
+  const handleJoin = async () => {
     if (!inputCode || isJoining) return;
 
     setIsJoining(true);
@@ -23,13 +23,11 @@ export default function JoinClassroomPage() {
         } else {
           setStatus("success");
         }
+      } else if (res.message.includes("capacity")) {
+        setStatus("full");
       } else {
-        if (res.message.includes("capacity")) {
-          setStatus("full");
-        } else {
-          setStatus("error");
-          setErrors({ server: res.message });
-        }
+        setStatus("error");
+        setErrors({ server: res.message });
       }
     } catch (error) {
       setStatus("error");

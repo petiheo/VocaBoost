@@ -1,4 +1,4 @@
-import { useState, useEffect, useId } from "react";
+import { useEffect, useId, useState } from "react";
 import Modal from "react-modal";
 
 // Set app element for accessibility only once

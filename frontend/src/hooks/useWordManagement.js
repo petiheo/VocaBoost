@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useConfirm } from "../components/Providers/ConfirmProvider.jsx";
 import { useToast } from "../components/Providers/ToastProvider.jsx";
 import vocabularyService from "../services/Vocabulary/vocabularyService";
@@ -124,9 +124,10 @@ export const useWordManagement = () => {
     [words, toast]
   );
 
-  const getValidWords = useCallback(() => {
-    return words.filter((w) => w.term && w.definition);
-  }, [words]);
+  const getValidWords = useCallback(
+    () => words.filter((w) => w.term && w.definition),
+    [words]
+  );
 
   const prepareWordsForSubmission = useCallback(() => {
     const validWords = getValidWords();

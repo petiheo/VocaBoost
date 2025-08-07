@@ -1,9 +1,8 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
-import authService from "../../services/Auth/authService";
-
 import { SignUpElement } from "../../assets/icons/index";
 import SignUpBackground from "../../assets/icons/SignUp/SignUpBackground.svg";
+import authService from "../../services/Auth/authService";
 
 export default function CheckYourMail() {
   const location = useLocation();

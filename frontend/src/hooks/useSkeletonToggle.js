@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Development hook for testing skeleton loading states
@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 export function useSkeletonToggle(initialLoading = false) {
   const [forceLoading, setForceLoading] = useState(initialLoading);
   const [isEnabled, setIsEnabled] = useState(
-    process.env.NODE_ENV === "development"
+    import.meta.env.MODE === "development"
   );
 
   useEffect(() => {

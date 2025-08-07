@@ -16,10 +16,7 @@ class SafeEditListErrorBoundary extends React.Component {
     console.error("Error Info:", errorInfo);
 
     // Don't reload the page automatically, just show error
-    this.setState({
-      error: error,
-      hasError: true,
-    });
+    this.setState({ error, hasError: true });
   }
 
   render() {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 
 const FillInBlank = ({
@@ -16,7 +16,6 @@ const FillInBlank = ({
   const [userAnswer, setUserAnswer] = useState("");
   const [isAnswered, setIsAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [showHint, setShowHint] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -24,7 +23,6 @@ const FillInBlank = ({
     setUserAnswer("");
     setIsAnswered(false);
     setIsCorrect(false);
-    setShowHint(false);
 
     // Focus input on new question
     if (inputRef.current) {

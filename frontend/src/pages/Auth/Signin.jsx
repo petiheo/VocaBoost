@@ -1,19 +1,17 @@
-import "../../assets/icons/index";
-import { Link } from "react-router-dom";
-import AccountPageInput from "../../components/Forms/AccountPageInput";
-import MainPageLogo from "../../assets/Logo.svg";
-import { GoogleLogo } from "../../assets/icons/index";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import authService from "../../services/Auth/authService";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { SignInSignUpBG } from "../../assets/Auth";
-import { useState, useEffect } from "react";
+import { GoogleLogo } from "../../assets/icons/index";
+import MainPageLogo from "../../assets/Logo.svg";
+import AccountPageInput from "../../components/Forms/AccountPageInput";
+import { useToast } from "../../components/Providers/ToastProvider";
 import LoadingCursor from "../../components/UI/LoadingCursor";
 import { useAuth } from "../../services/Auth/authContext";
+import authService from "../../services/Auth/authService";
 import {
-  handleLoginError,
   clearAuthErrors,
+  handleLoginError,
 } from "../../utils/authErrorHandler";
-import { useToast } from "../../components/Providers/ToastProvider";
 
 export default function Signin() {
   // Xử lý việc navigate trang
@@ -95,7 +93,7 @@ export default function Signin() {
         navigate("/checkYourMail", {
           state: {
             fromSignUp: false,
-            email: email,
+            email,
           },
         });
       }
