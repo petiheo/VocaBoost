@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from 'react-router-dom';
 import { Header, SideBar, Footer, ViewListSkeleton } from "../../components";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
@@ -6,6 +6,7 @@ import { UploadImage, MoreIcon, ShareIcon, DropdownIcon } from "../../assets/Voc
 import { SearchBarPattern } from "../../assets/icons/index"
 import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
 import { useToast } from "../../components/Providers/ToastProvider.jsx";
+import useClickOutside from "../../hooks/useClickOutside";
 
 
 export default function ViewList() {
@@ -18,9 +19,17 @@ export default function ViewList() {
   const [showMoreBox, setShowMoreBox] = useState(false);
   const { listId } = useParams();
 
+  // Refs for click outside functionality
+  const morePopupRef = useRef(null);
+  const sharePopupRef = useRef(null);
+
   const confirm = useConfirm();
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Click outside handlers
+  useClickOutside(morePopupRef, () => setShowMoreBox(false), showMoreBox);
+  useClickOutside(sharePopupRef, () => setShowShareBox(false), showShareBox);
 
 
   const handleCopy = async (text) => {
@@ -81,7 +90,7 @@ export default function ViewList() {
                     <div className="view-list__title">{listInfo.title}</div>
 
                     <div className="view-list__title-actions">
-                        <div className="options-wrapper">
+                        <div className="options-wrapper" ref={morePopupRef}>
                           <button className="icon-button" onClick={() => setShowMoreBox(!showMoreBox)}>
                             <img src={MoreIcon} alt="more" />
                           </button>
@@ -119,7 +128,7 @@ export default function ViewList() {
                           )}
                         </div>
 
-                        <div className="options-wrapper">  
+                        <div className="options-wrapper" ref={sharePopupRef}>  
                             <button
                             className="icon-button"
                             onClick={() => setShowShareBox(!showShareBox)}

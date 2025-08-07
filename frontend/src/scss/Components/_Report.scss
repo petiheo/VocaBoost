@@ -14,9 +14,6 @@
             pointer-events: auto;
         }
         
-        // Create isolated stacking context
-        isolation: isolate;
-        contain: layout style;
     }
 
     &-title {
