@@ -672,32 +672,6 @@ class ClassroomModel {
 
     if (error) throw error;
   }
-
-  // =================
-  //    user model
-  // =================
-
-  async findById(userId) {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle();
-
-    if (error) throw error;
-    return data;
-  }
-
-  async findByEmail(email) {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .maybeSingle();
-
-    if (error) throw error;
-    return data;
-  }
 }
 
 module.exports = new ClassroomModel();

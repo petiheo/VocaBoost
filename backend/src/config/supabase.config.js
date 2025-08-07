@@ -52,11 +52,8 @@ const testConnection = async () => {
     }
   }
 };
-
-// Initialize configuration logging and connection test
 testConnection();
 
-// Export monitoring utilities
 const dbPoolMonitor = require('../utils/dbPoolMonitor');
 
 module.exports = {
