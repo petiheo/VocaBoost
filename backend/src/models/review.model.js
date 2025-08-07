@@ -516,6 +516,135 @@ class ReviewModel {
       .insert(progressRecords, { onConflict: 'user_id, word_id', ignore: true });
     if (error) throw error;
   }
+
+  // =================================================================
+  //  OPTIMIZED SESSION MANAGEMENT (N+1 QUERY FIX)
+  // =================================================================
+
+  /**
+   * Get active session data with all related information in a single optimized query
+   * Fixes N+1 query issue by combining multiple queries into one with joins
+   */
+  async getActiveSessionOptimized(userId) {
+    try {
+      // First, get the active session
+      const activeSession = await this.findActiveSession(userId);
+      if (!activeSession) return null;
+
+      if (!activeSession.word_ids || activeSession.word_ids.length === 0) {
+        logger.warn(
+          `Active session ${activeSession.id} found without word_ids. Ignoring.`
+        );
+        return null;
+      }
+
+      // Get session summary stats (completed words) first to filter at DB level
+      const { data: completedResults, error: resultsError } = await supabase
+        .from('session_word_results')
+        .select('word_id')
+        .eq('session_id', activeSession.id);
+      
+      if (resultsError) throw resultsError;
+
+      const completedWordIds = new Set((completedResults || []).map(r => r.word_id));
+      
+      // Filter remaining word IDs at application level (this is still efficient)
+      const remainingWordIds = activeSession.word_ids.filter(
+        wordId => !completedWordIds.has(wordId)
+      );
+
+      // If no remaining words, return early
+      if (remainingWordIds.length === 0) {
+        return {
+          sessionId: activeSession.id,
+          sessionType: activeSession.session_type,
+          totalWords: activeSession.total_words,
+          completedWords: completedWordIds.size,
+          remainingWords: [],
+          currentBatch: Math.floor(completedWordIds.size / 10) + 1,
+          wordsInCurrentBatch: completedWordIds.size % 10,
+          needsSummary: (completedWordIds.size % 10) === 0 && completedWordIds.size > 0,
+          wordsPerBatch: 10,
+        };
+      }
+
+      // Single optimized query to get words with their progress data
+      // Using a subquery approach with explicit joins for better performance
+      const { data: wordsWithProgress, error: combinedError } = await supabase
+        .from('vocabulary')
+        .select(`
+          id,
+          term,
+          definition,
+          translation,
+          phonetics,
+          image_url,
+          created_at,
+          examples:vocabulary_examples!fk_vocabulary_examples_vocabulary_id (
+            vocabulary_id,
+            example_sentence,
+            ai_generated,
+            generation_prompt,
+            created_at
+          ),
+          synonyms:word_synonyms!fk_word_synonyms_word_id (
+            word_id,
+            synonym,
+            created_at  
+          ),
+          userProgress:user_word_progress!fk_user_word_progress_word (
+            word_id,
+            next_review_date,
+            interval_days,
+            ease_factor,
+            repetitions,
+            correct_count,
+            incorrect_count,
+            last_reviewed_at
+          )
+        `)
+        .in('id', remainingWordIds)
+        .eq('user_word_progress.user_id', userId);
+
+      if (combinedError) throw combinedError;
+
+      // Transform the data to match expected format
+      const processedWords = (wordsWithProgress || []).map(word => ({
+        ...word,
+        // Handle examples - keep single example for backward compatibility
+        vocabulary_examples: word.examples && word.examples.length > 0 ? word.examples[0] : null,
+        // Handle synonyms - extract just the synonym strings
+        synonyms: word.synonyms ? word.synonyms.map(s => s.synonym) : [],
+        // Handle user progress - take first match or null
+        userProgress: word.userProgress && word.userProgress.length > 0 ? word.userProgress[0] : null,
+        // Clean up the nested arrays
+        examples: undefined,
+      }));
+
+      // Calculate batch information
+      const totalCompleted = completedWordIds.size;
+      const wordsPerBatch = 10;
+      const currentBatch = Math.floor(totalCompleted / wordsPerBatch) + 1;
+      const wordsInCurrentBatch = totalCompleted % wordsPerBatch;
+      const needsSummary = wordsInCurrentBatch === 0 && totalCompleted > 0;
+
+      return {
+        sessionId: activeSession.id,
+        sessionType: activeSession.session_type,
+        totalWords: activeSession.total_words,
+        completedWords: totalCompleted,
+        remainingWords: processedWords, // These will be shuffled in the service
+        currentBatch,
+        wordsInCurrentBatch,
+        needsSummary,
+        wordsPerBatch,
+      };
+
+    } catch (error) {
+      logger.error('Error in getActiveSessionOptimized:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new ReviewModel();
