@@ -29,8 +29,8 @@ $text-color-light: #555;
     top: 50%;
     transform: translateY(-50%);
     background-color: #fff;
-    border: 1px solid #e0e0e0;
     border-radius: 50%;
+    border: none;
     width: 40px;
     height: 40px;
     display: flex;
@@ -40,11 +40,13 @@ $text-color-light: #555;
     color: $text-color-dark;
     cursor: pointer;
     z-index: 10;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: background-color 0.2s;
 
     &:hover {
       background-color: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      animation: scale-up 0.2s ease forwards;
     }
 
     img { 
@@ -53,11 +55,11 @@ $text-color-light: #555;
     }
 
     &.prev {
-      left: -24px;
+      left: -40px;
     }
 
     &.next {
-      right: -24px;
+      right: -40px;
     }
   }
 }
@@ -140,4 +142,13 @@ $text-color-light: #555;
   color: #cc4343;
   font-style: italic;
   font-size: 1.1rem;
+}
+
+@keyframes scale-up {
+  from {
+    transform: translateY(-50%) scale(1);
+  }
+  to {
+    transform: translateY(-50%) scale(1.2);
+  }
 }

@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Footer, Header, SideBar, LearnerSubMenu, CardSkeleton } from "../../components/index.jsx";
 import { DropdownIcon, MoreIcon, PlusIcon } from "../../assets/Vocabulary/index.jsx";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
 import { useToast } from "../../components/Providers/ToastProvider.jsx";
+import useClickOutside from "../../hooks/useClickOutside";
 
 export default function Dashboard() {
     const [lists, setLists] = useState([]);
@@ -19,10 +20,35 @@ export default function Dashboard() {
     const [tagFilter, setTagFilter] = useState(null);
     const [availableTags, setAvailableTags] = useState([]);
 
+    // Refs for click outside functionality
+    const filterDropdownRef = useRef(null);
+    const morePopupRefs = useRef({});
+
     const navigate = useNavigate();
     const confirm = useConfirm();
     const toast = useToast();
     const [isOpen, setIsOpen] = useState(false);
+
+    // Click outside handlers
+    useClickOutside(filterDropdownRef, () => setShowFilterOptions(false), showFilterOptions);
+    
+    // Handle click outside for more popups
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (activeListId && morePopupRefs.current[activeListId]) {
+                if (!morePopupRefs.current[activeListId].contains(event.target)) {
+                    setActiveListId(null);
+                }
+            }
+        };
+
+        if (activeListId) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside);
+            };
+        }
+    }, [activeListId]);
 
     const handleCreateNewList = () => {
         navigate('/vocabulary/create/new');
@@ -132,7 +158,7 @@ export default function Dashboard() {
                             Create New List
                         </button>
 
-                        <div className="dashboard__filter-dropdown">
+                        <div className="dashboard__filter-dropdown" ref={filterDropdownRef}>
                             <div className="dashboard__filter-bar">
                                 <span className="dashboard__list-count">All lists: {lists.length}</span>
 
@@ -216,7 +242,14 @@ export default function Dashboard() {
                                                 ? list.title.slice(0, 20) + "..."
                                                 : list.title}
                                         </button>
-                                        <div className="dashboard__more-button-wrapper">
+                                        <div 
+                                            className="dashboard__more-button-wrapper"
+                                            ref={(el) => {
+                                                if (el) {
+                                                    morePopupRefs.current[list.id] = el;
+                                                }
+                                            }}
+                                        >
                                             <button
                                                 className="dashboard__more-button"
                                                 onClick={() => setActiveListId((prevId) => (prevId === list.id ? null : list.id))}
