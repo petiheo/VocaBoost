@@ -3971,6 +3971,14 @@ h2 {
   font-size: 1.1rem;
 }
 
+@keyframes scale-up {
+  from {
+    transform: translateY(-50%) scale(1);
+  }
+  to {
+    transform: translateY(-50%) scale(1.2);
+  }
+}
 .learning-method-selector {
   padding: 1.5rem;
 }
