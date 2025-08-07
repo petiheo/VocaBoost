@@ -144,7 +144,7 @@ const Profile = () => {
             value={formData.displayName}
             onChange={handleInputChange}
             disabled={!isEditing}
-            placeholder="Jane Smith"
+            placeholder="Your display name"
             errors={validationErrors.displayName}
           />
 

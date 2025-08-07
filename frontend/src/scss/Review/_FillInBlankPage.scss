@@ -1,0 +1,59 @@
+@use '../Fonts' as *;
+
+.fill-blank-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #FFFCF7;
+
+  &__container {
+    display: flex;
+    flex: 1;
+    position: relative;
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin-left: 0; // Sidebar will handle its own spacing
+    
+    @media (min-width: 768px) {
+      margin-left: 60px; // Account for sidebar when open
+    }
+  }
+
+  &__loading,
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    font-family: 'Inder', sans-serif;
+    color: #352D24;
+    
+    p {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    button {
+      padding: 0.75rem 2rem;
+      background: #3F3122;
+      color: #FFFCF7;
+      border: none;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: #2A2018;
+        transform: translateY(-2px);
+      }
+    }
+  }
+}

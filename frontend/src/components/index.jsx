@@ -47,3 +47,5 @@ export { default as WordInput } from "./Forms/WordInput.jsx";
 
 // Review Components
 export { default as BatchSummary } from "./Review/BatchSummary.jsx";
+export { default as FillInBlank } from "./Review/FillInBlank.jsx";
+export { default as LearningMethodSelector } from "./Review/LearningMethodSelector.jsx";

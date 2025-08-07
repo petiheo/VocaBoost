@@ -1,4 +1,4 @@
-import { ReviewWithSR, StudyWithFlashcard, SessionSummary } from "../pages/Review";
+import { ReviewWithSR, StudyWithFlashcard, SessionSummary, FillInBlankPage } from "../pages/Review";
 import BatchSummaryPage from "../pages/Review/BatchSummaryPage";
 
 const reviewRoutes = [
@@ -11,8 +11,16 @@ const reviewRoutes = [
     element: <StudyWithFlashcard />,
   },
   {
+    path: "/review/:listId/fill-in-blank",
+    element: <FillInBlankPage />,
+  },
+  {
     path: "/review/session/:sessionId",
     element: <StudyWithFlashcard />,
+  },
+  {
+    path: "/review/session/:sessionId/fill-in-blank",
+    element: <FillInBlankPage />,
   },
   {
     path: "/review/:listId/batch-summary",
