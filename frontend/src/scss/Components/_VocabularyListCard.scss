@@ -31,6 +31,7 @@
     font-size: 0.9rem;
     color: #444;
     margin: 0;
+    margin-bottom: 0.5rem;
 
     // Giới hạn description thành 2 dòng
     display: -webkit-box;
@@ -43,7 +44,7 @@
 
   .vocab-completion-date {
     font-family: $font-inter;
-    font-size: 10px;
+    font-size: 12px;
     color: #2932B1;
     font-weight: bold;
     margin-top: 0.5rem;
@@ -52,14 +53,14 @@
 
   .vocab-result {
     font-family: $font-inter;
-    font-size: 10px;
+    font-size: 12px;
     color: #2932B1;
     font-weight: bold;
   }
 
   .vocab-next-review{
     font-family: $font-inter;
-    font-size: 10px;
+    font-size: 12px;
     color: #2932B1;
     font-weight: bold;
   }
@@ -148,6 +149,12 @@
       border: none;
       border-radius: 20px;
       cursor: pointer;
+      
+      &:disabled{
+        background-color: #515050; 
+        cursor: not-allowed;    
+        opacity: 0.6;
+      }
     }
   }
 }

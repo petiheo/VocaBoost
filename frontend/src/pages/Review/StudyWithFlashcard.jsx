@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Header, SideBar, Footer } from "../../components";
+import { useParams, useNavigate, useLocation, data } from "react-router-dom";
+import { Header, SideBar, Footer, ReportTrigger } from "../../components";
 import reviewService from "../../services/Review/reviewService";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { useToast } from "../../components/Providers/ToastProvider.jsx";
@@ -166,7 +166,8 @@ export default function StudyWithFlashcard() {
             sessionId: session?.sessionId || sessionId,
             listId: targetListId, // Pass the actual listId
             listInfo,
-            currentProgress
+            currentProgress,
+            sessionType: 'flashcard' // Pass session type for correct navigation
           }
         });
         return;
@@ -216,6 +217,8 @@ export default function StudyWithFlashcard() {
       setIsFlipped(false);
     }
   };
+
+  // Removed handleReportSubmit - now handled directly in ReportTrigger for reusability
 
   const handleEndSession = async () => {
     try {
@@ -279,10 +282,22 @@ export default function StudyWithFlashcard() {
           <div className="flashcard__animation" onClick={handleFlipCard}>
             <div className={`card__inner ${isFlipped ? "is-flipped" : ""}`}>
               <div className="card__face card__front">
-                {currentWord.term}
+                <div className="card__report-trigger">
+                  <ReportTrigger 
+                    wordId={currentWord.id}
+                  />
+                </div>
+                <div className="card__content">
+                  {currentWord.term}
+                </div>
               </div>
               <div className="card__face card__back">
-                <div>
+                <div className="card__report-trigger">
+                  <ReportTrigger 
+                    wordId={currentWord.id}
+                  />
+                </div>
+                <div className="card__content">
                   <div style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
                     {currentWord.definition}
                   </div>

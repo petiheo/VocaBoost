@@ -15,10 +15,11 @@ class ReviewService {
     if (error) throw error;
   
     const totalItems = await reviewModel.countListsWithDueWords(userId);
-  
+    
     const formattedLists = (data || []).map(list => ({
         id: list.id,
         title: list.title,
+        description: list.description,
         wordCount: list.word_count,
         creator: { 
             id: list.creator.id,
@@ -28,7 +29,7 @@ class ReviewService {
         },
         tags: list.tags.map(t => t.name) 
     }));
-  
+    
     return {
       listsWithDueWords: formattedLists,
       pagination: this._formatPagination(page, limit, totalItems),
@@ -40,9 +41,9 @@ class ReviewService {
   
     const { data, error } = await reviewModel.findUpcomingReviewLists(userId, from, to);
     if (error) throw error;
-  
+    
     const totalItems = await reviewModel.countListsWithScheduledWords(userId);
-  
+
     const now = new Date();
     const formattedLists = (data || []).map(list => {
         const nextReviewDate = new Date(list.next_review_date);
@@ -52,6 +53,7 @@ class ReviewService {
         return {
             listId: list.id,
             title: list.title,
+            description: list.description,
             wordCount: list.word_count,
             creator: {
                 id: list.creator.id,
@@ -63,7 +65,7 @@ class ReviewService {
             next_review_in_days: Math.max(1, diffDays),
         };
     });
-  
+    
     return {
       lists: formattedLists,
       pagination: this._formatPagination(page, limit, totalItems),

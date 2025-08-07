@@ -3,6 +3,7 @@
   width: auto;
   max-width: 80vh;
   min-width: 300px;
+  z-index: 11000 !important; // Higher than React Modal overlay (10000)
 }
 
 .Toastify__toast {

@@ -26,8 +26,8 @@ export { useConfirm, ConfirmProvider } from "./Providers/ConfirmProvider.jsx";
 export { useToast, ToastProvider } from "./Providers/ToastProvider.jsx";
 
 // Reporting Components
-export { default as Report} from "./Reporting/Report.jsx";
-export { default as ReportTrigger } from "./Reporting/ReportTrigger.jsx";
+export { default as Report} from "./Report/Report.jsx";
+export { default as ReportTrigger } from "./Report/ReportTrigger.jsx";
 
 // Classroom Components
 export {default as ClassroomTitle} from "./Classroom/ClassroomTitle.jsx";
@@ -47,3 +47,5 @@ export { default as WordInput } from "./Forms/WordInput.jsx";
 
 // Review Components
 export { default as BatchSummary } from "./Review/BatchSummary.jsx";
+export { default as FillInBlank } from "./Review/FillInBlank.jsx";
+export { default as LearningMethodSelector } from "./Review/LearningMethodSelector.jsx";
