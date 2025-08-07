@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('passport');
+const compression = require('compression');
 const app = express();
 const logger = require('./utils/logger');
 const securityMiddleware = require('./middlewares/security.middleware');
@@ -11,6 +12,9 @@ const router = require('./routes/index.route');
 require('./config/passport.config');
 
 app.use(express.json());
+
+// Enable GZIP compression
+app.use(compression());
 
 securityMiddleware(app);
 
