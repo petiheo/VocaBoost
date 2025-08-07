@@ -5,7 +5,7 @@ let tokenExpirationCache = {
   token: null,
   expiry: null,
   isExpired: true,
-  lastChecked: null
+  lastChecked: null,
 };
 
 const authService = {
@@ -117,7 +117,7 @@ const authService = {
   },
 
   // Enhanced session management
-  clearSession: (showNotification = false, reason = 'logout') => {
+  clearSession: (showNotification = false, reason = "logout") => {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
@@ -170,7 +170,7 @@ const authService = {
         token,
         expiry: payload.exp,
         isExpired,
-        lastChecked: currentTime
+        lastChecked: currentTime,
       };
 
       return isExpired;
@@ -181,7 +181,7 @@ const authService = {
         token,
         expiry: null,
         isExpired: false,
-        lastChecked: currentTime
+        lastChecked: currentTime,
       };
       return false;
     }
@@ -189,7 +189,7 @@ const authService = {
 
   getToken: () => localStorage.getItem("token"),
   getRefreshToken: () => localStorage.getItem("refreshToken"),
-  
+
   getCurrentUser: () => {
     try {
       const userStr = localStorage.getItem("user");
@@ -198,9 +198,9 @@ const authService = {
       return null;
     }
   },
-  
+
   isAuthenticated: () => !!localStorage.getItem("token"),
-  
+
   // Refresh the access token using refresh token
   refreshAccessToken: async () => {
     try {
@@ -208,9 +208,9 @@ const authService = {
       if (!refreshToken) {
         throw new Error("No refresh token available");
       }
-      
+
       const res = await api.post("/auth/refresh-token", { refreshToken });
-      
+
       if (res.data.success) {
         const newToken = res.data.data.token;
         localStorage.setItem("token", newToken);
@@ -218,11 +218,11 @@ const authService = {
         tokenExpirationCache.token = null;
         return newToken;
       }
-      
+
       throw new Error("Failed to refresh token");
     } catch (error) {
       // If refresh fails, clear session
-      authService.clearSession(true, 'expired');
+      authService.clearSession(true, "expired");
       throw error;
     }
   },

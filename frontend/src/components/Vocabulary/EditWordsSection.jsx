@@ -1,5 +1,5 @@
-import React from 'react';
-import WordCard from './WordCard.jsx';
+import React from "react";
+import WordCard from "./WordCard.jsx";
 
 const EditWordsSection = ({
   words,
@@ -16,7 +16,7 @@ const EditWordsSection = ({
   return (
     <>
       <h2 className="edit-list__header">Words</h2>
-      
+
       {selectedWordIds.size > 0 && (
         <div className="edit-list__delete-wrapper">
           <button
@@ -28,7 +28,7 @@ const EditWordsSection = ({
           </button>
         </div>
       )}
-       
+
       <div className="edit-list__word-list">
         {words.map((word, index) => (
           <WordCard

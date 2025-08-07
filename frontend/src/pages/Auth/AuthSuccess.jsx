@@ -27,13 +27,13 @@ export default function AuthSuccess() {
         try {
           // Validate token with server instead of client-side decoding
           const validation = await authService.validateToken();
-          
+
           if (validation && validation.success) {
             const userObject = validation.data;
             // Store token and user manually since validateToken doesn't return the same structure as login
             localStorage.setItem("user", JSON.stringify(userObject));
             setUser(userObject);
-            
+
             // Navigate based on user status
             if (isNewUser) {
               navigate("/select-user-type");

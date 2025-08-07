@@ -11,4 +11,4 @@ export { default as Signin } from "./Signin.jsx";
 export { default as SignUp } from "./SignUp.jsx";
 export { default as Successfully } from "./Successfully.jsx";
 export { default as TeacherVerification } from "./TeacherVerification.jsx";
-export { default as MainPage } from "./MainPage.jsx"; 
+export { default as MainPage } from "./MainPage.jsx";

@@ -5,13 +5,13 @@ const tabs = [
 
   {
     name: "Users",
-    route:  "/teacher-request",
+    route: "/teacher-request",
     matchRoutes: [
       "/teacher-request",
       "/teacher-request",
       "/teacher-request",
       "/teacher-request",
-    ]
+    ],
   },
 ];
 
@@ -46,4 +46,3 @@ export default function TeacherClassroomMenuTab() {
     </div>
   );
 }
-

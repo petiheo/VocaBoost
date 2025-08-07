@@ -1,178 +1,176 @@
-@use '../Fonts' as *;
-
+@use "../Fonts" as *;
 
 .flashcard {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #fffcf7;
+  font-family: "Inder", sans-serif;
+  color: #352d24;
+
+  &__title {
+    font-size: 2rem;
+    font-family: "Lalezar", "sans-serif";
+    font-weight: normal;
+    margin-left: 5rem;
+  }
+
+  &__content {
     display: flex;
+    flex: 1;
     flex-direction: column;
-    height: 100vh;
-    background-color: #FFFCF7; 
-    font-family: 'Inder', sans-serif;
-    color: #352D24;
+    align-items: center;
+    justify-self: center;
+    min-height: 40rem;
+    margin-bottom: 5rem;
+  }
 
-    &__title {
-        font-size: 2rem;
-        font-family: 'Lalezar', 'sans-serif';
-        font-weight: normal;
-        margin-left: 5rem;
+  &__card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 95%;
+    height: 100%;
+    border-radius: 12px;
+    padding: 2rem;
+  }
+
+  &__prev,
+  &__next {
+    border: none;
+    width: 6rem;
+    height: 3rem;
+    border-radius: 9999px; /* full rounded */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  &__prev {
+    background-color: #f3eddf;
+    &:hover {
+      background-color: #e6dfd3;
     }
-    
-    &__content {
-        display: flex;
-        flex: 1;
-        flex-direction: column;
-        align-items: center;
-        justify-self: center;
-        min-height: 40rem;
-        margin-bottom: 5rem;
+  }
+
+  &__next {
+    background-color: #ffe1a1;
+    &:hover {
+      background-color: #f3c664;
     }
+  }
 
-    &__card {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 95%;
-        height: 100%;
-        border-radius: 12px;
-        padding: 2rem;
-    }
+  &__icon {
+    width: 2rem;
+    height: 2rem;
+  }
 
-    &__prev, &__next {
-        border: none;
-        width: 6rem;
-        height: 3rem;
-        border-radius: 9999px; /* full rounded */
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
+  &__animation {
+    width: 70%;
+    height: 100%;
+    cursor: pointer;
+    margin: 2rem;
 
-    &__prev {
-        background-color: #F3EDDF;
-        &:hover {
-            background-color: #e6dfd3;
-        }
-    }
-
-    &__next {
-        background-color: #FFE1A1;
-        &:hover {
-            background-color: #f3c664;
-        }
-    }
-
-
-    &__icon {
-        width: 2rem;
-        height: 2rem;
+    .card__inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
     }
 
-
-    &__animation {
-        width: 70%;
-        height: 100%;
-        cursor: pointer;
-        margin: 2rem;
-        
-        .card__inner {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        transition: transform 0.6s;
-        transform-style: preserve-3d;
-        }
-
-        .card__inner.is-flipped {
-        transform: rotateY(180deg);
-        }
-
-        .card__face {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        border-radius: 12px;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        backface-visibility: hidden;
-        font-size: 2rem;
-        padding: 1rem;
-        text-align: center;
-        }
-
-        .card__front {
-        background-color: #F8F8F8;
-        }   
-
-        .card__back {
-        background-color: #FFFFFF;
-        transform: rotateY(180deg);
-        }
-
-        .card__report-trigger {
-            position: absolute;
-            top: 1rem;
-            right: 1.2rem;
-            z-index: 1000;
-        }
+    .card__inner.is-flipped {
+      transform: rotateY(180deg);
     }
 
-    &__controls {
-        margin-top: 1.5rem;
-        width: 70%;
-        justify-content: space-around;
-        display: flex;
-        align-items: center;
-
-        .know, .unknow {
-            width: 10rem;
-            height: 3rem;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 1.4rem;
-            cursor: pointer;
-            font-family:  $font-inriasans;
-        }
-
-        .know {
-            background-color: #F3EDDF; 
-            &:hover {
-                background-color: #e6dfd3;
-            }
-        }
-
-        .unknow {
-            background-color: #FFE1A1; 
-            &:hover {
-                background-color: #f3c664;
-            }
-        }
+    .card__face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      backface-visibility: hidden;
+      font-size: 2rem;
+      padding: 1rem;
+      text-align: center;
     }
 
-    
-    &__submit {
-        display: flex;
-        justify-content: right;
-        margin-right: 5rem;
-        margin-bottom: 2rem;
+    .card__front {
+      background-color: #f8f8f8;
     }
 
-    &__submit-button {
-        background-color: #3f3122;
-        color: #FFFCF7;
-        font-size: 1.2rem;
-        font-family: $font-inriasans;
-        font-weight: bold;
-        padding: 1% 3rem;
-        border: none;
-        border-radius: 2rem;
-        cursor: pointer;
-        transition: background 0.2s;
-
-        &:hover {
-            background-color: #1e150f;
-        }
+    .card__back {
+      background-color: #ffffff;
+      transform: rotateY(180deg);
     }
+
+    .card__report-trigger {
+      position: absolute;
+      top: 1rem;
+      right: 1.2rem;
+      z-index: 1000;
+    }
+  }
+
+  &__controls {
+    margin-top: 1.5rem;
+    width: 70%;
+    justify-content: space-around;
+    display: flex;
+    align-items: center;
+
+    .know,
+    .unknow {
+      width: 10rem;
+      height: 3rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 1.4rem;
+      cursor: pointer;
+      font-family: $font-inriasans;
+    }
+
+    .know {
+      background-color: #f3eddf;
+      &:hover {
+        background-color: #e6dfd3;
+      }
+    }
+
+    .unknow {
+      background-color: #ffe1a1;
+      &:hover {
+        background-color: #f3c664;
+      }
+    }
+  }
+
+  &__submit {
+    display: flex;
+    justify-content: right;
+    margin-right: 5rem;
+    margin-bottom: 2rem;
+  }
+
+  &__submit-button {
+    background-color: #3f3122;
+    color: #fffcf7;
+    font-size: 1.2rem;
+    font-family: $font-inriasans;
+    font-weight: bold;
+    padding: 1% 3rem;
+    border: none;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background-color: #1e150f;
+    }
+  }
 }

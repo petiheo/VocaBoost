@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 
-const AdminTeacherVerification = lazy(() =>
-  import("../pages/Admin/AdminTeacherVerification")
+const AdminTeacherVerification = lazy(
+  () => import("../pages/Admin/AdminTeacherVerification")
 );
 const TeacherRequest = lazy(() => import("../pages/Admin/TeacherRequest"));
 const AdminGeneral = lazy(() => import("../pages/Admin/AdminGeneral"));

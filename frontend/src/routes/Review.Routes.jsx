@@ -1,20 +1,24 @@
 import { lazy, Suspense } from "react";
 
 const ReviewWithSR = lazy(() => import("../pages/Review/ReviewWithSR"));
-const StudyWithFlashcard = lazy(() => import("../pages/Review/StudyWithFlashcard"));
+const StudyWithFlashcard = lazy(
+  () => import("../pages/Review/StudyWithFlashcard")
+);
 const SessionSummary = lazy(() => import("../pages/Review/SessionSummary"));
 const FillInBlankPage = lazy(() => import("../pages/Review/FillInBlankPage"));
 const BatchSummaryPage = lazy(() => import("../pages/Review/BatchSummaryPage"));
 
 const LoadingFallback = () => (
-  <div style={{ 
-    display: 'flex', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    minHeight: '200px',
-    fontSize: '1rem',
-    color: '#666'
-  }}>
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "200px",
+      fontSize: "1rem",
+      color: "#666",
+    }}
+  >
     Loading review session...
   </div>
 );

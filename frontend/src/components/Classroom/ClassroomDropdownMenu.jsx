@@ -12,7 +12,9 @@ const ClassroomDropdownMenu = ({ students }) => {
         onChange={(e) => navigate(e.target.value)}
       >
         <option value="/classroom/learners-list">Learner list</option>
-        <option value="/classroom/approve-join-classroom-request">Learner’s Request</option>
+        <option value="/classroom/approve-join-classroom-request">
+          Learner’s Request
+        </option>
       </select>
     </div>
   );

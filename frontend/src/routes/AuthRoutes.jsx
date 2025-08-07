@@ -16,8 +16,8 @@ const HomePage = lazy(() => import("../pages/Auth/HomePage"));
 const ResetPassword = lazy(() => import("../pages/Auth/ResetPassword"));
 const SelectUserType = lazy(() => import("../pages/Auth/SelectUserType"));
 const Successfully = lazy(() => import("../pages/Auth/Successfully"));
-const TeacherVerification = lazy(() =>
-  import("../pages/Auth/TeacherVerification")
+const TeacherVerification = lazy(
+  () => import("../pages/Auth/TeacherVerification")
 );
 
 const LoadingFallback = () => (

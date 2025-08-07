@@ -1,4 +1,4 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 
 .homepage__wrapper {
   display: flex;
@@ -23,18 +23,18 @@
 .homepage__content {
   // Đây là container chính giúp thụt vào 2 bên
   max-width: 90%; // Giới hạn chiều rộng tối đa
-  margin: 0 auto;   // Tự động căn giữa
+  margin: 0 auto; // Tự động căn giữa
 }
 
 .search-results-section {
   width: 100%;
-  
+
   h2 {
     font-family: $font-inriasans;
-    font-size: 2rem; 
+    font-size: 2rem;
     font-weight: 600;
-    color: #2D2D2D;
-    margin-bottom: 2rem; 
+    color: #2d2d2d;
+    margin-bottom: 2rem;
   }
   .search-status-message {
     width: 100%;
@@ -76,11 +76,11 @@
     flex-direction: column;
     margin-bottom: 2rem;
 
-    h2 {  
+    h2 {
       font-family: $font-lalezar;
       font-size: 2.5rem;
       font-weight: normal;
-      color: #2D2D2D;
+      color: #2d2d2d;
       margin: 0;
     }
   }
@@ -92,8 +92,8 @@
     margin-bottom: 2rem;
   }
 
-  .loading-container, 
-  .error-message, 
+  .loading-container,
+  .error-message,
   .no-data-message {
     padding: 3rem 1rem;
     text-align: center;
@@ -117,6 +117,3 @@
     margin-top: 2rem;
   }
 }
-
-
-

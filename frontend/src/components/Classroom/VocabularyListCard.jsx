@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 export default function VocabularyListCard({
   listId,
@@ -20,9 +20,9 @@ export default function VocabularyListCard({
       return;
     }
 
-    if (buttonContent.startsWith('Review')) {
+    if (buttonContent.startsWith("Review")) {
       navigate(`/review/${listId}`);
-    } else if (buttonContent === 'Overview') {
+    } else if (buttonContent === "Overview") {
       navigate(`/vocabulary/overview/${listId}`);
     }
   };
@@ -33,25 +33,37 @@ export default function VocabularyListCard({
       <p className="vocab-desc">{description}</p>
       {completionDate ? (
         <>
-          <span className="vocab-completion-date">{completionDate !== "N/A" ? (`Completion date: ${completionDate}`) : ("")}</span>
-          <span className="vocab-result">{result !== "0%" ? (`Result: ${result}`) : ("")}</span>
+          <span className="vocab-completion-date">
+            {completionDate !== "N/A"
+              ? `Completion date: ${completionDate}`
+              : ""}
+          </span>
+          <span className="vocab-result">
+            {result !== "0%" ? `Result: ${result}` : ""}
+          </span>
         </>
-      ): (<></>)}
-      { nextReview ? (
+      ) : (
+        <></>
+      )}
+      {nextReview ? (
         <>
-        <span className="vocab-next-review">{nextReview !== "N/A" ? (`Next review in ${nextReview} days`):("")}</span>
+          <span className="vocab-next-review">
+            {nextReview !== "N/A" ? `Next review in ${nextReview} days` : ""}
+          </span>
         </>
-      ): (<></>)}
+      ) : (
+        <></>
+      )}
       <div className="vocab-footer">
         <div className="user-block">
           <div className="avatar">
-            {avatarUrl ?
-              (<img src={avatarUrl} alt="Avatar" className="avatar img" /> // Dung hinh anh 
-              ) : (
-                <span className="avatar placeholder">
-                  {username?.charAt(0).toUpperCase() || "?"}
-                </span> // dung chu cai dau cua email 
-              )}
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Avatar" className="avatar img" /> // Dung hinh anh
+            ) : (
+              <span className="avatar placeholder">
+                {username?.charAt(0).toUpperCase() || "?"}
+              </span> // dung chu cai dau cua email
+            )}
           </div>
           <div className="user-info">
             <span className="username">{username}</span>
@@ -59,11 +71,13 @@ export default function VocabularyListCard({
           </div>
         </div>
 
-        <button className="btn review-btn" 
+        <button
+          className="btn review-btn"
           onClick={handleButtonClick}
-          disabled={isReviewDisabled} 
-        >{buttonContent}</button>
-
+          disabled={isReviewDisabled}
+        >
+          {buttonContent}
+        </button>
       </div>
     </div>
   );

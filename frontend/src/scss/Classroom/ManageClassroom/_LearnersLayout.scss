@@ -1,22 +1,22 @@
 .learners-layout {
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    min-height: 100vh;
-    background: #FFFCF7;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  background: #fffcf7;
 
-    &__body {
-        min-height: 100%;
-        width: 100vw;
-        margin: 2em 0;
+  &__body {
+    min-height: 100%;
+    width: 100vw;
+    margin: 2em 0;
 
-        display: flex;
-        gap: 5em;
-    }
+    display: flex;
+    gap: 5em;
+  }
 
-    &__content {
-        background: #FFFCF7;
-        min-width: 90vw;
-        // margin: 0 auto;
-        // gap: 2em;
-    }
+  &__content {
+    background: #fffcf7;
+    min-width: 90vw;
+    // margin: 0 auto;
+    // gap: 2em;
+  }
 }

@@ -1,6 +1,4 @@
-import Cofetti from "./JoinClassroom/cofetti.svg"
-import Error from "./JoinClassroom/error.svg"
+import Cofetti from "./JoinClassroom/cofetti.svg";
+import Error from "./JoinClassroom/error.svg";
 
-export {
-    Cofetti, Error,
-}
+export { Cofetti, Error };

@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Header, SideBar, Footer, ListFormSkeleton } from "../../components/index.jsx";
+import {
+  Header,
+  SideBar,
+  Footer,
+  ListFormSkeleton,
+} from "../../components/index.jsx";
 import ListMetadataForm from "../../components/Vocabulary/ListMetadataForm.jsx";
 import EditWordsSection from "../../components/Vocabulary/EditWordsSection.jsx";
 import SafeEditList from "../../components/Vocabulary/SafeEditList.jsx";
@@ -14,8 +19,12 @@ export default function EditList() {
   // Custom hooks for separated concerns
   const validationHook = useFormValidation();
   const wordManagementHook = useEditWordManagement();
-  const listManagementHook = useEditListManagement(listId, validationHook, wordManagementHook);
-  
+  const listManagementHook = useEditListManagement(
+    listId,
+    validationHook,
+    wordManagementHook
+  );
+
   // Destructure hook returns for cleaner component
   const { validationErrors, clearFieldError } = validationHook;
   const {
@@ -48,7 +57,7 @@ export default function EditList() {
   // Enhanced word change handler with validation clearing
   const handleWordChange = (index, field, value) => {
     updateWord(index, field, value);
-    clearFieldError('words', field, index);
+    clearFieldError("words", field, index);
   };
 
   // Show loading state while fetching data
@@ -73,7 +82,7 @@ export default function EditList() {
           <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
           <form className="edit-list__form" onSubmit={handleSubmit}>
             <h1 className="edit-list__header">Edit List</h1>
-            
+
             <ListMetadataForm
               title={title}
               description={description}
@@ -112,10 +121,10 @@ export default function EditList() {
               </button>
               <button
                 type="submit"
-                className={`edit-list__form--submit ${isSubmitting ? 'edit-list__form--submit--loading' : ''}`}
+                className={`edit-list__form--submit ${isSubmitting ? "edit-list__form--submit--loading" : ""}`}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                {isSubmitting ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </form>

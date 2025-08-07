@@ -1,5 +1,5 @@
-@use '../Fonts' as *;
-$text-color-dark: #2D2D2D;
+@use "../Fonts" as *;
+$text-color-dark: #2d2d2d;
 $text-color-light: #555;
 
 .carousel-vocab-section {
@@ -49,7 +49,7 @@ $text-color-light: #555;
       animation: scale-up 0.2s ease forwards;
     }
 
-    img { 
+    img {
       width: 32px;
       height: 32px;
     }
@@ -78,11 +78,13 @@ $text-color-light: #555;
     color: $text-color-light;
     cursor: pointer;
     border-radius: 20px;
-    transition: background-color 0.2s, color 0.2s;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
 
     &.active,
     &:hover {
-      background-color: #EFEFEF;
+      background-color: #efefef;
       color: $text-color-dark;
     }
   }
@@ -96,22 +98,22 @@ $text-color-light: #555;
 // Đây là container sẽ di chuyển, nó chứa tất cả các card
 .carousel-slider {
   display: flex; // Dùng flexbox để các item xếp hàng ngang
-  
-  transition: transform 0.5s ease-in-out; 
+
+  transition: transform 0.5s ease-in-out;
 }
 
 // Mỗi item trong carousel
 .carousel-item {
   // Mỗi item sẽ co lại để không làm vỡ layout, không giãn ra
-  flex-shrink: 0; 
+  flex-shrink: 0;
   flex-grow: 0;
 
   // Chiều rộng của mỗi item. Vì có 3 item trên trang, mỗi item chiếm 1/3
   // Dùng calc() để trừ đi khoảng cách (gap)
-  width: calc(100% / 4); 
-  
+  width: calc(100% / 4);
+
   // Thêm padding để tạo khoảng cách giữa các card
-  padding: 0 14px; 
+  padding: 0 14px;
 }
 
 .no-data-message {

@@ -1,136 +1,135 @@
-@use '../../Fonts' as *;
+@use "../../Fonts" as *;
 
 .assignment-page {
-    font-family: $font-inriasans;
+  font-family: $font-inriasans;
 
-    &__container {
-        display: flex;
-        gap: 2em;
-        // margin: 2em 0;
+  &__container {
+    display: flex;
+    gap: 2em;
+    // margin: 2em 0;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    // gap: 2em;
+    width: 100%;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .tab {
+      background-color: #f3eacc;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+
+      &.active {
+        background-color: #fff4c2;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .controls {
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .btn.dark {
+      background-color: #2e2e2e;
+      text-decoration: none;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
 
-    &__content {
-        display: flex;
-        flex-direction: column;
-        // gap: 2em;
-        width: 100%;
+    .sort {
+      font-size: 0.9rem;
+      color: #444;
+      cursor: pointer;
+    }
+  }
+
+  .assignment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 1rem;
+
+    .assignment-card {
+      background-color: #f9f3e4;
+      border: 0.5px solid #666;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
+
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+
+      h4 {
+        font-size: 1em;
+        font-weight: bold;
+        margin: 0.5rem 0;
+      }
+
+      p {
+        font-size: 0.85rem;
+        margin: 0.2rem 0;
+      }
+
+      .due {
+        color: #666;
+      }
+
+      &:hover {
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      .assignment-page__item {
+        border-bottom: 0.5px solid #666;
+        padding-bottom: 1em;
+      }
+    }
+  }
+
+  .see-more {
+    text-align: center;
+    margin: 2rem 0;
+
+    .see-more-btn {
+      background: none;
+      border: none;
+      color: #444;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+  }
+
+  .footer {
+    margin-top: auto;
+    padding: 1.5rem;
+    background-color: #1e1e1e;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    border-top: 2px solid #333;
+
+    .logo {
+      font-weight: bold;
     }
 
-
-    .tabs {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-
-        .tab {
-            background-color: #f3eacc;
-            border: none;
-            border-radius: 6px;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-
-            &.active {
-                background-color: #fff4c2;
-                font-weight: bold;
-            }
-        }
+    .contact p {
+      margin: 0;
+      font-size: 0.85rem;
     }
-
-    .controls {
-        margin: 20px 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .btn.dark {
-            background-color: #2e2e2e;
-            text-decoration: none;
-            color: #fff;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .sort {
-            font-size: 0.9rem;
-            color: #444;
-            cursor: pointer;
-        }
-    }
-
-    .assignment-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-        gap: 1rem;
-
-        .assignment-card {
-            background-color: #F9F3E4;
-            border: 0.5px solid #666;
-            border-radius: 10px;
-            padding: 1rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.3s ease;
-
-            display: flex;
-            flex-direction: column;
-            gap: 1em;
-
-            h4 {
-                font-size: 1em;
-                font-weight: bold;
-                margin: 0.5rem 0;
-            }
-
-            p {
-                font-size: 0.85rem;
-                margin: 0.2rem 0;
-            }
-
-            .due {
-                color: #666;
-            }
-
-            &:hover {
-                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-            }
-
-            .assignment-page__item {
-                border-bottom: 0.5px solid #666;
-                padding-bottom: 1em;
-            }
-        }
-    }
-
-    .see-more {
-        text-align: center;
-        margin: 2rem 0;
-
-        .see-more-btn {
-            background: none;
-            border: none;
-            color: #444;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-    }
-
-    .footer {
-        margin-top: auto;
-        padding: 1.5rem;
-        background-color: #1e1e1e;
-        color: white;
-        display: flex;
-        justify-content: space-between;
-        border-top: 2px solid #333;
-
-        .logo {
-            font-weight: bold;
-        }
-
-        .contact p {
-            margin: 0;
-            font-size: 0.85rem;
-        }
-    }
+  }
 }

@@ -7,19 +7,21 @@ import authRoutes from "./routes/AuthRoutes";
 import vocabularyRoutes from "./routes/VocabularyRoutes.jsx";
 import classroomRoutes from "./routes/ClassroomRoutes.jsx";
 import userRoutes from "./routes/UserRoutes.jsx";
-import devRoutes from "./routes/DevRoutes.jsx"; 
+import devRoutes from "./routes/DevRoutes.jsx";
 import reviewRoutes from "./routes/Review.Routes.jsx";
 import adminRoutes from "./routes/AdminRoutes.jsx";
 
 const LoadingFallback = () => (
-  <div style={{ 
-    display: 'flex', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    height: '100vh',
-    fontSize: '1.2rem',
-    color: '#666'
-  }}>
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
+      fontSize: "1.2rem",
+      color: "#666",
+    }}
+  >
     Loading...
   </div>
 );

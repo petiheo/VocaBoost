@@ -1,14 +1,14 @@
-@use '../../Fonts' as *;
+@use "../../Fonts" as *;
 
 .assignment-detail-page {
   display: flex;
-  background: #FFFCF7;
+  background: #fffcf7;
 
   .content {
     width: 100%;
 
     .assignment-detail__container {
-      background: #FFFCF7;
+      background: #fffcf7;
       // padding: 2rem;
       border-radius: 8px;
 
@@ -22,13 +22,11 @@
       .assignment-box {
         padding: 20px;
         border-radius: 20px;
-        background-color: #FFFAEF;
+        background-color: #fffaef;
         font-family: $font-inriasans;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
         .assignment-header {
-
-
           font-family: $font-inriasans;
           display: flex;
           justify-content: space-between;
@@ -65,11 +63,10 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
-
       }
 
       .word-card {
-        background-color: #FFF7DD;
+        background-color: #fff7dd;
         border-radius: 8px;
         padding: 1rem;
 
@@ -80,7 +77,6 @@
           font-size: 1.1rem;
         }
       }
-
     }
   }
 }
@@ -100,7 +96,7 @@
     align-items: center;
     gap: 5px;
 
-    background: #FBF4E7;
+    background: #fbf4e7;
     border: none;
     padding: 0.6rem 1.2rem;
     border-radius: 20px;

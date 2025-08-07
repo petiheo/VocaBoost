@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "sass src/scss/main.scss src/index.css && vite build",
     "lint": "eslint .",
+    "format": "prettier --write .",
     "preview": "vite preview",
     "start": "sass src/scss:public",
     "scssWatch": "sass --watch  src/scss/main.scss:src/index.css"

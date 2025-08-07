@@ -7,7 +7,7 @@
 }
 
 .Toastify__toast {
-  font-family: 'Inria Sans', sans-serif !important;
+  font-family: "Inria Sans", sans-serif !important;
   font-weight: bold !important;
   font-size: 1rem !important;
   border-radius: 0.2rem !important;
@@ -18,18 +18,18 @@
 
 // Success toasts - Green theme
 .Toastify__toast--success {
-  background-color: #3BC042 !important;
-  color: #E0FFE1 !important;
+  background-color: #3bc042 !important;
+  color: #e0ffe1 !important;
 }
 
 .Toastify__toast--success .Toastify__progress-bar {
-  background-color: #E0FFE1 !important;
+  background-color: #e0ffe1 !important;
 }
 
 .Toastify__toast--success .Toastify__close-button {
-  color: #E0FFE1 !important;
+  color: #e0ffe1 !important;
   opacity: 0.8;
-  
+
   &:hover {
     opacity: 1;
   }
@@ -37,18 +37,18 @@
 
 // Error toasts - Red theme
 .Toastify__toast--error {
-  background-color: #C03B3B !important;
-  color: #FFE2E2 !important;
+  background-color: #c03b3b !important;
+  color: #ffe2e2 !important;
 }
 
 .Toastify__toast--error .Toastify__progress-bar {
-  background-color: #FFE2E2 !important;
+  background-color: #ffe2e2 !important;
 }
 
 .Toastify__toast--error .Toastify__close-button {
-  color: #FFE2E2 !important;
+  color: #ffe2e2 !important;
   opacity: 0.8;
-  
+
   &:hover {
     opacity: 1;
   }
@@ -67,7 +67,7 @@
 .Toastify__toast--warning .Toastify__close-button {
   color: #fef3c7 !important;
   opacity: 0.8;
-  
+
   &:hover {
     opacity: 1;
   }
@@ -76,17 +76,17 @@
 // Info toasts - Brand brown theme
 .Toastify__toast--info {
   background-color: #352d24 !important;
-  color: #FFF3DF !important;
+  color: #fff3df !important;
 }
 
 .Toastify__toast--info .Toastify__progress-bar {
-  background-color: #FFF3DF !important;
+  background-color: #fff3df !important;
 }
 
 .Toastify__toast--info .Toastify__close-button {
-  color: #FFF3DF !important;
+  color: #fff3df !important;
   opacity: 0.8;
-  
+
   &:hover {
     opacity: 1;
   }
@@ -130,7 +130,7 @@
     min-width: 280px;
     padding: 0 0.5rem;
   }
-  
+
   .Toastify__toast {
     margin-bottom: 0.25rem !important;
     padding: 0.75rem 1rem !important;

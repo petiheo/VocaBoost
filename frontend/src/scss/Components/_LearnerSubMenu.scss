@@ -7,10 +7,10 @@
 }
 
 .submenu-tab {
-  font-family: 'Lalezar', sans-serif;
+  font-family: "Lalezar", sans-serif;
   font-weight: lighter;
   font-size: 1.5rem;
-  
+
   color: #2b1e17;
   text-decoration: none;
   padding: 0.5rem 4rem 0.5rem;
@@ -18,10 +18,10 @@
   transition: background-color 0.3s;
 
   &.active {
-    background-color: #F8EED3;
+    background-color: #f8eed3;
   }
 
   &:hover {
-    background-color: #F8EED3;
+    background-color: #f8eed3;
   }
 }

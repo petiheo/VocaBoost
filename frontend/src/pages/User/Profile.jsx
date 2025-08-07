@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useAuth } from "../../services/Auth/authContext";
-import { Footer, Header, SideBar, ProfileSkeleton } from "../../components/index.jsx";
+import {
+  Footer,
+  Header,
+  SideBar,
+  ProfileSkeleton,
+} from "../../components/index.jsx";
 import LoadingCursor from "../../components/UI/LoadingCursor.jsx";
 import { useUserProfile } from "../../hooks/useUserProfile";
 import {

@@ -2,11 +2,11 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #FFFCF7;
+  background-color: #fffcf7;
 
   &__content {
     display: flex;
-    font-family: 'Inria Sans', sans-serif;
+    font-family: "Inria Sans", sans-serif;
     flex: 1;
   }
 
@@ -41,7 +41,7 @@
       height: 1rem;
     }
   }
-  
+
   &__filter-bar {
     display: flex;
     justify-content: right;
@@ -137,7 +137,7 @@
       cursor: pointer;
 
       &.active {
-        background-color: #2932B1;
+        background-color: #2932b1;
         color: white;
         font-weight: bold;
       }
@@ -149,7 +149,6 @@
     color: #888;
     padding: 8px 0;
   }
-
 
   &__list-count {
     font-size: 1.1rem;
@@ -166,7 +165,7 @@
 
   &__list-card {
     aspect-ratio: 1.1 / 1;
-    background-color: #F9F3E4;
+    background-color: #f9f3e4;
     border-radius: 20px;
     padding: 1.5rem;
     min-height: 200px;
@@ -180,10 +179,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-family: 'Lalezar', sans-serif;
+    font-family: "Lalezar", sans-serif;
 
     h3 {
-      font-size: 1.5rem; 
+      font-size: 1.5rem;
       font-family: inherit;
       font-weight: normal;
       margin: 0; // tránh bị browser mặc định đẩy xuống
@@ -205,43 +204,42 @@
   }
 
   &__more-button-wrapper {
-        position: relative; // đánh dấu định vị để popup hiện đúng vị trí
-        z-index: 10; // đảm bảo popup hiện trên các phần tử khác
-  }   
-
-  &__more-popup {
-      position: absolute;
-      top: 120%;
-      right: 0;
-      background: #fff4f4;
-      border-radius: 12px;
-      padding: 0.5rem 0;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      z-index: 100;
-      min-width: 150px;
-
-      .more-option {
-          padding: 0.75rem 1rem;
-          font-size: 1rem;
-          cursor: pointer;
-          color: #2a1e17;
-
-          &.delete {
-          color: #a30000;
-          &:hover:not(.deleting) {
-              background: #ffe5e5;
-          }
-
-          &.deleting {
-              color: #999;
-              cursor: not-allowed;
-              opacity: 0.6;
-              background: #f5f5f5;
-          }
-          }
-      }
+    position: relative; // đánh dấu định vị để popup hiện đúng vị trí
+    z-index: 10; // đảm bảo popup hiện trên các phần tử khác
   }
 
+  &__more-popup {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background: #fff4f4;
+    border-radius: 12px;
+    padding: 0.5rem 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    min-width: 150px;
+
+    .more-option {
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      color: #2a1e17;
+
+      &.delete {
+        color: #a30000;
+        &:hover:not(.deleting) {
+          background: #ffe5e5;
+        }
+
+        &.deleting {
+          color: #999;
+          cursor: not-allowed;
+          opacity: 0.6;
+          background: #f5f5f5;
+        }
+      }
+    }
+  }
 
   &__list-description {
     display: -webkit-box;
@@ -296,8 +294,8 @@
           justify-content: center;
           padding: 0.2rem 0.5rem;
 
-          color: #2932B1;
-          background-color: #D0E5FF;
+          color: #2932b1;
+          background-color: #d0e5ff;
           border-radius: 999px;
         }
 
@@ -306,8 +304,8 @@
           justify-content: center;
           padding: 0.2rem 0.5rem;
 
-          color: #D5962C;
-          background-color: #FFE9BA;
+          color: #d5962c;
+          background-color: #ffe9ba;
           border-radius: 999px;
         }
       }
@@ -350,9 +348,9 @@
     }
   }
 
-    &__more-button {
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-    }
+  &__more-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+  }
 }

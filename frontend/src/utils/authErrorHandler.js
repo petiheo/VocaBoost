@@ -7,7 +7,7 @@ export const getAuthErrorMessage = (error) => {
   if (error.response?.data?.message) {
     return error.response.data.message;
   }
-  
+
   // Check for common HTTP status codes
   if (error.response?.status) {
     switch (error.response.status) {
@@ -31,35 +31,35 @@ export const getAuthErrorMessage = (error) => {
         return "An unexpected error occurred. Please try again.";
     }
   }
-  
+
   // Network errors
-  if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
+  if (error.code === "NETWORK_ERROR" || error.message === "Network Error") {
     return "Network error. Please check your connection and try again.";
   }
-  
+
   // Timeout errors
-  if (error.code === 'ECONNABORTED') {
+  if (error.code === "ECONNABORTED") {
     return "Request timeout. Please try again.";
   }
-  
+
   // Default fallback
   return error.message || "An unexpected error occurred. Please try again.";
 };
 
 export const handleAuthError = (error, setErrors, clearForm = null) => {
   const errorMessage = getAuthErrorMessage(error);
-  
+
   // Set the error state
   setErrors({ general: errorMessage });
-  
+
   // Clear form if function provided
-  if (clearForm && typeof clearForm === 'function') {
+  if (clearForm && typeof clearForm === "function") {
     clearForm();
   }
-  
+
   // Log error for debugging (only in development)
-  if (import.meta.env.MODE === 'development') {
-    console.error('Auth Error:', error);
+  if (import.meta.env.MODE === "development") {
+    console.error("Auth Error:", error);
   }
 };
 
@@ -70,10 +70,10 @@ export const clearAuthErrors = (setErrors) => {
 // Specific error handlers for common auth scenarios
 export const handleLoginError = (error, setErrors, clearForm) => {
   const errorMessage = getAuthErrorMessage(error);
-  
+
   // For login, we typically show errors on the password field
   setErrors({ login: errorMessage });
-  
+
   if (clearForm) {
     clearForm();
   }
@@ -81,14 +81,17 @@ export const handleLoginError = (error, setErrors, clearForm) => {
 
 export const handleSignupError = (error, setErrors, clearForm) => {
   const errorMessage = getAuthErrorMessage(error);
-  
+
   // For signup, check if it's an email conflict
   if (error.response?.status === 409) {
-    setErrors({ email: "This email is already registered. Please use a different email or sign in." });
+    setErrors({
+      email:
+        "This email is already registered. Please use a different email or sign in.",
+    });
   } else {
     setErrors({ general: errorMessage });
   }
-  
+
   if (clearForm) {
     clearForm();
   }

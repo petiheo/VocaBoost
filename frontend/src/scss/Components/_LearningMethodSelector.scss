@@ -1,12 +1,12 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 
 .learning-method-selector {
   padding: 1.5rem;
-  
+
   &__title {
     font-size: 1.5rem;
-    font-family: 'Lalezar', sans-serif;
-    color: #352D24;
+    font-family: "Lalezar", sans-serif;
+    color: #352d24;
     margin-bottom: 1.5rem;
     text-align: center;
   }
@@ -20,25 +20,25 @@
   }
 
   &__card {
-    background: #F3EDDF;
+    background: #f3eddf;
     border: 2px solid transparent;
     border-radius: 16px;
     padding: 2rem;
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: center;
-    font-family: 'Inder', sans-serif;
-    
+    font-family: "Inder", sans-serif;
+
     &:hover {
       transform: translateY(-4px);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      border-color: #FFE1A1;
-      background: #F8F2E5;
+      border-color: #ffe1a1;
+      background: #f8f2e5;
     }
 
     &:focus {
       outline: none;
-      border-color: #FFE1A1;
+      border-color: #ffe1a1;
       box-shadow: 0 0 0 3px rgba(255, 225, 161, 0.3);
     }
 
@@ -56,14 +56,14 @@
   &__name {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #352D24;
+    color: #352d24;
     margin: 0 0 0.5rem;
-    font-family: 'Inria Sans', sans-serif;
+    font-family: "Inria Sans", sans-serif;
   }
 
   &__description {
     font-size: 0.95rem;
-    color: #5A5246;
+    color: #5a5246;
     margin: 0;
     line-height: 1.5;
   }
@@ -73,7 +73,7 @@
 @media (max-width: 768px) {
   .learning-method-selector {
     padding: 1rem;
-    
+
     &__title {
       font-size: 1.25rem;
       margin-bottom: 1rem;

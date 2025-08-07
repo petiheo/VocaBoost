@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ClassroomTitle, TeacherClassroomMenuTab } from "../../../components/index"
+import {
+  ClassroomTitle,
+  TeacherClassroomMenuTab,
+} from "../../../components/index";
 import classroomService from "../../../services/Classroom/classroomService";
 
 export default function AddStudentPage() {
@@ -8,12 +11,13 @@ export default function AddStudentPage() {
   const [email, setEmail] = useState(""); // Xử lý trạng thái của email
   const [invitations, setInvitations] = useState([]); // lưu danh sách lời mời
 
-  // Truy xuất dữ liệu lớp học được lưu khi users chọn classroom ở trang MyClassroom. 
+  // Truy xuất dữ liệu lớp học được lưu khi users chọn classroom ở trang MyClassroom.
   const [classroomId, setClassroomId] = useState(() => {
-    const selectedClassroom = JSON.parse(localStorage.getItem("selectedClassroom"));
+    const selectedClassroom = JSON.parse(
+      localStorage.getItem("selectedClassroom")
+    );
     return selectedClassroom?.id || null;
   });
-
 
   // Fetch data về trang
   const fetchDataInvitations = async () => {
@@ -30,16 +34,19 @@ export default function AddStudentPage() {
       console.error("Lỗi khi lấy danh sách lời mời:", error.message);
       navigate("/fail");
     }
-  }
+  };
 
   useEffect(() => {
     fetchDataInvitations();
-  }, [classroomId])
+  }, [classroomId]);
 
   // Xử lý việc gửi lời mời đến cho learners
   const handleInviteLearner = async (invited_email) => {
     try {
-      const res = await classroomService.inviteLearner({ classroomId, email: invited_email })
+      const res = await classroomService.inviteLearner({
+        classroomId,
+        email: invited_email,
+      });
       if (res.success) {
         console.log("Gửi lời mời thành công");
         setEmail("");
@@ -55,7 +62,10 @@ export default function AddStudentPage() {
   const handleCancel = async (canceled_email) => {
     console.log(canceled_email);
     try {
-      const res = await classroomService.cancelInvitation(classroomId, canceled_email)
+      const res = await classroomService.cancelInvitation(
+        classroomId,
+        canceled_email
+      );
       if (res.success) {
         console.log(res.message);
         setInvitations(invitations.filter((i) => i.email !== canceled_email));
@@ -64,7 +74,7 @@ export default function AddStudentPage() {
       console.log("Lỗi cancel lời mời:", error.message);
       navigate("/fail");
     }
-  }
+  };
 
   return (
     <div className="add-student-page">
@@ -91,14 +101,12 @@ export default function AddStudentPage() {
         {/* Student list */}
         <div className="student-list">
           <h4>Student list</h4>
-          {
-            invitations.map((i) => (
-              <div className="student-row" key={i.email}>
-                <span>{i.email}</span>
-                <button onClick={() => handleCancel(i.email)}>Cancel</button>
-              </div>
-            ))
-          }
+          {invitations.map((i) => (
+            <div className="student-row" key={i.email}>
+              <span>{i.email}</span>
+              <button onClick={() => handleCancel(i.email)}>Cancel</button>
+            </div>
+          ))}
         </div>
 
         {/* See more */}

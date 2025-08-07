@@ -6,7 +6,7 @@ const reviewService = {
     const res = await api.get("/review/lists/due", { params });
     return {
       listsWithDueWords: res.data.data?.listsWithDueWords || [],
-      pagination: res.data.data?.pagination || {}
+      pagination: res.data.data?.pagination || {},
     };
   },
 
@@ -15,7 +15,7 @@ const reviewService = {
     const res = await api.get("/review/lists/upcoming", { params });
     return {
       lists: res.data.data?.lists || [],
-      pagination: res.data.data?.pagination || {}
+      pagination: res.data.data?.pagination || {},
     };
   },
 
@@ -43,7 +43,7 @@ const reviewService = {
     return res.data.data || {};
   },
 
-  // Resume session after batch summary  
+  // Resume session after batch summary
   resumeSession: async (sessionId) => {
     const res = await api.post(`/review/sessions/${sessionId}/resume`);
     return res.data.data || {};
@@ -52,7 +52,10 @@ const reviewService = {
   // Start a new review session
   startSession: async (data) => {
     console.log("reviewService.startSession - data:", data);
-    console.log("reviewService.startSession - localStorage token exists:", !!localStorage.getItem("token"));
+    console.log(
+      "reviewService.startSession - localStorage token exists:",
+      !!localStorage.getItem("token")
+    );
     const res = await api.post("/review/sessions/start", data);
     return res.data.data || {};
   },

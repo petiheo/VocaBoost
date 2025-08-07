@@ -1,6 +1,11 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Header, SideBar, Footer, ListFormSkeleton } from "../../components/index.jsx";
+import {
+  Header,
+  SideBar,
+  Footer,
+  ListFormSkeleton,
+} from "../../components/index.jsx";
 import ListMetadataForm from "../../components/Vocabulary/ListMetadataForm.jsx";
 import WordsSection from "../../components/Vocabulary/WordsSection.jsx";
 import { useWordManagement } from "../../hooks/useWordManagement.js";
@@ -9,16 +14,21 @@ import { useListManagement } from "../../hooks/useListManagement.js";
 
 export default function CreateList() {
   const { listId } = useParams();
-  const isNewList = listId === 'new';
+  const isNewList = listId === "new";
   const actualListId = isNewList ? null : listId;
   const [isOpen, setIsOpen] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  
+
   // Custom hooks for separated concerns
   const validationHook = useFormValidation();
   const wordManagementHook = useWordManagement();
-  const listManagementHook = useListManagement(actualListId, validationHook, wordManagementHook, isNewList);
-  
+  const listManagementHook = useListManagement(
+    actualListId,
+    validationHook,
+    wordManagementHook,
+    isNewList
+  );
+
   // Destructure hook returns for cleaner component
   const { validationErrors, clearFieldError } = validationHook;
   const {
@@ -56,7 +66,7 @@ export default function CreateList() {
   // Enhanced word change handler with validation clearing
   const handleWordChange = (index, field, value) => {
     updateWord(index, field, value);
-    clearFieldError('words', field, index);
+    clearFieldError("words", field, index);
   };
 
   if (initialLoading) {
@@ -116,11 +126,11 @@ export default function CreateList() {
               Cancel
             </button>
             <button
-              className={`create-list__form--submit ${isSubmitting ? 'create-list__form--submit--loading' : ''}`}
+              className={`create-list__form--submit ${isSubmitting ? "create-list__form--submit--loading" : ""}`}
               type="submit"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Creating...' : 'Create List'}
+              {isSubmitting ? "Creating..." : "Create List"}
             </button>
           </div>
         </form>

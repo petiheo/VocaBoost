@@ -1,95 +1,92 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 $background-color: white;
 $font-family: $font-inriasans;
 $text-color: black;
 
 .header {
-    margin: 20px 0;
-    background-color: #FFFCF7;
-    display: grid;
-    grid-template-columns: 10% 70% 20%;
-    font-family: $font-family;
-    font-size: 1.3em;
-    width: 100%;
+  margin: 20px 0;
+  background-color: #fffcf7;
+  display: grid;
+  grid-template-columns: 10% 70% 20%;
+  font-family: $font-family;
+  font-size: 1.3em;
+  width: 100%;
 
+  align-items: center;
+  justify-content: center;
 
-    align-items: center;
+  // Logo header
+  &__site-title {
+    grid-column: 1 / 2;
+
+    display: flex;
+    font-size: 1.5rem;
+    color: inherit;
+    text-decoration: none;
+
+    .header-logo {
+      margin-left: 20px;
+      height: 50px;
+    }
+  }
+
+  //Search Bar
+  &__search-bar {
+    grid-column: 2 / 3;
+    display: flex;
     justify-content: center;
+  }
 
-    // Logo header
-    &__site-title {
-        grid-column: 1 / 2;
-        
-        display: flex;
-        font-size: 1.5rem;
-        color: inherit;
+  &__user {
+    grid-column: 3 /4;
+    display: flex;
+    gap: 20%;
+    align-items: center;
+    .homepage__topbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+  }
+
+  &__non-user {
+    .login-signup {
+      grid-column: 3 / 4;
+
+      display: flex;
+      align-items: center;
+      justify-self: center;
+      gap: 1em;
+
+      .signup {
+        background-color: #352d24;
         text-decoration: none;
+        color: white;
 
-        .header-logo {
-            margin-left: 20px;
-            height: 50px;
+        padding: 10px 30px;
+        border-radius: 50px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+
+        &:focus {
+          outline: 2px solid #ffffff;
+          outline-offset: 4px;
+          box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
         }
-    }
+      }
 
-    //Search Bar
-    &__search-bar{
-        grid-column: 2 / 3;
-        display: flex;
-        justify-content: center;
-    }
+      .signin {
+        text-decoration: none;
+        color: $text-color;
+        padding: 4px 20px;
+        border-radius: 50px;
 
-    &__user {
-        grid-column: 3 /4;
-        display: flex;
-        gap: 20%;
-        align-items: center;
-        .homepage__topbar {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
+        outline: none;
+
+        &:focus {
+          outline: 2px solid $text-color;
+          outline-offset: 4px;
         }
+      }
     }
-
-    &__non-user{
-
-        .login-signup {
-            grid-column: 3 / 4;
-
-            display: flex;
-            align-items: center;
-            justify-self: center;
-            gap: 1em;
-    
-            .signup {
-                background-color: #352D24;
-                text-decoration: none;
-                color: white;
-    
-    
-                padding: 10px 30px;
-                border-radius: 50px;
-                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    
-                &:focus {
-                    outline: 2px solid #FFFFFF;
-                    outline-offset: 4px;
-                    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
-                }
-            }
-    
-            .signin {
-                text-decoration: none;
-                color: $text-color;
-                padding: 4px 20px;
-                border-radius: 50px;
-    
-                outline: none;
-    
-                &:focus {
-                    outline: 2px solid $text-color;
-                    outline-offset: 4px;
-                }
-            }
-        }
-    }
+  }
 }

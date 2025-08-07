@@ -7,62 +7,69 @@ import { Bell, Plus } from "../../assets/Auth/index.jsx";
 import { useEmailVerificationRedirect } from "../../hooks/useEmailVerificationRedirect.js";
 
 const Header = ({ searchQuery, onSearchChange }) => {
-    const { user, loading } = useAuth();
-    
-    // Handle email verification redirect for authenticated users
-    useEmailVerificationRedirect();
-    
-    if (loading) return null;
-    return (
-        <nav className="header">
-            {/* Logo */}
-            {user ? (
-                <Link to="/homepage" className="header__site-title">
-                    <img src={MainPageLogo} alt="Vocaboost Logo" className="header-logo" />
-                </Link>
-            ) : (
-                <Link to="/" className="header__site-title">
-                    <img src={MainPageLogo} alt="Vocaboost Logo" className="header-logo" />
-                </Link>
-            )}
+  const { user, loading } = useAuth();
 
-            {/* Search Bar */}
-            <div className="header__search-bar">
-                <SearchBar 
-                    searchQuery={searchQuery}
-                    onSearchChange={onSearchChange}
-                />
-            </div>
+  // Handle email verification redirect for authenticated users
+  useEmailVerificationRedirect();
 
-            {user ? (
-                <div className="header__user">
+  if (loading) return null;
+  return (
+    <nav className="header">
+      {/* Logo */}
+      {user ? (
+        <Link to="/homepage" className="header__site-title">
+          <img
+            src={MainPageLogo}
+            alt="Vocaboost Logo"
+            className="header-logo"
+          />
+        </Link>
+      ) : (
+        <Link to="/" className="header__site-title">
+          <img
+            src={MainPageLogo}
+            alt="Vocaboost Logo"
+            className="header-logo"
+          />
+        </Link>
+      )}
 
-                    {/* Create list action */}
-                    <Link to="/vocabulary" className="homepage_create-list">
-                        <img src={Plus} alt="create-list-icon" style={{width: "30px"}}/>
-                    </Link>
+      {/* Search Bar */}
+      <div className="header__search-bar">
+        <SearchBar searchQuery={searchQuery} onSearchChange={onSearchChange} />
+      </div>
 
-                    {/* Notification bell */}
-                    <div className="homepage__notification">
-                        <img src={Bell} alt="notification-icon"  style={{width: "30px"}}/>
-                    </div>
+      {user ? (
+        <div className="header__user">
+          {/* Create list action */}
+          <Link to="/vocabulary" className="homepage_create-list">
+            <img src={Plus} alt="create-list-icon" style={{ width: "30px" }} />
+          </Link>
 
-                    {/* Avatar Dropdown */}
-                    <div className="homepage__topbar">
-                        <DropdownMenu />
-                    </div>
-                </div>
-            ) : (
-                <div className="header__non-user">
-                    <div className="login-signup">
-                        <Link to="/signin" className="signin">Sign in</Link>
-                        <Link to="/signup" className="signup">Sign up</Link>
-                    </div>
-                </div>
-            )}
+          {/* Notification bell */}
+          <div className="homepage__notification">
+            <img src={Bell} alt="notification-icon" style={{ width: "30px" }} />
+          </div>
 
-        </nav>
-    );
-}
+          {/* Avatar Dropdown */}
+          <div className="homepage__topbar">
+            <DropdownMenu />
+          </div>
+        </div>
+      ) : (
+        <div className="header__non-user">
+          <div className="login-signup">
+            <Link to="/signin" className="signin">
+              Sign in
+            </Link>
+            <Link to="/signup" className="signup">
+              Sign up
+            </Link>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
 
-export default Header
+export default Header;
