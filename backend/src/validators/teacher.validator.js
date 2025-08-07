@@ -5,6 +5,7 @@ const teacherValidators = {
   submitVerification: [
     body('fullName')
       .trim()
+      .escape()
       .notEmpty()
       .withMessage('Full name is required')
       .isLength({ min: 2, max: 100 })
@@ -14,6 +15,7 @@ const teacherValidators = {
 
     body('institution')
       .trim()
+      .escape()
       .notEmpty()
       .withMessage('School/Institution name is required')
       .isLength({ min: 2, max: 200 })
@@ -24,6 +26,7 @@ const teacherValidators = {
     body('additionalNotes')
       .optional()
       .trim()
+      .escape()
       .isLength({ max: 1000 })
       .withMessage('Additional notes must not exceed 1000 characters'),
 
