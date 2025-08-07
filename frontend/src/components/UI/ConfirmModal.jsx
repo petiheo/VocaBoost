@@ -99,7 +99,7 @@ export default function ConfirmModal({ message, onConfirm, onCancel }) {
             className="btn-confirm"
             style={{
               padding: '12px 24px',
-              backgroundColor: '#41d518ff',
+              backgroundColor: '#68cc4dff',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -109,8 +109,8 @@ export default function ConfirmModal({ message, onConfirm, onCancel }) {
               transition: 'background-color 0.3s',
               minWidth: '80px'
             }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#09a811ff'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#41d518ff'}
+            onMouseOver={(e) => e.target.style.backgroundColor = '#45a84aff'}
+            onMouseOut={(e) => e.target.style.backgroundColor = '#68cc4dff'}
           >
             Yes
           </button>
@@ -119,7 +119,7 @@ export default function ConfirmModal({ message, onConfirm, onCancel }) {
             className="btn-cancel"
             style={{
               padding: '12px 24px',
-              backgroundColor: '#e74c3c',
+              backgroundColor: '#c74638ff',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
