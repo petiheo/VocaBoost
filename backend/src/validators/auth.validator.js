@@ -9,18 +9,19 @@ const authValidators = {
       .optional()
       .trim()
       .isIn(['learner', 'teacher'])
-      .withMessage('Role must be learner or teacher'),
+      .withMessage('Role must be learner or teacher')
+      .escape(),
     handleValidationErrors,
   ],
 
   login: [
     commonValidators.email(),
-    body('password').notEmpty().withMessage('Password is required'),
+    body('password').notEmpty().withMessage('Password is required').escape(),
     handleValidationErrors,
   ],
 
   resetPassword: [
-    body('token').trim().notEmpty().withMessage('Reset token is required'),
+    body('token').trim().notEmpty().withMessage('Reset token is required').escape(),
     commonValidators.password('newPassword'),
     handleValidationErrors,
   ],

@@ -3,7 +3,7 @@ import VocabularyListCard from '../Classroom/VocabularyListCard';
 import { LeftArrow, RightArrow } from '../../assets/User';
 import { VocabularyListCardSkeleton } from '../UI/Skeleton';
 
-export default function CarouselVocabSection({ title, children, vocabLists = [], isLoading, error }) {
+export default function CarouselVocabSection({ title, children, vocabLists = [], isLoading, error, isReviewDisabled }) {
   const [startIndex, setStartIndex] = useState(0);
 
 // Hiển thị 4 card mỗi lần
@@ -58,6 +58,7 @@ export default function CarouselVocabSection({ title, children, vocabLists = [],
                           <VocabularyListCard
                             {...list}
                             buttonContent={title === 'REVIEW LISTS' ? 'Review' : 'Overview'}
+                            isReviewDisabled={isReviewDisabled}
                           />
                       </div>
                     ))}

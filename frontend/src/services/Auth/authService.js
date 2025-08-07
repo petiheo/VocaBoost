@@ -1,5 +1,13 @@
 import api from "../../lib/api";
 
+// Token expiration cache
+let tokenExpirationCache = {
+  token: null,
+  expiry: null,
+  isExpired: true,
+  lastChecked: null
+};
+
 const authService = {
   register: async (data) => {
     const res = await api.post("/auth/register", data);
@@ -10,7 +18,10 @@ const authService = {
   login: async (email, password) => {
     const res = await api.post("/auth/login", { email, password });
     localStorage.setItem("token", res.data.data.token);
+    localStorage.setItem("refreshToken", res.data.data.refreshToken);
     localStorage.setItem("user", JSON.stringify(res.data.data.user));
+    // Clear cache when new token is set
+    tokenExpirationCache.token = null;
     return res.data;
   },
 
@@ -23,15 +34,19 @@ const authService = {
   // Store user session after verification
   storeUserSession: (userData) => {
     localStorage.setItem("token", userData.data.token);
+    localStorage.setItem("refreshToken", userData.data.refreshToken);
     localStorage.setItem("user", JSON.stringify(userData.data.user));
+    // Clear cache when new token is set
+    tokenExpirationCache.token = null;
   },
 
   // 4. Đăng xuất
   logout: async () => {
     const token = localStorage.getItem("token");
+    const refreshToken = localStorage.getItem("refreshToken");
     await api.post(
       "/auth/logout",
-      {},
+      { refreshToken },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -39,7 +54,10 @@ const authService = {
       }
     );
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
+    // Clear cache on logout
+    tokenExpirationCache.token = null;
   },
 
   // 5. Quên mật khẩu
@@ -101,7 +119,10 @@ const authService = {
   // Enhanced session management
   clearSession: (showNotification = false, reason = 'logout') => {
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
+    // Clear token cache
+    tokenExpirationCache.token = null;
 
     // Store logout reason in sessionStorage for notification
     if (showNotification) {
@@ -120,26 +141,55 @@ const authService = {
     }
   },
 
-  // Check if token is expired (client-side check)
+  // Check if token is expired (client-side check with caching)
   isTokenExpired: () => {
     const token = localStorage.getItem("token");
     if (!token) return true;
 
+    const currentTime = Date.now();
+
+    // Check if we have valid cache for this token
+    if (
+      tokenExpirationCache.token === token &&
+      tokenExpirationCache.lastChecked &&
+      currentTime - tokenExpirationCache.lastChecked < 60000 // Cache for 1 minute
+    ) {
+      return tokenExpirationCache.isExpired;
+    }
+
     try {
       // Decode JWT payload (basic check - not cryptographically secure)
       const payload = JSON.parse(atob(token.split(".")[1]));
-      const currentTime = Date.now() / 1000;
+      const currentTimeSeconds = currentTime / 1000;
 
       // Check if token is expired with 5 minute buffer
-      return payload.exp && payload.exp - 300 < currentTime;
+      const isExpired = payload.exp && payload.exp - 300 < currentTimeSeconds;
+
+      // Update cache
+      tokenExpirationCache = {
+        token,
+        expiry: payload.exp,
+        isExpired,
+        lastChecked: currentTime
+      };
+
+      return isExpired;
     } catch (error) {
       // If we can't decode the token, assume it's valid and let server validate
       // This prevents clearing sessions during OAuth flows with different token formats
+      tokenExpirationCache = {
+        token,
+        expiry: null,
+        isExpired: false,
+        lastChecked: currentTime
+      };
       return false;
     }
   },
 
   getToken: () => localStorage.getItem("token"),
+  getRefreshToken: () => localStorage.getItem("refreshToken"),
+  
   getCurrentUser: () => {
     try {
       const userStr = localStorage.getItem("user");
@@ -148,7 +198,34 @@ const authService = {
       return null;
     }
   },
+  
   isAuthenticated: () => !!localStorage.getItem("token"),
+  
+  // Refresh the access token using refresh token
+  refreshAccessToken: async () => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        throw new Error("No refresh token available");
+      }
+      
+      const res = await api.post("/auth/refresh-token", { refreshToken });
+      
+      if (res.data.success) {
+        const newToken = res.data.data.token;
+        localStorage.setItem("token", newToken);
+        // Clear token cache to force re-validation
+        tokenExpirationCache.token = null;
+        return newToken;
+      }
+      
+      throw new Error("Failed to refresh token");
+    } catch (error) {
+      // If refresh fails, clear session
+      authService.clearSession(true, 'expired');
+      throw error;
+    }
+  },
 };
 
 export default authService;

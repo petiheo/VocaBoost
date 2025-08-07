@@ -14,6 +14,7 @@ export default function BatchSummaryPage() {
   const [summary, setSummary] = useState(location.state?.summary || null);
   const [sessionId] = useState(location.state?.sessionId);
   const [listInfo] = useState(location.state?.listInfo);
+  const [sessionType] = useState(location.state?.sessionType || 'flashcard'); // Get session type from state
   const [loading, setLoading] = useState(!summary);
 
   useEffect(() => {
@@ -45,8 +46,16 @@ export default function BatchSummaryPage() {
       // Resume the session
       const sessionData = await reviewService.resumeSession(sessionId);
       
+      // Determine the correct route based on session type
+      let route;
+      if (sessionType === 'fill_blank') {
+        route = `/review/session/${sessionId}/fill-in-blank`;
+      } else {
+        route = `/review/session/${sessionId}`;
+      }
+      
       // Navigate back to the study page with the resumed session
-      navigate(`/review/${sessionId}/flashcard`, {
+      navigate(route, {
         state: { 
           listInfo,
           resumedSession: sessionData

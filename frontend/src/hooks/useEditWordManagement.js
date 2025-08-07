@@ -145,14 +145,9 @@ export const useEditWordManagement = () => {
               updated[index] = {
                 ...updated[index],
                 exampleSentence: exampleText,
-                // Store AI metadata for new words (existing words store this in backend)
-                ...(word.id
-                  ? {}
-                  : {
-                      aiGenerated: response.data.example.aiGenerated || true,
-                      generationPrompt:
-                        response.data.example.generationPrompt || null,
-                    }),
+                // Store AI metadata for ALL words (both new and existing)
+                aiGenerated: response.data.example.aiGenerated || true,
+                generationPrompt: response.data.example.generationPrompt || null,
               };
 
               return updated;
@@ -243,9 +238,13 @@ export const useEditWordManagement = () => {
       phonetics: w.phonetics || "",
       synonyms: normalizeSynonyms(w.synonyms),
       translation: w.translation || "",
+      // Always include exampleSentence to handle both adding and removing examples
       exampleSentence: w.exampleSentence || "",
-      aiGenerated: w.aiGenerated || false,
-      generationPrompt: w.generationPrompt || null,
+      // Include AI metadata only when we have an example with content
+      ...(w.exampleSentence && w.exampleSentence.trim() && w.aiGenerated ? {
+        aiGenerated: w.aiGenerated,
+        generationPrompt: w.generationPrompt || null,
+      } : {}),
       // Keep ID for edit operations
       ...(w.id ? { id: w.id } : {}),
     }));

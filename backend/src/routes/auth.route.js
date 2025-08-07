@@ -21,6 +21,9 @@ authRouter.post(
 
 authRouter.post('/logout', authController.logout);
 
+// Token Refresh
+authRouter.post('/refresh-token', authController.refreshToken);
+
 // OAuth Routes
 authRouter.get(
   '/google',

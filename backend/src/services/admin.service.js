@@ -5,6 +5,7 @@ const storageService = require('./storage.service');
 const emailService = require('./email.service');
 const { STORAGE_BUCKETS } = require('../config/storage.config');
 const logger = require('../utils/logger');
+const { PaginationUtil } = require('../utils');
 
 class AdminService {
   // =================================================================
@@ -12,14 +13,16 @@ class AdminService {
   // =================================================================
 
   async getPendingTeacherRequests({ page = 1, limit = 20, sortBy = 'created_at:asc' }) {
-    const { from, to } = this._getPagination(page, limit);
+    const pagination = PaginationUtil.validate(page, limit);
+    const from = pagination.offset;
+    const to = pagination.offset + pagination.limit - 1;
     const { data, error, count } = await adminModel.findPendingTeacherRequests({ from, to, sortBy });
 
     if (error) throw error;
     
     return {
       requests: data,
-      pagination: this._formatPagination(page, limit, count),
+      pagination: PaginationUtil.getMetadata(pagination.page, pagination.limit, count),
     };
   }
 
@@ -66,14 +69,16 @@ class AdminService {
   // =================================================================
 
   async getOpenReports({ page = 1, limit = 20 }) {
-    const { from, to } = this._getPagination(page, limit);
+    const pagination = PaginationUtil.validate(page, limit);
+    const from = pagination.offset;
+    const to = pagination.offset + pagination.limit - 1;
     const { data, error, count } = await adminModel.findOpenReports({ from, to });
     
     if (error) throw error;
     
     return {
       reports: data,
-      pagination: this._formatPagination(page, limit, count),
+      pagination: PaginationUtil.getMetadata(pagination.page, pagination.limit, count),
     };
   }
 
@@ -102,22 +107,6 @@ class AdminService {
     return updatedReport;
   }
   
-  // =================================================================
-  //  PRIVATE HELPER METHODS
-  // =================================================================
-  
-  _getPagination(page, size) {
-    const limit = size ? +size : 20;
-    const from = page ? (page - 1) * limit : 0;
-    const to = page ? from + size - 1 : size - 1;
-    return { from, to };
-  }
-  
-  _formatPagination(page, limit, totalItems) {
-    const currentPage = Number(page);
-    const totalPages = Math.ceil(totalItems / limit);
-    return { currentPage, totalPages, totalItems: totalItems || 0, limit: Number(limit) };
-  }
 }
 
 module.exports = new AdminService();
