@@ -7,6 +7,17 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    sourcemap: false
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui': ['react-select', 'react-toastify', 'react-modal', 'react-loading-skeleton'],
+          'api': ['axios', 'jwt-decode'],
+          'utils': ['date-fns']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
   }
 })
