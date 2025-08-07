@@ -369,15 +369,16 @@ export const useEditListManagement = (listId, validationHook, wordManagementHook
           term: word.term,
           definition: word.definition,
           phonetics: word.phonetics || "",
+          // Always include exampleSentence to handle both adding and removing examples
           exampleSentence: word.exampleSentence || "",
-          translation: word.translation || "",
-          synonyms: normalizeSynonyms(word.synonyms),
-          ...(word.image ? { image_url: word.image } : {}),
-          // Add AI metadata for words with AI-generated content
-          ...(word.aiGenerated ? { 
+          // Include AI metadata only when we have an example with content
+          ...(word.exampleSentence && word.exampleSentence.trim() && word.aiGenerated ? { 
             aiGenerated: word.aiGenerated,
             generationPrompt: word.generationPrompt 
           } : {}),
+          translation: word.translation || "",
+          synonyms: normalizeSynonyms(word.synonyms),
+          ...(word.image ? { image_url: word.image } : {}),
         };
 
         console.log(`Processing word: "${word.term}" (${word._isExisting ? 'EXISTING' : 'NEW'}), has ID: ${!!word.id}`);
