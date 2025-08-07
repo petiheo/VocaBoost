@@ -1,5 +1,6 @@
 const { supabase } = require('../config/supabase.config');
 const crypto = require('crypto');
+const { logger } = require('../utils');
 
 class TokenBlacklistModel {
   /**
@@ -61,7 +62,7 @@ class TokenBlacklistModel {
       
       return !!data;
     } catch (error) {
-      console.error('Error checking token blacklist:', error);
+      logger.error('Error checking token blacklist:', error);
       // In case of error, fail open (allow token) to prevent service disruption
       // But log the error for monitoring
       return false;
@@ -107,7 +108,7 @@ class TokenBlacklistModel {
       }
       
       // Fallback: Direct deletion if RPC fails
-      console.warn('RPC cleanup failed, using direct deletion:', rpcError.message);
+      logger.warn('RPC cleanup failed, using direct deletion:', rpcError.message);
       
       const { data, error } = await supabase
         .from('token_blacklist')
@@ -118,7 +119,7 @@ class TokenBlacklistModel {
       if (error) throw error;
       return data ? data.length : 0;
     } catch (error) {
-      console.error('Error cleaning up expired tokens:', error);
+      logger.error('Error cleaning up expired tokens:', error);
       return 0;
     }
   }
@@ -153,7 +154,7 @@ class TokenBlacklistModel {
         byReason: stats
       };
     } catch (error) {
-      console.error('Error getting blacklist stats:', error);
+      logger.error('Error getting blacklist stats:', error);
       return { total: 0, byReason: {} };
     }
   }

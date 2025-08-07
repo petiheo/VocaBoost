@@ -475,7 +475,6 @@ class ClassroomModel {
       .eq('classroom_id', classroomId)
       .order('start_date', { ascending: false });
 
-    console.log(data);
     if (error) throw error;
     return data;
   }

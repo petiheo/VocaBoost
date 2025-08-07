@@ -3,13 +3,20 @@ const vocabularyModel = require('../models/vocabulary.model');
 const { ForbiddenError, ValidationError } = require('../utils/errorHandler');
 const { shuffleArray } = require('../utils/common');
 const logger = require('../utils/logger');
+const { PaginationUtil } = require('../utils');
 
 class ReviewService {
   // =================================================================
   // GETTING DUE ITEMS
   // =================================================================
   async getListsWithDueWords(userId, { page = null, limit = null }) {
-    const { from, to } = this._getPagination(page, limit);
+    let from = null, to = null, pagination = null;
+    
+    if (page !== null && limit !== null) {
+      pagination = PaginationUtil.validate(page, limit);
+      from = pagination.offset;
+      to = pagination.offset + pagination.limit - 1;
+    }
     
     const { data, error } = await reviewModel.findListsWithDueWords(userId, from, to);
     if (error) throw error;
@@ -30,14 +37,24 @@ class ReviewService {
         tags: list.tags.map(t => t.name) 
     }));
     
+    const paginationResult = pagination 
+      ? PaginationUtil.getMetadata(pagination.page, pagination.limit, totalItems)
+      : { totalItems: totalItems || 0 };
+    
     return {
       listsWithDueWords: formattedLists,
-      pagination: this._formatPagination(page, limit, totalItems),
+      pagination: paginationResult,
     };
   }
 
   async getUpcomingReviewLists(userId, { page = null, limit = null }) {
-    const { from, to } = this._getPagination(page, limit);
+    let from = null, to = null, pagination = null;
+    
+    if (page !== null && limit !== null) {
+      pagination = PaginationUtil.validate(page, limit);
+      from = pagination.offset;
+      to = pagination.offset + pagination.limit - 1;
+    }
   
     const { data, error } = await reviewModel.findUpcomingReviewLists(userId, from, to);
     if (error) throw error;
@@ -66,9 +83,13 @@ class ReviewService {
         };
     });
     
+    const paginationResult = pagination 
+      ? PaginationUtil.getMetadata(pagination.page, pagination.limit, totalItems)
+      : { totalItems: totalItems || 0 };
+    
     return {
       lists: formattedLists,
-      pagination: this._formatPagination(page, limit, totalItems),
+      pagination: paginationResult,
     };
   }
 
@@ -500,32 +521,6 @@ class ReviewService {
     };
   }
 
-  // Helper for pagination
-  _getPagination(page, size) {
-    if (page == null || size == null) {
-      return { from: null, to: null, limit: null };
-    }
-
-    const limit = +size; 
-    const from = (page - 1) * limit;
-    const to = from + size - 1;
-    return { from, to, limit };
-  }
-
-  _formatPagination(page, limit, totalItems) {
-    if (page == null || limit == null) {
-      return { totalItems: totalItems || 0 };
-    }
-
-    const currentPage = Number(page);
-    const totalPages = Math.ceil(totalItems / limit);
-    return {
-      currentPage,
-      totalPages,
-      totalItems: totalItems || 0,
-      limit: Number(limit),
-    };
-  }
 }
 
 module.exports = new ReviewService();
