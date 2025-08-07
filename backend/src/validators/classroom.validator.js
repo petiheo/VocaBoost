@@ -3,10 +3,12 @@ const { handleValidationErrors } = require('./common.validator');
 
 const classroomValidator = {
   create: [
-    body('name').trim().notEmpty().withMessage('Classroom name is required'),
+    body('name').trim().escape().notEmpty().withMessage('Classroom name is required'),
 
     body('description')
       .optional()
+      .trim()
+      .escape()
       .isString()
       .isLength({ max: 1000 })
       .withMessage('Description must be less than 1000 characters'),
@@ -35,6 +37,7 @@ const classroomValidator = {
 
     body('title')
       .trim()
+      .escape()
       .notEmpty()
       .withMessage('Assignment title is required')
       .bail()

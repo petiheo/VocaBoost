@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('passport');
+const compression = require('compression');
 const app = express();
 const logger = require('./utils/logger');
 const securityMiddleware = require('./middlewares/security.middleware');
@@ -7,10 +8,14 @@ const ResponseUtils = require('./utils/response');
 const ErrorHandler = require('./utils/errorHandler');
 
 const router = require('./routes/index.route');
+const healthRouter = require('./routes/health.route');
 
 require('./config/passport.config');
 
 app.use(express.json());
+
+// Enable GZIP compression
+app.use(compression());
 
 securityMiddleware(app);
 
@@ -33,27 +38,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api', router);
-
-app.use('/health', async (req, res) => {
-  try {
-    const { supabase } = require('./config/supabase.config');
-    await supabase.from('users').select('count').limit(1);
-
-    return ResponseUtils.success(res, 'Service is healthy', {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-    });
-  } catch (error) {
-    return ErrorHandler.handleError(
-      res,
-      error,
-      'Health Check',
-      'Service is unhealthy',
-      503
-    );
-  }
-});
+app.use('/health', healthRouter);
 
 // =====ERROR HANDLING=====
 // Ignore favicon request to avoid 404 logs

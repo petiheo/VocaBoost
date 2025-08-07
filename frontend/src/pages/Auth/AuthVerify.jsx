@@ -30,10 +30,13 @@ export default function AuthVerify() {
             throw new Error(result.message || "Email verification failed");
           }
 
-          // After successful email verification, the backend should provide a session token
+          // After successful email verification, the backend should provide session tokens
           if (result.data && result.data.token) {
-            // Store the new session token provided by the backend
+            // Store both access and refresh tokens provided by the backend
             localStorage.setItem("token", result.data.token);
+            if (result.data.refreshToken) {
+              localStorage.setItem("refreshToken", result.data.refreshToken);
+            }
             
             // Store user data if provided
             if (result.data.user) {
@@ -71,6 +74,7 @@ export default function AuthVerify() {
             } catch (error) {
               console.error("Token validation failed:", error);
               localStorage.removeItem("token");
+              localStorage.removeItem("refreshToken");
               localStorage.removeItem("user");
               navigate("/signin");
             }

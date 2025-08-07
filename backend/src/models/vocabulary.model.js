@@ -245,14 +245,14 @@ class VocabularyModel {
       },
       nestedSelect: `
         *,
-        vocabulary_examples!fk_vocabulary_examples_vocabulary_id (
+        vocabulary_examples (
           vocabulary_id,
           example_sentence,
           ai_generated,
           generation_prompt,
           created_at
         ),
-        word_synonyms!fk_word_synonyms_word_id (
+        word_synonyms (
           word_id,
           synonym,
           created_at
@@ -288,10 +288,7 @@ class VocabularyModel {
     // Build new query with nested select (we know the table is 'vocabulary')
     let nestedQuery = supabase
       .from('vocabulary')
-      .select(
-        config.nestedSelect,
-        { count: 'exact' }
-      );
+      .select(config.nestedSelect, { count: 'exact' });
 
     // Apply the same filters from base query
     if (context.listId) {
@@ -442,7 +439,12 @@ class VocabularyModel {
    * Enrich word data from nested query results
    */
   _enrichWordsFromNested(word, format) {
-    const examples = word.vocabulary_examples || [];
+    // Handle both single example object and array of examples
+    let examples = word.vocabulary_examples || [];
+    if (word.vocabulary_examples && !Array.isArray(word.vocabulary_examples)) {
+      examples = [word.vocabulary_examples];
+    }
+
     const synonyms = word.word_synonyms
       ? word.word_synonyms.map((s) => s.synonym)
       : [];
@@ -782,18 +784,26 @@ class VocabularyModel {
   //  EXAMPLE MODELS
   // =================================================================
   async createExamplesBulk(examplesToInsert) {
-    return await supabase.from('vocabulary_examples').insert(examplesToInsert);
+    return await supabase
+      .from('vocabulary_examples')
+      .insert(examplesToInsert)
+      .select();
   }
 
   async upsertExample(wordId, exampleData) {
     return await supabase
       .from('vocabulary_examples')
-      .upsert({
-        vocabulary_id: wordId,
-        example_sentence: exampleData.exampleSentence,
-        ai_generated: exampleData.aiGenerated || false,
-        generation_prompt: exampleData.generationPrompt || null,
-      })
+      .upsert(
+        {
+          vocabulary_id: wordId,
+          example_sentence: exampleData.exampleSentence,
+          ai_generated: exampleData.aiGenerated || false,
+          generation_prompt: exampleData.generationPrompt || null,
+        },
+        {
+          onConflict: 'vocabulary_id',
+        }
+      )
       .select()
       .single();
   }

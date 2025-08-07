@@ -1,4 +1,5 @@
 import api from "../../lib/api";
+import { decodeVocabularyList } from "../../utils/htmlUtils";
 
 const vocabularyService = {
   // 1. Lấy danh sách của người dùng
@@ -43,7 +44,8 @@ const vocabularyService = {
   // 7. Lấy các từ trong danh sách
   getWordsByListId: async (listId, params = {}) => {
     const res = await api.get(`/vocabulary/lists/${listId}/words`, { params }); //  sửa endpoint + rename
-    return res.data.data.words;
+    const words = res.data.data.words;
+    return decodeVocabularyList(words); // Decode HTML entities
   },
 
   // 8. Thêm 1 từ

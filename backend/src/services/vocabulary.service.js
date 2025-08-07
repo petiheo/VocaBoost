@@ -248,9 +248,14 @@ class VocabularyService {
     const finalSynonyms = this._mapSubItemsToNewWords(words, newWords, 'synonym');
 
     if (finalExamples.length > 0) {
-      await vocabularyModel
-        .createExamplesBulk(finalExamples)
-        .catch((err) => logger.error('Bulk example creation failed:', err));
+      try {
+        const result = await vocabularyModel.createExamplesBulk(finalExamples);
+        if (result.error) {
+          logger.error('Bulk example creation failed:', result.error);
+        }
+      } catch (err) {
+        logger.error('Bulk example creation failed with exception:', err);
+      }
     }
     if (finalSynonyms.length > 0) {
       await vocabularyModel
@@ -404,15 +409,20 @@ class VocabularyService {
         context
       );
 
+      const generationPrompt = `Generate example for "${word.term}" (${word.definition})${context ? ` in context: ${context}` : ''}`;
+
       await vocabularyModel.upsertExample(wordId, {
         exampleSentence: example,
         aiGenerated: true,
+        generationPrompt: generationPrompt,
       });
 
       return {
         wordId,
         term: word.term,
         example,
+        aiGenerated: true,
+        generationPrompt: generationPrompt,
       };
     } catch (error) {
       logger.error(`Failed to generate example for word ${wordId}:`, error);
@@ -581,7 +591,7 @@ class VocabularyService {
       return { from: null, to: null, limit: null };
     }
 
-    const limit = +size; 
+    const limit = +size;
     const from = (page - 1) * limit;
     const to = from + size - 1;
     return { from, to, limit };

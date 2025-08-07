@@ -49,16 +49,37 @@ api.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+    
     // Handle token expiration or invalid token
-    if (error.response?.status === 401) {
-      // Use authService to handle session cleanup
-      if (authService) {
-        authService.clearSession(true, "unauthorized");
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // Don't retry refresh for auth endpoints
+      if (originalRequest.url?.includes('/auth/')) {
+        return Promise.reject(error);
+      }
+      
+      originalRequest._retry = true;
+      
+      // Try to refresh the token
+      if (authService && authService.refreshAccessToken) {
+        try {
+          const newToken = await authService.refreshAccessToken();
+          
+          // Update the authorization header with new token
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          
+          // Retry the original request with new token
+          return api(originalRequest);
+        } catch (refreshError) {
+          // Refresh failed, session cleanup already handled in refreshAccessToken
+          return Promise.reject(refreshError);
+        }
       } else {
         // Fallback if authService not loaded yet
         sessionStorage.setItem("logoutReason", "unauthorized");
         localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
         localStorage.removeItem("user");
 
         const currentPath = window.location.pathname;
