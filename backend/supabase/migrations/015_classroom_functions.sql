@@ -50,4 +50,3 @@ BEGIN
     AND a.classroom_id = p_classroom_id;
 END;
 $$;
-·

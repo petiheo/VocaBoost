@@ -545,7 +545,6 @@ INSERT INTO notifications (id, recipient_id, notification_type, title, message, 
 ('80000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000013', 'achievement', 'Great Job!', 'You completed the IELTS Speaking Vocabulary assignment with a score of 92%!', true, '{"score": 92, "assignment_id": "50000000-0000-0000-0000-000000000003"}', '/achievements', '2024-07-30 16:46:00+00'),
 ('80000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000002', 'system', 'New Student Joined', 'A new student has joined your classroom "English for Academic Success"', false, '{"classroom_id": "40000000-0000-0000-0000-000000000001", "student_name": "Alex Nguyen"}', '/classrooms/40000000-0000-0000-0000-000000000001/learners', '2024-06-02 10:30:00+00'),
 ('80000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000011', 'reminder', 'Daily Study Reminder', 'Don''t forget to review your vocabulary today! You''re on a 3-day streak.', false, '{"streak": 3, "daily_goal": 10}', '/review', '2024-07-31 08:00:00+00');
-('80000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000011', 'reminder', 'Daily Study Reminder', 'Don''t forget to review your vocabulary today! You''re on a 3-day streak.', false, '{"streak": 3, "daily_goal": 10}', '/review', '2024-07-31 08:00:00+00');
 
 -- =================================================================
 -- ACHIEVEMENTS
