@@ -1,4 +1,5 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const ClassroomDropdownMenu = ({ students }) => {
   const navigate = useNavigate();
@@ -12,10 +13,16 @@ const ClassroomDropdownMenu = ({ students }) => {
         onChange={(e) => navigate(e.target.value)}
       >
         <option value="/classroom/learners-list">Learner list</option>
-        <option value="/classroom/approve-join-classroom-request">Learner’s Request</option>
+        <option value="/classroom/approve-join-classroom-request">
+          Learner’s Request
+        </option>
       </select>
     </div>
   );
+};
+
+ClassroomDropdownMenu.propTypes = {
+  students: PropTypes.array.isRequired,
 };
 
 export default ClassroomDropdownMenu;

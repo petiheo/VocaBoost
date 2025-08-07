@@ -1,34 +1,43 @@
-import { useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import useClickOutside from "../../hooks/useClickOutside";
-import {Home, Learning, Analysis, Setting, LogOut, ArrowRight, ArrowLeft} from "../../assets/icons/index";
-import { MyClassroom } from "../../assets/Auth"
+import { useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { MyClassroom } from "../../assets/Auth";
+import {
+  Analysis,
+  ArrowLeft,
+  ArrowRight,
+  Home,
+  Learning,
+  LogOut,
+  Setting,
+} from "../../assets/icons/index";
 import { useToast } from "../../components/Providers/ToastProvider.jsx";
-import authService from "../../services/Auth/authService";
+import useClickOutside from "../../hooks/useClickOutside";
 import { useAuth } from "../../services/Auth/authContext.jsx";
-import { useNavigate } from "react-router-dom";
+import authService from "../../services/Auth/authService";
 
-const Sidebar = ({isOpen, setIsOpen}) => {
+const Sidebar = ({ isOpen, setIsOpen }) => {
   const sidebarRef = useRef(null);
   const toast = useToast();
-  const { user, logout: contextLogout } = useAuth();
+  const { logout: contextLogout } = useAuth();
   const navigate = useNavigate();
 
   useClickOutside(sidebarRef, () => setIsOpen(false), isOpen);
 
   const handleLogOut = async () => {
-      try {
-          await authService.logout();
-          contextLogout();
-          navigate("/");
-      } catch (error) {
-          console.error("Logout failed:", error);
-      }
-  }
+    try {
+      await authService.logout();
+      contextLogout();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
-    <aside ref={sidebarRef} className={`sidebar ${isOpen ? 'open' : 'collapsed'}`}>
-
+    <aside
+      ref={sidebarRef}
+      className={`sidebar ${isOpen ? "open" : "collapsed"}`}
+    >
       <button className="sidebar__toggle" onClick={() => setIsOpen(!isOpen)}>
         <img src={isOpen ? ArrowLeft : ArrowRight} alt="toggle" />
       </button>
@@ -49,7 +58,14 @@ const Sidebar = ({isOpen, setIsOpen}) => {
             <img src={MyClassroom} alt="my classroom icon" />
             <span className="sidebar__label">My Classrooms</span>
           </Link>
-          <Link to="#" className="sidebar__link" onClick={e => { e.preventDefault(); toast("Feature coming soon!", "success"); }}>
+          <Link
+            to="#"
+            className="sidebar__link"
+            onClick={(e) => {
+              e.preventDefault();
+              toast("Feature coming soon!", "success");
+            }}
+          >
             <img src={Analysis} alt="analysis icon" />
             <span className="sidebar__label">Learning Statistics</span>
           </Link>
@@ -70,6 +86,6 @@ const Sidebar = ({isOpen, setIsOpen}) => {
       </nav>
     </aside>
   );
-}
+};
 
 export default Sidebar;

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Header, SideBar, Footer } from '../../components';
-import FillInBlank from '../../components/Review/FillInBlank';
-import reviewService from '../../services/Review/reviewService';
-import vocabularyService from '../../services/Vocabulary/vocabularyService';
-import { useToast } from '../../components/Providers/ToastProvider';
-import { useConfirm } from '../../components/Providers/ConfirmProvider';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { Header, SideBar, Footer } from "../../components";
+import FillInBlank from "../../components/Review/FillInBlank";
+import reviewService from "../../services/Review/reviewService";
+import vocabularyService from "../../services/Vocabulary/vocabularyService";
+import { useToast } from "../../components/Providers/ToastProvider";
+import { useConfirm } from "../../components/Providers/ConfirmProvider";
 
 const FillInBlankPage = () => {
   const { listId, sessionId } = useParams();
@@ -14,7 +14,7 @@ const FillInBlankPage = () => {
   const toast = useToast();
   const confirm = useConfirm();
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const [listInfo, setListInfo] = useState(location.state?.listInfo || null);
   const [words, setWords] = useState([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -34,10 +34,10 @@ const FillInBlankPage = () => {
       if (isSessionCompleted) {
         return;
       }
-      
+
       try {
         setLoading(true);
-        
+
         // Get list info if not passed through navigation state
         if (!listInfo && listId) {
           const info = await vocabularyService.getListById(listId);
@@ -51,7 +51,8 @@ const FillInBlankPage = () => {
           setWords(resumedSession.remainingWords || []);
           const completedWords = resumedSession.completedWords || 0;
           const wordsPerBatch = resumedSession.wordsPerBatch || 10;
-          const currentBatchStartIndex = Math.floor(completedWords / wordsPerBatch) * wordsPerBatch;
+          const currentBatchStartIndex =
+            Math.floor(completedWords / wordsPerBatch) * wordsPerBatch;
           setCurrentWordIndex(completedWords - currentBatchStartIndex);
         }
         // If sessionId exists, we're continuing a session
@@ -60,18 +61,24 @@ const FillInBlankPage = () => {
           if (sessionStatus?.activeSession) {
             setSession(sessionStatus.activeSession);
             setWords(sessionStatus.activeSession.remainingWords || []);
-            const completedWords = sessionStatus.activeSession.completedWords || 0;
-            const wordsPerBatch = sessionStatus.activeSession.wordsPerBatch || 10;
-            const currentBatchStartIndex = Math.floor(completedWords / wordsPerBatch) * wordsPerBatch;
+            const completedWords =
+              sessionStatus.activeSession.completedWords || 0;
+            const wordsPerBatch =
+              sessionStatus.activeSession.wordsPerBatch || 10;
+            const currentBatchStartIndex =
+              Math.floor(completedWords / wordsPerBatch) * wordsPerBatch;
             setCurrentWordIndex(completedWords - currentBatchStartIndex);
           }
         } else {
           // Check for existing active session first
-          const activeSessionResponse = await reviewService.getActiveSessionStatus();
-          
+          const activeSessionResponse =
+            await reviewService.getActiveSessionStatus();
+
           if (activeSessionResponse?.activeSession) {
             try {
-              await reviewService.endSession(activeSessionResponse.activeSession.sessionId);
+              await reviewService.endSession(
+                activeSessionResponse.activeSession.sessionId
+              );
             } catch (endError) {
               console.warn("Failed to end existing session:", endError);
             }
@@ -82,19 +89,24 @@ const FillInBlankPage = () => {
           try {
             sessionResponse = await reviewService.startSession({
               listId: listId || listInfo?.id,
-              sessionType: 'fill_blank'
+              sessionType: "fill_blank",
             });
 
             if (sessionResponse.session.practiceMode) {
-              toast("No due words found. Starting practice mode with all words.", "success");
+              toast(
+                "No due words found. Starting practice mode with all words.",
+                "success"
+              );
             }
           } catch (error) {
             console.log("Error starting session:", error);
-            
-            const isNoWordsError = 
-              error.message?.includes('has no words to practice') ||
-              error.response?.data?.message?.includes('has no words to practice');
-            
+
+            const isNoWordsError =
+              error.message?.includes("has no words to practice") ||
+              error.response?.data?.message?.includes(
+                "has no words to practice"
+              );
+
             if (isNoWordsError) {
               toast("This list has no words to practice.", "error");
               navigate(`/review/${listId || listInfo?.id}`);
@@ -108,7 +120,6 @@ const FillInBlankPage = () => {
             setWords(sessionResponse.session.words || []);
           }
         }
-
       } catch (err) {
         console.error("Error initializing fill-blank session:", err);
         toast("Failed to start fill-blank session", "error");
@@ -118,30 +129,38 @@ const FillInBlankPage = () => {
     }
 
     initializeFillBlankSession();
-  }, [sessionId, listId, listInfo, toast, confirm, isSessionCompleted, navigate]);
+  }, [
+    sessionId,
+    listId,
+    listInfo,
+    toast,
+    confirm,
+    isSessionCompleted,
+    navigate,
+  ]);
 
   const generateQuestionSentence = (word) => {
     // If the word has an example sentence, use it with a blank
     if (word.vocabulary_examples?.example_sentence) {
       const sentence = word.vocabulary_examples.example_sentence;
       // Replace the word (case-insensitive) with underscores
-      const regex = new RegExp(`\\b${word.term}\\b`, 'gi');
-      return sentence.replace(regex, '_____');
+      const regex = new RegExp(`\\b${word.term}\\b`, "gi");
+      return sentence.replace(regex, "_____");
     }
-    
+
     // Fallback: use the definition as a prompt
-    return `${word.definition} (_____)`; 
+    return `${word.definition} (_____)`;
   };
 
   const handleAnswer = async (isCorrect, userAnswer) => {
     try {
       const currentWord = words[currentWordIndex];
-      
+
       // Submit the result to the backend
       await reviewService.submitResult(session?.sessionId || sessionId, {
         wordId: currentWord.id,
-        result: isCorrect ? 'correct' : 'incorrect',
-        responseTimeMs: Date.now() - (session?.startTime || Date.now())
+        result: isCorrect ? "correct" : "incorrect",
+        responseTimeMs: Date.now() - (session?.startTime || Date.now()),
       });
 
       // Just record the answer, don't navigate automatically
@@ -153,7 +172,7 @@ const FillInBlankPage = () => {
   };
 
   const handleDontKnow = () => {
-    handleAnswer(false, '');
+    handleAnswer(false, "");
   };
 
   const handleContinue = async () => {
@@ -161,22 +180,25 @@ const FillInBlankPage = () => {
       // Check if we need to show batch summary (after every 10 words)
       const currentProgress = currentWordIndex + 1;
       const wordsPerBatch = 10;
-      const needsBatchSummary = currentProgress % wordsPerBatch === 0 && currentProgress < words.length;
+      const needsBatchSummary =
+        currentProgress % wordsPerBatch === 0 && currentProgress < words.length;
 
       if (needsBatchSummary) {
         // Show batch summary
-        const batchSummary = await reviewService.getBatchSummary(session?.sessionId || sessionId);
-        
+        const batchSummary = await reviewService.getBatchSummary(
+          session?.sessionId || sessionId
+        );
+
         const targetListId = batchSummary.listId || listId || listInfo?.id;
         navigate(`/review/${targetListId}/batch-summary`, {
-          state: { 
+          state: {
             summary: batchSummary,
             sessionId: session?.sessionId || sessionId,
             listId: targetListId,
             listInfo,
             currentProgress,
-            sessionType: 'fill_blank' // Pass session type for correct navigation
-          }
+            sessionType: "fill_blank", // Pass session type for correct navigation
+          },
         });
         return;
       }
@@ -187,17 +209,19 @@ const FillInBlankPage = () => {
       } else {
         // End session and get summary
         setIsSessionCompleted(true);
-        const response = await reviewService.endSession(session?.sessionId || sessionId);
+        const response = await reviewService.endSession(
+          session?.sessionId || sessionId
+        );
         const summary = response.summary || response;
-        
+
         const targetListId = summary.listId || listId || listInfo?.id;
         toast("Fill-blank session completed!", "success");
         navigate(`/review/${targetListId}/summary`, {
-          state: { 
+          state: {
             summary,
             sessionId: session?.sessionId || sessionId,
             listId: targetListId,
-          }
+          },
         });
       }
     } catch (err) {
@@ -209,21 +233,25 @@ const FillInBlankPage = () => {
   const handleEndSession = async () => {
     try {
       if (session?.sessionId || sessionId) {
-        const isConfirmed = await confirm("Are you sure you want to end this session early?");
+        const isConfirmed = await confirm(
+          "Are you sure you want to end this session early?"
+        );
         if (!isConfirmed) return;
 
         setIsSessionCompleted(true);
-        const response = await reviewService.endSession(session?.sessionId || sessionId);
+        const response = await reviewService.endSession(
+          session?.sessionId || sessionId
+        );
         const summary = response.summary || response;
-        
+
         const targetListId = summary.listId || listId || listInfo?.id;
         toast("Session ended", "info");
         navigate(`/review/${targetListId}/summary`, {
-          state: { 
+          state: {
             summary,
             sessionId: session?.sessionId || sessionId,
             listId: targetListId,
-          }
+          },
         });
       } else {
         // No active session, just go back
@@ -304,7 +332,7 @@ const FillInBlankPage = () => {
             onDontKnow={handleDontKnow}
             onContinue={handleContinue}
             onEndSession={handleEndSession}
-            listTitle={listInfo?.title || ''}
+            listTitle={listInfo?.title || ""}
           />
         </div>
       </div>

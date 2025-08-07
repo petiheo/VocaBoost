@@ -1,138 +1,137 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 
 .create-classroom {
-    width: 100vw;
-    height: 100vh;
-    display: grid;
-    grid-template-rows: 10% 90%;
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 10% 90%;
 
-    &__content {
-        padding-top: 2em;
+  &__content {
+    padding-top: 2em;
 
-        grid-row: 2 / 3;
+    grid-row: 2 / 3;
 
-        display: flex;
-        gap: 2em;
+    display: flex;
+    gap: 2em;
+  }
+
+  &__header {
+    font-family: $font-lalezar;
+    font-size: 45px;
+    margin: 0;
+  }
+
+  &__form {
+    width: 75%;
+    margin: auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+
+    font-family: $font-inriasans;
+
+    .classroom-name {
+      width: 100%;
+      .input-error {
+        margin-left: 1rem;
+      }
     }
 
-    &__header {
-        font-family: $font-lalezar;
-        font-size: 45px;
-        margin: 0;
+    &--classroom-name {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #f1e8d0;
+      font-size: 1rem;
+      color: #2b2112;
     }
 
-    &__form {
-        width: 75%;
-        margin: auto;
-
-        display: flex;
-        flex-direction: column;
-        gap: 2em;
-
-        font-family: $font-inriasans;
-
-        .classroom-name{
-            width: 100%;
-            .input-error{
-                margin-left: 1rem;
-            }
-        }
-
-        &--classroom-name {
-            width: 100%;
-            padding: 1rem;
-            border: none;
-            border-radius: 10px;
-            background-color: #f1e8d0;
-            font-size: 1rem;
-            color: #2b2112;
-        }
-
-        &--description {
-            padding: 1rem;
-            border: none;
-            border-radius: 10px;
-            background-color: #f1e8d0;
-            font-size: 1rem;
-            color: #2b2112;
-        }
-
-        &::placeholder {
-            color: #857c6b;
-        }
-
-        &:disabled {
-            background-color: #f1e8d0;
-            color: #b0a78e;
-        }
-
-        &--limit{
-            padding: 5px;
-            border: none;
-            border-radius: 10px;
-            background-color: #f1e8d0;
-            font-size: 1rem;
-            color: #2b2112;
-            text-align: center;
-        }
-
-        &--submit {
-            align-self: flex-end;
-            padding: 0.75rem 1.5rem;
-            background-color: #2b2112;
-            color: #fff;
-            font-size: 1rem;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-
-            &:hover {
-                background-color: #1f180e;
-            }
-        }
+    &--description {
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #f1e8d0;
+      font-size: 1rem;
+      color: #2b2112;
     }
 
-    &__privacy-section {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    
-        justify-content: center;
-        text-align: center;
-    
-        &--label {
-            font-size: 20px;
-            font-weight: bold;
-            align-self: center;
-        }
-    
-        &--button {
-            display: flex;
-            gap: 1rem;
-    
-            button {
-                padding: 0.5rem 1.2rem;
-                border: none;
-                border-radius: 30px;
-                background-color: #fdf6e9;
-                cursor: pointer;
-                font-weight: 500;
-                transition: all 0.2s ease;
-    
-                &.active {
-                    background-color: #fddc8f;
-                    color: #2b2112;
-                }
-            }
-        }
+    &::placeholder {
+      color: #857c6b;
     }
 
-    &__limit-wrapper{
-        display: flex;
-        gap: 10px;
-        font-size: 20px;
-        font-weight: bold;
-
+    &:disabled {
+      background-color: #f1e8d0;
+      color: #b0a78e;
     }
+
+    &--limit {
+      padding: 5px;
+      border: none;
+      border-radius: 10px;
+      background-color: #f1e8d0;
+      font-size: 1rem;
+      color: #2b2112;
+      text-align: center;
+    }
+
+    &--submit {
+      align-self: flex-end;
+      padding: 0.75rem 1.5rem;
+      background-color: #2b2112;
+      color: #fff;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: #1f180e;
+      }
+    }
+  }
+
+  &__privacy-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    justify-content: center;
+    text-align: center;
+
+    &--label {
+      font-size: 20px;
+      font-weight: bold;
+      align-self: center;
+    }
+
+    &--button {
+      display: flex;
+      gap: 1rem;
+
+      button {
+        padding: 0.5rem 1.2rem;
+        border: none;
+        border-radius: 30px;
+        background-color: #fdf6e9;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+
+        &.active {
+          background-color: #fddc8f;
+          color: #2b2112;
+        }
+      }
+    }
+  }
+
+  &__limit-wrapper {
+    display: flex;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: bold;
+  }
 }

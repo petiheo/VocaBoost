@@ -3,23 +3,26 @@
  * @param {Object} validationErrors - The validation errors object
  * @param {string} formPrefix - The CSS class prefix for the form (e.g., 'create-list', 'edit-list')
  */
-export const scrollToFirstError = (validationErrors, formPrefix = 'create-list') => {
-  if (!validationErrors || typeof validationErrors !== 'object') {
+export const scrollToFirstError = (
+  validationErrors,
+  formPrefix = "create-list"
+) => {
+  if (!validationErrors || typeof validationErrors !== "object") {
     return;
   }
 
   // Priority order: title, description, then words
-  const errorPriority = ['title', 'description', 'words'];
-  
+  const errorPriority = ["title", "description", "words"];
+
   for (const errorType of errorPriority) {
     if (validationErrors[errorType]) {
-      if (errorType === 'words') {
+      if (errorType === "words") {
         // For word errors, find the first word with errors
         const wordErrors = validationErrors.words;
         const firstErrorWordIndex = Object.keys(wordErrors)
           .map(Number)
           .sort((a, b) => a - b)[0];
-        
+
         if (firstErrorWordIndex !== undefined) {
           scrollToWordError(firstErrorWordIndex, formPrefix);
           return;
@@ -58,7 +61,7 @@ const scrollToFieldError = (fieldName, formPrefix) => {
       return;
     }
   }
-  
+
   console.warn(`Could not find element for field: ${fieldName}`);
 };
 
@@ -82,16 +85,16 @@ const scrollToWordError = (wordIndex, formPrefix) => {
       // For input elements, scroll to the parent word box if available
       const wordBox = element.closest(`.${formPrefix}__word-box`);
       scrollToElement(wordBox || element);
-      
+
       // Also focus the first input in the word box for better UX
-      const firstInput = (wordBox || element).querySelector('input, textarea');
+      const firstInput = (wordBox || element).querySelector("input, textarea");
       if (firstInput && firstInput.focus) {
         setTimeout(() => firstInput.focus(), 100);
       }
       return;
     }
   }
-  
+
   console.warn(`Could not find element for word at index: ${wordIndex}`);
 };
 
@@ -103,25 +106,25 @@ const scrollToElement = (element) => {
   if (!element) return;
 
   // Tính offset để tránh che bởi header
-  const headerOffset = 100; // Chỉnh theo height của header 
+  const headerOffset = 100; // Chỉnh theo height của header
   const elementPosition = element.getBoundingClientRect().top;
   const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
   // Smooth scroll to the element
   window.scrollTo({
     top: offsetPosition,
-    behavior: 'smooth'
+    behavior: "smooth",
   });
 
   // Add a subtle highlight effect
-  element.style.transition = 'box-shadow 0.3s ease';
-  element.style.boxShadow = '0 0 10px rgba(255, 193, 7, 0.5)';
-  
+  element.style.transition = "box-shadow 0.3s ease";
+  element.style.boxShadow = "0 0 10px rgba(255, 193, 7, 0.5)";
+
   // Remove highlight after animation
   setTimeout(() => {
-    element.style.boxShadow = '';
+    element.style.boxShadow = "";
     setTimeout(() => {
-      element.style.transition = '';
+      element.style.transition = "";
     }, 300);
   }, 2000);
 };

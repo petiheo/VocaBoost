@@ -4,13 +4,13 @@ const tabs = [
   { name: "Assignments", route: "/classroom/assignment-page" },
   {
     name: "Learners",
-    route:  "/classroom/learners-list",
+    route: "/classroom/learners-list",
     matchRoutes: [
       "/classroom/pending-request",
       "/classroom/learners-list",
       "/classroom/approve-join-classroom-request",
       "/classroom/add-students",
-    ]
+    ],
   },
 ];
 
@@ -45,4 +45,3 @@ export default function TeacherClassroomMenuTab() {
     </div>
   );
 }
-

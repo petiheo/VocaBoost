@@ -4,10 +4,10 @@
  * @returns {string} - The decoded string
  */
 export const decodeHtmlEntities = (str) => {
-  if (!str || typeof str !== 'string') return str;
-  
+  if (!str || typeof str !== "string") return str;
+
   // Create a temporary DOM element to decode HTML entities
-  const textArea = document.createElement('textarea');
+  const textArea = document.createElement("textarea");
   textArea.innerHTML = str;
   return textArea.value;
 };
@@ -19,19 +19,23 @@ export const decodeHtmlEntities = (str) => {
  */
 export const decodeVocabularyData = (word) => {
   if (!word) return word;
-  
+
   return {
     ...word,
     term: decodeHtmlEntities(word.term),
     definition: decodeHtmlEntities(word.definition),
     translation: decodeHtmlEntities(word.translation),
-    vocabulary_examples: word.vocabulary_examples ? {
-      ...word.vocabulary_examples,
-      example_sentence: decodeHtmlEntities(word.vocabulary_examples.example_sentence)
-    } : word.vocabulary_examples,
-    synonyms: Array.isArray(word.synonyms) 
+    vocabulary_examples: word.vocabulary_examples
+      ? {
+          ...word.vocabulary_examples,
+          example_sentence: decodeHtmlEntities(
+            word.vocabulary_examples.example_sentence
+          ),
+        }
+      : word.vocabulary_examples,
+    synonyms: Array.isArray(word.synonyms)
       ? word.synonyms.map(decodeHtmlEntities)
-      : word.synonyms
+      : word.synonyms,
   };
 };
 

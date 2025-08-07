@@ -74,14 +74,19 @@ const verifyRefreshToken = async (token) => {
   return jwt.verify(token, JWT_REFRESH_SECRET);
 };
 
-const blacklistToken = async (token, tokenType = 'access', userId = null, reason = 'logout') => {
+const blacklistToken = async (
+  token,
+  tokenType = 'access',
+  userId = null,
+  reason = 'logout'
+) => {
   try {
     // Decode token to get expiry and user info
     const decoded = jwt.decode(token);
     if (!decoded || !decoded.exp) {
       return false;
     }
-    
+
     const userIdFromToken = userId || decoded.userId || decoded.sub;
     await TokenBlacklistModel.addToBlacklist(
       token,
@@ -103,13 +108,13 @@ const refreshAccessToken = async (refreshToken) => {
     const newPayload = {
       userId: decoded.userId,
       email: decoded.email,
-      role: decoded.role
+      role: decoded.role,
     };
-    
+
     // Optional: Rotate refresh token (invalidate old one, issue new one)
     // This provides additional security but requires frontend changes
     // await blacklistToken(refreshToken, 'refresh', decoded.userId, 'refresh_rotation');
-    
+
     return generateToken(newPayload);
   } catch (error) {
     throw new Error('Invalid refresh token');

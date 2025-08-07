@@ -1,157 +1,154 @@
 .review {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #fffcf7;
+  font-family: "Inria sans", sans-serif;
+  color: #352d24;
+
+  &__content {
     display: flex;
+    flex: 1;
     flex-direction: column;
-    height: 100vh;
-    background-color: #FFFCF7; 
-    font-family: 'Inria sans', sans-serif;
-    color: #352D24;
-    
-    &__content {
-        display: flex;
-        flex: 1;
-        flex-direction: column;
-        align-items: center;
-    }
+    align-items: center;
+  }
 
-    &__main {
-        flex: 1;
-        width: 90%;
-        height: 90%;
-        background-color: #F8F3E8; 
-        border-radius: 3rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 5rem;
-        padding: 2rem;
-    }
+  &__main {
+    flex: 1;
+    width: 90%;
+    height: 90%;
+    background-color: #f8f3e8;
+    border-radius: 3rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 5rem;
+    padding: 2rem;
+  }
 
-    &__title {
-        font-size: 2.8rem;
-        font-family: 'Lalezar', 'sans-serif';
-        font-weight: normal;
-        margin-left: 5rem;
-    }
+  &__title {
+    font-size: 2.8rem;
+    font-family: "Lalezar", "sans-serif";
+    font-weight: normal;
+    margin-left: 5rem;
+  }
 
-    &__header {
-        margin-bottom: 2rem;
-    }
+  &__header {
+    margin-bottom: 2rem;
+  }
 
+  &__list-title {
+    font-family: "Lalezar", sans-serif;
+    color: #352d24;
+    font-size: 2.6rem;
+    font-weight: normal;
+    margin: 0rem;
+  }
 
-    &__list-title {
-        font-family: 'Lalezar', sans-serif;
-        color: #352D24;
-        font-size: 2.6rem;
-        font-weight: normal;
-        margin: 0rem;
-    }
-
-    &__tags {
+  &__tags {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-bottom: 1rem;
+  }
+
+  &__tag {
+    background-color: #ffeab6;
+    color: #2a1e17;
+    border: 1px solid #d5962c;
+    border-radius: 999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  &__creator {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #8c8c8c;
+    margin-bottom: 0.5rem;
+  }
+
+  &__information {
+    .stats {
+      display: flex;
+      align-items: first baseline;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
     }
 
-    &__tag {
-        background-color: #FFEAB6;
-        color: #2a1e17;
-        border: 1px solid #d5962c;
-        border-radius: 999px;
-        padding: 0.25rem 0.75rem;
-        font-size: 0.9rem;
-        font-weight: 500;
+    .sub-title {
+      font-family: "Lalezar", sans-serif;
+      font-size: 1.2rem;
+      font-weight: normal;
+      color: #352d24;
+      margin-bottom: 0.3rem;
     }
 
-
-    &__creator {
-        font-size: 1rem;
-        font-weight: bold;
-        color: #8C8C8C;
-        margin-bottom: 0.5rem;
+    .sub-content {
+      font-size: 1rem;
+      color: #352d24;
+      margin-bottom: 1rem;
     }
+  }
 
-    &__information {
+  &__methods {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 1rem;
+  }
 
-        .stats {
-            display: flex;
-            align-items: first baseline;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
+  &__dropdownWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
 
-        .sub-title {
-            font-family: 'Lalezar', sans-serif;
-            font-size: 1.2rem;
-            font-weight: normal;
-            color: #352D24;
-            margin-bottom: 0.3rem;
-        }
+  &__methods select {
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 0.05rem solid #2a1e17;
+    margin: 1rem 1rem;
+    background-color: transparent;
+    height: 2.5rem;
+    padding: 0.5rem;
+    appearance: none;
+    width: 15rem;
 
-        .sub-content {
-            font-size: 1rem;
-            color: #352D24;
-            margin-bottom: 1rem;
-        }
+    option {
+      background-color: #f8f3e8;
     }
+  }
 
-    &__methods {
-        display: flex;
-        justify-content: left;
-        align-items: center;
-        gap: 1rem;
+  &__start {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+  }
+
+  &__start-button {
+    background-color: #3f3122;
+    color: #fffcf7;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background-color: #1e150f;
     }
-
-    &__dropdownWrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    &__methods select {
-        font-size: 1rem;
-        border-radius: 6px;
-        border: 0.05rem solid #2a1e17;
-        margin: 1rem 1rem;
-        background-color: transparent;
-        height: 2.5rem;
-        padding: 0.5rem;
-        appearance: none;
-        width: 15rem;
-
-        option {
-            background-color: #F8F3E8;
-        }
-    }
-
-    &__start {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 1rem;
-    }
-
-    &__start-button {
-        background-color: #3f3122;
-        color: #FFFCF7;
-        font-size: 1rem;
-        font-weight: bold;
-        padding: 0.75rem 1.5rem;
-        border: none;
-        border-radius: 2rem;
-        cursor: pointer;
-        transition: background 0.2s;
-
-        &:hover {
-            background-color: #1e150f;
-        }
-    }
+  }
 }
 
 .dropdown__icon {
-    position: absolute;
-    right: 1.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0.8rem;
-    height: 0.8rem;
-    pointer-events: none; 
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.8rem;
+  height: 0.8rem;
+  pointer-events: none;
 }

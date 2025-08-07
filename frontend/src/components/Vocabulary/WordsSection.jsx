@@ -1,5 +1,5 @@
-import React from 'react';
-import WordCard from './WordCard.jsx';
+import React from "react";
+import WordCard from "./WordCard.jsx";
 
 const WordsSection = ({
   words,
@@ -16,7 +16,7 @@ const WordsSection = ({
   return (
     <>
       <h1 className="create-list__header">Add words</h1>
-      
+
       {selectedWordIds.size > 0 && (
         <div className="create-list__delete-wrapper">
           <button
@@ -28,7 +28,7 @@ const WordsSection = ({
           </button>
         </div>
       )}
-      
+
       <div className="create-list__word-list">
         {words.map((word, index) => (
           <WordCard

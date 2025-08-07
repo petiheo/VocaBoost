@@ -1,5 +1,5 @@
-import React from 'react';
-import WordInput from '../Forms/WordInput.jsx';
+import React from "react";
+import WordInput from "../Forms/WordInput.jsx";
 
 const WordCard = ({
   word,
@@ -40,9 +40,7 @@ const WordCard = ({
       data-word-index={index}
     >
       <div className={`${classPrefix}__word-box--header`}>
-        <div className={`${classPrefix}__word-box--index`}>
-          {index + 1}
-        </div>
+        <div className={`${classPrefix}__word-box--index`}>{index + 1}</div>
         <button
           className={`${classPrefix}__word-box--remove`}
           type="button"
@@ -53,7 +51,7 @@ const WordCard = ({
       </div>
 
       <hr className={`${classPrefix}__word-box--divider`} />
-      
+
       {/* First Row */}
       <div className={`${classPrefix}__word-box--row`}>
         <div className={`${classPrefix}__word-box--field`}>
@@ -139,14 +137,16 @@ const WordCard = ({
             type="text"
             placeholder="Enter an example sentence (optional)"
             value={word.exampleSentence || ""}
-            onChange={(e) => onWordChange(index, "exampleSentence", e.target.value)}
+            onChange={(e) =>
+              onWordChange(index, "exampleSentence", e.target.value)
+            }
             required={false}
             errors={validationErrors?.words?.[index]?.exampleSentence}
             classPrefix={classPrefix}
           />
         </div>
-        <button 
-          type="button" 
+        <button
+          type="button"
           className={`${classPrefix}__ai-btn`}
           onClick={() => onGenerateExample(index)}
           disabled={isGeneratingExample}

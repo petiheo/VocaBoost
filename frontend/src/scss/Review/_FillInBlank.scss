@@ -1,12 +1,12 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 
 .fill-blank {
   display: flex;
   flex-direction: column;
   flex: 1;
-  background-color: #FFFCF7;
-  font-family: 'Inder', sans-serif;
-  color: #352D24;
+  background-color: #fffcf7;
+  font-family: "Inder", sans-serif;
+  color: #352d24;
 
   &__header {
     display: flex;
@@ -18,15 +18,15 @@
 
   &__title {
     font-size: 2rem;
-    font-family: 'Lalezar', sans-serif;
+    font-family: "Lalezar", sans-serif;
     font-weight: normal;
-    color: #352D24;
+    color: #352d24;
     margin: 0;
   }
 
   &__progress {
     font-size: 1.5rem;
-    color: #352D24;
+    color: #352d24;
     font-weight: 500;
   }
 
@@ -40,7 +40,7 @@
   }
 
   &__question-container {
-    background: #F3EDDF;
+    background: #f3eddf;
     border-radius: 20px;
     padding: 3rem;
     max-width: 900px;
@@ -57,7 +57,7 @@
   &__question {
     font-size: 1.25rem;
     line-height: 1.8;
-    color: #352D24;
+    color: #352d24;
     margin-bottom: 2.5rem;
     text-align: left;
   }
@@ -69,7 +69,7 @@
   &__label {
     display: block;
     font-size: 1.1rem;
-    color: #352D24;
+    color: #352d24;
     margin-bottom: 1rem;
     font-weight: 500;
   }
@@ -80,24 +80,24 @@
     font-size: 1.2rem;
     border: 2px solid transparent;
     border-radius: 12px;
-    background: #FFFCF7;
-    color: #352D24;
+    background: #fffcf7;
+    color: #352d24;
     transition: all 0.3s ease;
-    font-family: 'Inder', sans-serif;
+    font-family: "Inder", sans-serif;
 
     &:focus {
       outline: none;
-      border-color: #FFE1A1;
+      border-color: #ffe1a1;
       box-shadow: 0 0 0 3px rgba(255, 225, 161, 0.2);
     }
 
     &::placeholder {
-      color: #8B7E6B;
+      color: #8b7e6b;
       opacity: 0.7;
     }
 
     &--disabled {
-      background: #E8E2D4;
+      background: #e8e2d4;
       cursor: not-allowed;
       opacity: 0.7;
     }
@@ -118,7 +118,7 @@
     border-radius: 30px;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-family: 'Inria Sans', sans-serif;
+    font-family: "Inria Sans", sans-serif;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
     &:hover:not(:disabled) {
@@ -136,31 +136,31 @@
     }
 
     &--primary {
-      background: #3F3122;
-      color: #FFFCF7;
+      background: #3f3122;
+      color: #fffcf7;
 
       &:hover:not(:disabled) {
-        background: #2A2018;
+        background: #2a2018;
       }
     }
 
     &--secondary {
-      background: #F3EDDF;
-      color: #352D24;
+      background: #f3eddf;
+      color: #352d24;
 
       &:hover:not(:disabled) {
-        background: #E6DFD0;
+        background: #e6dfd0;
       }
     }
 
     &--continue {
-      background: #3F3122;
-      color: #FFFCF7;
+      background: #3f3122;
+      color: #fffcf7;
       padding: 1rem 3rem;
       font-size: 1.2rem;
 
       &:hover {
-        background: #2A2018;
+        background: #2a2018;
       }
     }
   }
@@ -170,24 +170,24 @@
     padding: 1.5rem;
     border-radius: 12px;
     animation: slideIn 0.4s ease forwards;
-    
+
     &--correct {
-      background: #D4F4DD;
-      border: 2px solid #52C41A;
+      background: #d4f4dd;
+      border: 2px solid #52c41a;
       color: #135200;
 
       .fill-blank__feedback-icon {
-        color: #52C41A;
+        color: #52c41a;
       }
     }
 
     &--incorrect {
-      background: #FFE4E6;
-      border: 2px solid #FF4D4F;
-      color: #5C0011;
+      background: #ffe4e6;
+      border: 2px solid #ff4d4f;
+      color: #5c0011;
 
       .fill-blank__feedback-icon {
-        color: #FF4D4F;
+        color: #ff4d4f;
       }
     }
   }
@@ -235,15 +235,15 @@
     animation: fadeIn 0.3s ease forwards;
     gap: 1rem;
     width: 100%;
-    
+
     .fill-blank__submit-button {
       margin-left: auto;
     }
-    
+
     // When continue button is shown, reset margin and use space-between
     &--with-continue {
       justify-content: space-between;
-      
+
       .fill-blank__submit-button {
         margin-left: 0;
       }
@@ -251,10 +251,10 @@
   }
 
   &__submit-button {
-    background-color: #3F3122;
-    color: #FFFCF7;
+    background-color: #3f3122;
+    color: #fffcf7;
     font-size: 1.2rem;
-    font-family: 'Inria Sans', sans-serif;
+    font-family: "Inria Sans", sans-serif;
     font-weight: bold;
     padding: 1rem 3rem;
     border: none;
@@ -263,7 +263,7 @@
     transition: all 0.3s ease;
 
     &:hover {
-      background-color: #2A2018;
+      background-color: #2a2018;
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
@@ -310,7 +310,7 @@
       flex-direction: column;
       gap: 1rem;
       align-items: stretch;
-      
+
       .fill-blank__button--continue,
       .fill-blank__submit-button {
         width: 100%;
@@ -341,7 +341,7 @@
 
     &__actions {
       flex-direction: column;
-      
+
       .fill-blank__button {
         width: 100%;
       }

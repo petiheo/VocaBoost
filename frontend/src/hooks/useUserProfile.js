@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../services/Auth/authContext";
 import { useToast } from "../components/Providers/ToastProvider";
 import userService from "../services/User/userService";
@@ -57,7 +57,7 @@ export function useUserProfile() {
       }
 
       // Reset form data with updated values
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         avatarFile: null,
         avatarPreview: null,
@@ -69,7 +69,7 @@ export function useUserProfile() {
         avatarUrl: updatedData.data.avatar_url,
       };
       setUser(updatedUser);
-      
+
       // Also update localStorage so header updates immediately
       localStorage.setItem("user", JSON.stringify(updatedUser));
       return true;

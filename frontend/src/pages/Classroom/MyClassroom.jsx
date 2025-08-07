@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react";
-import { Header, Footer, SideBar, ClassroomCardSkeleton } from "../../components/index";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import classroomService from "../../services/Classroom/classroomService";
-import { useAuth } from "../../services/Auth/authContext";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  ClassroomCardSkeleton,
+  Footer,
+  Header,
+  SideBar,
+} from "../../components/index";
 import SeeMoreSection from "../../components/Classroom/SeeMoreSection";
+import { useAuth } from "../../services/Auth/authContext";
+import classroomService from "../../services/Classroom/classroomService";
 
-
-const tabs = [
-  { name: "Teaching" },
-  { name: "Joined" },
-];
+const tabs = [{ name: "Teaching" }, { name: "Joined" }];
 
 export default function MyClassroomPage() {
   const [classrooms, setClassrooms] = useState([]);
@@ -18,16 +19,14 @@ export default function MyClassroomPage() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
-
   // Lấy pathname hiện tại, ví dụ: "/my-classroom"
   const [currentTab, setCurrentTab] = useState("Teaching");
-
 
   useEffect(() => {
     const fetchClassroom = async () => {
       try {
         setLoading(true);
-        let apiCall
+        let apiCall;
         // Trường hợp là giáo viên
         if (user?.role === "teacher") {
           let res;
@@ -39,14 +38,14 @@ export default function MyClassroomPage() {
             case "Joined":
               apiCall = classroomService.getMyJoined();
               console.log("Fetching JOINED classrooms for teacher...");
-              break
+              break;
             default:
               setClassrooms([]);
               console.log("Error - Do not know currentTab");
               return;
           }
-
-        } else if (user?.role === "learner") { // Trường hợp là học sinh
+        } else if (user?.role === "learner") {
+          // Trường hợp là học sinh
           apiCall = classroomService.getMyJoined();
           console.log("Fetching JOINED classrooms for learner...");
         }
@@ -55,12 +54,10 @@ export default function MyClassroomPage() {
 
           if (res.success && Array.isArray(res.data)) {
             setClassrooms(res.data);
-          }
-          else {
+          } else {
             setClassrooms([]);
           }
-        }
-        else {
+        } else {
           setClassrooms([]);
         }
       } catch (error) {
@@ -69,19 +66,18 @@ export default function MyClassroomPage() {
       } finally {
         setLoading(false);
       }
-    }
+    };
     fetchClassroom();
-  }, [currentTab])
+  }, [currentTab]);
 
   return (
     <div className="my-classroom">
       <Header />
       <div className="my-classroom-container">
         <div className="my-classroom-sidebar">
-            <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
+          <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         </div>
         <div className="my-classroom-page">
-
           <h1>My Classroom</h1>
 
           {user.role === "teacher" && (
@@ -102,9 +98,13 @@ export default function MyClassroomPage() {
 
           {/* Actions */}
           <div className="actions">
-            <Link to="/join-classroom-page" className="btn light">Join Classroom</Link>
+            <Link to="/join-classroom-page" className="btn light">
+              Join Classroom
+            </Link>
             {user?.role === "teacher" && (
-              <Link to="/create-classroom" className="btn dark">+ Create New Classroom</Link>
+              <Link to="/create-classroom" className="btn dark">
+                + Create New Classroom
+              </Link>
             )}
             <span className="total">All classrooms: {classrooms.length} </span>
           </div>
@@ -124,18 +124,28 @@ export default function MyClassroomPage() {
                 <SeeMoreSection
                   items={classrooms}
                   renderItem={(item, index) => (
-                    <div className="classroom-card" key={item.id}
+                    <div
+                      className="classroom-card"
+                      key={item.id}
                       onClick={() => {
-                        localStorage.setItem("selectedClassroom", JSON.stringify(item)) // luu thông tin của classroom được chọn
+                        localStorage.setItem(
+                          "selectedClassroom",
+                          JSON.stringify(item)
+                        ); // luu thông tin của classroom được chọn
                         // Điều hướng
-                        {user?.role === "teacher" ? (
-                          navigate(`/classroom/learners-list`)
-                        ):(navigate(`/view-classroom`))}
+                        {
+                          user?.role === "teacher"
+                            ? navigate(`/classroom/learners-list`)
+                            : navigate(`/view-classroom`);
+                        }
                       }}
                       style={{ cursor: "pointer" }}
                     >
                       <div className="info">
-                        <span>{item.assignment_count} assignments | {item.learner_count} members</span>
+                        <span>
+                          {item.assignment_count} assignments |{" "}
+                          {item.learner_count} members
+                        </span>
                         <h3>{item.name}</h3>
                       </div>
                     </div>
@@ -152,7 +162,5 @@ export default function MyClassroomPage() {
       </div>
       <Footer />
     </div>
-
   );
 }
-

@@ -1,4 +1,4 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 
 .join-classroom {
   min-height: 100vh;
@@ -12,12 +12,11 @@
   }
 
   &.error-bg {
-    background-color: #F6CFCF;
+    background-color: #f6cfcf;
     background-image: url("./assets/Classroom/join_classroom_error.svg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-
   }
 
   &__card {
@@ -47,7 +46,7 @@
   &__message {
     font-family: $font-inriasans;
     font-size: 15px;
-    color: #2A1E17;
+    color: #2a1e17;
     margin-bottom: 1rem;
   }
 
@@ -87,7 +86,7 @@
     }
 
     &:active {
-      background-color: #D6D6D6;
+      background-color: #d6d6d6;
       border-radius: 10px;
     }
   }

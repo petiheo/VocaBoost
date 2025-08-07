@@ -5,7 +5,7 @@ let tokenExpirationCache = {
   token: null,
   expiry: null,
   isExpired: true,
-  lastChecked: null
+  lastChecked: null,
 };
 
 const authService = {
@@ -61,9 +61,8 @@ const authService = {
   },
 
   // 5. Quên mật khẩu
-  forgotPassword: async (email) => {
-    return await api.post("/auth/forgot-password", { email });
-  },
+  forgotPassword: async (email) =>
+    await api.post("/auth/forgot-password", { email }),
 
   // 7. Đặt lại mật khẩu
   resetPassword: async (token, newPassword) => {
@@ -73,8 +72,8 @@ const authService = {
       );
     }
     const res = await api.post("/auth/reset-password", {
-      token: token,
-      newPassword: newPassword,
+      token,
+      newPassword,
     });
     return res.data;
   },
@@ -87,7 +86,7 @@ const authService = {
 
   // 9. Get account status
   getAccountStatus: async (email) => {
-    const res = await api.post("/auth/get-account-status", { email: email });
+    const res = await api.post("/auth/get-account-status", { email });
     return res.data;
   },
 
@@ -109,7 +108,7 @@ const authService = {
         },
       });
       return res.data;
-    } catch (error) {
+    } catch {
       // Token is invalid, clear it and redirect
       authService.clearSession();
       return null;
@@ -117,7 +116,7 @@ const authService = {
   },
 
   // Enhanced session management
-  clearSession: (showNotification = false, reason = 'logout') => {
+  clearSession: (showNotification = false, reason = "logout") => {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
@@ -170,18 +169,18 @@ const authService = {
         token,
         expiry: payload.exp,
         isExpired,
-        lastChecked: currentTime
+        lastChecked: currentTime,
       };
 
       return isExpired;
-    } catch (error) {
+    } catch {
       // If we can't decode the token, assume it's valid and let server validate
       // This prevents clearing sessions during OAuth flows with different token formats
       tokenExpirationCache = {
         token,
         expiry: null,
         isExpired: false,
-        lastChecked: currentTime
+        lastChecked: currentTime,
       };
       return false;
     }
@@ -189,18 +188,18 @@ const authService = {
 
   getToken: () => localStorage.getItem("token"),
   getRefreshToken: () => localStorage.getItem("refreshToken"),
-  
+
   getCurrentUser: () => {
     try {
       const userStr = localStorage.getItem("user");
       return userStr ? JSON.parse(userStr) : null;
-    } catch (e) {
+    } catch {
       return null;
     }
   },
-  
+
   isAuthenticated: () => !!localStorage.getItem("token"),
-  
+
   // Refresh the access token using refresh token
   refreshAccessToken: async () => {
     try {
@@ -208,9 +207,9 @@ const authService = {
       if (!refreshToken) {
         throw new Error("No refresh token available");
       }
-      
+
       const res = await api.post("/auth/refresh-token", { refreshToken });
-      
+
       if (res.data.success) {
         const newToken = res.data.data.token;
         localStorage.setItem("token", newToken);
@@ -218,11 +217,11 @@ const authService = {
         tokenExpirationCache.token = null;
         return newToken;
       }
-      
+
       throw new Error("Failed to refresh token");
     } catch (error) {
       // If refresh fails, clear session
-      authService.clearSession(true, 'expired');
+      authService.clearSession(true, "expired");
       throw error;
     }
   },

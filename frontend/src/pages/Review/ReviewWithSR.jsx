@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Header, SideBar, Footer } from "../../components";
+import { useNavigate, useParams } from "react-router-dom";
+import { Footer, Header, SideBar } from "../../components";
 import reviewService from "../../services/Review/reviewService";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
 import { useToast } from "../../components/Providers/ToastProvider.jsx";
-import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
 import { DropdownIcon } from "../../assets/Vocabulary/index.jsx";
 
 export default function ReviewWithSR() {
   const { listId } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
-  const confirm = useConfirm();
   const [isOpen, setIsOpen] = useState(false);
 
   const [listInfo, setListInfo] = useState(null);
@@ -43,17 +41,22 @@ export default function ReviewWithSR() {
 
   const handleStartReview = async () => {
     try {
-      console.log("Starting review for listId:", listId, "method:", reviewMethod);
-      
+      console.log(
+        "Starting review for listId:",
+        listId,
+        "method:",
+        reviewMethod
+      );
+
       // Navigate directly for specific methods without session
       if (reviewMethod === "Flashcard") {
         navigate(`/review/${listId}/flashcard`, {
-          state: { method: reviewMethod, listInfo }
+          state: { method: reviewMethod, listInfo },
         });
         return;
       } else if (reviewMethod === "Fill in the blank") {
         navigate(`/review/${listId}/fill-in-blank`, {
-          state: { method: reviewMethod, listInfo }
+          state: { method: reviewMethod, listInfo },
         });
         return;
       }
@@ -72,10 +75,7 @@ export default function ReviewWithSR() {
           sessionType = "flashcard";
       }
 
-      const requestData = {
-        listId: listId,
-        sessionType: sessionType,
-      };
+      const requestData = { listId, sessionType };
       console.log("Request data:", requestData);
 
       let sessionResponse;
@@ -85,7 +85,10 @@ export default function ReviewWithSR() {
 
         // Check if backend automatically switched to practice mode
         if (sessionResponse.session.practiceMode && !requestData.practiceMode) {
-          toast("No due words found. Starting practice mode with all words.", "success");
+          toast(
+            "No due words found. Starting practice mode with all words.",
+            "success"
+          );
         }
       } catch (error) {
         console.log("Error starting session:", error);
@@ -93,14 +96,14 @@ export default function ReviewWithSR() {
           message: error.message,
           response: error.response,
           status: error.response?.status,
-          data: error.response?.data
+          data: error.response?.data,
         });
-        
+
         // If no words in list at all, offer practice mode choice
-        const isNoWordsError = 
-          error.message?.includes('has no words to practice') ||
-          error.response?.data?.message?.includes('has no words to practice');
-        
+        const isNoWordsError =
+          error.message?.includes("has no words to practice") ||
+          error.response?.data?.message?.includes("has no words to practice");
+
         if (isNoWordsError) {
           toast("This list has no words to practice.", "error");
           return;
@@ -108,10 +111,10 @@ export default function ReviewWithSR() {
           throw error; // Re-throw if it's a different error
         }
       }
-      
+
       // Navigate to the actual review interface
       navigate(`/review/session/${sessionResponse.session.sessionId}`, {
-        state: { method: reviewMethod, listInfo }
+        state: { method: reviewMethod, listInfo },
       });
     } catch (err) {
       console.error("Error starting review session:", err);
@@ -143,9 +146,7 @@ export default function ReviewWithSR() {
         <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         <div className="review__content">
           <div className="review__main">
-            <p className="error">
-              {error || "Vocabulary list not found"}
-            </p>
+            <p className="error">{error || "Vocabulary list not found"}</p>
           </div>
         </div>
         <Footer />
@@ -166,31 +167,39 @@ export default function ReviewWithSR() {
             {listInfo.tags && listInfo.tags.length > 0 && (
               <div className="review__tags">
                 {listInfo.tags.map((tag, index) => (
-                  <span key={index} className="review__tag">{tag}</span>
+                  <span key={index} className="review__tag">
+                    {tag}
+                  </span>
                 ))}
               </div>
             )}
             <div className="review__creator">
-              <div>Created by: {listInfo.created_by?.full_name || "Unknown"}</div>
+              <div>
+                Created by: {listInfo.created_by?.full_name || "Unknown"}
+              </div>
             </div>
           </div>
 
           <div className="review__information">
-            <div className='sub-title'>Description</div> 
-            <div className='sub-content'>{listInfo.description || "No description available"}</div>
-            <div className='stats'>
-              <div className='sub-title'>Total words:</div> 
-              <div className='sub-content'>{listInfo.word_count || 0} words</div>
+            <div className="sub-title">Description</div>
+            <div className="sub-content">
+              {listInfo.description || "No description available"}
+            </div>
+            <div className="stats">
+              <div className="sub-title">Total words:</div>
+              <div className="sub-content">
+                {listInfo.word_count || 0} words
+              </div>
             </div>
           </div>
 
           <div className="review__methods">
             <div className="review__information">
-              <div className='sub-title'>Method:</div>
+              <div className="sub-title">Method:</div>
             </div>
             <div className="review__dropdownWrapper">
-              <select 
-                value={reviewMethod} 
+              <select
+                value={reviewMethod}
                 onChange={(e) => setReviewMethod(e.target.value)}
               >
                 {reviewMethods.map((method) => (
@@ -199,13 +208,20 @@ export default function ReviewWithSR() {
                   </option>
                 ))}
               </select>
-              <img src={DropdownIcon} alt="DropdownIcon" className="dropdown__icon"/>
+              <img
+                src={DropdownIcon}
+                alt="DropdownIcon"
+                className="dropdown__icon"
+              />
             </div>
           </div>
 
           <div className="review__start">
-            <button className="review__start-button" onClick={handleStartReview}>
-              Start Review Session    
+            <button
+              className="review__start-button"
+              onClick={handleStartReview}
+            >
+              Start Review Session
             </button>
           </div>
         </div>

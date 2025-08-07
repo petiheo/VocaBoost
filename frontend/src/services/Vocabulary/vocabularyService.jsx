@@ -18,15 +18,15 @@ const vocabularyService = {
   searchPublicLists: async (params = {}) => {
     const res = await api.get("/vocabulary/search", { params });
     return {
-        lists: res.data.data.lists || [],
-        pagination: res.data.data.pagination || {}
+      lists: res.data.data.lists || [],
+      pagination: res.data.data.pagination || {},
     };
   },
 
   // 4. Lấy chi tiết một danh sách
   getListById: async (listId) => {
     const res = await api.get(`/vocabulary/lists/${listId}`); //  sửa endpoint
-    return res.data.data.list ||{};
+    return res.data.data.list || {};
   },
 
   // 5. Cập nhật danh sách
@@ -58,7 +58,10 @@ const vocabularyService = {
   // 9. Thêm nhiều từ
   createWordsBulk: async (data) => {
     if (!data.listId || !data.words || !Array.isArray(data.words)) return;
-    const res = await api.post(`/vocabulary/lists/${data.listId}/words-bulk`, data); //  đúng format bulk
+    const res = await api.post(
+      `/vocabulary/lists/${data.listId}/words-bulk`,
+      data
+    ); //  đúng format bulk
     return res.data.data;
   },
 
@@ -95,86 +98,89 @@ const vocabularyService = {
   // 14. Generate example sentences
   generateExample: async (wordId, data) => {
     if (wordId) {
-      const res = await api.post(`/vocabulary/words/${wordId}/generate-example`, data);
+      const res = await api.post(
+        `/vocabulary/words/${wordId}/generate-example`,
+        data
+      );
       return res.data;
     }
-    
+
     const res = await api.post(`/vocabulary/generate-example`, {
       term: data.term,
       definition: data.definition,
-      context: data.context
+      context: data.context,
     });
     return res.data;
   },
   // 15. Get Recently Viewed Lists
   getHistoryLists: async (params = {}) => {
     try {
-        const response = await api.get("/vocabulary/lists/history", { params });
-        if (response.data && response.data.success && response.data.data) {
-            return {
-                lists: response.data.data.lists || [],
-                pagination: response.data.pagination || {}
-            };
-        } else {
-            throw new Error(response.data.message || 'Invalid API response.');
-        }
+      const response = await api.get("/vocabulary/lists/history", { params });
+      if (response.data && response.data.success && response.data.data) {
+        return {
+          lists: response.data.data.lists || [],
+          pagination: response.data.pagination || {},
+        };
+      } else {
+        throw new Error(response.data.message || "Invalid API response.");
+      }
     } catch (error) {
-        console.error("API Error in getHistoryLists:", error);
-        throw error;
+      console.error("API Error in getHistoryLists:", error);
+      throw error;
     }
   },
 
   // 16. Get Popular Lists
   getPopularLists: async (params = {}) => {
     try {
-        const response = await api.get("/vocabulary/lists/popular", { params });
-        if (response.data && response.data.success && response.data.data) {
-            return {
-                lists: response.data.data.lists || [],
-                pagination: response.data.pagination || {}
-            };
-        } else {
-            throw new Error(response.data.message || 'Invalid API response.');
-        }
+      const response = await api.get("/vocabulary/lists/popular", { params });
+      if (response.data && response.data.success && response.data.data) {
+        return {
+          lists: response.data.data.lists || [],
+          pagination: response.data.pagination || {},
+        };
+      } else {
+        throw new Error(response.data.message || "Invalid API response.");
+      }
     } catch (error) {
-        console.error("API Error in getPopularLists:", error);
-        throw error;
+      console.error("API Error in getPopularLists:", error);
+      throw error;
     }
   },
 
   // 17. Get Lists with Due Words (cho tab "Today")
   getDueLists: async (params = {}) => {
     try {
-        const response = await api.get("/review/lists/due", { params });
-        if (response.data && response.data.success && response.data.data) {
-            return {
-                lists: response.data.data.listsWithDueWords || [],
-                pagination: response.data.pagination || {}
-            };
-        } else {
-            throw new Error(response.data.message || 'Invalid API response.');
-        }
+      const response = await api.get("/review/lists/due", { params });
+      if (response.data && response.data.success && response.data.data) {
+        return {
+          lists: response.data.data.listsWithDueWords || [],
+          pagination: response.data.pagination || {},
+        };
+      } else {
+        throw new Error(response.data.message || "Invalid API response.");
+      }
     } catch (error) {
-        console.error("API Error in getDueLists:", error);
-        throw error;
+      console.error("API Error in getDueLists:", error);
+      throw error;
     }
   },
 
   // 18. Get Upcoming Review Lists (cho tab "Upcoming")
   getUpcomingLists: async (params = {}) => {
     try {
-        const response = await api.get("/review/lists/upcoming", { params });
-        if (response.data && response.data.success && response.data.data) {
-            return {
-                lists: response.data.data.lists || [],
-                pagination: response.data.pagination || {}
-            };
-        } else {
-            throw new Error(response.data.message || 'Invalid API response.');
-        }
+      const response = await api.get("/review/lists/upcoming", { params });
+      if (response.data && response.data.success && response.data.data) {
+        return {
+          lists: response.data.data.lists || [],
+          pagination: response.data.pagination || {},
+        };
+      } else {
+        throw new Error(response.data.message || "Invalid API response.");
+      }
     } catch (error) {
-        console.error("API Error in getUpcomingLists:", error);
-        throw error;
+      console.error("API Error in getUpcomingLists:", error);
+      throw error;
     }
   },
 };

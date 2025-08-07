@@ -2,7 +2,7 @@
 //  Mà frontend (React) không thể tự xử lý token trong URL nếu bạn không có route /auth/success tương ứng.
 
 import { useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../services/Auth/authContext";
 import authService from "../../services/Auth/authService";
 
@@ -27,13 +27,13 @@ export default function AuthSuccess() {
         try {
           // Validate token with server instead of client-side decoding
           const validation = await authService.validateToken();
-          
+
           if (validation && validation.success) {
             const userObject = validation.data;
             // Store token and user manually since validateToken doesn't return the same structure as login
             localStorage.setItem("user", JSON.stringify(userObject));
             setUser(userObject);
-            
+
             // Navigate based on user status
             if (isNewUser) {
               navigate("/select-user-type");
@@ -43,7 +43,7 @@ export default function AuthSuccess() {
           } else {
             throw new Error("Token validation failed");
           }
-        } catch (error) {
+        } catch {
           localStorage.removeItem("token");
           localStorage.removeItem("refreshToken");
           localStorage.removeItem("user");

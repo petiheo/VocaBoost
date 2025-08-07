@@ -1,12 +1,19 @@
-import { useState } from 'react';
-import VocabularyListCard from '../Classroom/VocabularyListCard'; 
-import { LeftArrow, RightArrow } from '../../assets/User';
-import { VocabularyListCardSkeleton } from '../UI/Skeleton';
+import { useState } from "react";
+import VocabularyListCard from "../Classroom/VocabularyListCard";
+import { LeftArrow, RightArrow } from "../../assets/User";
+import { VocabularyListCardSkeleton } from "../UI/Skeleton";
 
-export default function CarouselVocabSection({ title, children, vocabLists = [], isLoading, error, isReviewDisabled }) {
+export default function CarouselVocabSection({
+  title,
+  children,
+  vocabLists = [],
+  isLoading,
+  error,
+  isReviewDisabled,
+}) {
   const [startIndex, setStartIndex] = useState(0);
 
-// Hiển thị 4 card mỗi lần
+  // Hiển thị 4 card mỗi lần
   const itemsPerPage = 4;
   const handlePrev = () => {
     setStartIndex((prev) => Math.max(prev - itemsPerPage, 0));
@@ -33,10 +40,9 @@ export default function CarouselVocabSection({ title, children, vocabLists = [],
       </div>
 
       <div className="carousel-body">
-
         {isLoading ? (
           <div className="carousel-viewport">
-            <div className="carousel-slider" style={{ display: 'flex' }}>
+            <div className="carousel-slider" style={{ display: "flex" }}>
               {Array.from({ length: 4 }).map((_, index) => (
                 <div key={index} className="carousel-item">
                   <VocabularyListCardSkeleton />
@@ -48,24 +54,34 @@ export default function CarouselVocabSection({ title, children, vocabLists = [],
           <p className="error-message">Could not load this section.</p>
         ) : vocabLists.length > 0 ? (
           <>
-            <button className="nav-arrow prev" onClick={handlePrev} disabled={startIndex === 0}>
-                <img src={LeftArrow} alt="Previous" />
+            <button
+              className="nav-arrow prev"
+              onClick={handlePrev}
+              disabled={startIndex === 0}
+            >
+              <img src={LeftArrow} alt="Previous" />
             </button>
             <div className="carousel-viewport">
-                <div className="carousel-slider" style={sliderStyle}>
-                    {vocabLists.map((list) => (
-                      <div className="carousel-item" key={list.id}>
-                          <VocabularyListCard
-                            {...list}
-                            buttonContent={title === 'REVIEW LISTS' ? 'Review' : 'Overview'}
-                            isReviewDisabled={isReviewDisabled}
-                          />
-                      </div>
-                    ))}
-                </div>
+              <div className="carousel-slider" style={sliderStyle}>
+                {vocabLists.map((list) => (
+                  <div className="carousel-item" key={list.id}>
+                    <VocabularyListCard
+                      {...list}
+                      buttonContent={
+                        title === "REVIEW LISTS" ? "Review" : "Overview"
+                      }
+                      isReviewDisabled={isReviewDisabled}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-            <button className="nav-arrow next" onClick={handleNext} disabled={startIndex + itemsPerPage >= vocabLists.length}>
-                <img src={RightArrow} alt="Next" />
+            <button
+              className="nav-arrow next"
+              onClick={handleNext}
+              disabled={startIndex + itemsPerPage >= vocabLists.length}
+            >
+              <img src={RightArrow} alt="Next" />
             </button>
           </>
         ) : (

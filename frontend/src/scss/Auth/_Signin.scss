@@ -1,146 +1,142 @@
-@use '../Fonts' as *;
-$text-color: #352D24;
+@use "../Fonts" as *;
+$text-color: #352d24;
 
 .grid-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    height: 100vh;
-    overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100vh;
+  overflow: hidden;
 
-    .right-grid {
-        grid-column-start: 2;
-        grid-column-end: 3;
+  .right-grid {
+    grid-column-start: 2;
+    grid-column-end: 3;
 
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
+  }
 }
 
 .login {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5;
+
+  &-logo {
+    position: relative;
+    left: calc((260 / 1440) * 100vw);
+    top: calc((77 / 1440) * 100vh);
+    width: calc((151 / 1440) * 100vw);
+    height: calc((65 / 1440) * 100vh);
+  }
+
+  &-login-button {
+    padding: 0 20px;
+    color: $text-color;
+    font-family: $font-lalezar;
+    font-size: calc((30 / 1440) * 100vw);
+
+    &:active {
+      background-color: #d6d6d6;
+      border-radius: 10px;
+    }
+  }
+
+  &-signup-button {
+    padding: 0 20px;
+    text-decoration: none;
+    color: $text-color;
+    font-family: $font-lalezar;
+    font-size: calc((30 / 1440) * 100vw);
+
+    &:active {
+      background-color: #d6d6d6;
+      border-radius: 10px;
+    }
+  }
+
+  &-google {
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #F5F5F5;
+    gap: 5%;
 
-    &-logo {
-        position: relative;
-        left: calc((260 / 1440) * 100vw);
-        top: calc((77 / 1440) * 100vh);
-        width: calc((151 / 1440) * 100vw);
-        height: calc((65 / 1440) * 100vh);
+    text-decoration: none;
+    color: $text-color;
+    font-family: $font-lalezar;
+
+    border: 2px solid #a0a0a0;
+    border-radius: 40px;
+    padding: 10px;
+
+    margin: 10px 0;
+  }
+
+  &-container {
+    position: relative;
+    left: calc((66 / 1440) * 100vw);
+    top: calc((174 / 1440) * 100vh);
+    width: calc((556 / 1440) * 100vw);
+    height: calc((648 / 1440) * 100vh);
+
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  &-signup-container {
+    display: flex;
+    justify-content: center;
+    gap: 50%;
+  }
+
+  &-or {
+    color: $text-color;
+    font-family: $font-lalezar;
+    font-size: 30px;
+  }
+
+  &-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &-forgot-password {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    text-decoration: none;
+    color: $text-color;
+    font-family: $font-lalezar;
+    font-size: calc((15 / 1440) * 100vw);
+  }
+
+  &-back-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+
+    .login-back-button {
+      display: flex;
+      justify-content: center;
+
+      width: 30%;
+      text-decoration: none;
+      color: $text-color;
+      font-family: $font-inriasans;
+      background-color: #f3eddf;
+
+      border: none;
+      border-radius: 17px;
+      padding: 8px;
     }
-
-    &-login-button {
-        padding: 0 20px;
-        color: $text-color;
-        font-family: $font-lalezar;
-        font-size: calc((30 / 1440) * 100vw);
-
-        &:active {
-            background-color: #D6D6D6;
-            border-radius: 10px;
-        }
-    }
-
-    &-signup-button {
-        padding: 0 20px;
-        text-decoration: none;
-        color: $text-color;
-        font-family: $font-lalezar;
-        font-size: calc((30 / 1440) * 100vw);
-
-        &:active {
-            background-color: #D6D6D6;
-            border-radius: 10px;
-        }
-    }
-
-    &-google {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 5%;
-
-        text-decoration: none;
-        color: $text-color;
-        font-family: $font-lalezar;
-
-        border: 2px solid #A0A0A0;
-        border-radius: 40px;
-        padding: 10px;
-
-        margin: 10px 0;
-
-    }
-
-    &-container {
-        position: relative;
-        left: calc((66 / 1440) * 100vw);
-        top: calc((174 / 1440) * 100vh);
-        width: calc((556 / 1440) * 100vw);
-        height: calc((648 / 1440) * 100vh);
-
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-    }
-
-    &-signup-container {
-        display: flex;
-        justify-content: center;
-        gap: 50%;
-    }
-
-    &-or {
-        color: $text-color;
-        font-family: $font-lalezar;
-        font-size: 30px;
-    }
-
-    &-form {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-
-    &-forgot-password {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-
-        text-decoration: none;
-        color: $text-color;
-        font-family: $font-lalezar;
-        font-size: calc((15 / 1440) * 100vw);
-    }
-
-    &-back-button-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-
-        .login-back-button {
-            display: flex;
-            justify-content: center;
-
-            width: 30%;
-            text-decoration: none;
-            color: $text-color;
-            font-family: $font-inriasans;
-            background-color: #F3EDDF;
-
-            border: none;
-            border-radius: 17px;
-            padding: 8px;
-
-        }
-    }
-
+  }
 }

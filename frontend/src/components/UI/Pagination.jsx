@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-const Pagination = ({ pagination, onPageChange, className = '' }) => {
+const Pagination = ({ pagination, onPageChange, className = "" }) => {
   if (!pagination || !pagination.totalPages || pagination.totalPages <= 1) {
     return null;
   }
@@ -12,19 +12,23 @@ const Pagination = ({ pagination, onPageChange, className = '' }) => {
   if (currentPage > 3) {
     pages.push(1);
     if (currentPage > 4) {
-      pages.push('...');
+      pages.push("...");
     }
   }
 
   // Show pages around current page
-  for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+  for (
+    let i = Math.max(1, currentPage - 2);
+    i <= Math.min(totalPages, currentPage + 2);
+    i++
+  ) {
     pages.push(i);
   }
 
   // Show last page
   if (currentPage < totalPages - 2) {
     if (currentPage < totalPages - 3) {
-      pages.push('...');
+      pages.push("...");
     }
     pages.push(totalPages);
   }
@@ -42,11 +46,11 @@ const Pagination = ({ pagination, onPageChange, className = '' }) => {
       <div className="pagination-numbers">
         {pages.map((page, index) => (
           <React.Fragment key={index}>
-            {page === '...' ? (
+            {page === "..." ? (
               <span className="pagination-dots">...</span>
             ) : (
               <button
-                className={`pagination-number ${currentPage === page ? 'active' : ''}`}
+                className={`pagination-number ${currentPage === page ? "active" : ""}`}
                 onClick={() => onPageChange(page)}
               >
                 {page}

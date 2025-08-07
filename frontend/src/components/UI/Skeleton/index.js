@@ -1,14 +1,14 @@
 // Themes
-export { SKELETON_THEMES } from './themes';
+export { SKELETON_THEMES } from "./themes";
 
 // Utility Components
-export * from './Utility';
+export * from "./Utility";
 
-// Card Components  
-export * from './Cards';
+// Card Components
+export * from "./Cards";
 
 // Page Components
-export * from './Pages';
+export * from "./Pages";
 
 // Classroom Components
-export * from './Classroom';
+export * from "./Classroom";

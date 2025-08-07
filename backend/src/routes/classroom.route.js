@@ -105,7 +105,7 @@ classroomRouter.post(
   classroomValidator.createAssignment,
   (req, res, next) => classroomController.createAssignment(req, res, next) // Chỉnh ở đây nè
   // Tao hỏi GPT thì nó bảo nếu mày truyền classroomController.createAssignment trực tiếp như một middleware cho Express
-  // nó chỉ lấy tham chiếu đến hàm đó mà không giữ lại context (this) của đối tượng classroomController. . 
+  // nó chỉ lấy tham chiếu đến hàm đó mà không giữ lại context (this) của đối tượng classroomController. .
   // Do đó, khi Express (Express gọi hàm một cách độc lập) gọi hàm này, this ở bên trong nó sẽ là undefined, dẫn đến lỗi undefined._extractAssignmentData(...).
 );
 

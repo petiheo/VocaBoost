@@ -10,37 +10,43 @@ class ReviewService {
   // GETTING DUE ITEMS
   // =================================================================
   async getListsWithDueWords(userId, { page = null, limit = null }) {
-    let from = null, to = null, pagination = null;
-    
+    let from = null,
+      to = null,
+      pagination = null;
+
     if (page !== null && limit !== null) {
       pagination = PaginationUtil.validate(page, limit);
       from = pagination.offset;
       to = pagination.offset + pagination.limit - 1;
     }
-    
-    const { data, error } = await reviewModel.findListsWithDueWords(userId, from, to);
+
+    const { data, error } = await reviewModel.findListsWithDueWords(
+      userId,
+      from,
+      to
+    );
     if (error) throw error;
-  
+
     const totalItems = await reviewModel.countListsWithDueWords(userId);
-    
-    const formattedLists = (data || []).map(list => ({
-        id: list.id,
-        title: list.title,
-        description: list.description,
-        wordCount: list.word_count,
-        creator: { 
-            id: list.creator.id,
-            display_name: list.creator.display_name,
-            role: list.creator.role,
-            avatar_url: list.creator.avatar_url
-        },
-        tags: list.tags.map(t => t.name) 
+
+    const formattedLists = (data || []).map((list) => ({
+      id: list.id,
+      title: list.title,
+      description: list.description,
+      wordCount: list.word_count,
+      creator: {
+        id: list.creator.id,
+        display_name: list.creator.display_name,
+        role: list.creator.role,
+        avatar_url: list.creator.avatar_url,
+      },
+      tags: list.tags.map((t) => t.name),
     }));
-    
-    const paginationResult = pagination 
+
+    const paginationResult = pagination
       ? PaginationUtil.getMetadata(pagination.page, pagination.limit, totalItems)
       : { totalItems: totalItems || 0 };
-    
+
     return {
       listsWithDueWords: formattedLists,
       pagination: paginationResult,
@@ -48,45 +54,51 @@ class ReviewService {
   }
 
   async getUpcomingReviewLists(userId, { page = null, limit = null }) {
-    let from = null, to = null, pagination = null;
-    
+    let from = null,
+      to = null,
+      pagination = null;
+
     if (page !== null && limit !== null) {
       pagination = PaginationUtil.validate(page, limit);
       from = pagination.offset;
       to = pagination.offset + pagination.limit - 1;
     }
-  
-    const { data, error } = await reviewModel.findUpcomingReviewLists(userId, from, to);
+
+    const { data, error } = await reviewModel.findUpcomingReviewLists(
+      userId,
+      from,
+      to
+    );
     if (error) throw error;
-    
+
     const totalItems = await reviewModel.countListsWithScheduledWords(userId);
 
     const now = new Date();
-    const formattedLists = (data || []).map(list => {
-        const nextReviewDate = new Date(list.next_review_date);
-        const diffTime = nextReviewDate - now;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-        return {
-            listId: list.id,
-            title: list.title,
-            description: list.description,
-            wordCount: list.word_count,
-            creator: {
-                id: list.creator.id,
-                display_name: list.creator.display_name,
-                role: list.creator.role,
-                avatar_url: list.creator.avatar_url
-            },
-            tags: (list.tags || []).map(t => t.name),
-            next_review_in_days: Math.max(1, diffDays),
-        };
+    const formattedLists = (data || []).map((list) => {
+      const nextReviewDate = new Date(list.next_review_date);
+      const diffTime = nextReviewDate - now;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      return {
+        listId: list.id,
+        title: list.title,
+        description: list.description,
+        wordCount: list.word_count,
+        creator: {
+          id: list.creator.id,
+          display_name: list.creator.display_name,
+          role: list.creator.role,
+          avatar_url: list.creator.avatar_url,
+        },
+        tags: (list.tags || []).map((t) => t.name),
+        next_review_in_days: Math.max(1, diffDays),
+      };
     });
-    
-    const paginationResult = pagination 
+
+    const paginationResult = pagination
       ? PaginationUtil.getMetadata(pagination.page, pagination.limit, totalItems)
       : { totalItems: totalItems || 0 };
-    
+
     return {
       lists: formattedLists,
       pagination: paginationResult,
@@ -119,18 +131,19 @@ class ReviewService {
   }
 
   async getDueWordsByList(userId, listId) {
-    const { data: listData, error: listError } = await vocabularyModel.findListById(listId);
+    const { data: listData, error: listError } =
+      await vocabularyModel.findListById(listId);
     if (listError) {
-      if (listError.code === 'PGRST116') { 
+      if (listError.code === 'PGRST116') {
         throw new Error('List not found.');
       }
       throw listError;
     }
-  
+
     if (!listData) {
       throw new Error('List not found.');
     }
-  
+
     if (userId !== listData.creator_id) {
       throw new ForbiddenError('User does not have permission to access this list.');
     }
@@ -182,7 +195,7 @@ class ReviewService {
       return null;
     }
 
-    // Step 1: Fetch the words 
+    // Step 1: Fetch the words
     const { data: sessionWords, error: wordsError } =
       await vocabularyModel.findWordsByIds(activeSession.word_ids);
     if (wordsError) throw wordsError;
@@ -238,12 +251,14 @@ class ReviewService {
       const now = new Date();
       const timeDiff = now - sessionStartTime;
       const thirtyMinutes = 30 * 60 * 1000; // 30 minutes in milliseconds
-      
+
       if (timeDiff > thirtyMinutes || existingSession.vocab_list_id !== listId) {
         // Auto-end the abandoned session
         try {
           await reviewModel.updateSessionStatus(existingSession.id, 'interrupted');
-          logger.info(`Auto-ended abandoned session ${existingSession.id} for user ${userId}`);
+          logger.info(
+            `Auto-ended abandoned session ${existingSession.id} for user ${userId}`
+          );
         } catch (error) {
           logger.warn(`Failed to auto-end session ${existingSession.id}:`, error);
         }
@@ -257,19 +272,21 @@ class ReviewService {
 
     let words;
     let actualMode = practiceMode;
-    
+
     if (practiceMode) {
       // Practice mode: get all words from the list regardless of due status
       words = await reviewModel.findAllWordsByListId(listId, 20);
     } else {
       // Normal mode: try to get due words first
       words = await reviewModel.findDueWordsByListId(userId, listId, 20);
-      
+
       // If no due words found, automatically switch to practice mode
       if (!words || words.length === 0) {
         words = await reviewModel.findAllWordsByListId(listId, 20);
         actualMode = true; // Switch to practice mode
-        logger.info(`No due words found for list ${listId}, automatically switching to practice mode`);
+        logger.info(
+          `No due words found for list ${listId}, automatically switching to practice mode`
+        );
       }
     }
 
@@ -294,7 +311,10 @@ class ReviewService {
       totalWords: words.length,
       words: shuffleArray(words),
       practiceMode: actualMode,
-      message: actualMode && !practiceMode ? 'No due words found. Started practice session with all words.' : null
+      message:
+        actualMode && !practiceMode
+          ? 'No due words found. Started practice session with all words.'
+          : null,
     };
   }
 
@@ -312,26 +332,28 @@ class ReviewService {
     const totalCompleted = results.length;
     const wordsPerBatch = 10;
     const currentBatch = Math.floor((totalCompleted - 1) / wordsPerBatch) + 1;
-    
+
     // Get results for current batch (last 10 completed words)
     const batchStartIndex = Math.max(0, totalCompleted - wordsPerBatch);
     const currentBatchResults = results.slice(batchStartIndex);
-    
-    const correctInBatch = currentBatchResults.filter(r => r.result === 'correct').length;
+
+    const correctInBatch = currentBatchResults.filter(
+      (r) => r.result === 'correct'
+    ).length;
     const totalInBatch = currentBatchResults.length;
-    
+
     // Get word details for the batch
-    const wordIds = currentBatchResults.map(r => r.word_id);
-    const { data: batchWords, error: wordsError } = 
+    const wordIds = currentBatchResults.map((r) => r.word_id);
+    const { data: batchWords, error: wordsError } =
       await vocabularyModel.findWordsByIds(wordIds);
     if (wordsError) throw wordsError;
 
-    const wordsWithResults = (batchWords || []).map(word => {
-      const result = currentBatchResults.find(r => r.word_id === word.id);
+    const wordsWithResults = (batchWords || []).map((word) => {
+      const result = currentBatchResults.find((r) => r.word_id === word.id);
       return {
         ...word,
         result: result?.result,
-        responseTime: result?.response_time_ms
+        responseTime: result?.response_time_ms,
       };
     });
 
@@ -342,14 +364,21 @@ class ReviewService {
       totalBatches: Math.ceil(session.total_words / wordsPerBatch),
       wordsInBatch: totalInBatch,
       correctAnswers: correctInBatch,
-      accuracy: totalInBatch > 0 ? Math.round((correctInBatch / totalInBatch) * 100) : 0,
+      accuracy:
+        totalInBatch > 0 ? Math.round((correctInBatch / totalInBatch) * 100) : 0,
       words: wordsWithResults,
       overallProgress: {
         totalWords: session.total_words,
         completedWords: totalCompleted,
-        overallAccuracy: totalCompleted > 0 ? 
-          Math.round((results.filter(r => r.result === 'correct').length / totalCompleted) * 100) : 0
-      }
+        overallAccuracy:
+          totalCompleted > 0
+            ? Math.round(
+                (results.filter((r) => r.result === 'correct').length /
+                  totalCompleted) *
+                  100
+              )
+            : 0,
+      },
     };
   }
 
@@ -385,17 +414,17 @@ class ReviewService {
 
     // Get detailed word results for final summary
     const wordIds = session.word_ids || [];
-    const { data: sessionWords, error: wordsError } = 
+    const { data: sessionWords, error: wordsError } =
       await vocabularyModel.findWordsByIds(wordIds);
     if (wordsError) throw wordsError;
 
     // Combine words with their results
-    const wordsWithResults = (sessionWords || []).map(word => {
-      const result = (results || []).find(r => r.word_id === word.id);
+    const wordsWithResults = (sessionWords || []).map((word) => {
+      const result = (results || []).find((r) => r.word_id === word.id);
       return {
         ...word,
         result: result?.result || 'not_attempted',
-        responseTime: result?.response_time_ms
+        responseTime: result?.response_time_ms,
       };
     });
 
@@ -408,13 +437,16 @@ class ReviewService {
       const batchStartIndex = i * wordsPerBatch;
       const batchEndIndex = Math.min(batchStartIndex + wordsPerBatch, totalWords);
       const batchResults = (results || []).slice(batchStartIndex, batchEndIndex);
-      const batchCorrect = batchResults.filter(r => r.result === 'correct').length;
-      
+      const batchCorrect = batchResults.filter((r) => r.result === 'correct').length;
+
       batchSummaries.push({
         batchNumber: i + 1,
         wordsInBatch: batchResults.length,
         correctAnswers: batchCorrect,
-        accuracy: batchResults.length > 0 ? Math.round((batchCorrect / batchResults.length) * 100) : 0
+        accuracy:
+          batchResults.length > 0
+            ? Math.round((batchCorrect / batchResults.length) * 100)
+            : 0,
       });
     }
 
@@ -429,7 +461,10 @@ class ReviewService {
       await vocabularyModel.updateListAccess(session.vocab_list_id, userId);
     } catch (error) {
       // Log but don't fail the session end if list access update fails
-      logger.warn(`Failed to update list access for list ${session.vocab_list_id}:`, error);
+      logger.warn(
+        `Failed to update list access for list ${session.vocab_list_id}:`,
+        error
+      );
     }
 
     return {
@@ -445,7 +480,7 @@ class ReviewService {
       completedAt: new Date().toISOString(),
       words: wordsWithResults,
       batchSummaries: batchSummaries,
-      totalBatches: totalBatches
+      totalBatches: totalBatches,
     };
   }
 
@@ -520,7 +555,6 @@ class ReviewService {
       last_reviewed_at: new Date().toISOString(),
     };
   }
-
 }
 
 module.exports = new ReviewService();

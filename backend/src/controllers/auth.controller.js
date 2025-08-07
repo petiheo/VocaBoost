@@ -1,5 +1,9 @@
 const authService = require('../services/auth.service');
-const { generateToken, generateTokenPair, refreshAccessToken } = require('../helpers/jwt.helper');
+const {
+  generateToken,
+  generateTokenPair,
+  refreshAccessToken,
+} = require('../helpers/jwt.helper');
 const passport = require('passport');
 const { ResponseUtils, ErrorHandler } = require('../utils');
 const logger = require('../utils/logger');
@@ -207,15 +211,15 @@ class AuthController {
   async refreshToken(req, res) {
     try {
       const { refreshToken } = req.body;
-      
+
       if (!refreshToken) {
         return ResponseUtils.badRequest(res, 'Refresh token is required');
       }
 
       const newAccessToken = await refreshAccessToken(refreshToken);
-      
+
       return ResponseUtils.success(res, 'Token refreshed successfully', {
-        token: newAccessToken
+        token: newAccessToken,
       });
     } catch (error) {
       return ErrorHandler.handleError(
@@ -232,17 +236,12 @@ class AuthController {
     try {
       const accessToken = req.headers.authorization?.replace('Bearer ', '');
       const { refreshToken } = req.body;
-      
+
       const result = await authService.logout(accessToken, refreshToken);
-      
+
       return ResponseUtils.success(res, result.message, null);
     } catch (error) {
-      return ErrorHandler.handleError(
-        res,
-        error,
-        'logout',
-        'Logout failed'
-      );
+      return ErrorHandler.handleError(res, error, 'logout', 'Logout failed');
     }
   }
 }

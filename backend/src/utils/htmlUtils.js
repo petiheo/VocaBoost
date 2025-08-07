@@ -7,21 +7,25 @@ const he = require('he'); // HTML entity decoder library
  */
 function decodeVocabularyData(word) {
   if (!word) return word;
-  
+
   return {
     ...word,
     term: word.term ? he.decode(word.term) : word.term,
     definition: word.definition ? he.decode(word.definition) : word.definition,
     translation: word.translation ? he.decode(word.translation) : word.translation,
-    vocabulary_examples: word.vocabulary_examples ? {
-      ...word.vocabulary_examples,
-      example_sentence: word.vocabulary_examples.example_sentence 
-        ? he.decode(word.vocabulary_examples.example_sentence)
-        : word.vocabulary_examples.example_sentence
-    } : word.vocabulary_examples,
-    synonyms: Array.isArray(word.synonyms) 
-      ? word.synonyms.map(synonym => typeof synonym === 'string' ? he.decode(synonym) : synonym)
-      : word.synonyms
+    vocabulary_examples: word.vocabulary_examples
+      ? {
+          ...word.vocabulary_examples,
+          example_sentence: word.vocabulary_examples.example_sentence
+            ? he.decode(word.vocabulary_examples.example_sentence)
+            : word.vocabulary_examples.example_sentence,
+        }
+      : word.vocabulary_examples,
+    synonyms: Array.isArray(word.synonyms)
+      ? word.synonyms.map((synonym) =>
+          typeof synonym === 'string' ? he.decode(synonym) : synonym
+        )
+      : word.synonyms,
   };
 }
 
@@ -37,5 +41,5 @@ function decodeVocabularyList(words) {
 
 module.exports = {
   decodeVocabularyData,
-  decodeVocabularyList
+  decodeVocabularyList,
 };

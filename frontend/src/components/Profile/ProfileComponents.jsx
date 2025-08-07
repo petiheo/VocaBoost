@@ -1,9 +1,22 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
-export function ProfileInput({ label, name, type, value, onChange, disabled, className, placeholder, min, max, errors }) {
+export function ProfileInput({
+  label,
+  name,
+  type,
+  value,
+  onChange,
+  disabled,
+  className,
+  placeholder,
+  min,
+  max,
+  errors,
+}) {
   const hasErrors = errors && errors.length > 0;
-  const inputClassName = `${className || ''} ${hasErrors ? 'error' : ''}`.trim();
-  
+  const inputClassName =
+    `${className || ""} ${hasErrors ? "error" : ""}`.trim();
+
   return (
     <div className="form-group">
       <label>{label}:</label>
@@ -27,7 +40,7 @@ export function ProfileInput({ label, name, type, value, onChange, disabled, cla
           ))}
         </div>
       )}
-      {type === 'number' && !hasErrors && (
+      {type === "number" && !hasErrors && (
         <small className="field-description">
           Maximum words you can review in a single session (1-1000)
         </small>
@@ -47,7 +60,7 @@ ProfileInput.propTypes = {
   placeholder: PropTypes.string,
   min: PropTypes.number,
   max: PropTypes.number,
-  errors: PropTypes.arrayOf(PropTypes.string)
+  errors: PropTypes.arrayOf(PropTypes.string),
 };
 
 export function TeacherVerification({ userProfile, onVerificationClick }) {
@@ -60,24 +73,25 @@ export function TeacherVerification({ userProfile, onVerificationClick }) {
       <label>Teacher verification:</label>
       <div className="verification-status">
         <div className="status-row">
-          <span className={`status-badge ${userProfile.teacherVerification.status}`}>
+          <span
+            className={`status-badge ${userProfile.teacherVerification.status}`}
+          >
             {userProfile.teacherVerification.status === "approved"
               ? "Verified"
               : userProfile.teacherVerification.status === "pending"
-              ? "Pending"
-              : "Not Verified"}
+                ? "Pending"
+                : "Not Verified"}
           </span>
         </div>
-        <button 
-          type="button" 
-          className={`verification-button ${isVerified ? 'disabled' : ''}`}
+        <button
+          type="button"
+          className={`verification-button ${isVerified ? "disabled" : ""}`}
           onClick={isVerified ? undefined : onVerificationClick}
           disabled={isVerified}
         >
-          {isVerified 
+          {isVerified
             ? "Your teacher account has been verified"
-            : "Click here to submit or update your teacher verification form"
-          }
+            : "Click here to submit or update your teacher verification form"}
           {!isVerified && <span className="arrow">›</span>}
         </button>
       </div>
@@ -87,12 +101,19 @@ export function TeacherVerification({ userProfile, onVerificationClick }) {
 
 TeacherVerification.propTypes = {
   userProfile: PropTypes.object.isRequired,
-  onVerificationClick: PropTypes.func.isRequired
+  onVerificationClick: PropTypes.func.isRequired,
 };
 
-export function ProfileAvatar({ avatarUrl, displayName, email, isEditing, onAvatarChange, errors }) {
+export function ProfileAvatar({
+  avatarUrl,
+  displayName,
+  email,
+  isEditing,
+  onAvatarChange,
+  errors,
+}) {
   const hasErrors = errors && errors.length > 0;
-  
+
   return (
     <div className="avatar-section">
       <div className="profile-avatar">
@@ -115,7 +136,10 @@ export function ProfileAvatar({ avatarUrl, displayName, email, isEditing, onAvat
             id="avatar-upload"
             style={{ display: "none" }}
           />
-          <label htmlFor="avatar-upload" className={`upload-button ${hasErrors ? 'error' : ''}`}>
+          <label
+            htmlFor="avatar-upload"
+            className={`upload-button ${hasErrors ? "error" : ""}`}
+          >
             Change Avatar
           </label>
           {hasErrors && (
@@ -139,5 +163,5 @@ ProfileAvatar.propTypes = {
   email: PropTypes.string,
   isEditing: PropTypes.bool,
   onAvatarChange: PropTypes.func,
-  errors: PropTypes.arrayOf(PropTypes.string)
+  errors: PropTypes.arrayOf(PropTypes.string),
 };

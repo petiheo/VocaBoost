@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -13,12 +13,9 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     // Log error details for debugging
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
-    this.setState({
-      error: error,
-      errorInfo: errorInfo
-    });
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+
+    this.setState({ error, errorInfo });
   }
 
   render() {
@@ -28,18 +25,23 @@ class ErrorBoundary extends React.Component {
         <div className="error-boundary">
           <div className="error-boundary-container">
             <h2>Something went wrong</h2>
-            <p>We're sorry, but something unexpected happened. Please try refreshing the page.</p>
-            <button 
+            <p>
+              We're sorry, but something unexpected happened. Please try
+              refreshing the page.
+            </p>
+            <button
               onClick={() => window.location.reload()}
               className="error-boundary-button"
             >
               Refresh Page
             </button>
-            {import.meta.env.MODE === 'development' && (
+            {import.meta.env.MODE === "development" && (
               <details className="error-details">
                 <summary>Error details (development only)</summary>
                 <pre>{this.state.error && this.state.error.toString()}</pre>
-                <pre>{this.state.errorInfo && this.state.errorInfo.componentStack}</pre>
+                <pre>
+                  {this.state.errorInfo && this.state.errorInfo.componentStack}
+                </pre>
               </details>
             )}
           </div>

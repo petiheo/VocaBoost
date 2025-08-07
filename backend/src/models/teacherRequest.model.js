@@ -35,13 +35,15 @@ class teacherRequestModel {
     const updateData = {
       institution: data.institution,
       credentials_url: data.credentialsUrl,
-      additional_notes: data.additionalNotes, 
-      status: 'pending', 
+      additional_notes: data.additionalNotes,
+      status: 'pending',
       school_email: data.schoolEmail,
-      rejection_reason: null, 
+      rejection_reason: null,
     };
 
-    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+    Object.keys(updateData).forEach(
+      (key) => updateData[key] === undefined && delete updateData[key]
+    );
 
     const { data: result, error } = await supabase
       .from('teacher_requests')

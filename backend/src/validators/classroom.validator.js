@@ -3,7 +3,11 @@ const { handleValidationErrors } = require('./common.validator');
 
 const classroomValidator = {
   create: [
-    body('name').trim().escape().notEmpty().withMessage('Classroom name is required'),
+    body('name')
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage('Classroom name is required'),
 
     body('description')
       .optional()

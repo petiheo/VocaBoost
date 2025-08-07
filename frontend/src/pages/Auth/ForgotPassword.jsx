@@ -17,10 +17,15 @@ export default function ForgotPassword() {
 
     try {
       const res = await authService.forgotPassword(email);
-      setSuccess(res.data?.message || "We've sent you a password reset link. Please check your inbox.");
+      setSuccess(
+        res.data?.message ||
+          "We've sent you a password reset link. Please check your inbox."
+      );
       setEmail(""); // Clear email after successful submission
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || "Oops! Something went wrong while sending the email. Please try again.";
+    } catch (e) {
+      const errorMessage =
+        e.response?.data?.message ||
+        "Oops! Something went wrong while sending the email. Please try again.";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -45,14 +50,10 @@ export default function ForgotPassword() {
         />
 
         {/* Success Message */}
-        {success && (
-          <div className="forgot__success">
-            {success}
-          </div>
-        )}
-        
-        <AccountPageInput 
-          type="submit" 
+        {success && <div className="forgot__success">{success}</div>}
+
+        <AccountPageInput
+          type="submit"
           value={isLoading ? "Submitting..." : "Submit"}
           disabled={isLoading}
         />

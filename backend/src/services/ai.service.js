@@ -43,11 +43,11 @@ class AIService {
         const now = Date.now();
         const timeSinceLastRequest = now - this.lastRequestTime;
         if (timeSinceLastRequest < this.minRequestInterval) {
-          await new Promise(resolve => 
+          await new Promise((resolve) =>
             setTimeout(resolve, this.minRequestInterval - timeSinceLastRequest)
           );
         }
-        
+
         const prompt = this._buildExamplePrompt(word, definition, context);
 
         const response = await this.genAI.models.generateContent({
@@ -60,22 +60,30 @@ class AIService {
         this.lastRequestTime = Date.now();
         return example;
       } catch (error) {
-        const isOverloaded = error.message?.includes('overloaded') || 
-                           error.status === 'UNAVAILABLE' ||
-                           error.code === 503;
-        
+        const isOverloaded =
+          error.message?.includes('overloaded') ||
+          error.status === 'UNAVAILABLE' ||
+          error.code === 503;
+
         if (isOverloaded && attempt < maxRetries) {
           const waitTime = retryDelay * attempt;
-          logger.warn(`AI model overloaded, retrying in ${waitTime}ms (attempt ${attempt}/${maxRetries})`);
-          await new Promise(resolve => setTimeout(resolve, waitTime));
+          logger.warn(
+            `AI model overloaded, retrying in ${waitTime}ms (attempt ${attempt}/${maxRetries})`
+          );
+          await new Promise((resolve) => setTimeout(resolve, waitTime));
           continue;
         }
 
-        logger.error(`Failed to generate example (attempt ${attempt}/${maxRetries}):`, error);
-        
+        logger.error(
+          `Failed to generate example (attempt ${attempt}/${maxRetries}):`,
+          error
+        );
+
         // Provide user-friendly error message
         if (isOverloaded) {
-          throw new Error('AI service is currently busy. Please try again in a few moments.');
+          throw new Error(
+            'AI service is currently busy. Please try again in a few moments.'
+          );
         }
         throw new Error('Failed to generate example sentence');
       }

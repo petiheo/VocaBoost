@@ -1,49 +1,48 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 
 // .account-page-display-field {
 //   margin-bottom: 1rem;
 // }
 
 .account-page-label {
-    font-weight: bold;
-    display: flex;
-    align-items: center;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
 }
 
 .account-page-value {
-    background-color: #f0f2f5;
-    padding: 10px;
-    border-radius: 5px;
-    min-height: 40px; // Giống với chiều cao của input
+  background-color: #f0f2f5;
+  padding: 10px;
+  border-radius: 5px;
+  min-height: 40px; // Giống với chiều cao của input
 }
 
 .teacher-verification__preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .teacher-verification__buttons {
+  display: flex;
+  gap: 2em;
+  justify-content: center;
+  align-items: center;
+  .btn {
+    width: 20%;
     display: flex;
-    gap: 2em;
     justify-content: center;
     align-items: center;
-    .btn {
-        width: 20%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 1em;
+    gap: 1em;
 
-        &_approve {
-            background-color: #d0f5d0;
-            color: #206f20;
-        }
-
-        &_decline {
-            background-color: #fcd2d2;
-            color: #b50000;
-        }
+    &_approve {
+      background-color: #d0f5d0;
+      color: #206f20;
     }
 
+    &_decline {
+      background-color: #fcd2d2;
+      color: #b50000;
+    }
+  }
 }

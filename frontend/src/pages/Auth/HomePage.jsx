@@ -1,23 +1,28 @@
-import { Header, SideBar, Footer, SearchResultsGridSkeleton, CarouselSectionSkeleton } from '../../components';
-import CarouselVocabSection from '../../components/Vocabulary/CarouselVocabSection';
-import { useState, useEffect } from 'react';
-import { useDebounce } from '../../hooks/useDebounce'; 
-import { VocabularyListCard } from '../../components';
-import vocabularyService from '../../services/Vocabulary/vocabularyService';
-import { useSkeletonToggle } from '../../hooks/useSkeletonToggle';
+import { useEffect, useState } from "react";
+import {
+  Footer,
+  Header,
+  SearchResultsGridSkeleton,
+  SideBar,
+  VocabularyListCard,
+} from "../../components";
+import CarouselVocabSection from "../../components/Vocabulary/CarouselVocabSection";
+import { useDebounce } from "../../hooks/useDebounce";
+import vocabularyService from "../../services/Vocabulary/vocabularyService";
+import { useSkeletonToggle } from "../../hooks/useSkeletonToggle";
 
 // Component cho các Tab
 const ReviewTabs = ({ activeTab, onTabChange }) => (
   <div className="review-tabs">
     <button
-      className={`tab-button ${activeTab === 'today' ? 'active' : ''}`}
-      onClick={() => onTabChange('today')}
+      className={`tab-button ${activeTab === "today" ? "active" : ""}`}
+      onClick={() => onTabChange("today")}
     >
       Today
     </button>
     <button
-      className={`tab-button ${activeTab === 'upcoming' ? 'active' : ''}`}
-      onClick={() => onTabChange('upcoming')}
+      className={`tab-button ${activeTab === "upcoming" ? "active" : ""}`}
+      onClick={() => onTabChange("upcoming")}
     >
       Upcoming
     </button>
@@ -25,23 +30,31 @@ const ReviewTabs = ({ activeTab, onTabChange }) => (
 );
 
 const HomePage = () => {
-  const [reviewLists, setReviewLists] = useState({ 
-    data: [], 
-    pagination: null, 
-    isLoading: true, 
-    error: null 
+  const [reviewLists, setReviewLists] = useState({
+    data: [],
+    pagination: null,
+    isLoading: true,
+    error: null,
   });
-  const [recentLists, setRecentLists] = useState({ data: [], isLoading: true, error: null });
-  const [popularLists, setPopularLists] = useState({ data: [], isLoading: true, error: null });
+  const [recentLists, setRecentLists] = useState({
+    data: [],
+    isLoading: true,
+    error: null,
+  });
+  const [popularLists, setPopularLists] = useState({
+    data: [],
+    isLoading: true,
+    error: null,
+  });
 
-  const [activeReviewTab, setActiveReviewTab] = useState('today');
+  const [activeReviewTab, setActiveReviewTab] = useState("today");
 
-  const [searchQuery, setSearchQuery] = useState(''); 
-  const [searchResults, setSearchResults] = useState({ 
-    data: [], 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState({
+    data: [],
     pagination: null, // Thêm state để lưu thông tin phân trang
-    isLoading: false, 
-    error: null 
+    isLoading: false,
+    error: null,
   });
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [isOpen, setIsOpen] = useState(false);
@@ -50,35 +63,44 @@ const HomePage = () => {
   const { isLoading: isSkeletonLoading } = useSkeletonToggle();
 
   useEffect(() => {
-    if (searchQuery) return; 
+    if (searchQuery) return;
 
     const fetchStaticLists = async () => {
       try {
         const [historyResponse, popularResponse] = await Promise.all([
-            vocabularyService.getHistoryLists({limit: 12}),
-            vocabularyService.getPopularLists({limit: 12})
+          vocabularyService.getHistoryLists({ limit: 12 }),
+          vocabularyService.getPopularLists({ limit: 12 }),
         ]);
 
-        const transformedRecent = (historyResponse.lists || []).map(list => ({
+        const transformedRecent = (historyResponse.lists || []).map((list) => ({
           listId: list.id,
           title: list.title,
           description: list.description,
           username: list.creator?.display_name,
           role: list.creator?.role,
-          avatarUrl: list.creator?.avatar_url
+          avatarUrl: list.creator?.avatar_url,
         }));
-        setRecentLists({ data: transformedRecent, isLoading: false, error: null });
+        setRecentLists({
+          data: transformedRecent,
+          isLoading: false,
+          error: null,
+        });
 
-        const transformedPopular = (popularResponse.lists || []).map(list => ({
-          listId: list.id,
-          title: list.title,
-          description: list.description,
-          username: list.creator?.display_name,
-          role: list.creator?.role,
-          avatarUrl: list.creator?.avatar_url
-        }));
-        setPopularLists({ data: transformedPopular, isLoading: false, error: null });
-
+        const transformedPopular = (popularResponse.lists || []).map(
+          (list) => ({
+            listId: list.id,
+            title: list.title,
+            description: list.description,
+            username: list.creator?.display_name,
+            role: list.creator?.role,
+            avatarUrl: list.creator?.avatar_url,
+          })
+        );
+        setPopularLists({
+          data: transformedPopular,
+          isLoading: false,
+          error: null,
+        });
       } catch (err) {
         console.error("Failed to fetch homepage lists:", err);
         const errorState = { data: [], isLoading: false, error: err };
@@ -93,36 +115,48 @@ const HomePage = () => {
 
   useEffect(() => {
     // Nếu query đã debounce là rỗng, không làm gì cả, xóa kết quả cũ
-    if (debouncedSearchQuery === '') {
-      setSearchResults({ data: [], pagination: null, isLoading: false, error: null });
+    if (debouncedSearchQuery === "") {
+      setSearchResults({
+        data: [],
+        pagination: null,
+        isLoading: false,
+        error: null,
+      });
       return;
     }
 
     const fetchSearchResults = async () => {
       setSearchResults({ data: [], isLoading: true, error: null });
       try {
-        const { lists: apiLists, pagination } = await vocabularyService.searchPublicLists({ q: debouncedSearchQuery });
+        const { lists: apiLists, pagination } =
+          await vocabularyService.searchPublicLists({
+            q: debouncedSearchQuery,
+          });
 
         // Dịch dữ liệu từ API sang định dạng mà VocabularyListCard cần
-        const transformedLists = apiLists.map(list => ({
+        const transformedLists = apiLists.map((list) => ({
           id: list.id,
           listId: list.id, // Giữ lại listId nếu component con cần
           title: list.title,
           description: list.description,
-          username: list.creator.display_name, 
+          username: list.creator.display_name,
           role: list.creator.role,
           avatarUrl: list.creator.avatar_url,
         }));
-        
-        setSearchResults({ 
-          data: transformedLists, 
-          pagination: pagination, 
-          isLoading: false, 
-          error: null 
-        });
 
+        setSearchResults({
+          data: transformedLists,
+          pagination,
+          isLoading: false,
+          error: null,
+        });
       } catch (err) {
-        setSearchResults({ data: [], pagination: null, isLoading: false, error: err });
+        setSearchResults({
+          data: [],
+          pagination: null,
+          isLoading: false,
+          error: err,
+        });
       }
     };
 
@@ -134,24 +168,29 @@ const HomePage = () => {
     setSearchQuery(newQuery);
 
     if (newQuery) {
-      setSearchResults(prevState => ({ ...prevState, isLoading: true }));
+      setSearchResults((prevState) => ({ ...prevState, isLoading: true }));
     }
   };
-  
+
   // 2. useEffect để fetch REVIEW LISTS dựa vào tab đang active
   useEffect(() => {
     const fetchReviewData = async () => {
-      setReviewLists({ data: [], pagination: null, isLoading: true, error: null });
+      setReviewLists({
+        data: [],
+        pagination: null,
+        isLoading: true,
+        error: null,
+      });
       try {
         let response;
-        
-        if (activeReviewTab === 'today') {
+
+        if (activeReviewTab === "today") {
           response = await vocabularyService.getDueLists();
         } else {
-          response = await vocabularyService.getUpcomingLists({limit: 12});
+          response = await vocabularyService.getUpcomingLists({ limit: 12 });
         }
-        
-        const transformedReview = (response.lists || []).map(list => ({
+
+        const transformedReview = (response.lists || []).map((list) => ({
           listId: list.id || list.listId,
           title: list.title,
           description: list.description,
@@ -160,22 +199,27 @@ const HomePage = () => {
           avatarUrl: list.creator?.avatar_url,
           nextReview: list.next_review_in_days,
         }));
-        setReviewLists({ 
-          data: transformedReview, 
+        setReviewLists({
+          data: transformedReview,
           pagination: response.pagination || null,
-          isLoading: false, 
-          error: null 
+          isLoading: false,
+          error: null,
         });
       } catch (err) {
         console.error(`Failed to fetch ${activeReviewTab} review lists:`, err);
-        setReviewLists({ data: [], pagination: null, isLoading: false, error: err });
+        setReviewLists({
+          data: [],
+          pagination: null,
+          isLoading: false,
+          error: err,
+        });
       }
     };
 
     if (!searchQuery) {
-        fetchReviewData();
+      fetchReviewData();
     }
-  }, [activeReviewTab, searchQuery]); 
+  }, [activeReviewTab, searchQuery]);
 
   const handleTabChange = (tabIdentifier) => {
     if (tabIdentifier !== activeReviewTab) {
@@ -185,20 +229,16 @@ const HomePage = () => {
 
   return (
     <div className="homepage__wrapper">
-      <Header 
-        searchQuery={searchQuery} 
-        onSearchChange={handleSearchChange} 
-      />
+      <Header searchQuery={searchQuery} onSearchChange={handleSearchChange} />
 
       <div className="homepage__body">
         <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         <main className="homepage__main">
           <section className="homepage__content">
-            
             {searchQuery ? (
               <section className="search-results-section">
                 <h2>Search Results for "{searchQuery}"</h2>
-                
+
                 <div className="search-results-content">
                   {(() => {
                     if (isSkeletonLoading(searchResults.isLoading)) {
@@ -206,17 +246,30 @@ const HomePage = () => {
                     }
 
                     if (searchResults.error) {
-                      return <p className="search-status-message error">Error finding lists. Please try again. {searchQuery.error}</p>;
+                      return (
+                        <p className="search-status-message error">
+                          Error finding lists. Please try again.{" "}
+                          {searchQuery.error}
+                        </p>
+                      );
                     }
 
                     if (searchResults.data.length === 0) {
-                      return <p className="search-status-message empty">No lists found matching your search.</p>;
+                      return (
+                        <p className="search-status-message empty">
+                          No lists found matching your search.
+                        </p>
+                      );
                     }
 
                     return (
                       <div className="search-results-grid">
-                        {searchResults.data.map(list => (
-                          <VocabularyListCard key={list.id} {...list} buttonContent='Overview' />
+                        {searchResults.data.map((list) => (
+                          <VocabularyListCard
+                            key={list.id}
+                            {...list}
+                            buttonContent="Overview"
+                          />
                         ))}
                       </div>
                     );
@@ -225,39 +278,38 @@ const HomePage = () => {
               </section>
             ) : (
               <>
-                <CarouselVocabSection 
-                  title="REVIEW LISTS" 
+                <CarouselVocabSection
+                  title="REVIEW LISTS"
                   vocabLists={reviewLists.data}
-                  isLoading={isSkeletonLoading(reviewLists.isLoading)} 
-                  error={reviewLists.error}  
-                  isReviewDisabled={activeReviewTab === 'upcoming'}
+                  isLoading={isSkeletonLoading(reviewLists.isLoading)}
+                  error={reviewLists.error}
+                  isReviewDisabled={activeReviewTab === "upcoming"}
                 >
-                  <ReviewTabs 
-                    activeTab={activeReviewTab} 
-                    onTabChange={handleTabChange} 
+                  <ReviewTabs
+                    activeTab={activeReviewTab}
+                    onTabChange={handleTabChange}
                   />
                 </CarouselVocabSection>
 
-                <CarouselVocabSection 
-                  title="RECENTLY LISTS" 
+                <CarouselVocabSection
+                  title="RECENTLY LISTS"
                   vocabLists={recentLists.data}
-                  isLoading={isSkeletonLoading(recentLists.isLoading)} 
-                  error={recentLists.error}         
+                  isLoading={isSkeletonLoading(recentLists.isLoading)}
+                  error={recentLists.error}
                 />
 
-                <CarouselVocabSection 
-                  title="POPULAR LISTS" 
+                <CarouselVocabSection
+                  title="POPULAR LISTS"
                   vocabLists={popularLists.data}
-                  isLoading={isSkeletonLoading(popularLists.isLoading)} 
-                  error={popularLists.error}         
+                  isLoading={isSkeletonLoading(popularLists.isLoading)}
+                  error={popularLists.error}
                 />
               </>
             )}
-
           </section>
         </main>
       </div>
-      
+
       <Footer />
     </div>
   );
