@@ -45,9 +45,14 @@ export default function ReviewWithSR() {
     try {
       console.log("Starting review for listId:", listId, "method:", reviewMethod);
       
-      // For flashcards method, navigate directly to flashcard study
+      // Navigate directly for specific methods without session
       if (reviewMethod === "Flashcard") {
         navigate(`/review/${listId}/flashcard`, {
+          state: { method: reviewMethod, listInfo }
+        });
+        return;
+      } else if (reviewMethod === "Fill in the blank") {
+        navigate(`/review/${listId}/fill-in-blank`, {
           state: { method: reviewMethod, listInfo }
         });
         return;

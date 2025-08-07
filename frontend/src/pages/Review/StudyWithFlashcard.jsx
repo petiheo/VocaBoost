@@ -166,7 +166,8 @@ export default function StudyWithFlashcard() {
             sessionId: session?.sessionId || sessionId,
             listId: targetListId, // Pass the actual listId
             listInfo,
-            currentProgress
+            currentProgress,
+            sessionType: 'flashcard' // Pass session type for correct navigation
           }
         });
         return;
