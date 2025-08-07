@@ -10,8 +10,22 @@ export default function VocabularyListCard({
   nextReview,
   buttonContent,
   completionDate,
-  result
+  result,
+  isReviewDisabled,
 }) {
+  const navigate = useNavigate();
+
+  const handleButtonClick = () => {
+    if (isReviewDisabled) {
+      return;
+    }
+
+    if (buttonContent.startsWith('Review')) {
+      navigate(`/review/${listId}`);
+    } else if (buttonContent === 'Overview') {
+      navigate(`/vocabulary/overview/${listId}`);
+    }
+  };
 
   return (
     <div className="vocab-card">
@@ -25,7 +39,7 @@ export default function VocabularyListCard({
       ): (<></>)}
       { nextReview ? (
         <>
-        <span className="vocab-next-review">{completionDate !== "N/A" ? (`Next review in ${nextReview} days`):("")}</span>
+        <span className="vocab-next-review">{nextReview !== "N/A" ? (`Next review in ${nextReview} days`):("")}</span>
         </>
       ): (<></>)}
       <div className="vocab-footer">
@@ -45,7 +59,11 @@ export default function VocabularyListCard({
           </div>
         </div>
 
-        <button className="btn review-btn" >{buttonContent}</button>
+        <button className="btn review-btn" 
+          onClick={handleButtonClick}
+          disabled={isReviewDisabled} 
+        >{buttonContent}</button>
+
       </div>
     </div>
   );

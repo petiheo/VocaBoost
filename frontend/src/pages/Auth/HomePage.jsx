@@ -1,7 +1,6 @@
 import { Header, SideBar, Footer, SearchResultsGridSkeleton, CarouselSectionSkeleton } from '../../components';
 import CarouselVocabSection from '../../components/Vocabulary/CarouselVocabSection';
 import { useState, useEffect } from 'react';
-import  LoadingCursor from '../../components/UI/LoadingCursor';
 import { useDebounce } from '../../hooks/useDebounce'; 
 import { VocabularyListCard } from '../../components';
 import vocabularyService from '../../services/Vocabulary/vocabularyService';
@@ -36,8 +35,6 @@ const HomePage = () => {
   const [popularLists, setPopularLists] = useState({ data: [], isLoading: true, error: null });
 
   const [activeReviewTab, setActiveReviewTab] = useState('today');
-  const [reviewPage, setReviewPage] = useState(1);
-  const [reviewLimit] = useState(10);
 
   const [searchQuery, setSearchQuery] = useState(''); 
   const [searchResults, setSearchResults] = useState({ 
@@ -58,12 +55,12 @@ const HomePage = () => {
     const fetchStaticLists = async () => {
       try {
         const [historyResponse, popularResponse] = await Promise.all([
-            vocabularyService.getHistoryLists(),
-            vocabularyService.getPopularLists()
+            vocabularyService.getHistoryLists({limit: 12}),
+            vocabularyService.getPopularLists({limit: 12})
         ]);
 
         const transformedRecent = (historyResponse.lists || []).map(list => ({
-          id: list.listId,
+          listId: list.id,
           title: list.title,
           description: list.description,
           username: list.creator?.display_name,
@@ -73,7 +70,7 @@ const HomePage = () => {
         setRecentLists({ data: transformedRecent, isLoading: false, error: null });
 
         const transformedPopular = (popularResponse.lists || []).map(list => ({
-          id: list.listId,
+          listId: list.id,
           title: list.title,
           description: list.description,
           username: list.creator?.display_name,
@@ -147,21 +144,21 @@ const HomePage = () => {
       setReviewLists({ data: [], pagination: null, isLoading: true, error: null });
       try {
         let response;
-        const params = { page: reviewPage, limit: reviewLimit };
         
         if (activeReviewTab === 'today') {
-          response = await vocabularyService.getDueLists(params);
+          response = await vocabularyService.getDueLists();
         } else {
-          response = await vocabularyService.getUpcomingLists(params);
+          response = await vocabularyService.getUpcomingLists({limit: 12});
         }
         
         const transformedReview = (response.lists || []).map(list => ({
-          id: list.id || list.listId,
+          listId: list.id || list.listId,
           title: list.title,
           description: list.description,
           username: list.creator?.display_name,
           role: list.creator?.role,
           avatarUrl: list.creator?.avatar_url,
+          nextReview: list.next_review_in_days,
         }));
         setReviewLists({ 
           data: transformedReview, 
@@ -178,17 +175,12 @@ const HomePage = () => {
     if (!searchQuery) {
         fetchReviewData();
     }
-  }, [activeReviewTab, reviewPage, reviewLimit, searchQuery]); 
+  }, [activeReviewTab, searchQuery]); 
 
   const handleTabChange = (tabIdentifier) => {
     if (tabIdentifier !== activeReviewTab) {
       setActiveReviewTab(tabIdentifier);
-      setReviewPage(1); // Reset to page 1 when changing tabs
     }
-  };
-
-  const handleReviewPageChange = (newPage) => {
-    setReviewPage(newPage);
   };
 
   return (
@@ -233,43 +225,32 @@ const HomePage = () => {
               </section>
             ) : (
               <>
-                {isSkeletonLoading(reviewLists.isLoading) ? (
-                  <CarouselSectionSkeleton title="REVIEW LISTS" showTabs={true} />
-                ) : (
-                  <CarouselVocabSection 
-                    title="REVIEW LISTS" 
-                    vocabLists={reviewLists.data}
-                    isLoading={reviewLists.isLoading} 
-                    error={reviewLists.error}        
-                  >
-                    <ReviewTabs 
-                      activeTab={activeReviewTab} 
-                      onTabChange={handleTabChange} 
-                    />
-                  </CarouselVocabSection>
-                )}
-
-                {isSkeletonLoading(recentLists.isLoading) ? (
-                  <CarouselSectionSkeleton title="RECENTLY LISTS" />
-                ) : (
-                  <CarouselVocabSection 
-                    title="RECENTLY LISTS" 
-                    vocabLists={recentLists.data}
-                    isLoading={recentLists.isLoading} 
-                    error={recentLists.error}         
+                <CarouselVocabSection 
+                  title="REVIEW LISTS" 
+                  vocabLists={reviewLists.data}
+                  isLoading={isSkeletonLoading(reviewLists.isLoading)} 
+                  error={reviewLists.error}  
+                  isReviewDisabled={activeReviewTab === 'upcoming'}
+                >
+                  <ReviewTabs 
+                    activeTab={activeReviewTab} 
+                    onTabChange={handleTabChange} 
                   />
-                )}
+                </CarouselVocabSection>
 
-                {isSkeletonLoading(popularLists.isLoading) ? (
-                  <CarouselSectionSkeleton title="POPULAR LISTS" />
-                ) : (
-                  <CarouselVocabSection 
-                    title="POPULAR LISTS" 
-                    vocabLists={popularLists.data}
-                    isLoading={popularLists.isLoading} 
-                    error={popularLists.error}         
-                  />
-                )}
+                <CarouselVocabSection 
+                  title="RECENTLY LISTS" 
+                  vocabLists={recentLists.data}
+                  isLoading={isSkeletonLoading(recentLists.isLoading)} 
+                  error={recentLists.error}         
+                />
+
+                <CarouselVocabSection 
+                  title="POPULAR LISTS" 
+                  vocabLists={popularLists.data}
+                  isLoading={isSkeletonLoading(popularLists.isLoading)} 
+                  error={popularLists.error}         
+                />
               </>
             )}
 

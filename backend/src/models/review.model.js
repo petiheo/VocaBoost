@@ -37,7 +37,7 @@ class ReviewModel {
     // Step 3: Fetch the full details for those unique lists, with optional pagination.
     let query = supabase
       .from('vocab_lists')
-      .select('id, title, word_count, creator:users(id, display_name, role, avatar_url), tags(name)', { count: 'exact' })
+      .select('id, title, description, word_count, creator:users(id, display_name, role, avatar_url), tags(name)', { count: 'exact' })
       .in('id', uniqueListIds)
       .order('updated_at', { ascending: false });
 
@@ -74,7 +74,7 @@ class ReviewModel {
     // Step 2: Get the list_id and details for each of those upcoming words.
     const { data: wordDetails, error: wordError } = await supabase
       .from('vocabulary')
-      .select('list_id, vocab_lists(*, creator:users(id, display_name, role, avatar_url))')
+      .select('id, list_id, vocab_lists(*, creator:users(id, display_name, role, avatar_url))')
       .in('id', upcomingWordIds);
       
     if (wordError) throw wordError;

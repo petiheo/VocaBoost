@@ -3528,6 +3528,7 @@ h2 {
   font-size: 0.9rem;
   color: #444;
   margin: 0;
+  margin-bottom: 0.5rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -3537,7 +3538,7 @@ h2 {
 }
 .vocab-card .vocab-completion-date {
   font-family: "Inter", sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   color: #2932B1;
   font-weight: bold;
   margin-top: 0.5rem;
@@ -3545,13 +3546,13 @@ h2 {
 }
 .vocab-card .vocab-result {
   font-family: "Inter", sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   color: #2932B1;
   font-weight: bold;
 }
 .vocab-card .vocab-next-review {
   font-family: "Inter", sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   color: #2932B1;
   font-weight: bold;
 }
@@ -3630,6 +3631,11 @@ h2 {
   border-radius: 20px;
   cursor: pointer;
 }
+.vocab-card .vocab-footer .review-btn:disabled {
+  background-color: #515050;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
 
 .carousel-vocab-section {
   width: 100%;
@@ -3643,6 +3649,7 @@ h2 {
   font-size: 2.5rem;
   color: #2D2D2D;
   margin: 0 0 1rem 0;
+  font-weight: normal;
 }
 .carousel-vocab-section .carousel-body {
   position: relative;
