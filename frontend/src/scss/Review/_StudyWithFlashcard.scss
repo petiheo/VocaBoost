@@ -21,6 +21,7 @@
         flex: 1;
         flex-direction: column;
         align-items: center;
+        justify-self: center;
         min-height: 40rem;
         margin-bottom: 5rem;
     }
@@ -93,6 +94,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
         backface-visibility: hidden;
         font-size: 2rem;
         padding: 1rem;
@@ -101,11 +103,18 @@
 
         .card__front {
         background-color: #F8F8F8;
-        }
+        }   
 
         .card__back {
         background-color: #FFFFFF;
         transform: rotateY(180deg);
+        }
+
+        .card__report-trigger {
+            position: absolute;
+            top: 1rem;
+            right: 1.2rem;
+            z-index: 1000;
         }
     }
 
