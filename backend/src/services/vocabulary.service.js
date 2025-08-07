@@ -2,6 +2,7 @@ const vocabularyModel = require('../models/vocabulary.model');
 const reviewModel = require('../models/review.model');
 const logger = require('../utils/logger');
 const aiService = require('./ai.service');
+const { PaginationUtil } = require('../utils');
 class ForbiddenError extends Error {
   constructor(message = 'User does not have permission for this action.') {
     super(message);
@@ -42,7 +43,14 @@ class VocabularyService {
 
   async findUserLists(userId, options) {
     const { page = null, limit = null } = options;
-    const { from, to } = this._getPagination(page, limit);
+    let from = null, to = null, pagination = null;
+    
+    if (page !== null && limit !== null) {
+      pagination = PaginationUtil.validate(page, limit);
+      from = pagination.offset;
+      to = pagination.offset + pagination.limit - 1;
+    }
+    
     const { data, error, count } = await vocabularyModel.findUserLists(userId, {
       ...options,
       from,
@@ -55,12 +63,24 @@ class VocabularyService {
       ...list,
       tags: list.tags.map((t) => t.name),
     }));
-    return { lists, pagination: this._formatPagination(page, limit, count) };
+    
+    const paginationResult = pagination 
+      ? PaginationUtil.getMetadata(pagination.page, pagination.limit, count)
+      : { totalItems: count || 0 };
+      
+    return { lists, pagination: paginationResult };
   }
 
   async searchPublicLists(options) {
     const { page = null, limit = null } = options;
-    const { from, to } = this._getPagination(page, limit);
+    let from = null, to = null, pagination = null;
+    
+    if (page !== null && limit !== null) {
+      pagination = PaginationUtil.validate(page, limit);
+      from = pagination.offset;
+      to = pagination.offset + pagination.limit - 1;
+    }
+    
     const { data, error, count } = await vocabularyModel.searchPublicLists({
       ...options,
       from,
@@ -73,7 +93,12 @@ class VocabularyService {
       ...list,
       tags: list.tags.map((t) => t.name),
     }));
-    return { lists, pagination: this._formatPagination(page, limit, count) };
+    
+    const paginationResult = pagination 
+      ? PaginationUtil.getMetadata(pagination.page, pagination.limit, count)
+      : { totalItems: count || 0 };
+      
+    return { lists, pagination: paginationResult };
   }
 
   async findListById(listId, userId, skipPermissionCheck = false) {
@@ -104,7 +129,13 @@ class VocabularyService {
   }
 
   async findHistoryLists(userId, { page = null, limit = null }) {
-    const { from, to } = this._getPagination(page, limit);
+    let from = null, to = null, pagination = null;
+    
+    if (page !== null && limit !== null) {
+      pagination = PaginationUtil.validate(page, limit);
+      from = pagination.offset;
+      to = pagination.offset + pagination.limit - 1;
+    }
 
     const { data, error, count } = await vocabularyModel.findHistoryLists(
       userId,
@@ -113,21 +144,35 @@ class VocabularyService {
     );
     if (error) throw error;
 
+    const paginationResult = pagination 
+      ? PaginationUtil.getMetadata(pagination.page, pagination.limit, count)
+      : { totalItems: count || 0 };
+
     return {
       lists: data || [],
-      pagination: this._formatPagination(page, limit, count),
+      pagination: paginationResult,
     };
   }
 
   async findPopularLists({ page = null, limit = null }) {
-    const { from, to } = this._getPagination(page, limit);
+    let from = null, to = null, pagination = null;
+    
+    if (page !== null && limit !== null) {
+      pagination = PaginationUtil.validate(page, limit);
+      from = pagination.offset;
+      to = pagination.offset + pagination.limit - 1;
+    }
 
     const { data, error, count } = await vocabularyModel.findPopularLists(from, to);
     if (error) throw error;
 
+    const paginationResult = pagination 
+      ? PaginationUtil.getMetadata(pagination.page, pagination.limit, count)
+      : { totalItems: count || 0 };
+
     return {
       lists: data || [],
-      pagination: this._formatPagination(page, limit, count),
+      pagination: paginationResult,
     };
   }
 
@@ -350,14 +395,26 @@ class VocabularyService {
 
   async findWordsByListId(listId, userId, { page = null, limit = null }) {
     await this.findListById(listId, userId);
-    const { from, to } = this._getPagination(page, limit);
+    let from = null, to = null, pagination = null;
+    
+    if (page !== null && limit !== null) {
+      pagination = PaginationUtil.validate(page, limit);
+      from = pagination.offset;
+      to = pagination.offset + pagination.limit - 1;
+    }
+    
     const {
       data: words,
       error,
       count,
     } = await vocabularyModel.findWordsByListId(listId, from, to);
     if (error) throw error;
-    return { words, pagination: this._formatPagination(page, limit, count) };
+    
+    const paginationResult = pagination 
+      ? PaginationUtil.getMetadata(pagination.page, pagination.limit, count)
+      : { totalItems: count || 0 };
+      
+    return { words, pagination: paginationResult };
   }
 
   async findWordById(wordId, userId) {
@@ -382,14 +439,26 @@ class VocabularyService {
         { field: 'sortBy', message: 'Invalid sort format.' },
       ]);
     }
-    const { from, to } = this._getPagination(page, limit);
+    let from = null, to = null, pagination = null;
+    
+    if (page !== null && limit !== null) {
+      pagination = PaginationUtil.validate(page, limit);
+      from = pagination.offset;
+      to = pagination.offset + pagination.limit - 1;
+    }
+    
     const {
       data: words,
       error,
       count,
     } = await vocabularyModel.searchInList(listId, { q, sortBy, from, to });
     if (error) throw error;
-    return { words, pagination: this._formatPagination(page, limit, count) };
+    
+    const paginationResult = pagination 
+      ? PaginationUtil.getMetadata(pagination.page, pagination.limit, count)
+      : { totalItems: count || 0 };
+      
+    return { words, pagination: paginationResult };
   }
 
   async generateExample(wordId, userId, context = null) {
@@ -571,10 +640,6 @@ class VocabularyService {
           ai_generated: originalWord.aiGenerated || false,
           generation_prompt: originalWord.generationPrompt || null,
         };
-        console.log(
-          `Creating example for word "${originalWord.term}":`,
-          exampleData
-        );
         itemsToInsert.push(exampleData);
       }
       if (itemType === 'synonym' && originalWord.synonyms) {
@@ -586,31 +651,6 @@ class VocabularyService {
     return itemsToInsert;
   }
 
-  _getPagination(page, size) {
-    if (page == null || size == null) {
-      return { from: null, to: null, limit: null };
-    }
-
-    const limit = +size;
-    const from = (page - 1) * limit;
-    const to = from + size - 1;
-    return { from, to, limit };
-  }
-
-  _formatPagination(page, limit, totalItems) {
-    if (page == null || limit == null) {
-      return { totalItems: totalItems || 0 };
-    }
-
-    const currentPage = Number(page);
-    const totalPages = Math.ceil(totalItems / limit);
-    return {
-      currentPage,
-      totalPages,
-      totalItems: totalItems || 0,
-      limit: Number(limit),
-    };
-  }
 }
 
 module.exports = new VocabularyService();

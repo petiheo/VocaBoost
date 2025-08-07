@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const TokenBlacklistModel = require('../models/tokenBlacklist.model');
+const { logger } = require('../utils');
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRE = process.env.JWT_EXPIRE;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || JWT_SECRET + '_refresh';
@@ -91,7 +92,7 @@ const blacklistToken = async (token, tokenType = 'access', userId = null, reason
     );
     return true;
   } catch (error) {
-    console.error('Error blacklisting token:', error);
+    logger.error('Error blacklisting token:', error);
     return false;
   }
 };
