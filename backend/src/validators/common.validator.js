@@ -37,15 +37,20 @@ const commonValidators = {
       .withMessage('Password must contain uppercase, lowercase and number'),
 
   text: (field, options = {}) => {
-    const { min = 1, max = 500, required = true, message = `${field} is required` } = options;
+    const {
+      min = 1,
+      max = 500,
+      required = true,
+      message = `${field} is required`,
+    } = options;
     let validator = body(field).trim();
-    
+
     if (required) {
       validator = validator.notEmpty().withMessage(message);
     } else {
       validator = validator.optional();
     }
-    
+
     return validator
       .isLength({ min: required ? min : 0, max })
       .withMessage(`${field} must be between ${min} and ${max} characters`)

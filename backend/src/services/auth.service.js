@@ -225,14 +225,14 @@ class AuthService {
   async logout(accessToken, refreshToken) {
     // Blacklist both tokens
     const promises = [];
-    
+
     if (accessToken) {
       promises.push(blacklistToken(accessToken, 'access', null, 'logout'));
     }
     if (refreshToken) {
       promises.push(blacklistToken(refreshToken, 'refresh', null, 'logout'));
     }
-    
+
     await Promise.all(promises);
     return { message: 'Logged out successfully' };
   }

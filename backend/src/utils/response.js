@@ -86,7 +86,7 @@ class ResponseUtils {
       success: true,
       message,
       data,
-      pagination
+      pagination,
     });
   }
 }

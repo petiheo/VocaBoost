@@ -6,7 +6,7 @@ This directory contains utility functions and helpers for the VocaBoost backend 
 
 - **ResponseUtils**: Standardized API response formatting
 - **ErrorHandler**: Consistent error handling with logging
-- **PaginationUtil**: Database pagination helpers  
+- **PaginationUtil**: Database pagination helpers
 - **logger**: Winston-based logging system
 - **common**: Common utility functions (array shuffling, etc.)
 - **dbPoolMonitor**: Database connection pool monitoring
@@ -17,15 +17,15 @@ This directory contains utility functions and helpers for the VocaBoost backend 
 
 ```javascript
 // Import all utilities
-const { 
-  ResponseUtils, 
-  ErrorHandler, 
+const {
+  ResponseUtils,
+  ErrorHandler,
   PaginationUtil,
   logger,
   common,
   dbPoolMonitor,
   htmlUtils,
-  tokenCleanup 
+  tokenCleanup,
 } = require('../utils');
 
 // Or import individual modules
@@ -518,9 +518,9 @@ logger.error('Database error in getUserProfile:', error);
 
 // Use appropriate log levels
 logger.debug('Detailed debug info'); // Development only
-logger.info('General information');   // Important events
-logger.warn('Warning condition');     // Potential issues
-logger.error('Error occurred');       // Actual errors
+logger.info('General information'); // Important events
+logger.warn('Warning condition'); // Potential issues
+logger.error('Error occurred'); // Actual errors
 ```
 
 ### Pagination Implementation
@@ -531,11 +531,16 @@ const { PaginationUtil, ResponseUtils } = require('../utils');
 async function getUsers(req, res) {
   const { page, limit } = req.query;
   const pagination = PaginationUtil.validate(page, limit);
-  
+
   const query = supabase.from('users').select('*');
   const result = await PaginationUtil.execute(query, pagination);
-  
-  return ResponseUtils.paginated(res, 'Users retrieved', result.data, result.pagination);
+
+  return ResponseUtils.paginated(
+    res,
+    'Users retrieved',
+    result.data,
+    result.pagination
+  );
 }
 ```
 

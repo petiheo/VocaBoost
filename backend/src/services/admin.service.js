@@ -12,22 +12,35 @@ class AdminService {
   //  TEACHER VERIFICATION
   // =================================================================
 
-  async getPendingTeacherRequests({ page = 1, limit = 20, sortBy = 'created_at:asc' }) {
+  async getPendingTeacherRequests({
+    page = 1,
+    limit = 20,
+    sortBy = 'created_at:asc',
+  }) {
     const pagination = PaginationUtil.validate(page, limit);
     const from = pagination.offset;
     const to = pagination.offset + pagination.limit - 1;
-    const { data, error, count } = await adminModel.findPendingTeacherRequests({ from, to, sortBy });
+    const { data, error, count } = await adminModel.findPendingTeacherRequests({
+      from,
+      to,
+      sortBy,
+    });
 
     if (error) throw error;
-    
+
     return {
       requests: data,
-      pagination: PaginationUtil.getMetadata(pagination.page, pagination.limit, count),
+      pagination: PaginationUtil.getMetadata(
+        pagination.page,
+        pagination.limit,
+        count
+      ),
     };
   }
 
   async getTeacherRequestById(requestId) {
-    const { data: request, error } = await adminModel.findTeacherRequestById(requestId);
+    const { data: request, error } =
+      await adminModel.findTeacherRequestById(requestId);
     if (error) throw error;
     if (!request) return null;
 
@@ -35,7 +48,8 @@ class AdminService {
   }
 
   async approveTeacherRequest(requestId, adminId) {
-    const { data: originalRequest, error: findError } = await adminModel.findTeacherRequestById(requestId);
+    const { data: originalRequest, error: findError } =
+      await adminModel.findTeacherRequestById(requestId);
     if (findError) throw findError;
     if (!originalRequest || originalRequest.status !== 'pending') {
       throw new Error('Teacher request not found or is not pending.');
@@ -43,14 +57,16 @@ class AdminService {
 
     const userProfile = await userModel.findById(originalRequest.user.userId);
 
-    const { data: updatedRequest, error: updateRequestError } = await adminModel.updateTeacherRequestStatus(requestId, 'approved', adminId);
+    const { data: updatedRequest, error: updateRequestError } =
+      await adminModel.updateTeacherRequestStatus(requestId, 'approved', adminId);
     if (updateRequestError) throw updateRequestError;
 
-    return { request: updatedRequest, user: userProfile};
+    return { request: updatedRequest, user: userProfile };
   }
 
-  async rejectTeacherRequest(requestId, adminId, reason="") {
-    const { data: originalRequest, error: findError } = await adminModel.findTeacherRequestById(requestId);
+  async rejectTeacherRequest(requestId, adminId, reason = '') {
+    const { data: originalRequest, error: findError } =
+      await adminModel.findTeacherRequestById(requestId);
     if (findError) throw findError;
     if (!originalRequest || originalRequest.status !== 'pending') {
       throw new Error('Teacher request not found or is not pending.');
@@ -58,10 +74,16 @@ class AdminService {
 
     const userProfile = await userModel.findById(originalRequest.user.userId);
 
-    const { data: updatedRequest, error: updateRequestError } = await adminModel.updateTeacherRequestStatus(requestId, 'rejected', adminId, reason);
+    const { data: updatedRequest, error: updateRequestError } =
+      await adminModel.updateTeacherRequestStatus(
+        requestId,
+        'rejected',
+        adminId,
+        reason
+      );
     if (updateRequestError) throw updateRequestError;
 
-    return { request: updatedRequest, user: userProfile};
+    return { request: updatedRequest, user: userProfile };
   }
 
   // =================================================================
@@ -73,12 +95,16 @@ class AdminService {
     const from = pagination.offset;
     const to = pagination.offset + pagination.limit - 1;
     const { data, error, count } = await adminModel.findOpenReports({ from, to });
-    
+
     if (error) throw error;
-    
+
     return {
       reports: data,
-      pagination: PaginationUtil.getMetadata(pagination.page, pagination.limit, count),
+      pagination: PaginationUtil.getMetadata(
+        pagination.page,
+        pagination.limit,
+        count
+      ),
     };
   }
 
@@ -89,7 +115,8 @@ class AdminService {
   }
 
   async resolveReport(reportId, adminId, action, notes) {
-    const { data: report, error: findError } = await adminModel.findReportById(reportId);
+    const { data: report, error: findError } =
+      await adminModel.findReportById(reportId);
     if (findError) throw findError;
     if (!report || report.status !== 'open') {
       throw new Error('Report not found or is not open.');
@@ -101,12 +128,12 @@ class AdminService {
     }
 
     // Update the report itself with the resolution
-    const { data: updatedReport, error: updateError } = await adminModel.updateReportStatus(reportId, action, adminId, notes);
+    const { data: updatedReport, error: updateError } =
+      await adminModel.updateReportStatus(reportId, action, adminId, notes);
     if (updateError) throw updateError;
-    
+
     return updatedReport;
   }
-  
 }
 
 module.exports = new AdminService();

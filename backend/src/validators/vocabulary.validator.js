@@ -7,8 +7,16 @@ const vocabularyValidator = {
   //  LIST VALIDATORS
   // =================================================================
   createList: [
-    commonValidators.text('title', { min: 2, max: 100, message: 'Title is required and must be between 2 and 100 characters.' }),
-    commonValidators.text('description', { required: false, max: 500, message: 'Description cannot exceed 500 characters.' }),
+    commonValidators.text('title', {
+      min: 2,
+      max: 100,
+      message: 'Title is required and must be between 2 and 100 characters.',
+    }),
+    commonValidators.text('description', {
+      required: false,
+      max: 500,
+      message: 'Description cannot exceed 500 characters.',
+    }),
     body('privacy_setting')
       .isIn(['private', 'public'])
       .withMessage("Privacy setting must be 'private' or 'public'."),
@@ -57,7 +65,11 @@ const vocabularyValidator = {
       .isUUID()
       .withMessage('URL parameter listId must be a valid UUID.'),
     body('term').trim().escape().notEmpty().withMessage('Term is required.'),
-    body('definition').trim().escape().notEmpty().withMessage('Definition is required.'),
+    body('definition')
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage('Definition is required.'),
     body('translation').optional().trim().escape().isString(),
     body('image_url')
       .optional()
@@ -90,7 +102,11 @@ const vocabularyValidator = {
     body('words')
       .isArray({ min: 1 })
       .withMessage('Words must be a non-empty array.'),
-    body('words.*.term').trim().escape().notEmpty().withMessage('Each word must have a term.'),
+    body('words.*.term')
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage('Each word must have a term.'),
     body('words.*.definition')
       .trim()
       .escape()
@@ -127,7 +143,12 @@ const vocabularyValidator = {
     param('wordId')
       .isUUID()
       .withMessage('URL parameter wordId must be a valid UUID.'),
-    body('term').optional().trim().escape().notEmpty().withMessage('Term cannot be empty.'),
+    body('term')
+      .optional()
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage('Term cannot be empty.'),
     body('definition')
       .optional()
       .trim()

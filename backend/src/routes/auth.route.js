@@ -7,17 +7,9 @@ const authController = require('../controllers/auth.controller');
 const authenticateMiddleware = require('../middlewares/authenticate.middleware');
 
 // Registration & Login & Logout
-authRouter.post(
-  '/register',
-  authValidators.register,
-  authController.register
-);
+authRouter.post('/register', authValidators.register, authController.register);
 
-authRouter.post(
-  '/login',
-  authValidators.login,
-  authController.login
-);
+authRouter.post('/login', authValidators.login, authController.login);
 
 authRouter.post('/logout', authController.logout);
 
@@ -63,6 +55,10 @@ authRouter.post(
   authController.getAccountStatus
 );
 
-authRouter.get('/validate-token', authenticateMiddleware, authController.validateToken);
+authRouter.get(
+  '/validate-token',
+  authenticateMiddleware,
+  authController.validateToken
+);
 
 module.exports = authRouter;
