@@ -125,10 +125,9 @@ class AdminModel {
         status,
         created_at,
         word_id,
-        reporter_id
-      `,
-        { count: 'exact' }
-      )
+        reporter_id,
+        reason
+      `, { count: 'exact' })
       .eq('status', 'open')
       .order('created_at', { ascending: true });
 
@@ -159,6 +158,7 @@ class AdminModel {
       reportId: r.id,
       status: r.status,
       reportedAt: r.created_at,
+      reason: r.reason,
       reportedWord: {
         wordId: r.word_id,
         term: wordsMap.get(r.word_id)?.term,

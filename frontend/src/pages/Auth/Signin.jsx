@@ -8,6 +8,7 @@ import { useToast } from "../../components/Providers/ToastProvider";
 import LoadingCursor from "../../components/UI/LoadingCursor";
 import { useAuth } from "../../services/Auth/authContext";
 import authService from "../../services/Auth/authService";
+import { navigateByRole } from "../../utils/navigationUtils";
 import {
   clearAuthErrors,
   handleLoginError,
@@ -87,7 +88,9 @@ export default function Signin() {
         // Only store tokens for verified users
         authService.storeUserSession(res);
         setUser(res?.data?.user);
-        navigate("/homepage");
+        
+        // Navigate based on user role
+        navigateByRole(res?.data?.user, navigate);
       } else {
         // Don't store tokens for unverified users
         navigate("/checkYourMail", {

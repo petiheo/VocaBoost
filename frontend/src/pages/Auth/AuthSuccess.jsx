@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../services/Auth/authContext";
 import authService from "../../services/Auth/authService";
+import { navigateByRole } from "../../utils/navigationUtils";
 
 export default function AuthSuccess() {
   const [searchParams] = useSearchParams();
@@ -34,12 +35,8 @@ export default function AuthSuccess() {
             localStorage.setItem("user", JSON.stringify(userObject));
             setUser(userObject);
 
-            // Navigate based on user status
-            if (isNewUser) {
-              navigate("/select-user-type");
-            } else {
-              navigate("/homepage");
-            }
+            // Navigate based on user status and role
+            navigateByRole(userObject, navigate, isNewUser);
           } else {
             throw new Error("Token validation failed");
           }

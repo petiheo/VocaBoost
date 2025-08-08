@@ -1,10 +1,13 @@
 import { lazy, Suspense } from "react";
+import ProtectedAdminRoute from "../components/Auth/ProtectedAdminRoute";
 
 const AdminTeacherVerification = lazy(
   () => import("../pages/Admin/AdminTeacherVerification")
 );
 const TeacherRequest = lazy(() => import("../pages/Admin/TeacherRequest"));
-const AdminGeneral = lazy(() => import("../pages/Admin/AdminGeneral"));
+const AdminUsers = lazy(() => import("../pages/Admin/AdminUsers"));
+const AdminDashboard = lazy(() => import("../pages/Admin/AdminDashboard"));
+const AdminContent = lazy(() => import("../pages/Admin/AdminContent"));
 
 const LoadingFallback = () => (
   <div
@@ -23,17 +26,17 @@ const LoadingFallback = () => (
 
 const withSuspense = (Component) => (
   <Suspense fallback={<LoadingFallback />}>
-    <Component />
+    <ProtectedAdminRoute>
+      <Component />
+    </ProtectedAdminRoute>
   </Suspense>
 );
 
 const adminRoutes = [
-  {
-    path: "/admin-teacher-verification",
-    element: withSuspense(AdminTeacherVerification),
-  },
-  { path: "/teacher-request", element: withSuspense(TeacherRequest) },
-  { path: "/admin-general", element: withSuspense(AdminGeneral) },
-];
-
+    { path: "/admin-teacher-verification", element: withSuspense(AdminTeacherVerification) },
+    { path: "/teacher-request", element: withSuspense(TeacherRequest) },
+    { path: "/admin-users", element: withSuspense(AdminUsers) },
+    { path: "/admin-dashboard", element: withSuspense(AdminDashboard) },
+    { path: "/admin-content", element: withSuspense(AdminContent) },
+]
 export default adminRoutes;
