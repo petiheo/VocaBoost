@@ -23,4 +23,8 @@ export const SKELETON_THEMES = {
     baseColor: "#fff6e9",
     highlightColor: "#ffe8d1",
   },
+  viewList: {
+    baseColor: "#ffebd5",
+    highlightColor: "#ffd9b3",
+  },
 };
