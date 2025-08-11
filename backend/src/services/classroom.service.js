@@ -1,4 +1,5 @@
 const classroomModel = require('../models/classroom.model');
+const userModel = require('../models/user.model');
 const {
   generateUniqueJoinCode,
   computeAssignmentStatus,
@@ -198,7 +199,7 @@ class ClassroomService {
   async inviteLearner(classroomId, email) {
     const classroom = await classroomModel.getClassroomById(classroomId);
 
-    const teacher = await classroomModel.findById(classroom.teacher_id);
+    const teacher = await userModel.findById(classroom.teacher_id);
     if (!teacher) {
       throw new Error('Teacher not found.');
     }
@@ -207,7 +208,7 @@ class ClassroomService {
       throw new Error('You cannot invite yourself to your own classroom.');
     }
 
-    const learner = await classroomModel.findByEmail(email);
+    const learner = await userModel.findByEmail(email);
     if (learner) {
       const member = await classroomModel.findMemberStatus(classroomId, learner.id);
       if (member?.join_status === 'joined') {
@@ -465,7 +466,7 @@ class ClassroomService {
       learnerId,
       ['completed']
     );
-    
+
     return raw.map((item) => ({
       assignment_id: item.assignment_id,
       title: item.assignments.title,
@@ -502,7 +503,7 @@ class ClassroomService {
         due_date: item.assignments.due_date,
         status: 'overdue',
         learner_status: item.status,
-        creator:item.assignments.vocab_lists.creator,
+        creator: item.assignments.vocab_lists.creator,
       }));
   }
 

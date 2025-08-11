@@ -1,0 +1,42 @@
+/* Modal shake animation */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-10px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(10px);
+  }
+}
+
+.shake-animation {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Common modal styles */
+.close-button:hover {
+  color: #333 !important;
+  transform: scale(1.1);
+}
+
+.report-textarea:focus {
+  border-color: #3498db !important;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.btn-confirm:focus,
+.btn-cancel:focus,
+.submit-button:focus {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}

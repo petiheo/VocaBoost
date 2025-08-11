@@ -1,4 +1,4 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 
 .my-classroom {
   display: grid;
@@ -12,7 +12,7 @@
 
   font-family: $font-inter;
   font-weight: bold;
-  color: #352D24;
+  color: #352d24;
 }
 
 .my-classroom-page {
@@ -26,7 +26,6 @@
     font-size: 50px;
     margin: 0;
   }
-
 
   .my-classroom-header {
     display: flex;
@@ -88,13 +87,12 @@
       box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.15);
 
       &.light {
-        background-color: #F1EDE4;
-
+        background-color: #f1ede4;
       }
 
       &.dark {
         background-color: #222;
-        color: #FFF3DF;
+        color: #fff3df;
       }
     }
 
@@ -104,9 +102,8 @@
   }
 
   .classroom-list {
-
     .classroom-card {
-      background-color: #F9F3E4;
+      background-color: #f9f3e4;
       padding: 1rem;
       margin-bottom: 1rem;
       border-radius: 8px;
@@ -160,7 +157,7 @@
   font-family: $font-inriasans;
   font-size: 20px;
 
-  background-color: #FFFAEF;
+  background-color: #fffaef;
   height: 30vh;
 
   display: flex;

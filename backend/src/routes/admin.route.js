@@ -4,7 +4,7 @@ const adminRouter = express.Router();
 const authenticateMiddleware = require('../middlewares/authenticate.middleware');
 const { requireAdmin } = require('../middlewares/authorize.middleware');
 
-const adminValidator = require('../validators/admin.validator'); 
+const adminValidator = require('../validators/admin.validator');
 const adminController = require('../controllers/admin.controller');
 
 adminRouter.use(authenticateMiddleware);
@@ -17,7 +17,7 @@ adminRouter.get(
 
 adminRouter.get(
   '/teacher-requests/:requestId',
-  ...adminValidator.getRequestById, 
+  ...adminValidator.getRequestById,
   adminController.getTeacherRequestById
 );
 
@@ -29,18 +29,15 @@ adminRouter.put(
 
 adminRouter.put(
   '/teacher-requests/:requestId/reject',
-  ...adminValidator.rejectTeacherRequest, 
+  ...adminValidator.getRequestById,
   adminController.rejectTeacherRequest
 );
 
-adminRouter.get(
-  '/reports/open',
-  adminController.getOpenReports
-);
+adminRouter.get('/reports/open', adminController.getOpenReports);
 
 adminRouter.get(
   '/reports/:reportId',
-  ...adminValidator.getReportById, 
+  ...adminValidator.getReportById,
   adminController.getReportById
 );
 

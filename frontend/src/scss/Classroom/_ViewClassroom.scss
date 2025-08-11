@@ -1,79 +1,78 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 
 .manage-classroom-learner {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  background: #fffcf7;
 
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    min-height: 100vh;
-    background: #FFFCF7;
+  font-family: $font-inriasans;
+  background-color: #fdfbf7;
+  margin: auto;
 
-    font-family: $font-inriasans;
-    background-color: #fdfbf7;
+  &__container {
+    margin: 2em 0;
+    display: flex;
+    gap: 2em;
+  }
+
+  &__content {
+    width: 80%;
     margin: auto;
+  }
 
-    &__container {
-        margin: 2em 0;
-        display: flex;
-        gap: 2em;
+  .tags {
+    display: flex;
+    gap: 0.5rem;
+
+    .tag {
+      background-color: #f5e7c0;
+      padding: 0.3rem 0.7rem;
+      border-radius: 5px;
+      font-size: 0.85rem;
+      color: #3f3f3f;
     }
-
-    &__content {
-        width: 80%;
-        margin: auto;
-    }
-
-    .tags {
-        display: flex;
-        gap: 0.5rem;
-
-        .tag {
-            background-color: #f5e7c0;
-            padding: 0.3rem 0.7rem;
-            border-radius: 5px;
-            font-size: 0.85rem;
-            color: #3f3f3f;
-        }
-    }
+  }
 }
 
 .list-topbar {
-    display: flex;
-    // justify-content: space-between;
-    align-items: center;
-    margin: 1em;
-    justify-content: end;
-    gap: 2em;
+  display: flex;
+  // justify-content: space-between;
+  align-items: center;
+  margin: 1em;
+  justify-content: end;
+  gap: 2em;
 
-    span {
-        color: #777;
-    }
+  span {
+    color: #777;
+  }
 
-    .filter {
-        cursor: pointer;
-        font-size: 0.9rem;
-    }
+  .filter {
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
 }
 
 .list-grid {
-    // display: grid;
-    // grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    // gap: 1em;
+  // display: grid;
+  // grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  // gap: 1em;
 
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat (2, 1fr);
-    gap: 28px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat (2, 1fr);
+  gap: 28px;
 }
 
 .see-more {
-    margin-top: 2rem;
-    text-align: center;
+  margin-top: 2rem;
+  text-align: center;
 
-    .see-more-btn {
-        background: none;
-        border: none;
-        color: #555;
-        cursor: pointer;
-        font-size: 0.9rem;
-    }
+  .see-more-btn {
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
 }

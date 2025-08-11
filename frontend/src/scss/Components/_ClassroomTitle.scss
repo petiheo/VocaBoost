@@ -1,9 +1,9 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 
 .class-header {
   padding: 20px;
   border-radius: 20px;
-  background-color: #FFFAEF;
+  background-color: #fffaef;
   font-family: $font-inriasans;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   min-height: 140px;
@@ -24,7 +24,7 @@
   position: absolute;
   top: 100%; // hoặc top: 30px nếu bạn muốn cách xa button
   right: 0;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
   min-width: 120px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 10;
@@ -45,7 +45,6 @@
   }
 }
 
-
 .class-header h2 {
   font-size: 20px;
   font-weight: bold;
@@ -58,13 +57,12 @@
   margin-top: 10px;
   font-family: $font-inriasans;
 
-
   .tag {
     display: flex;
     align-items: center;
     gap: 10px;
 
-    background: #F8EED3;
+    background: #f8eed3;
     padding: 4px 12px;
     border-radius: 8px;
     font-size: 13px;

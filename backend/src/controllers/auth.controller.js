@@ -1,5 +1,9 @@
 const authService = require('../services/auth.service');
-const { generateToken } = require('../helpers/jwt.helper');
+const {
+  generateToken,
+  generateTokenPair,
+  refreshAccessToken,
+} = require('../helpers/jwt.helper');
 const passport = require('passport');
 const { ResponseUtils, ErrorHandler } = require('../utils');
 const logger = require('../utils/logger');
@@ -62,14 +66,14 @@ class AuthController {
           return res.redirect(`${frontendUrl}/login?error=access_denied`);
         }
 
-        const accessToken = generateToken({
+        const { accessToken, refreshToken } = generateTokenPair({
           userId: user.id,
           email: user.email,
           role: user.role,
         });
 
-        // Pass isNewUser as separate URL parameter
-        const redirectUrl = `${frontendUrl}/auth/success?token=${accessToken}&isNewUser=${user.isNewUser}`;
+        // Pass isNewUser and refreshToken as separate URL parameters
+        const redirectUrl = `${frontendUrl}/auth/success?token=${accessToken}&refreshToken=${refreshToken}&isNewUser=${user.isNewUser}`;
         res.redirect(redirectUrl);
       } catch (error) {
         logger.error('Google callback processing error:', error);
@@ -201,6 +205,43 @@ class AuthController {
         'Internal server error',
         500
       );
+    }
+  }
+
+  async refreshToken(req, res) {
+    try {
+      const { refreshToken } = req.body;
+
+      if (!refreshToken) {
+        return ResponseUtils.badRequest(res, 'Refresh token is required');
+      }
+
+      const newAccessToken = await refreshAccessToken(refreshToken);
+
+      return ResponseUtils.success(res, 'Token refreshed successfully', {
+        token: newAccessToken,
+      });
+    } catch (error) {
+      return ErrorHandler.handleError(
+        res,
+        error,
+        'refreshToken',
+        'Failed to refresh token',
+        401
+      );
+    }
+  }
+
+  async logout(req, res) {
+    try {
+      const accessToken = req.headers.authorization?.replace('Bearer ', '');
+      const { refreshToken } = req.body;
+
+      const result = await authService.logout(accessToken, refreshToken);
+
+      return ResponseUtils.success(res, result.message, null);
+    } catch (error) {
+      return ErrorHandler.handleError(res, error, 'logout', 'Logout failed');
     }
   }
 }

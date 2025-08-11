@@ -4,8 +4,10 @@ const AuthToken = require('../models/authToken.model');
 const ms = require('ms');
 const {
   generateToken,
+  generateTokenPair,
   generateEmailVerificationToken,
   generateResetToken,
+  blacklistToken,
 } = require('../helpers/jwt.helper');
 const emailService = require('./email.service');
 
@@ -70,8 +72,8 @@ class AuthService {
     );
     await emailService.sendEmailVerification(email, verificationToken);
 
-    // Generate access token
-    const accessToken = generateToken({
+    // Generate token pair
+    const { accessToken, refreshToken } = generateTokenPair({
       userId: userData.id,
       email,
       role,
@@ -85,6 +87,7 @@ class AuthService {
         emailVerified: false,
       },
       token: accessToken,
+      refreshToken,
     };
   }
 
@@ -120,8 +123,8 @@ class AuthService {
       throw new Error('Account has been suspended');
     }
 
-    // Generate access token
-    const accessToken = generateToken({
+    // Generate token pair
+    const { accessToken, refreshToken } = generateTokenPair({
       userId: userData.id,
       email,
       role: userData.role,
@@ -135,6 +138,7 @@ class AuthService {
         avatarUrl: userData.avatar_url,
       },
       token: accessToken,
+      refreshToken,
     };
   }
 
@@ -171,7 +175,7 @@ class AuthService {
     const userData = await this.verifyEmail(tokenData.user_id);
     await this.updateUsedAt(token);
 
-    const accessToken = generateToken({
+    const { accessToken, refreshToken } = generateTokenPair({
       userId: userData.id,
       email: userData.email,
       role: userData.role,
@@ -185,6 +189,7 @@ class AuthService {
         emailVerified: true,
       },
       token: accessToken,
+      refreshToken,
     };
   }
 
@@ -215,6 +220,21 @@ class AuthService {
       emailVerified: userData.email_verified,
       accountStatus: userData.account_status,
     };
+  }
+
+  async logout(accessToken, refreshToken) {
+    // Blacklist both tokens
+    const promises = [];
+
+    if (accessToken) {
+      promises.push(blacklistToken(accessToken, 'access', null, 'logout'));
+    }
+    if (refreshToken) {
+      promises.push(blacklistToken(refreshToken, 'refresh', null, 'logout'));
+    }
+
+    await Promise.all(promises);
+    return { message: 'Logged out successfully' };
   }
 }
 

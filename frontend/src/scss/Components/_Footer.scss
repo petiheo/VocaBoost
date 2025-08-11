@@ -1,36 +1,35 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 
 .footer {
-    margin-top: auto;
-    background-color: #241F1F;
-    
-    grid-template-columns: repeat(2, 50%);
+  margin-top: auto;
+  background-color: #241f1f;
 
-    &-left {
-        grid-column: 1 / 2;
-        .logo {
-            margin: 2em 4em;
-            width: 100px;
-        }
+  grid-template-columns: repeat(2, 50%);
 
-        .support-button-list {
-            margin-left: 4em;
-
-            display: flex;
-            gap: 20px ;
-
-            font-family: $font-jost;
-            font-size: 16px;
-
-            .about,
-            .carees,
-            .pres,
-            .custom-care,
-            .service {
-                color: white;
-                text-decoration: none;
-            }
-
-        }
+  &-left {
+    grid-column: 1 / 2;
+    .logo {
+      margin: 2em 4em;
+      width: 100px;
     }
+
+    .support-button-list {
+      margin-left: 4em;
+
+      display: flex;
+      gap: 20px;
+
+      font-family: $font-jost;
+      font-size: 16px;
+
+      .about,
+      .carees,
+      .pres,
+      .custom-care,
+      .service {
+        color: white;
+        text-decoration: none;
+      }
+    }
+  }
 }

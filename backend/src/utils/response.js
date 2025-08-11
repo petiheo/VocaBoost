@@ -73,6 +73,22 @@ class ResponseUtils {
       message,
     });
   }
+
+  static badRequest(res, message = 'Bad request') {
+    return res.status(400).json({
+      success: false,
+      message,
+    });
+  }
+
+  static paginated(res, message, data, pagination, statusCode = 200) {
+    return res.status(statusCode).json({
+      success: true,
+      message,
+      data,
+      pagination,
+    });
+  }
 }
 
 module.exports = ResponseUtils;

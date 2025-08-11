@@ -157,11 +157,10 @@ h2 {
     margin-left: 8px;
 
     .error-message {
-      display: block;
       font-size: 12px;
       color: #dc3545;
       margin-bottom: 2px;
-      
+
       &:last-child {
         margin-bottom: 0;
       }

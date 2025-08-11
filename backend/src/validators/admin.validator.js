@@ -15,6 +15,7 @@ const adminValidator = {
       .withMessage('URL parameter requestId must be a valid UUID.'),
     body('reason')
       .trim()
+      .escape()
       .notEmpty()
       .withMessage('A reason is required to reject a request.')
       .isLength({ min: 1, max: 1000 })
@@ -35,6 +36,7 @@ const adminValidator = {
       .withMessage('URL parameter reportId must be a valid UUID.'),
     body('notes')
       .trim()
+      .escape()
       .notEmpty()
       .withMessage('Admin notes are required to resolve a report.')
       .isLength({ min: 1, max: 2000 })

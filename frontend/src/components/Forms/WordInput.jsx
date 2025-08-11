@@ -1,28 +1,29 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
-const WordInput = ({ 
-  label, 
-  name, 
-  type = "text", 
-  value, 
-  onChange, 
-  placeholder = "", 
-  required = false, 
-  errors = [], 
+const WordInput = ({
+  label,
+  name,
+  type = "text",
+  value,
+  onChange,
+  placeholder = "",
+  required = false,
+  errors = [],
   className = "",
   classPrefix = "create-list",
-  ...props 
+  ...props
 }) => {
   const hasErrors = errors && errors.length > 0;
-  const inputClassName = `word-input ${className} ${hasErrors ? 'error' : ''}`.trim();
-  
+  const inputClassName =
+    `word-input ${className} ${hasErrors ? "error" : ""}`.trim();
+
   return (
     <div className={`${classPrefix}__word-input-group`}>
       <div className="word-input-label">
         {label}
         {required && <span className="required-asterisk">*</span>}
       </div>
-      
+
       <input
         name={name}
         type={type}
@@ -32,7 +33,7 @@ const WordInput = ({
         className={inputClassName}
         {...props}
       />
-      
+
       {hasErrors && (
         <div className="word-input-errors">
           {errors.map((error, index) => (
@@ -56,7 +57,7 @@ WordInput.propTypes = {
   required: PropTypes.bool,
   errors: PropTypes.arrayOf(PropTypes.string),
   className: PropTypes.string,
-  classPrefix: PropTypes.string
+  classPrefix: PropTypes.string,
 };
 
 export default WordInput;

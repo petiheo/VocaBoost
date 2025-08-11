@@ -1,13 +1,12 @@
-@use 'Fonts' as *;
-@use './Admin';
-@use './Auth';
-@use './Classroom';
-@use './Components';
-@use './Review';
-@use './User';
-@use './Vocabulary';
-@use './ErrorBoundary';
-
+@use "Fonts" as *;
+@use "./Admin";
+@use "./Auth";
+@use "./Classroom";
+@use "./Components";
+@use "./Review";
+@use "./User";
+@use "./Vocabulary";
+@use "./ErrorBoundary";
 
 * {
   padding: 0 0;
@@ -15,6 +14,6 @@
 }
 
 body {
-  background: #FFFCF7;
+  background: #fffcf7;
   margin: 0 0;
 }

@@ -1,18 +1,23 @@
 import { useState } from "react";
 import { useAuth } from "../../services/Auth/authContext";
-import { Footer, Header, SideBar, ProfileSkeleton } from "../../components/index.jsx";
+import {
+  Footer,
+  Header,
+  ProfileSkeleton,
+  SideBar,
+} from "../../components/index.jsx";
 import LoadingCursor from "../../components/UI/LoadingCursor.jsx";
 import { useUserProfile } from "../../hooks/useUserProfile";
 import {
+  ProfileAvatar,
   ProfileInput,
   TeacherVerification,
-  ProfileAvatar,
 } from "../../components/Profile/ProfileComponents";
 import {
-  validateProfile,
-  validateDisplayName,
-  validateDailyGoal,
   validateAvatarFile,
+  validateDailyGoal,
+  validateDisplayName,
+  validateProfile,
 } from "../../utils/validation";
 
 const Profile = () => {
@@ -144,7 +149,7 @@ const Profile = () => {
             value={formData.displayName}
             onChange={handleInputChange}
             disabled={!isEditing}
-            placeholder="Jane Smith"
+            placeholder="Your display name"
             errors={validationErrors.displayName}
           />
 

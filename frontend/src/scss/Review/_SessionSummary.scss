@@ -1,10 +1,10 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 
 .session-summary {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: #FFF7EA;
+  background: #fff7ea;
   position: relative;
   overflow: hidden;
   font-family: $font-inriasans, sans-serif;
@@ -50,7 +50,7 @@
     font-weight: normal;
     color: #2c3e50;
     margin-bottom: 1rem;
-    background: #352D24;
+    background: #352d24;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -60,7 +60,7 @@
     font-family: $font-inriasans;
     font-size: 1.3rem;
     font-weight: bold;
-    color: #352D24;
+    color: #352d24;
     margin: 0;
   }
 
@@ -93,7 +93,7 @@
   &__check-circle {
     width: 10rem;
     height: 10rem;
-    background: #30B237;
+    background: #30b237;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -112,11 +112,11 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    }
+  }
 
   &__stat-label {
     font-size: 1.5rem;
-    color: #352D24;
+    color: #352d24;
     font-weight: bold;
     margin-bottom: 0.25rem;
   }
@@ -174,7 +174,7 @@
   }
 
   &__details {
-    background: #FED1E0;
+    background: #fed1e0;
     border-radius: 15px;
     padding: 2rem;
     margin-bottom: 2rem;
@@ -231,7 +231,7 @@
     min-width: 180px;
 
     &--primary {
-      background: #352D24;
+      background: #352d24;
       color: #fcf1d6;
 
       &:hover {
@@ -240,7 +240,7 @@
     }
 
     &--secondary {
-      background: #352D24;
+      background: #352d24;
       color: #fcf1d6;
 
       &:hover {
@@ -253,7 +253,8 @@
     }
   }
 
-  .loading, .error {
+  .loading,
+  .error {
     text-align: center;
     padding: 3rem;
     font-size: 1.2rem;
@@ -270,14 +271,15 @@
   // New sections styling
 
   &__batch-section {
-    background: #5A80D5;
+    background: #5a80d5;
   }
 
   &__words-section {
     background: rgba(255, 255, 255);
   }
 
-  &__batch-section, &__words-section {
+  &__batch-section,
+  &__words-section {
     margin-top: 3rem;
     border-radius: 15px;
     padding: 2rem;
@@ -297,7 +299,7 @@
     font-family: $font-lalezar;
     font-weight: normal;
     font-size: 1.8rem;
-    color: #352D24;
+    color: #352d24;
     margin-bottom: 1.5rem;
     text-align: center;
   }
@@ -310,10 +312,10 @@
   }
 
   &__batch-card {
-    background: #DCECFF;
+    background: #dcecff;
     border-radius: 10px;
     padding: 1rem;
-    border-left: 4px solid #9BB5F0;
+    border-left: 4px solid #9bb5f0;
     transition: transform 0.2s ease;
 
     &:hover {
@@ -341,18 +343,18 @@
     border-radius: 5px;
 
     &.high {
-      background: #A1E8AE;
-      color: #079C0E;
+      background: #a1e8ae;
+      color: #079c0e;
     }
 
     &.medium {
       background: #ffe489;
-      color: #BF8F05;
-    } 
+      color: #bf8f05;
+    }
 
     &.low {
-      background: #FFD1D2;
-      color: #E5091D;
+      background: #ffd1d2;
+      color: #e5091d;
     }
   }
 
@@ -398,7 +400,7 @@
 
   &__word-term {
     font-weight: 600;
-    color: #352D24;
+    color: #352d24;
     margin-bottom: 0.5rem;
     font-size: 1rem;
     padding-right: 2rem; // Space for result icon

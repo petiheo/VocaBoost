@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Header, SideBar, Footer } from "../../components";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { ArrowLeftIcon, ArrowRightIcon } from "../../assets/Review";
+import { Footer, Header, ReportTrigger, SideBar } from "../../components";
+import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
+import { useToast } from "../../components/Providers/ToastProvider.jsx";
 import reviewService from "../../services/Review/reviewService";
 import vocabularyService from "../../services/Vocabulary/vocabularyService";
-import { useToast } from "../../components/Providers/ToastProvider.jsx";
-import { useConfirm } from "../../components/Providers/ConfirmProvider.jsx";
-import { ArrowLeftIcon, ArrowRightIcon } from "../../assets/Review";
 
 export default function StudyWithFlashcard() {
   const { sessionId, listId } = useParams();
@@ -38,10 +38,10 @@ export default function StudyWithFlashcard() {
       if (isSessionCompleted) {
         return;
       }
-      
+
       try {
         setLoading(true);
-        
+
         // Get list info if not passed through navigation state
         if (!listInfo && listId) {
           const info = await vocabularyService.getListById(listId);
@@ -56,7 +56,8 @@ export default function StudyWithFlashcard() {
           // Calculate current index based on completed words
           const completedWords = resumedSession.completedWords || 0;
           const wordsPerBatch = resumedSession.wordsPerBatch || 10;
-          const currentBatchStartIndex = Math.floor(completedWords / wordsPerBatch) * wordsPerBatch;
+          const currentBatchStartIndex =
+            Math.floor(completedWords / wordsPerBatch) * wordsPerBatch;
           setCurrentWordIndex(completedWords - currentBatchStartIndex);
         }
         // If sessionId exists, we're continuing a session
@@ -66,19 +67,25 @@ export default function StudyWithFlashcard() {
             setSession(sessionStatus.activeSession);
             setWords(sessionStatus.activeSession.remainingWords || []);
             // Set current index based on completed progress
-            const completedWords = sessionStatus.activeSession.completedWords || 0;
-            const wordsPerBatch = sessionStatus.activeSession.wordsPerBatch || 10;
-            const currentBatchStartIndex = Math.floor(completedWords / wordsPerBatch) * wordsPerBatch;
+            const completedWords =
+              sessionStatus.activeSession.completedWords || 0;
+            const wordsPerBatch =
+              sessionStatus.activeSession.wordsPerBatch || 10;
+            const currentBatchStartIndex =
+              Math.floor(completedWords / wordsPerBatch) * wordsPerBatch;
             setCurrentWordIndex(completedWords - currentBatchStartIndex);
           }
         } else {
           // Check for existing active session first
-          const activeSessionResponse = await reviewService.getActiveSessionStatus();
-          
+          const activeSessionResponse =
+            await reviewService.getActiveSessionStatus();
+
           if (activeSessionResponse?.activeSession) {
             // End the existing session first
             try {
-              await reviewService.endSession(activeSessionResponse.activeSession.sessionId);
+              await reviewService.endSession(
+                activeSessionResponse.activeSession.sessionId
+              );
             } catch (endError) {
               console.warn("Failed to end existing session:", endError);
               // Continue anyway to try starting new session
@@ -91,21 +98,26 @@ export default function StudyWithFlashcard() {
           try {
             sessionResponse = await reviewService.startSession({
               listId: listId || listInfo?.id,
-              sessionType: 'flashcard'
+              sessionType: "flashcard",
             });
 
             // Check if backend automatically switched to practice mode
             if (sessionResponse.session.practiceMode) {
-              toast("No due words found. Starting practice mode with all words.", "success");
+              toast(
+                "No due words found. Starting practice mode with all words.",
+                "success"
+              );
             }
           } catch (error) {
             console.log("Error starting session:", error);
-            
+
             // If no words in list at all
-            const isNoWordsError = 
-              error.message?.includes('has no words to practice') ||
-              error.response?.data?.message?.includes('has no words to practice');
-            
+            const isNoWordsError =
+              error.message?.includes("has no words to practice") ||
+              error.response?.data?.message?.includes(
+                "has no words to practice"
+              );
+
             if (isNoWordsError) {
               toast("This list has no words to practice.", "error");
               navigate(`/review/${listId || listInfo?.id}`);
@@ -119,7 +131,6 @@ export default function StudyWithFlashcard() {
             setWords(sessionResponse.session.words || []);
           }
         }
-
       } catch (err) {
         console.error("Error initializing study session:", err);
         toast("Failed to start study session", "error");
@@ -129,7 +140,15 @@ export default function StudyWithFlashcard() {
     }
 
     initializeStudySession();
-  }, [sessionId, listId, listInfo, toast, confirm, isSessionCompleted, navigate]);
+  }, [
+    sessionId,
+    listId,
+    listInfo,
+    toast,
+    confirm,
+    isSessionCompleted,
+    navigate,
+  ]);
 
   const handleFlipCard = () => {
     setIsFlipped(!isFlipped);
@@ -138,36 +157,50 @@ export default function StudyWithFlashcard() {
   const handleResponse = async (known) => {
     try {
       const currentWord = words[currentWordIndex];
-      
+
       // Submit the result to the backend
       await reviewService.submitResult(session?.sessionId || sessionId, {
         wordId: currentWord.id,
-        result: known ? 'correct' : 'incorrect',
-        responseTimeMs: Date.now() - (session?.startTime || Date.now())
+        result: known ? "correct" : "incorrect",
+        responseTimeMs: Date.now() - (session?.startTime || Date.now()),
       });
 
       // Check if we need to show batch summary (after every 10 words)
       const currentProgress = currentWordIndex + 1;
       const wordsPerBatch = 10;
-      const needsBatchSummary = currentProgress % wordsPerBatch === 0 && currentProgress < words.length;
+      const needsBatchSummary =
+        currentProgress % wordsPerBatch === 0 && currentProgress < words.length;
 
       if (needsBatchSummary) {
         // Show batch summary
-        const batchSummary = await reviewService.getBatchSummary(session?.sessionId || sessionId);
-        
+        const batchSummary = await reviewService.getBatchSummary(
+          session?.sessionId || sessionId
+        );
+
         // Use listId from batch summary (from backend) or fallback to URL params
         const targetListId = batchSummary.listId || listId || listInfo?.id;
-        console.log("StudyWithFlashcard - navigating to batch-summary with listId:", targetListId);
-        console.log("Available IDs - batchSummary.listId:", batchSummary.listId, "URL listId:", listId, "listInfo.id:", listInfo?.id);
-        
+        console.log(
+          "StudyWithFlashcard - navigating to batch-summary with listId:",
+          targetListId
+        );
+        console.log(
+          "Available IDs - batchSummary.listId:",
+          batchSummary.listId,
+          "URL listId:",
+          listId,
+          "listInfo.id:",
+          listInfo?.id
+        );
+
         navigate(`/review/${targetListId}/batch-summary`, {
-          state: { 
+          state: {
             summary: batchSummary,
             sessionId: session?.sessionId || sessionId,
             listId: targetListId, // Pass the actual listId
             listInfo,
-            currentProgress
-          }
+            currentProgress,
+            sessionType: "flashcard", // Pass session type for correct navigation
+          },
         });
         return;
       }
@@ -179,22 +212,34 @@ export default function StudyWithFlashcard() {
       } else {
         // End session and get summary
         setIsSessionCompleted(true); // Mark session as completed to prevent further API calls
-        const response = await reviewService.endSession(session?.sessionId || sessionId);
+        const response = await reviewService.endSession(
+          session?.sessionId || sessionId
+        );
         const summary = response.summary || response; // Handle both wrapped and unwrapped responses
-        
+
         // Use listId from end session response (from backend) or fallback to URL params
         const targetListId = summary.listId || listId || listInfo?.id;
-        console.log("StudyWithFlashcard - ending session, navigating to summary with listId:", targetListId);
-        console.log("Available IDs - summary.listId:", summary.listId, "URL listId:", listId, "listInfo.id:", listInfo?.id);
-        
+        console.log(
+          "StudyWithFlashcard - ending session, navigating to summary with listId:",
+          targetListId
+        );
+        console.log(
+          "Available IDs - summary.listId:",
+          summary.listId,
+          "URL listId:",
+          listId,
+          "listInfo.id:",
+          listInfo?.id
+        );
+
         console.log("StudyWithFlashcard - ending session, summary:", summary); // Debug log
         toast("Study session completed!", "success");
         navigate(`/review/${targetListId}/summary`, {
-          state: { 
+          state: {
             summary,
             sessionId: session?.sessionId || sessionId,
             listId: targetListId, // Pass the actual listId
-          }
+          },
         });
       }
     } catch (err) {
@@ -217,6 +262,8 @@ export default function StudyWithFlashcard() {
     }
   };
 
+  // Removed handleReportSubmit - now handled directly in ReportTrigger for reusability
+
   const handleEndSession = async () => {
     try {
       await reviewService.endSession(session?.sessionId || sessionId);
@@ -232,7 +279,7 @@ export default function StudyWithFlashcard() {
       <div className="flashcard">
         <Header />
         <h1 className="flashcard__title">Review with Spaced Repetition</h1>
-        <SideBar isOpen={isOpen} setIsOpen={setIsOpen}/>
+        <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         <div className="flashcard__content">
           <div className="loading">Loading study session...</div>
         </div>
@@ -246,7 +293,7 @@ export default function StudyWithFlashcard() {
       <div className="flashcard">
         <Header />
         <h1 className="flashcard__title">Review with Spaced Repetition</h1>
-        <SideBar isOpen={isOpen} setIsOpen={setIsOpen}/>
+        <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
         <div className="flashcard__content">
           <div className="error">No words found for this list</div>
         </div>
@@ -262,37 +309,61 @@ export default function StudyWithFlashcard() {
     <div className="flashcard">
       <Header />
       <h1 className="flashcard__title">
-        {listInfo?.title || "Flashcard Study"} ({currentWordIndex + 1}/{words.length})
+        {listInfo?.title || "Flashcard Study"} ({currentWordIndex + 1}/
+        {words.length})
       </h1>
-      <SideBar isOpen={isOpen} setIsOpen={setIsOpen}/>
+      <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
 
       <div className="flashcard__content">
         <div className="flashcard__card">
-          <button 
-            className="flashcard__prev" 
+          <button
+            className="flashcard__prev"
             onClick={handlePrevious}
             disabled={currentWordIndex === 0}
           >
-            <img src={ArrowLeftIcon} alt="Previous" className="flashcard__icon" />
+            <img
+              src={ArrowLeftIcon}
+              alt="Previous"
+              className="flashcard__icon"
+            />
           </button>
 
           <div className="flashcard__animation" onClick={handleFlipCard}>
             <div className={`card__inner ${isFlipped ? "is-flipped" : ""}`}>
               <div className="card__face card__front">
-                {currentWord.term}
+                <div className="card__report-trigger">
+                  <ReportTrigger wordId={currentWord.id} />
+                </div>
+                <div className="card__content">{currentWord.term}</div>
               </div>
               <div className="card__face card__back">
-                <div>
-                  <div style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
+                <div className="card__report-trigger">
+                  <ReportTrigger wordId={currentWord.id} />
+                </div>
+                <div className="card__content">
+                  <div style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>
                     {currentWord.definition}
                   </div>
                   {currentWord.phonetics && (
-                    <div style={{ fontSize: '1rem', color: '#007bff', fontStyle: 'italic', marginBottom: '1rem' }}>
+                    <div
+                      style={{
+                        fontSize: "1rem",
+                        color: "#007bff",
+                        fontStyle: "italic",
+                        marginBottom: "1rem",
+                      }}
+                    >
                       {currentWord.phonetics}
                     </div>
                   )}
                   {currentWord.examples && currentWord.examples.length > 0 && (
-                    <div style={{ fontSize: '0.9rem', color: '#6c757d', fontStyle: 'italic' }}>
+                    <div
+                      style={{
+                        fontSize: "0.9rem",
+                        color: "#6c757d",
+                        fontStyle: "italic",
+                      }}
+                    >
                       "{currentWord.examples[0].example_sentence}"
                     </div>
                   )}
@@ -301,8 +372,8 @@ export default function StudyWithFlashcard() {
             </div>
           </div>
 
-          <button 
-            className="flashcard__next" 
+          <button
+            className="flashcard__next"
             onClick={handleNext}
             disabled={currentWordIndex === words.length - 1}
           >
@@ -312,23 +383,24 @@ export default function StudyWithFlashcard() {
 
         {isFlipped && (
           <div className="flashcard__controls">
-            <button 
-              className='know'
-              onClick={() => handleResponse(false)}
-            >
+            <button className="know" onClick={() => handleResponse(false)}>
               Unknow
             </button>
-            <button 
-              className='unknow'
-              onClick={() => handleResponse(true)}
-            >
+            <button className="unknow" onClick={() => handleResponse(true)}>
               Know
             </button>
           </div>
         )}
 
         {!isFlipped && (
-          <div style={{ textAlign: 'center', color: '#6c757d', fontSize: '1rem', marginTop: '1rem' }}>
+          <div
+            style={{
+              textAlign: "center",
+              color: "#6c757d",
+              fontSize: "1rem",
+              marginTop: "1rem",
+            }}
+          >
             Click the card to see the definition
           </div>
         )}

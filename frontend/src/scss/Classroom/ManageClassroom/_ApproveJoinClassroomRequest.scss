@@ -1,7 +1,6 @@
-@use '../../Fonts' as *;
+@use "../../Fonts" as *;
 
 .approve-join-classroom-request {
-
   &__page {
     font-family: $font-inriasans;
   }
@@ -62,7 +61,6 @@
   display: flex;
   gap: 2em;
 }
-
 
 .btn {
   padding: 8px 14px;

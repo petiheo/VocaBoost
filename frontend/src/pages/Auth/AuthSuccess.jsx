@@ -2,9 +2,10 @@
 //  Mà frontend (React) không thể tự xử lý token trong URL nếu bạn không có route /auth/success tương ứng.
 
 import { useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../services/Auth/authContext";
 import authService from "../../services/Auth/authService";
+import { navigateByRole } from "../../utils/navigationUtils";
 
 export default function AuthSuccess() {
   const [searchParams] = useSearchParams();
@@ -14,33 +15,34 @@ export default function AuthSuccess() {
   useEffect(() => {
     const handleGoogleAuth = async () => {
       const token = searchParams.get("token");
+      const refreshToken = searchParams.get("refreshToken");
       const isNewUser = searchParams.get("isNewUser") === "true";
 
       if (token) {
-        // Store token temporarily
+        // Store both tokens
         localStorage.setItem("token", token);
+        if (refreshToken) {
+          localStorage.setItem("refreshToken", refreshToken);
+        }
 
         try {
           // Validate token with server instead of client-side decoding
           const validation = await authService.validateToken();
-          
+
           if (validation && validation.success) {
             const userObject = validation.data;
             // Store token and user manually since validateToken doesn't return the same structure as login
             localStorage.setItem("user", JSON.stringify(userObject));
             setUser(userObject);
-            
-            // Navigate based on user status
-            if (isNewUser) {
-              navigate("/select-user-type");
-            } else {
-              navigate("/homepage");
-            }
+
+            // Navigate based on user status and role
+            navigateByRole(userObject, navigate, isNewUser);
           } else {
             throw new Error("Token validation failed");
           }
-        } catch (error) {
+        } catch {
           localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
           localStorage.removeItem("user");
           navigate("/signin");
         }

@@ -118,7 +118,11 @@ class ReviewController {
 
       const summary = await reviewService.getBatchSummary(sessionId, userId);
 
-      return ResponseUtils.success(res, 'Batch summary retrieved successfully.', summary);
+      return ResponseUtils.success(
+        res,
+        'Batch summary retrieved successfully.',
+        summary
+      );
     } catch (error) {
       if (error.isForbidden) {
         return ResponseUtils.forbidden(res, error.message);
@@ -140,7 +144,11 @@ class ReviewController {
 
       const sessionData = await reviewService.resumeSession(sessionId, userId);
 
-      return ResponseUtils.success(res, 'Session resumed successfully.', sessionData);
+      return ResponseUtils.success(
+        res,
+        'Session resumed successfully.',
+        sessionData
+      );
     } catch (error) {
       if (error.isForbidden) {
         return ResponseUtils.forbidden(res, error.message);
@@ -160,16 +168,16 @@ class ReviewController {
       const userId = req.user.userId;
       const { listId, sessionType, practiceMode } = req.body;
 
-      const session = await reviewService.startSession(userId, listId, sessionType, practiceMode);
+      const session = await reviewService.startSession(
+        userId,
+        listId,
+        sessionType,
+        practiceMode
+      );
 
       // Check if we automatically switched to practice mode
       if (session.message) {
-        return ResponseUtils.success(
-          res,
-          session.message,
-          { session },
-          201
-        );
+        return ResponseUtils.success(res, session.message, { session }, 201);
       }
 
       return ResponseUtils.success(

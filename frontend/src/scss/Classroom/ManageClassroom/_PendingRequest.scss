@@ -1,7 +1,6 @@
-@use '../../Fonts' as *;
+@use "../../Fonts" as *;
 
 .pending-request {
-
   &__page {
     font-family: $font-inriasans;
   }
@@ -21,12 +20,10 @@
     grid-template-columns: 50% 50%;
     width: 100%;
 
-    .search-block--dropdown-menu{
+    .search-block--dropdown-menu {
       justify-self: end;
     }
   }
-
-  
 
   &__student-list {
     margin-top: 10px;

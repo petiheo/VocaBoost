@@ -9,9 +9,17 @@ class AdminController {
   async getPendingTeacherRequests(req, res) {
     try {
       const { page, limit, sortBy } = req.query;
-      const result = await adminService.getPendingTeacherRequests({ page, limit, sortBy });
-      
-      return ResponseUtils.success(res, 'Pending teacher requests retrieved successfully.', result);
+      const result = await adminService.getPendingTeacherRequests({
+        page,
+        limit,
+        sortBy,
+      });
+
+      return ResponseUtils.success(
+        res,
+        'Pending teacher requests retrieved successfully.',
+        result
+      );
     } catch (error) {
       return ErrorHandler.handleError(res, error, 'Admin.getPendingTeacherRequests');
     }
@@ -21,12 +29,19 @@ class AdminController {
     try {
       const { requestId } = req.params;
       const request = await adminService.getTeacherRequestById(requestId);
-      
+
       if (!request) {
-        return ResponseUtils.notFound(res, 'Teacher verification request not found.');
+        return ResponseUtils.notFound(
+          res,
+          'Teacher verification request not found.'
+        );
       }
-      
-      return ResponseUtils.success(res, 'Teacher request details retrieved successfully.', { request });
+
+      return ResponseUtils.success(
+        res,
+        'Teacher request details retrieved successfully.',
+        { request }
+      );
     } catch (error) {
       return ErrorHandler.handleError(res, error, 'Admin.getTeacherRequestById');
     }
@@ -36,17 +51,21 @@ class AdminController {
     try {
       const { requestId } = req.params;
       const adminId = req.user.userId;
-      
+
       const result = await adminService.approveTeacherRequest(requestId, adminId);
-      
-      return ResponseUtils.success(res, `Teacher request for '${result.user.display_name}' has been approved.`, {
-        requestId: result.request.id,
-        status: result.request.status,
-        reviewedBy: result.request.reviewed_by,
-      });
+
+      return ResponseUtils.success(
+        res,
+        `Teacher request for '${result.user.display_name}' has been approved.`,
+        {
+          requestId: result.request.id,
+          status: result.request.status,
+          reviewedBy: result.request.reviewed_by,
+        }
+      );
     } catch (error) {
       if (error.message.includes('not found or is not pending')) {
-          return ResponseUtils.notFound(res, error.message);
+        return ResponseUtils.notFound(res, error.message);
       }
       return ErrorHandler.handleError(res, error, 'Admin.approveTeacherRequest');
     }
@@ -55,20 +74,24 @@ class AdminController {
   async rejectTeacherRequest(req, res) {
     try {
       const { requestId } = req.params;
-      const { reason } = req.body;
+      // const { reason } = req.body;
       const adminId = req.user.userId;
 
-      const result = await adminService.rejectTeacherRequest(requestId, adminId, reason);
+      const result = await adminService.rejectTeacherRequest(requestId, adminId);
 
-      return ResponseUtils.success(res, `Teacher request for '${result.user.display_name}' has been rejected.`, {
-        requestId: result.request.id,
-        status: result.request.status,
-        reason: result.request.rejection_reason,
-        reviewedBy: result.request.reviewed_by,
-      });
+      return ResponseUtils.success(
+        res,
+        `Teacher request for '${result.user.display_name}' has been rejected.`,
+        {
+          requestId: result.request.id,
+          status: result.request.status,
+          // reason: result.request.rejection_reason,
+          reviewedBy: result.request.reviewed_by,
+        }
+      );
     } catch (error) {
       if (error.message.includes('not found or is not pending')) {
-          return ResponseUtils.notFound(res, error.message);
+        return ResponseUtils.notFound(res, error.message);
       }
       return ErrorHandler.handleError(res, error, 'Admin.rejectTeacherRequest');
     }
@@ -82,8 +105,12 @@ class AdminController {
     try {
       const { page, limit } = req.query;
       const result = await adminService.getOpenReports({ page, limit });
-      
-      return ResponseUtils.success(res, 'Open content reports retrieved successfully.', result);
+
+      return ResponseUtils.success(
+        res,
+        'Open content reports retrieved successfully.',
+        result
+      );
     } catch (error) {
       return ErrorHandler.handleError(res, error, 'Admin.getOpenReports');
     }
@@ -98,7 +125,9 @@ class AdminController {
         return ResponseUtils.notFound(res, 'Content report not found.');
       }
 
-      return ResponseUtils.success(res, 'Report details retrieved successfully.', { report });
+      return ResponseUtils.success(res, 'Report details retrieved successfully.', {
+        report,
+      });
     } catch (error) {
       return ErrorHandler.handleError(res, error, 'Admin.getReportById');
     }
@@ -109,19 +138,28 @@ class AdminController {
       const { reportId } = req.params;
       const { notes } = req.body;
       const adminId = req.user.userId;
-      
-      const result = await adminService.resolveReport(reportId, adminId, 'resolved', notes);
-      
-      return ResponseUtils.success(res, 'Report approved successfully. The associated content has been removed.', {
+
+      const result = await adminService.resolveReport(
+        reportId,
+        adminId,
+        'resolved',
+        notes
+      );
+
+      return ResponseUtils.success(
+        res,
+        'Report approved successfully. The associated content has been removed.',
+        {
           reportId: result.id,
           status: result.status,
           resolution: 'resolved',
           notes: result.resolution_notes,
-          resolvedBy: result.resolver_id
-      });
+          resolvedBy: result.resolver_id,
+        }
+      );
     } catch (error) {
-       if (error.message.includes('not found or is not open')) {
-          return ResponseUtils.notFound(res, error.message);
+      if (error.message.includes('not found or is not open')) {
+        return ResponseUtils.notFound(res, error.message);
       }
       return ErrorHandler.handleError(res, error, 'Admin.approveReport');
     }
@@ -133,18 +171,27 @@ class AdminController {
       const { notes } = req.body;
       const adminId = req.user.userId;
 
-      const result = await adminService.resolveReport(reportId, adminId, 'dismissed', notes);
+      const result = await adminService.resolveReport(
+        reportId,
+        adminId,
+        'dismissed',
+        notes
+      );
 
-      return ResponseUtils.success(res, 'Report dismissed successfully. The content will remain on the platform.', {
+      return ResponseUtils.success(
+        res,
+        'Report dismissed successfully. The content will remain on the platform.',
+        {
           reportId: result.id,
           status: result.status,
           resolution: 'dismissed',
           notes: result.resolution_notes,
-          resolvedBy: result.resolver_id
-      });
+          resolvedBy: result.resolver_id,
+        }
+      );
     } catch (error) {
-       if (error.message.includes('not found or is not open')) {
-          return ResponseUtils.notFound(res, error.message);
+      if (error.message.includes('not found or is not open')) {
+        return ResponseUtils.notFound(res, error.message);
       }
       return ErrorHandler.handleError(res, error, 'Admin.dismissReport');
     }

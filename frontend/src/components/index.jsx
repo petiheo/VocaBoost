@@ -14,6 +14,7 @@ export { default as DropdownMenu } from "./Navigation/DropdownMenu.jsx";
 export { default as LearnerSubMenu } from "./Navigation/LearnerSubMenu.jsx";
 export { default as AssignSubMenu } from "./Navigation/AssignSubMenu.jsx";
 
+export { default as AdminSubMenu } from "./Navigation/AdminSubMenu.jsx";
 
 // UI Components
 export { default as ConfirmModal } from "./UI/ConfirmModal.jsx";
@@ -22,18 +23,18 @@ export * from "./UI/Skeleton";
 export { default as Pagination } from "./UI/Pagination.jsx";
 
 // Providers
-export { useConfirm, ConfirmProvider } from "./Providers/ConfirmProvider.jsx";
-export { useToast, ToastProvider } from "./Providers/ToastProvider.jsx";
+export { ConfirmProvider } from "./Providers/ConfirmProvider.jsx";
+export { ToastProvider } from "./Providers/ToastProvider.jsx";
 
 // Reporting Components
-export { default as Report} from "./Reporting/Report.jsx";
-export { default as ReportTrigger } from "./Reporting/ReportTrigger.jsx";
+export { default as Report } from "./Report/Report.jsx";
+export { default as ReportTrigger } from "./Report/ReportTrigger.jsx";
 
 // Classroom Components
-export {default as ClassroomTitle} from "./Classroom/ClassroomTitle.jsx";
-export {default as TeacherClassroomMenuTab} from "./Classroom/TeacherClassroomMenuTab.jsx";
-export {default as ClassroomDropdownMenu} from "./Classroom/ClassroomDropdownMenu.jsx";
-export {default as VocabularyListCard} from "./Classroom/VocabularyListCard.jsx";
+export { default as ClassroomTitle } from "./Classroom/ClassroomTitle.jsx";
+export { default as TeacherClassroomMenuTab } from "./Classroom/TeacherClassroomMenuTab.jsx";
+export { default as ClassroomDropdownMenu } from "./Classroom/ClassroomDropdownMenu.jsx";
+export { default as VocabularyListCard } from "./Classroom/VocabularyListCard.jsx";
 
 // Vocabulary Components
 export { default as CarouselVocabSection } from "./Vocabulary/CarouselVocabSection.jsx";
@@ -47,3 +48,5 @@ export { default as WordInput } from "./Forms/WordInput.jsx";
 
 // Review Components
 export { default as BatchSummary } from "./Review/BatchSummary.jsx";
+export { default as FillInBlank } from "./Review/FillInBlank.jsx";
+export { default as LearningMethodSelector } from "./Review/LearningMethodSelector.jsx";

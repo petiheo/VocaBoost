@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../../services/Auth/authService";
 import AccountPageInput from "../../components/Forms/AccountPageInput";
@@ -36,29 +36,37 @@ export default function ResetPassword() {
     }
 
     // Password validation
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
-      setError("Password must at least 8 characters, contain uppercase, lowercase and number");
+    if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/.test(password)
+    ) {
+      setError(
+        "Password must at least 8 characters, contain uppercase, lowercase and number"
+      );
       setIsLoading(false);
       return;
     }
 
     try {
       const res = await authService.resetPassword(token, password);
-      setSuccess(res.data?.message || "Password reset successfully! Redirecting to login page...");
+      setSuccess(
+        res.data?.message ||
+          "Password reset successfully! Redirecting to login page..."
+      );
       setPassword(""); // Clear password after success
-      
+
       // Redirect to login page after 2 seconds
       setTimeout(() => {
         navigate("/signin");
       }, 2000);
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || "Error resetting password. Please try again.";
+    } catch (e) {
+      const errorMessage =
+        e.response?.data?.message ||
+        "Error resetting password. Please try again.";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="reset">
@@ -77,18 +85,10 @@ export default function ResetPassword() {
         />
 
         {/* Success Message */}
-        {success && (
-          <div className="reset__success">
-            {success}
-          </div>
-        )}
+        {success && <div className="reset__success">{success}</div>}
 
         {/* Error Message */}
-        {error && (
-          <div className="reset__error">
-            {error}
-          </div>
-        )}
+        {error && <div className="reset__error">{error}</div>}
 
         <AccountPageInput
           type="submit"

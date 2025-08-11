@@ -1,21 +1,22 @@
 const { body, param, validationResult } = require('express-validator');
 const { supabase } = require('../config/supabase.config');
-const { handleValidationErrors } = require('./common.validator');
+const { handleValidationErrors, commonValidators } = require('./common.validator');
 
 const vocabularyValidator = {
   // =================================================================
   //  LIST VALIDATORS
   // =================================================================
   createList: [
-    body('title')
-      .trim()
-      .isLength({ min: 2, max: 100 })
-      .withMessage('Title is required and must be between 2 and 100 characters.'),
-    body('description')
-      .optional()
-      .trim()
-      .isLength({ max: 500 })
-      .withMessage('Description cannot exceed 500 characters.'),
+    commonValidators.text('title', {
+      min: 2,
+      max: 100,
+      message: 'Title is required and must be between 2 and 100 characters.',
+    }),
+    commonValidators.text('description', {
+      required: false,
+      max: 500,
+      message: 'Description cannot exceed 500 characters.',
+    }),
     body('privacy_setting')
       .isIn(['private', 'public'])
       .withMessage("Privacy setting must be 'private' or 'public'."),
@@ -49,6 +50,7 @@ const vocabularyValidator = {
     body('title')
       .optional()
       .trim()
+      .escape()
       .isLength({ min: 2, max: 100 })
       .withMessage('Title must be between 2 and 100 characters.'),
     // Note: You might want to add back the other fields like description, privacy_setting, and tags as optional checks here.
@@ -62,9 +64,13 @@ const vocabularyValidator = {
     param('listId')
       .isUUID()
       .withMessage('URL parameter listId must be a valid UUID.'),
-    body('term').trim().notEmpty().withMessage('Term is required.'),
-    body('definition').trim().notEmpty().withMessage('Definition is required.'),
-    body('translation').optional().trim().isString(),
+    body('term').trim().escape().notEmpty().withMessage('Term is required.'),
+    body('definition')
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage('Definition is required.'),
+    body('translation').optional().trim().escape().isString(),
     body('image_url')
       .optional()
       .isURL()
@@ -72,6 +78,7 @@ const vocabularyValidator = {
     body('exampleSentence')
       .optional({ checkFalsy: true })
       .trim()
+      .escape()
       .isLength({ min: 0, max: 255 })
       .withMessage('Example sentence must be between 0 and 255 characters.'),
     body('synonyms')
@@ -82,6 +89,7 @@ const vocabularyValidator = {
       .optional()
       .isString()
       .trim()
+      .escape()
       .notEmpty()
       .withMessage('Synonyms cannot be empty strings.'),
     handleValidationErrors,
@@ -94,17 +102,25 @@ const vocabularyValidator = {
     body('words')
       .isArray({ min: 1 })
       .withMessage('Words must be a non-empty array.'),
-    body('words.*.term').notEmpty().withMessage('Each word must have a term.'),
+    body('words.*.term')
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage('Each word must have a term.'),
     body('words.*.definition')
+      .trim()
+      .escape()
       .notEmpty()
       .withMessage('Each word must have a definition.'),
-    body('words.*.translation').optional().isString(),
+    body('words.*.translation').optional().trim().escape().isString(),
     body('words.*.image_url')
       .optional()
       .isURL()
       .withMessage('Image URL for each word must be a valid URL format.'),
     body('words.*.exampleSentence')
       .optional({ checkFalsy: true })
+      .trim()
+      .escape()
       .isLength({ min: 2, max: 255 })
       .withMessage(
         'Example sentence for each word must be between 2 and 255 characters.'
@@ -117,6 +133,7 @@ const vocabularyValidator = {
       .optional()
       .isString()
       .trim()
+      .escape()
       .notEmpty()
       .withMessage('Each synonym must be a non-empty string.'),
     handleValidationErrors,
@@ -126,19 +143,27 @@ const vocabularyValidator = {
     param('wordId')
       .isUUID()
       .withMessage('URL parameter wordId must be a valid UUID.'),
-    body('term').optional().trim().notEmpty().withMessage('Term cannot be empty.'),
+    body('term')
+      .optional()
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage('Term cannot be empty.'),
     body('definition')
       .optional()
       .trim()
+      .escape()
       .notEmpty()
       .withMessage('Definition cannot be empty.'),
-    body('translation').optional({ nullable: true }).isString(),
+    body('translation').optional({ nullable: true }).trim().escape().isString(),
     body('image_url')
       .optional({ nullable: true })
       .isURL()
       .withMessage('Image URL must be a valid URL format.'),
     body('exampleSentence')
       .optional({ nullable: true, checkFalsy: true })
+      .trim()
+      .escape()
       .isLength({ min: 2, max: 255 })
       .withMessage('Example sentence must be between 2 and 255 characters.'),
     body('synonyms')
@@ -149,6 +174,7 @@ const vocabularyValidator = {
       .optional()
       .isString()
       .trim()
+      .escape()
       .notEmpty()
       .withMessage('Synonyms cannot be empty strings.'),
     handleValidationErrors,
@@ -161,6 +187,7 @@ const vocabularyValidator = {
     body('context')
       .optional()
       .trim()
+      .escape()
       .isLength({ min: 2, max: 500 })
       .withMessage('Context must be between 2 and 500 characters.'),
     handleValidationErrors,
@@ -170,11 +197,13 @@ const vocabularyValidator = {
     body('term')
       .notEmpty()
       .trim()
+      .escape()
       .isLength({ min: 1, max: 200 })
       .withMessage('Term is required and must be between 1 and 200 characters.'),
     body('definition')
       .notEmpty()
       .trim()
+      .escape()
       .isLength({ min: 1, max: 1000 })
       .withMessage(
         'Definition is required and must be between 1 and 1000 characters.'
@@ -182,6 +211,7 @@ const vocabularyValidator = {
     body('context')
       .optional()
       .trim()
+      .escape()
       .isLength({ min: 2, max: 500 })
       .withMessage('Context must be between 2 and 500 characters.'),
     handleValidationErrors,

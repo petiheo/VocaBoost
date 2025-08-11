@@ -1,39 +1,57 @@
-import { Children } from "react";
+import { lazy, Suspense } from "react";
 
-import {
-    CreateList,
-    Dashboard,
-    EditList,
-    ViewList,
-    OverviewList
-} from "../pages/Vocabulary";
+const CreateList = lazy(() => import("../pages/Vocabulary/CreateList"));
+const Dashboard = lazy(() => import("../pages/Vocabulary/Dashboard"));
+const EditList = lazy(() => import("../pages/Vocabulary/EditList"));
+const ViewList = lazy(() => import("../pages/Vocabulary/ViewList"));
+const OverviewList = lazy(() => import("../pages/Vocabulary/OverviewList"));
 
+const LoadingFallback = () => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "200px",
+      fontSize: "1rem",
+      color: "#666",
+    }}
+  >
+    Loading vocabulary...
+  </div>
+);
+
+const withSuspense = (Component) => (
+  <Suspense fallback={<LoadingFallback />}>
+    <Component />
+  </Suspense>
+);
 
 const vocabularyRoutes = [
   {
     path: "/vocabulary/create/:listId",
-    element: <CreateList />
+    element: withSuspense(CreateList),
   },
   {
     path: "/vocabulary/create/new",
-    element: <CreateList />
+    element: withSuspense(CreateList),
   },
   {
     path: "/vocabulary",
-    element: <Dashboard />
+    element: withSuspense(Dashboard),
   },
   {
     path: "/vocabulary/edit/:listId",
-    element: <EditList />
+    element: withSuspense(EditList),
   },
   {
     path: "/vocabulary/view/:listId",
-    element: <ViewList />
+    element: withSuspense(ViewList),
   },
   {
     path: "/vocabulary/overview/:listId",
-    element: <OverviewList />
-  }
+    element: withSuspense(OverviewList),
+  },
 ];
 
 export default vocabularyRoutes;

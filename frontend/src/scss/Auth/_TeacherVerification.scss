@@ -1,11 +1,10 @@
-@use '../Fonts' as *;
+@use "../Fonts" as *;
 
-$text-color: #352D24;
+$text-color: #352d24;
 
 .teacher-verification {
-  background-color: #F8F8F8;
+  // background-color: #F8F8F8;
   height: 100vh;
-
 
   &__header {
     margin: 0 0 40px 0;
@@ -23,7 +22,6 @@ $text-color: #352D24;
     font-family: $font-lalezar;
     font-size: 28px;
     margin: 0 0 24px 0;
-
   }
 
   &__grid {
@@ -43,7 +41,7 @@ $text-color: #352D24;
 
   // &__input{
   //   display: flex;
-  //   gap: 2px; 
+  //   gap: 2px;
   // }
 
   &__upload-label {
@@ -56,8 +54,6 @@ $text-color: #352D24;
     margin: 0;
     color: #666;
   }
-
-
 
   &__upload-box {
     position: relative;

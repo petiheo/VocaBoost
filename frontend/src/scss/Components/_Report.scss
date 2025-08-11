@@ -1,60 +1,57 @@
 .report {
-    font-family: 'Inria Sans', serif;
-    &-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
+  font-family: "Inria Sans", serif;
+
+  // React Modal specific styling
+  &-modal-content {
+    position: relative;
+    text-align: center;
+    animation: modalAppear 0.3s ease-out;
+    pointer-events: all; // Ensure modal content can receive events
+    user-select: auto; // Allow text selection within modal
+
+    // Prevent event bubbling
+    * {
+      pointer-events: auto;
+    }
+  }
+
+  &-title {
+    font-family: "Lalezar", serif;
+    font-size: 28px;
+    font-weight: normal;
+    color: #2d1d0b;
+    margin-bottom: 10px;
+  }
+
+  &-instruction {
+    font-size: 16px;
+    color: #2d1d0b;
+    margin-bottom: 20px;
+  }
+
+  &-textarea {
+    width: 100%;
+    min-height: 12rem;
+    background-color: #fdf0cc;
+    border: 1px solid #b4a790;
+    border-radius: 20px;
+    padding: 20px;
+    font-size: 16px;
+    font-family: "Inria Sans", serif;
+    resize: none;
+    color: #2d1d0b;
+    outline: none;
+    transition: border-color 0.2s ease;
+
+    &::placeholder {
+      color: #b4a790;
     }
 
-    &-modal {
-        width: 60%;
-        max-width: 550px;
-        background-color: #faf3e0;
-        border-radius: 20px;
-        padding: 40px;
-        position: relative;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        text-align: center;
+    &:focus {
+      border-color: #8b7766;
+      box-shadow: 0 0 0 2px rgba(139, 119, 102, 0.2);
     }
-
-    &-title {
-        font-family: 'Lalezar', serif;
-        font-size: 28px;
-        font-weight: normal;
-        color: #2d1d0b;
-        margin-bottom: 10px;
-    }
-
-    &-instruction {
-        font-size: 16px;
-        color: #2d1d0b;
-        margin-bottom: 20px;
-    }
-
-    &-textarea {
-        width: 100%;
-        min-height: 12rem;
-        background-color: #fdf0cc;
-        border: 1px solid #b4a790;
-        border-radius: 20px;
-        padding: 20px;
-        font-size: 16px;
-        font-family: 'Inria Sans', serif;
-        resize: none;
-        color: #2d1d0b;
-        outline: none;
-
-        &::placeholder {
-            color: #b4a790;
-        }
-    }
+  }
 }
 
 .close-button {
@@ -66,10 +63,16 @@
   border: none;
   cursor: pointer;
   color: #2d1d0b;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #d32f2f;
+    transform: scale(1.1);
+  }
 }
 
 .submit-button {
-  font-family: 'Inria Sans', serif;
+  font-family: "Inria Sans", serif;
   font-size: 1rem;
   font-weight: bold;
 
@@ -81,9 +84,104 @@
   border: none;
   border-radius: 1rem;
   cursor: pointer;
-  transition: opacity 0.3s;
+  transition: all 0.3s ease;
 
   &:hover {
-    opacity: 0.9;
+    background-color: #1a120a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Enhanced animations
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+// React Modal specific overrides
+.ReactModal__Overlay {
+  opacity: 0;
+  transition: opacity 300ms ease-in-out;
+  pointer-events: all !important; // Ensure overlay catches all events
+
+  &--after-open {
+    opacity: 1;
+  }
+
+  &--before-close {
+    opacity: 0;
+  }
+}
+
+.ReactModal__Content {
+  transform: scale(0.9) translateY(-20px);
+  transition: all 300ms ease-in-out;
+
+  &--after-open {
+    transform: scale(1) translateY(0);
+  }
+
+  &--before-close {
+    transform: scale(0.9) translateY(-20px);
+  }
+}
+
+// Portal styling for blocking interactions
+.report-modal-portal {
+  .ReactModal__Overlay {
+    user-select: none; // Prevent text selection
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: all !important; // Force overlay to catch all events
+
+    // Block all interactions except modal content
+    * {
+      pointer-events: none !important;
+    }
+
+    // Re-enable events for modal content
+    .report-modal-content,
+    .report-modal-content * {
+      pointer-events: auto !important;
+      user-select: auto !important;
+    }
+  }
+}
+
+// Enhanced shake animation with stronger effect
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0) scale(1);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-10px) scale(1.02);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(10px) scale(1.02);
+  }
+}
+
+.shake-animation {
+  animation: shake 0.6s ease-in-out;
+  box-shadow: 0 8px 32px rgba(220, 38, 38, 0.2) !important; // Red glow during shake
 }

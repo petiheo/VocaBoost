@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { format } from 'date-fns';
+import { useEffect, useRef, useState } from "react";
+import { format } from "date-fns";
 import { Line } from "../../../assets/Classroom";
 import classroomService from "../../../services/Classroom/classroomService";
 import SeeMoreSection from "../../../components/Classroom/SeeMoreSection";
@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { AssignSubMenu, AssignmentDetailSkeleton } from "../../../components";
 
 export default function AssignmentDetail() {
-
   // Lấy pathname hiện tại, ví dụ: "/my-classroom"
   const [currentTab, setCurrentTab] = useState("Details");
 
@@ -28,25 +27,28 @@ export default function AssignmentDetail() {
     };
   }, []);
 
-  // Truy xuất dữ liệu lớp học được lưu khi users chọn classroom ở trang MyClassroom. 
+  // Truy xuất dữ liệu lớp học được lưu khi users chọn classroom ở trang MyClassroom.
   const [classroomId, setClassroomId] = useState(() => {
-    const selectedClassroom = JSON.parse(localStorage.getItem("selectedClassroom"));
+    const selectedClassroom = JSON.parse(
+      localStorage.getItem("selectedClassroom")
+    );
     return selectedClassroom?.id || null;
   });
 
-  // Truy xuất assignment 
+  // Truy xuất assignment
   const [assignment, setAssignment] = useState(() => {
-    const selectedAssignment = JSON.parse(localStorage.getItem("selectedAssignment"));
+    const selectedAssignment = JSON.parse(
+      localStorage.getItem("selectedAssignment")
+    );
     return selectedAssignment;
-  })
+  });
 
   //Khởi tạo biến lưu dữ liệu của Assignment
   const [assignmentsDetail, setAssignmentsDetail] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (currentTab !== "Details")
-      return;
+    if (currentTab !== "Details") return;
 
     if (!classroomId || !assignment?.id) {
       console.error("Missing classroom ID or assignment ID");
@@ -56,13 +58,15 @@ export default function AssignmentDetail() {
     const fetchingAssignmentDetail = async () => {
       try {
         setLoading(true);
-        const res = await classroomService.getAssignmentDetails(classroomId, assignment?.id);
+        const res = await classroomService.getAssignmentDetails(
+          classroomId,
+          assignment?.id
+        );
         if (res.success) {
           console.log("Fetch assignment detail thành công");
           console.log(res.data);
           setAssignmentsDetail(res.data);
-        }
-        else {
+        } else {
           console.log(res.message);
         }
       } catch (error) {
@@ -70,7 +74,7 @@ export default function AssignmentDetail() {
       } finally {
         setLoading(false);
       }
-    }
+    };
     fetchingAssignmentDetail();
   }, [classroomId, assignment?.id]);
 
@@ -80,7 +84,10 @@ export default function AssignmentDetail() {
     console.log("Remove clicked");
     // Thêm logic xóa classroom ở đây nếu cần
     try {
-      const res = await classroomService.deleteAssignment(classroomId, assignment?.id)
+      const res = await classroomService.deleteAssignment(
+        classroomId,
+        assignment?.id
+      );
       if (res.success) {
         console.log("Xoá assignment thành công");
         localStorage.removeItem("selectedAssignment");
@@ -92,7 +99,6 @@ export default function AssignmentDetail() {
       console.log("Lỗi xoá lớp học ở Assignment", err);
     }
   };
-
 
   if (loading) {
     return <AssignmentDetailSkeleton />;
@@ -116,20 +122,42 @@ export default function AssignmentDetail() {
                 </button>
                 {showDropdown && (
                   <div className="dropdown-menu">
-                    <button onClick={handleRemoveAssignment} className="dropdown-item">Remove</button>
+                    <button
+                      onClick={handleRemoveAssignment}
+                      className="dropdown-item"
+                    >
+                      Remove
+                    </button>
                   </div>
                 )}
               </div>
             </div>
             <div className="assignment-meta">
-              <p><strong>Total words:</strong> {assignmentsDetail?.total_words || 0}</p>
-              <p><strong>Start date:</strong> {assignmentsDetail?.start_date ? format(new Date(assignment.start_date), 'd/M/yyyy') : 'N/A'}</p>
-              <p> <strong>Learner reviewed:</strong> {assignmentsDetail?.reviewed_learner_count || 0}</p>
-              <p><strong>Due date:</strong> {assignmentsDetail?.due_date ? format(new Date(assignment.due_date), 'd/M/yyyy') : 'N/A'}</p>
+              <p>
+                <strong>Total words:</strong>{" "}
+                {assignmentsDetail?.total_words || 0}
+              </p>
+              <p>
+                <strong>Start date:</strong>{" "}
+                {assignmentsDetail?.start_date
+                  ? format(new Date(assignment.start_date), "d/M/yyyy")
+                  : "N/A"}
+              </p>
+              <p>
+                {" "}
+                <strong>Learner reviewed:</strong>{" "}
+                {assignmentsDetail?.reviewed_learner_count || 0}
+              </p>
+              <p>
+                <strong>Due date:</strong>{" "}
+                {assignmentsDetail?.due_date
+                  ? format(new Date(assignment.due_date), "d/M/yyyy")
+                  : "N/A"}
+              </p>
             </div>
           </div>
 
-          <AssignSubMenu/>
+          <AssignSubMenu />
 
           {/* <img src={Line} alt="line" className="line" style={{ width: "100%" }} /> */}
 
