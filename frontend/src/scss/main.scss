@@ -1,19 +1,171 @@
-@use "Fonts" as *;
-@use "./Admin";
-@use "./Auth";
-@use "./Classroom";
-@use "./Components";
-@use "./Review";
-@use "./User";
-@use "./Vocabulary";
-@use "./ErrorBoundary";
+// ====================================================================
+// ALL IMPORTS (must be at the top before any CSS rules)
+// ====================================================================
 
-* {
-  padding: 0 0;
+// 1. Design System Foundation (import order matters for SCSS variables)
+@use "./DesignTokens" as tokens;
+@use "./ComponentTokens" as components;
+@use "./CSSVariables";
+@use "./Fonts" as fonts;
+
+// 2. Component Styles (imported in dependency order)
+@use "./ErrorBoundary";     // Error handling (highest priority)
+@use "./Components";        // Layout & navigation
+@use "./Auth";              // Authentication
+@use "./User";              // User management
+@use "./Vocabulary";        // Core vocabulary features
+@use "./Classroom";         // Classroom management
+@use "./Review";            // Learning & review
+@use "./Admin";             // Administrative interface
+
+// ====================================================================
+// CSS RESET & BASE STYLES
+// ====================================================================
+
+// Modern CSS reset
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+// Base typography and layout
+html {
+  font-size: var(--vb-font-size-base);
+  scroll-behavior: smooth;
 }
 
 body {
-  background: #fffcf7;
-  margin: 0 0;
+  background-color: var(--vb-color-bg-primary);
+  font-family: var(--vb-font-primary);
+  color: var(--vb-color-text-primary);
+  line-height: var(--vb-line-height-base);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+// Remove default styles
+ul, ol { list-style: none; }
+button { border: none; background: none; font: inherit; cursor: pointer; }
+img { max-width: 100%; height: auto; display: block; }
+
+// ====================================================================
+// ACCESSIBILITY & UX ENHANCEMENTS
+// ====================================================================
+
+// Focus styles for better keyboard navigation
+*:focus {
+  outline: 2px solid var(--vb-color-brand-primary);
+  outline-offset: 2px;
+}
+
+// Enhanced focus for interactive elements
+button:focus,
+input:focus,
+textarea:focus,
+select:focus,
+a:focus {
+  outline: 3px solid var(--vb-color-brand-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(53, 45, 36, 0.1);
+}
+
+// Respect user motion preferences
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  :root {
+    --vb-color-border-light: #000000;
+    --vb-elevation-base: 0 0 0 2px #000000;
+  }
+}
+
+// ====================================================================
+// UTILITY CLASSES
+// ====================================================================
+
+// Screen reader only content
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Common state utilities
+.loading {
+  pointer-events: none;
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.error-state {
+  color: var(--vb-color-error-primary);
+  border-color: var(--vb-color-error-primary);
+}
+
+.success-state {
+  color: var(--vb-color-success-primary);
+  border-color: var(--vb-color-success-primary);
+}
+
+// ====================================================================
+// RESPONSIVE DESIGN
+// ====================================================================
+
+// Mobile-first responsive adjustments
+@media (max-width: 767px) {
+  body { font-size: var(--vb-font-size-sm); }
+  h1 { font-size: var(--vb-font-size-2xl); }
+  h2 { font-size: var(--vb-font-size-xl); }
+  h3 { font-size: var(--vb-font-size-lg); }
+}
+
+// ====================================================================
+// PERFORMANCE OPTIMIZATIONS
+// ====================================================================
+
+// Hardware acceleration for animations
+.animate {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+// Print styles - hide non-essential elements
+@media print {
+  .no-print,
+  nav,
+  .sidebar,
+  .header,
+  .footer {
+    display: none !important;
+  }
+  
+  body {
+    color: #000000;
+    background: #ffffff;
+    font-size: 12pt;
+  }
+}
+
+// iOS Safari viewport fix
+@supports (-webkit-touch-callout: none) {
+  .full-height {
+    min-height: -webkit-fill-available;
+  }
 }

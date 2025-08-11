@@ -43,6 +43,23 @@ const adminValidator = {
       .withMessage('Notes must be between 1 and 2000 characters.'),
     handleValidationErrors,
   ],
+
+  getUserById: [
+    param('userId')
+      .isUUID()
+      .withMessage('URL parameter userId must be a valid UUID.'),
+    handleValidationErrors,
+  ],
+
+  banUser: [
+    body('reason')
+      .trim()
+      .escape()
+      .optional()
+      .isLength({ max: 1000 })
+      .withMessage('Ban reason must not exceed 1000 characters.'),
+    handleValidationErrors,
+  ],
 };
 
 module.exports = adminValidator;

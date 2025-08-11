@@ -235,6 +235,54 @@ class AdminModel {
       .select()
       .single();
   }
+
+  // =================================================================
+  //  USER MANAGEMENT MODELS
+  // =================================================================
+
+  async findAllUsers({ from, to, search }) {
+    let query = supabase
+      .from('users')
+      .select(
+        `
+        id,
+        email,
+        display_name,
+        role,
+        account_status,
+        created_at
+      `,
+        { count: 'exact' }
+      )
+      .order('created_at', { ascending: false });
+
+    // Add search functionality
+    if (search && search.trim() !== '') {
+      const searchTerm = `%${search.trim()}%`;
+      query = query.or(`display_name.ilike.${searchTerm},email.ilike.${searchTerm}`);
+    }
+
+    if (from !== null && to !== null) {
+      query = query.range(from, to);
+    }
+
+    const { data: users, error, count } = await query;
+    if (error) return { error };
+
+    return { data: users || [], error: null, count: count || 0 };
+  }
+
+  async updateUserStatus(userId, status, adminId, reason) {
+    return await supabase
+      .from('users')
+      .update({
+        account_status: status,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+  }
 }
 
 module.exports = new AdminModel();

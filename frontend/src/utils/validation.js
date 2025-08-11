@@ -20,7 +20,7 @@ export const validateDisplayName = (displayName) => {
   }
 
   // Check for invalid characters (only letters, numbers, spaces, hyphens, underscores)
-  const validPattern = /^[a-zA-Z0-9\s\-_]+$/;
+  const validPattern = /^[a-zA-Z0-9\s\u00C0-\u1EF9_-]+$/;
   if (!validPattern.test(trimmed)) {
     errors.push(
       "Display name contains invalid characters. Only letters, numbers, spaces, hyphens, and underscores are allowed"

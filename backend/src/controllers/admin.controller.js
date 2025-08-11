@@ -196,6 +196,85 @@ class AdminController {
       return ErrorHandler.handleError(res, error, 'Admin.dismissReport');
     }
   }
+
+  // =================================================================
+  //  USER MANAGEMENT
+  // =================================================================
+
+  async getAllUsers(req, res) {
+    try {
+      const { page, limit, search } = req.query;
+      const result = await adminService.getAllUsers({
+        page,
+        limit,
+        search,
+      });
+
+      return ResponseUtils.success(
+        res,
+        'Users retrieved successfully.',
+        result
+      );
+    } catch (error) {
+      return ErrorHandler.handleError(res, error, 'Admin.getAllUsers');
+    }
+  }
+
+  async banUser(req, res) {
+    try {
+      const { userId } = req.params;
+      const { reason } = req.body;
+      const adminId = req.user.userId;
+
+      const result = await adminService.banUser(userId, adminId, reason);
+
+      return ResponseUtils.success(
+        res,
+        `User '${result.display_name}' has been suspended successfully.`,
+        {
+          userId: result.id,
+          status: result.account_status,
+          bannedBy: adminId,
+          reason,
+        }
+      );
+    } catch (error) {
+      if (error.message.includes('not found')) {
+        return ResponseUtils.notFound(res, error.message);
+      }
+      if (error.message.includes('already suspended')) {
+        return ResponseUtils.badRequest(res, error.message);
+      }
+      return ErrorHandler.handleError(res, error, 'Admin.banUser');
+    }
+  }
+
+  async unbanUser(req, res) {
+    try {
+      const { userId } = req.params;
+      const adminId = req.user.userId;
+
+      const result = await adminService.unbanUser(userId, adminId);
+
+      return ResponseUtils.success(
+        res,
+        `User '${result.display_name}' has been unsuspended successfully.`,
+        {
+          userId: result.id,
+          status: result.account_status,
+          unbannedBy: adminId,
+        }
+      );
+    } catch (error) {
+      if (error.message.includes('not found')) {
+        return ResponseUtils.notFound(res, error.message);
+      }
+      if (error.message.includes('not suspended')) {
+        return ResponseUtils.badRequest(res, error.message);
+      }
+      return ErrorHandler.handleError(res, error, 'Admin.unbanUser');
+    }
+  }
 }
 
 module.exports = new AdminController();

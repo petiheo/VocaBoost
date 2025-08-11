@@ -19,12 +19,6 @@ const adminService = {
     return res.data;
   },
 
-    //3. Approve a Teacher Request
-    approveATeacherRequest: async (requestId) => {
-        const res = await api.put(`/admin/teacher-requests/${requestId}/approve`);
-        return res.data; 
-    },
-
     //4. Reject a Teacher Request
     rejectATeacherRequest: async (requestId) => {
         const res = await api.put(`/admin/teacher-requests/${requestId}/reject`);
@@ -53,6 +47,26 @@ const adminService = {
     dismissAReport: async (reportId, notes = "") => {
         const res = await api.put(`/admin/reports/${reportId}/dismiss`, { notes });
         return res.data; 
+    },
+
+    //9. Get All Users
+    getAllUsers: async (page = 1, limit = 20, search = "") => {
+        const params = new URLSearchParams({ page, limit });
+        if (search) params.append('search', search);
+        const res = await api.get(`/admin/users?${params}`);
+        return res.data;
+    },
+
+    //10. Ban a User
+    banUser: async (userId, reason = "") => {
+        const res = await api.put(`/admin/users/${userId}/ban`, { reason });
+        return res.data;
+    },
+
+    //11. Unban a User
+    unbanUser: async (userId) => {
+        const res = await api.put(`/admin/users/${userId}/unban`);
+        return res.data;
     }
 };
 

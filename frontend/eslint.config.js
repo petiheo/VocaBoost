@@ -84,7 +84,7 @@ export default [
 
       // ES6+
       "arrow-body-style": "off",
-      "prefer-arrow-callback": "warn",
+      "prefer-arrow-callback": "off",
       "prefer-template": "off",
       "no-duplicate-imports": "error",
       "object-shorthand": ["warn", "always"],
@@ -106,13 +106,7 @@ export default [
       "no-promise-executor-return": "error",
 
       // Import sorting (optional but helpful)
-      "sort-imports": [
-        "warn",
-        {
-          ignoreCase: true,
-          ignoreDeclarationSort: true,
-        },
-      ],
+      "sort-imports": "off",
     },
   },
 ];
