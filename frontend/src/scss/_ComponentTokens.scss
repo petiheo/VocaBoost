@@ -1,0 +1,248 @@
+// ====================================================================
+// COMPONENT DESIGN TOKENS
+// ====================================================================
+// Component-specific tokens built on top of base design tokens
+// Import this after _DesignTokens.scss
+
+@use "sass:color";
+@use "DesignTokens" as tokens;
+
+// ====================================================================
+// BUTTON TOKENS
+// ====================================================================
+
+// Primary Button
+$btn-primary-bg: tokens.$color-brand-primary;
+$btn-primary-color: tokens.$color-text-inverse;
+$btn-primary-hover-bg: tokens.$color-brand-primary-light;
+$btn-primary-active-bg: tokens.$color-brand-primary-dark;
+$btn-primary-padding: tokens.$spacing-sm tokens.$spacing-lg;
+$btn-primary-border-radius: tokens.$border-radius-base;
+$btn-primary-transition: tokens.$transition-base;
+$btn-primary-elevation: tokens.$elevation-sm;
+
+// Secondary Button
+$btn-secondary-bg: transparent;
+$btn-secondary-color: tokens.$color-brand-primary;
+$btn-secondary-border: 1px solid tokens.$color-brand-primary;
+$btn-secondary-hover-bg: tokens.$color-brand-primary;
+$btn-secondary-hover-color: tokens.$color-text-inverse;
+
+// AI Button (Special)
+$btn-ai-bg: tokens.$color-accent-orange;
+$btn-ai-color: tokens.$color-text-inverse;
+$btn-ai-hover-bg: color.adjust(tokens.$color-accent-orange, $lightness: -10%);
+$btn-ai-border-radius: tokens.$border-radius-base;
+
+// ====================================================================
+// CARD TOKENS
+// ====================================================================
+
+$card-bg: tokens.$color-bg-tertiary;
+$card-border: 1px solid tokens.$color-border-light;
+$card-border-radius: tokens.$border-radius-lg;
+$card-padding: tokens.$spacing-card-padding;
+$card-elevation: tokens.$elevation-base;
+$card-hover-elevation: tokens.$elevation-md;
+$card-transition: tokens.$transition-base;
+
+// Word Card Specific
+$word-card-selected-border: 2px solid tokens.$color-brand-primary;
+$word-card-selected-bg: color.adjust(tokens.$color-bg-primary, $lightness: 2%);
+
+// Vocabulary List Card
+$vocab-card-bg: tokens.$color-bg-primary;
+$vocab-card-header-bg: tokens.$color-bg-secondary;
+$vocab-card-border-radius: tokens.$border-radius-md;
+
+// ====================================================================
+// FORM TOKENS
+// ====================================================================
+
+// Input Fields
+$input-bg: tokens.$color-bg-input;
+$input-border: 1px solid tokens.$color-border-light;
+$input-border-focus: 2px solid tokens.$color-brand-primary;
+$input-border-radius: tokens.$border-radius-base;
+$input-padding: tokens.$spacing-sm tokens.$spacing-md;
+$input-color: tokens.$color-text-primary;
+$input-placeholder-color: tokens.$color-text-disabled;
+$input-transition: tokens.$transition-base;
+
+// Input Error State
+$input-error-border: 1px solid tokens.$color-error-primary;
+$input-error-bg: tokens.$color-error-bg;
+$input-error-color: tokens.$color-error-secondary;
+
+// Input Success State
+$input-success-border: 1px solid tokens.$color-success-primary;
+$input-success-bg: tokens.$color-success-bg;
+
+// Search Bar
+$searchbar-bg: tokens.$color-bg-tertiary;
+$searchbar-border: 1px solid tokens.$color-border-medium;
+$searchbar-focus-border: tokens.$color-brand-primary;
+$searchbar-icon-color: tokens.$color-text-tertiary;
+
+// ====================================================================
+// NAVIGATION TOKENS
+// ====================================================================
+
+// Header
+$header-bg: tokens.$color-bg-tertiary;
+$header-border-bottom: 1px solid tokens.$color-border-light;
+$header-padding: tokens.$spacing-md tokens.$spacing-lg;
+$header-elevation: tokens.$elevation-sm;
+
+// Sidebar
+$sidebar-bg: tokens.$color-brand-primary;
+$sidebar-color: tokens.$color-text-inverse;
+$sidebar-width: 280px;
+$sidebar-item-hover-bg: tokens.$color-brand-primary-light;
+$sidebar-item-active-bg: tokens.$color-brand-primary-dark;
+$sidebar-item-padding: tokens.$spacing-md;
+
+// Dropdown Menu
+$dropdown-bg: tokens.$color-bg-tertiary;
+$dropdown-border: 1px solid tokens.$color-border-light;
+$dropdown-border-radius: tokens.$border-radius-md;
+$dropdown-elevation: tokens.$elevation-lg;
+$dropdown-item-hover-bg: tokens.$color-bg-primary;
+$dropdown-item-padding: tokens.$spacing-sm tokens.$spacing-md;
+$dropdown-z-index: tokens.$z-index-dropdown;
+
+// ====================================================================
+// MODAL & OVERLAY TOKENS
+// ====================================================================
+
+$modal-overlay-bg: rgba(tokens.$color-brand-primary, tokens.$opacity-overlay);
+$modal-bg: tokens.$color-bg-tertiary;
+$modal-border-radius: tokens.$border-radius-lg;
+$modal-elevation: tokens.$elevation-2xl;
+$modal-padding: tokens.$spacing-2xl;
+$modal-max-width: 600px;
+$modal-z-index: tokens.$z-index-modal;
+
+// Confirm Modal
+$confirm-modal-header-color: tokens.$color-text-primary;
+$confirm-modal-text-color: tokens.$color-text-secondary;
+$confirm-modal-button-gap: tokens.$spacing-md;
+
+// ====================================================================
+// TOAST NOTIFICATION TOKENS
+// ====================================================================
+
+$toast-border-radius: tokens.$border-radius-base;
+$toast-padding: tokens.$spacing-md tokens.$spacing-lg;
+$toast-elevation: tokens.$elevation-toast;
+$toast-z-index: tokens.$z-index-toast;
+$toast-transition: tokens.$transition-base;
+
+// Toast Success
+$toast-success-bg: tokens.$color-success-primary;
+$toast-success-color: tokens.$color-success-bg;
+
+// Toast Error
+$toast-error-bg: tokens.$color-error-primary;
+$toast-error-color: color.adjust(tokens.$color-error-bg, $lightness: 10%);
+
+// Toast Warning
+$toast-warning-bg: tokens.$color-warning-primary;
+$toast-warning-color: tokens.$color-warning-bg;
+
+// Toast Info
+$toast-info-bg: tokens.$color-info-primary;
+$toast-info-color: tokens.$color-info-bg;
+
+// ====================================================================
+// SKELETON LOADING TOKENS
+// ====================================================================
+
+$skeleton-base-color: tokens.$color-border-light;
+$skeleton-highlight-color: tokens.$color-border-medium;
+$skeleton-border-radius: tokens.$border-radius-base;
+$skeleton-animation-duration: 1.5s;
+
+// Skeleton Theme Variants
+$skeleton-classroom-base: #f1ede4;
+$skeleton-classroom-highlight: #e8ddc7;
+$skeleton-cream-base: tokens.$color-bg-primary;
+$skeleton-cream-highlight: #F7F1E3;
+$skeleton-vocab-card-base: #F9F3E4;
+$skeleton-vocab-card-highlight: #F1EBD8;
+
+// ====================================================================
+// TABLE TOKENS
+// ====================================================================
+
+$table-header-bg: tokens.$color-bg-secondary;
+$table-header-color: tokens.$color-text-primary;
+$table-row-hover-bg: tokens.$color-bg-primary;
+$table-border: 1px solid tokens.$color-border-light;
+$table-cell-padding: tokens.$spacing-sm tokens.$spacing-md;
+
+// ====================================================================
+// PAGINATION TOKENS
+// ====================================================================
+
+$pagination-item-bg: tokens.$color-bg-tertiary;
+$pagination-item-color: tokens.$color-text-primary;
+$pagination-item-hover-bg: tokens.$color-bg-primary;
+$pagination-active-bg: tokens.$color-brand-primary;
+$pagination-active-color: tokens.$color-text-inverse;
+$pagination-border: 1px solid tokens.$color-border-light;
+$pagination-border-radius: tokens.$border-radius-base;
+
+// ====================================================================
+// CLASSROOM SPECIFIC TOKENS
+// ====================================================================
+
+// Classroom Card
+$classroom-card-bg: tokens.$color-bg-tertiary;
+$classroom-card-header-bg: tokens.$color-accent-gold;
+$classroom-card-border-radius: tokens.$border-radius-lg;
+$classroom-card-elevation: tokens.$elevation-base;
+
+// Statistics Cards
+$stats-completion-bg: tokens.$color-success-bg;
+$stats-completion-color: tokens.$color-success-primary;
+$stats-performance-bg: tokens.$color-warning-bg;
+$stats-performance-color: tokens.$color-warning-primary;
+$stats-time-bg: tokens.$color-info-bg;
+$stats-time-color: tokens.$color-info-primary;
+
+// ====================================================================
+// REVIEW SYSTEM TOKENS
+// ====================================================================
+
+// Flashcard
+$flashcard-bg: tokens.$color-bg-tertiary;
+$flashcard-border: 2px solid tokens.$color-border-medium;
+$flashcard-border-radius: tokens.$border-radius-xl;
+$flashcard-elevation: tokens.$elevation-md;
+$flashcard-padding: tokens.$spacing-2xl;
+
+// Fill in Blank
+$fill-blank-input-bg: tokens.$color-bg-input;
+$fill-blank-input-border: 2px dashed tokens.$color-border-medium;
+$fill-blank-correct-bg: tokens.$color-success-bg;
+$fill-blank-correct-border: tokens.$color-success-primary;
+$fill-blank-incorrect-bg: tokens.$color-error-bg;
+$fill-blank-incorrect-border: tokens.$color-error-primary;
+
+// ====================================================================
+// STATUS INDICATOR TOKENS
+// ====================================================================
+
+$status-active-bg: tokens.$color-success-primary;
+$status-active-color: tokens.$color-text-inverse;
+$status-pending-bg: tokens.$color-warning-primary;
+$status-pending-color: tokens.$color-text-inverse;
+$status-inactive-bg: tokens.$color-text-disabled;
+$status-inactive-color: tokens.$color-text-inverse;
+
+// Badge tokens
+$badge-border-radius: tokens.$border-radius-full;
+$badge-padding: tokens.$spacing-xs tokens.$spacing-sm;
+$badge-font-size: tokens.$font-size-xs;
+$badge-font-weight: tokens.$font-weight-bold;

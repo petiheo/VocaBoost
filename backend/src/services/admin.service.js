@@ -134,6 +134,94 @@ class AdminService {
 
     return updatedReport;
   }
+
+  // =================================================================
+  //  USER MANAGEMENT
+  // =================================================================
+
+  async getAllUsers({ page = 1, limit = 20, search = '' }) {
+    const pagination = PaginationUtil.validate(page, limit);
+    const from = pagination.offset;
+    const to = pagination.offset + pagination.limit - 1;
+    
+    const { data, error, count } = await adminModel.findAllUsers({
+      from,
+      to,
+      search,
+    });
+
+    if (error) throw error;
+
+    return {
+      users: data,
+      pagination: PaginationUtil.getMetadata(
+        pagination.page,
+        pagination.limit,
+        count
+      ),
+    };
+  }
+
+  async banUser(userId, adminId, reason = '') {
+    // First check if user exists
+    const user = await userModel.findById(userId);
+    if (!user) {
+      throw new Error('User not found.');
+    }
+
+    // Check if user is already suspended
+    if (user.account_status === 'suspended') {
+      throw new Error('User is already suspended.');
+    }
+
+    // Prevent banning other admins
+    if (user.role === 'admin') {
+      throw new Error('Cannot ban an admin user.');
+    }
+
+    // Update user status to suspended (banned)
+    const { data: updatedUser, error } = await adminModel.updateUserStatus(
+      userId,
+      'suspended',
+      adminId,
+      reason
+    );
+    
+    if (error) throw error;
+
+    // Log the ban action
+    logger.info(`User ${userId} banned by admin ${adminId}. Reason: ${reason}`);
+
+    return updatedUser;
+  }
+
+  async unbanUser(userId, adminId) {
+    // First check if user exists
+    const user = await userModel.findById(userId);
+    if (!user) {
+      throw new Error('User not found.');
+    }
+
+    // Check if user is actually suspended
+    if (user.account_status !== 'suspended') {
+      throw new Error('User is not suspended.');
+    }
+
+    // Update user status back to active
+    const { data: updatedUser, error } = await adminModel.updateUserStatus(
+      userId,
+      'active',
+      adminId,
+      'Account unbanned by admin'
+    );
+    
+    if (error) throw error;
+
+    // Log the unban action
+    logger.info(`User ${userId} unbanned by admin ${adminId}`);
+
+    return updatedUser;
+  }
 }
 
 module.exports = new AdminService();

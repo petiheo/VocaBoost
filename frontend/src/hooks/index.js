@@ -15,3 +15,4 @@ export { useEditListManagement } from "./useEditListManagement.js";
 export { useListManagement } from "./useListManagement.js";
 export { default as useClickOutside } from "./useClickOutside.js";
 export { useEmailVerificationRedirect } from "./useEmailVerificationRedirect.js";
+export { useDesignTokens, useColors, useSpacing, useTypography, useComponents, useTheme } from "./useDesignTokens.js";

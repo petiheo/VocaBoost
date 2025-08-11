@@ -24,6 +24,8 @@ import {
 } from "../../assets/icons/index";
 import { useEffect } from "react";
 import { useToast } from "../../components/Providers/ToastProvider";
+import { useAuth } from "../../services/Auth/authContext";
+import { getGetStartedRoute } from "../../utils/navigationUtils";
 
 const patterns = {
   1: Pattern1,
@@ -52,6 +54,8 @@ const Group = {
 
 export default function MainPage() {
   const showToast = useToast();
+  const { user } = useAuth();
+  const getStartedRoute = getGetStartedRoute(user);
 
   // Check for logout notifications on component mount (fallback for users landing on mainpage)
   useEffect(() => {
@@ -113,7 +117,7 @@ export default function MainPage() {
             exercises, and word associations to help you remember words faster
             and longer.
           </p>
-          <Link to="/signup" className="get-started">
+          <Link to={getStartedRoute} className="get-started">
             Get started
           </Link>
         </div>
@@ -195,7 +199,7 @@ export default function MainPage() {
 
       <div className="ready-to-start">
         <div className="so-you-ready-to-start">So you ready to start?</div>
-        <Link to="/signup" className="get-started">
+        <Link to={getStartedRoute} className="get-started">
           Get started
         </Link>
       </div>

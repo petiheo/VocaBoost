@@ -1,0 +1,202 @@
+// ====================================================================
+// CSS CUSTOM PROPERTIES (CSS Variables)
+// ====================================================================
+// Runtime-accessible design tokens for dynamic theming
+// These can be modified via JavaScript for theme switching
+
+:root {
+  // ====================================================================
+  // COLOR VARIABLES
+  // ====================================================================
+  
+  // Primary Brand Colors
+  --vb-color-brand-primary: #352d24;
+  --vb-color-brand-primary-light: #2a1e17;
+  --vb-color-brand-primary-dark: #1e150f;
+
+  // Background Colors
+  --vb-color-bg-primary: #fffcf7;
+  --vb-color-bg-secondary: #fdfaf5;
+  --vb-color-bg-tertiary: #fff;
+  --vb-color-bg-card: #f2f2f2;
+  --vb-color-bg-input: #fff4f4;
+
+  // Text Colors
+  --vb-color-text-primary: #352d24;
+  --vb-color-text-secondary: #2a1e17;
+  --vb-color-text-tertiary: #757575;
+  --vb-color-text-disabled: #999;
+  --vb-color-text-inverse: #fff3df;
+
+  // Accent Colors
+  --vb-color-accent-yellow: #ffeab6;
+  --vb-color-accent-orange: #d5962c;
+  --vb-color-accent-gold: #f7d99d;
+
+  // Status Colors
+  --vb-color-success-primary: #3bc042;
+  --vb-color-success-bg: #e0ffe1;
+  --vb-color-error-primary: #c03b3b;
+  --vb-color-error-secondary: #a30000;
+  --vb-color-error-bg: #ffe5e5;
+  --vb-color-warning-primary: #f59e0b;
+  --vb-color-warning-bg: #fef3c7;
+  --vb-color-info-primary: #352d24;
+  --vb-color-info-bg: #fff3df;
+
+  // Border Colors
+  --vb-color-border-light: #eee;
+  --vb-color-border-medium: #e2e2e2;
+  --vb-color-border-dark: #ccc;
+
+  // ====================================================================
+  // SPACING VARIABLES
+  // ====================================================================
+  
+  --vb-spacing-xs: 0.25rem;    // 4px
+  --vb-spacing-sm: 0.5rem;     // 8px
+  --vb-spacing-md: 1rem;       // 16px
+  --vb-spacing-lg: 1.5rem;     // 24px
+  --vb-spacing-xl: 2rem;       // 32px
+  --vb-spacing-2xl: 3rem;      // 48px
+  --vb-spacing-3xl: 4rem;      // 64px
+
+  // ====================================================================
+  // TYPOGRAPHY VARIABLES
+  // ====================================================================
+  
+  --vb-font-primary: "Inria Sans", sans-serif;
+  --vb-font-display: "Lalezar", sans-serif;
+  --vb-font-body: "Jost", sans-serif;
+  --vb-font-ui: "Inter", sans-serif;
+
+  --vb-font-size-xs: 0.75rem;     // 12px
+  --vb-font-size-sm: 0.875rem;    // 14px
+  --vb-font-size-base: 1rem;      // 16px
+  --vb-font-size-lg: 1.125rem;    // 18px
+  --vb-font-size-xl: 1.25rem;     // 20px
+  --vb-font-size-2xl: 1.5rem;     // 24px
+
+  --vb-font-weight-normal: 400;
+  --vb-font-weight-medium: 500;
+  --vb-font-weight-semibold: 600;
+  --vb-font-weight-bold: 700;
+
+  --vb-line-height-tight: 1.25;
+  --vb-line-height-base: 1.5;
+  --vb-line-height-relaxed: 1.75;
+
+  // ====================================================================
+  // BORDER RADIUS VARIABLES
+  // ====================================================================
+  
+  --vb-border-radius-sm: 0.125rem;    // 2px
+  --vb-border-radius-base: 0.25rem;   // 4px
+  --vb-border-radius-md: 0.375rem;    // 6px
+  --vb-border-radius-lg: 0.5rem;      // 8px
+  --vb-border-radius-xl: 1rem;        // 16px
+  --vb-border-radius-full: 50%;
+
+  // ====================================================================
+  // ELEVATION VARIABLES
+  // ====================================================================
+  
+  --vb-elevation-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --vb-elevation-base: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --vb-elevation-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --vb-elevation-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --vb-elevation-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  --vb-elevation-toast: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  // ====================================================================
+  // TRANSITION VARIABLES
+  // ====================================================================
+  
+  --vb-transition-fast: 0.15s ease-in-out;
+  --vb-transition-base: 0.2s ease-in-out;
+  --vb-transition-slow: 0.3s ease-in-out;
+
+  // ====================================================================
+  // Z-INDEX VARIABLES
+  // ====================================================================
+  
+  --vb-z-index-dropdown: 10;
+  --vb-z-index-header: 100;
+  --vb-z-index-overlay: 1000;
+  --vb-z-index-modal: 10000;
+  --vb-z-index-toast: 11000;
+
+  // ====================================================================
+  // COMPONENT-SPECIFIC VARIABLES
+  // ====================================================================
+  
+  // Button Variables
+  --vb-btn-padding: var(--vb-spacing-sm) var(--vb-spacing-lg);
+  --vb-btn-border-radius: var(--vb-border-radius-base);
+  --vb-btn-transition: var(--vb-transition-base);
+
+  // Card Variables
+  --vb-card-padding: var(--vb-spacing-lg);
+  --vb-card-border-radius: var(--vb-border-radius-lg);
+  --vb-card-elevation: var(--vb-elevation-base);
+
+  // Input Variables
+  --vb-input-padding: var(--vb-spacing-sm) var(--vb-spacing-md);
+  --vb-input-border-radius: var(--vb-border-radius-base);
+  --vb-input-transition: var(--vb-transition-base);
+}
+
+// ====================================================================
+// DARK THEME VARIABLES (Future Enhancement)
+// ====================================================================
+
+[data-theme="dark"] {
+  // Dark theme overrides would go here
+  --vb-color-bg-primary: #1a1a1a;
+  --vb-color-bg-secondary: #2d2d2d;
+  --vb-color-bg-tertiary: #383838;
+  --vb-color-text-primary: #ffffff;
+  --vb-color-text-secondary: #e0e0e0;
+  --vb-color-text-tertiary: #b0b0b0;
+}
+
+// ====================================================================
+// HIGH CONTRAST THEME VARIABLES (Accessibility)
+// ====================================================================
+
+[data-theme="high-contrast"] {
+  --vb-color-text-primary: #000000;
+  --vb-color-bg-primary: #ffffff;
+  --vb-color-border-light: #000000;
+  --vb-color-border-medium: #000000;
+  --vb-elevation-base: 0 0 0 2px #000000;
+}
+
+// ====================================================================
+// UTILITY CLASSES FOR CSS VARIABLES
+// ====================================================================
+
+// Color utilities
+.vb-bg-primary { background-color: var(--vb-color-bg-primary); }
+.vb-bg-secondary { background-color: var(--vb-color-bg-secondary); }
+.vb-text-primary { color: var(--vb-color-text-primary); }
+.vb-text-secondary { color: var(--vb-color-text-secondary); }
+.vb-text-muted { color: var(--vb-color-text-tertiary); }
+
+// Spacing utilities
+.vb-p-sm { padding: var(--vb-spacing-sm); }
+.vb-p-md { padding: var(--vb-spacing-md); }
+.vb-p-lg { padding: var(--vb-spacing-lg); }
+.vb-m-sm { margin: var(--vb-spacing-sm); }
+.vb-m-md { margin: var(--vb-spacing-md); }
+.vb-m-lg { margin: var(--vb-spacing-lg); }
+
+// Border radius utilities
+.vb-rounded-sm { border-radius: var(--vb-border-radius-sm); }
+.vb-rounded { border-radius: var(--vb-border-radius-base); }
+.vb-rounded-lg { border-radius: var(--vb-border-radius-lg); }
+
+// Elevation utilities
+.vb-elevation-sm { box-shadow: var(--vb-elevation-sm); }
+.vb-elevation-md { box-shadow: var(--vb-elevation-md); }
+.vb-elevation-lg { box-shadow: var(--vb-elevation-lg); }

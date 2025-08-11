@@ -3,6 +3,7 @@ import { UploadPattern } from "../../assets/icons";
 import { useEffect, useState } from "react";
 import adminService from "../../services/Admin/adminService";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 // Component giờ đây chỉ dùng để hiển thị thông tin
 export default function TeacherInformationDisplay() {
@@ -12,6 +13,8 @@ export default function TeacherInformationDisplay() {
   });
 
   const [teacherInformation, setTeacherInformation] = useState([]);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -100,20 +103,28 @@ export default function TeacherInformationDisplay() {
                 Verification Document:
               </label>
 
-              <div className="teacher-verification__upload-box">
-                <div
-                  className="teacher-verification__preview"
-                  style={{ display: "block" }}
-                >
-                  <a
-                    href={teacherInformation.request?.credentials_url}
-                    target="_blank"
-                  >
-                    <img
-                      src={teacherInformation.request?.credentials_url}
-                      alt="Preview"
-                    />
-                  </a>
+              <div className="credential-document">
+                <div className="document-viewer">
+                  <img
+                    src={teacherInformation.request?.credentials_url}
+                    alt="Teacher Credential Document"
+                    className="credential-image"
+                    onClick={() => {
+                      setModalImageUrl(teacherInformation.request?.credentials_url);
+                      setShowImageModal(true);
+                    }}
+                  />
+                  <div className="view-actions">
+                    <button 
+                      className="view-btn"
+                      onClick={() => {
+                        setModalImageUrl(teacherInformation.request?.credentials_url);
+                        setShowImageModal(true);
+                      }}
+                    >
+                      View Full Size
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -141,6 +152,25 @@ export default function TeacherInformationDisplay() {
           </div>
         </div>
       </div>
+
+      {/* Clean Modal */}
+      {showImageModal && (
+        <div className="modal-backdrop" onClick={() => setShowImageModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="close-btn"
+              onClick={() => setShowImageModal(false)}
+            >
+              ×
+            </button>
+            <img 
+              src={modalImageUrl} 
+              alt="Teacher Credential Document" 
+              className="full-image"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

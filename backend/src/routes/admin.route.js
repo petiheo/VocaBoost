@@ -53,4 +53,20 @@ adminRouter.put(
   adminController.dismissReport
 );
 
+// User management routes
+adminRouter.get('/users', adminController.getAllUsers);
+
+adminRouter.put(
+  '/users/:userId/ban',
+  ...adminValidator.getUserById,
+  ...adminValidator.banUser,
+  adminController.banUser
+);
+
+adminRouter.put(
+  '/users/:userId/unban',
+  ...adminValidator.getUserById,
+  adminController.unbanUser
+);
+
 module.exports = adminRouter;

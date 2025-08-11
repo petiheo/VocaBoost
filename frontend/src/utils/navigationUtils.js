@@ -68,3 +68,31 @@ export const canAccessAdminRoutes = (user) => {
 export const hasTeacherPrivileges = (user) => {
   return user?.role === "teacher" || user?.role === "admin";
 };
+
+/**
+ * Get the appropriate route for "Get started" button based on user login status and role
+ * @param {Object} user - User object (null if not logged in)
+ * @returns {string} - Route path
+ */
+export const getGetStartedRoute = (user) => {
+  if (!user) {
+    return '/signup'; // Not logged in, go to signup
+  }
+
+  // If user is logged in, redirect based on role
+  return getDefaultRouteByRole(user.role);
+};
+
+/**
+ * Get the appropriate route for logo click based on user login status and role
+ * @param {Object} user - User object (null if not logged in)
+ * @returns {string} - Route path
+ */
+export const getLogoRoute = (user) => {
+  if (!user) {
+    return '/'; // Not logged in, go to landing page
+  }
+
+  // If user is logged in, redirect based on role
+  return getDefaultRouteByRole(user.role);
+};
